@@ -130,6 +130,16 @@ export interface CreateUserDto {
   firstName?: string;
   lastName?: string;
   phone?: string;
+  dateOfBirth?: Date | string;
+  gender?: Gender;
+  isCompany?: boolean;
+  companyName?: string;
+  companyId?: string; // IČO
+  companyTaxId?: string; // DIČ
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
 }
 
 export interface LoginDto {

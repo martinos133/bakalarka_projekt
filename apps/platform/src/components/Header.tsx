@@ -1,11 +1,43 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { isAuthenticated, getAuthUser, logout } from '@/lib/auth'
+import { User, LogOut, ChevronDown } from 'lucide-react'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [mounted, setMounted] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [showUserMenu, setShowUserMenu] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    if (isAuthenticated()) {
+      setUser(getAuthUser())
+    }
+  }, [])
+
+  const handleLogout = () => {
+    logout()
+    setUser(null)
+    setShowUserMenu(false)
+  }
+
+  // Re-check authentication when component mounts or when navigating
+  useEffect(() => {
+    const checkAuth = () => {
+      if (isAuthenticated()) {
+        setUser(getAuthUser())
+      } else {
+        setUser(null)
+      }
+    }
+    checkAuth()
+    window.addEventListener('storage', checkAuth)
+    return () => window.removeEventListener('storage', checkAuth)
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -122,34 +154,122 @@ export default function Header() {
             >
               Stať sa predajcom
             </Link>
-            <Link
-              href="/signin"
-              className="text-gray-900 hover:text-[#1dbf73] transition-colors text-sm font-medium"
-            >
-              Prihlásiť sa
-            </Link>
-            <Link
-              href="/join"
-              className="px-4 py-2 bg-[#1dbf73] text-white rounded-md hover:bg-[#19a463] transition-colors font-medium text-sm"
-            >
-              Registrovať sa
-            </Link>
+            {mounted && user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-[#1dbf73] flex items-center justify-center text-white font-semibold text-sm">
+                    {user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">
+                    {user.firstName || user.email.split('@')[0]}
+                  </span>
+                  <ChevronDown className="w-4 h-4 text-gray-600" />
+                </button>
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-semibold text-gray-900">
+                        {user.firstName && user.lastName 
+                          ? `${user.firstName} ${user.lastName}`
+                          : user.firstName || user.email.split('@')[0]}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    </div>
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <User className="w-4 h-4" />
+                      Môj profil
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Odhlásiť sa
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/signin"
+                  className="text-gray-900 hover:text-[#1dbf73] transition-colors text-sm font-medium"
+                >
+                  Prihlásiť sa
+                </Link>
+                <Link
+                  href="/join"
+                  className="px-4 py-2 bg-[#1dbf73] text-white rounded-md hover:bg-[#19a463] transition-colors font-medium text-sm"
+                >
+                  Registrovať sa
+                </Link>
+              </>
+            )}
           </nav>
 
           {/* Mobile menu button - Sign in/Join */}
           <div className="flex lg:hidden items-center gap-3">
-            <Link
-              href="/signin"
-              className="text-gray-900 text-sm"
-            >
-              Prihlásiť sa
-            </Link>
-            <Link
-              href="/join"
-              className="px-3 py-1.5 border-2 border-blue-500 text-blue-500 rounded-md text-sm font-medium"
-            >
-              Registrovať sa
-            </Link>
+            {mounted && user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2"
+                >
+                  <div className="w-8 h-8 rounded-full bg-[#1dbf73] flex items-center justify-center text-white font-semibold text-sm">
+                    {user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                  </div>
+                </button>
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-semibold text-gray-900">
+                        {user.firstName && user.lastName 
+                          ? `${user.firstName} ${user.lastName}`
+                          : user.firstName || user.email.split('@')[0]}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    </div>
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <User className="w-4 h-4" />
+                      Môj profil
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Odhlásiť sa
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/signin"
+                  className="text-gray-900 text-sm"
+                >
+                  Prihlásiť sa
+                </Link>
+                <Link
+                  href="/join"
+                  className="px-3 py-1.5 border-2 border-blue-500 text-blue-500 rounded-md text-sm font-medium"
+                >
+                  Registrovať sa
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -159,7 +279,7 @@ export default function Header() {
         <div className="lg:hidden border-t border-gray-200 bg-white">
           <div className="px-4 py-4 space-y-3">
             <button className="flex items-center justify-between w-full text-gray-900">
-              Fiverr Pro
+              RentMe Pro
               <svg
                 className="w-4 h-4"
                 fill="none"
@@ -175,7 +295,7 @@ export default function Header() {
               </svg>
             </button>
             <button className="flex items-center justify-between w-full text-gray-900">
-              Explore
+              Preskúmať
               <svg
                 className="w-4 h-4"
                 fill="none"
@@ -198,6 +318,14 @@ export default function Header() {
             </Link>
           </div>
         </div>
+      )}
+
+      {/* Click outside to close user menu */}
+      {showUserMenu && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setShowUserMenu(false)}
+        />
       )}
     </header>
   )
