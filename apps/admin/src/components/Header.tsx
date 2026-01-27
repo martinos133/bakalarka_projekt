@@ -1,14 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
 import { getAuthUser } from '@/lib/auth'
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState('')
-  const user = getAuthUser()
+  const [user, setUser] = useState<any>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    setUser(getAuthUser())
+  }, [])
 
   const getInitials = (firstName?: string, lastName?: string) => {
+    if (!mounted) return 'A'
     const first = firstName?.charAt(0) || ''
     const last = lastName?.charAt(0) || ''
     return (first + last).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'A'

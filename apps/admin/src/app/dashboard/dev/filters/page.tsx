@@ -7,7 +7,7 @@ import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { Filter, Category, FilterType } from '@inzertna-platforma/shared'
-import { Plus, Edit, Trash2, X, Save, Filter as FilterIcon, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Edit, Trash2, X, Save, Filter as FilterIcon, ChevronDown, ChevronUp, Search } from 'lucide-react'
 
 export default function DevFiltersPage() {
   const router = useRouter()
@@ -18,6 +18,12 @@ export default function DevFiltersPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('')
   const [optionsInput, setOptionsInput] = useState('')
+  const [searchFilters, setSearchFilters] = useState({
+    search: '',
+    type: '' as '' | FilterType,
+    isActive: '' as '' | 'active' | 'inactive',
+    isRequired: '' as '' | 'required' | 'optional',
+  })
   const [formData, setFormData] = useState<{
     name: string
     type: FilterType
@@ -199,9 +205,34 @@ export default function DevFiltersPage() {
     return labels[type] || type
   }
 
-  const filteredFilters = selectedCategoryId
-    ? filters.filter(f => f.categoryId === selectedCategoryId)
-    : filters
+  const filteredFilters = filters.filter((filter) => {
+    // Kategória (existujúci filter)
+    if (selectedCategoryId && filter.categoryId !== selectedCategoryId) return false
+
+    // Vyhľadávanie
+    if (searchFilters.search) {
+      const searchLower = searchFilters.search.toLowerCase()
+      const matchesSearch =
+        filter.name.toLowerCase().includes(searchLower) ||
+        filter.description?.toLowerCase().includes(searchLower) ||
+        (filter.category as any)?.name?.toLowerCase().includes(searchLower)
+      
+      if (!matchesSearch) return false
+    }
+
+    // Typ filtru
+    if (searchFilters.type && filter.type !== searchFilters.type) return false
+
+    // Status
+    if (searchFilters.isActive === 'active' && !filter.isActive) return false
+    if (searchFilters.isActive === 'inactive' && filter.isActive) return false
+
+    // Povinný/voliteľný
+    if (searchFilters.isRequired === 'required' && !filter.isRequired) return false
+    if (searchFilters.isRequired === 'optional' && filter.isRequired) return false
+
+    return true
+  })
 
   return (
     <div className="min-h-screen bg-dark text-white flex">
@@ -209,21 +240,99 @@ export default function DevFiltersPage() {
       <div className="flex-1 ml-64">
         <Header />
         <main className="p-6">
-          <div className="mb-6 flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <select
-                value={selectedCategoryId}
-                onChange={(e) => setSelectedCategoryId(e.target.value)}
-                className="bg-card border border-dark rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-              >
-                <option value="">Všetky kategórie</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+          {/* Filtre */}
+          <div className="bg-card rounded-lg p-4 border border-dark mb-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <FilterIcon className="w-5 h-5 text-gray-400" />
+              <h3 className="text-sm font-semibold text-gray-300">Filtre</h3>
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div>
+                <label className="block text-xs text-gray-400 mb-2">Vyhľadávanie</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchFilters.search}
+                    onChange={(e) => setSearchFilters({ ...searchFilters, search: e.target.value })}
+                    placeholder="Názov, popis..."
+                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover text-sm"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-2">Kategória</label>
+                <select
+                  value={selectedCategoryId}
+                  onChange={(e) => setSelectedCategoryId(e.target.value)}
+                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                >
+                  <option value="">Všetky</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-2">Typ filtru</label>
+                <select
+                  value={searchFilters.type}
+                  onChange={(e) => setSearchFilters({ ...searchFilters, type: e.target.value as '' | FilterType })}
+                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                >
+                  <option value="">Všetky</option>
+                  <option value="TEXT">Text</option>
+                  <option value="NUMBER">Číslo</option>
+                  <option value="SELECT">Výber (jedna)</option>
+                  <option value="MULTISELECT">Výber (viacero)</option>
+                  <option value="BOOLEAN">Áno/Nie</option>
+                  <option value="DATE">Dátum</option>
+                  <option value="RANGE">Rozsah</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-2">Status</label>
+                <select
+                  value={searchFilters.isActive}
+                  onChange={(e) => setSearchFilters({ ...searchFilters, isActive: e.target.value as '' | 'active' | 'inactive' })}
+                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                >
+                  <option value="">Všetky</option>
+                  <option value="active">Aktívne</option>
+                  <option value="inactive">Neaktívne</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-2">Povinnosť</label>
+                <select
+                  value={searchFilters.isRequired}
+                  onChange={(e) => setSearchFilters({ ...searchFilters, isRequired: e.target.value as '' | 'required' | 'optional' })}
+                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                >
+                  <option value="">Všetky</option>
+                  <option value="required">Povinné</option>
+                  <option value="optional">Voliteľné</option>
+                </select>
+              </div>
+            </div>
+            {(searchFilters.search || searchFilters.type || searchFilters.isActive || searchFilters.isRequired || selectedCategoryId) && (
+              <div className="mt-4 flex items-center justify-end">
+                <button
+                  onClick={() => {
+                    setSearchFilters({ search: '', type: '' as FilterType, isActive: '', isRequired: '' })
+                    setSelectedCategoryId('')
+                  }}
+                  className="text-sm text-gray-400 hover:text-white transition-colors"
+                >
+                  Vymazať filtre
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="mb-6 flex items-center justify-end">
             {!showForm && (
               <button
                 onClick={() => setShowForm(true)}
@@ -410,15 +519,24 @@ export default function DevFiltersPage() {
             ) : filteredFilters.length === 0 ? (
               <div className="p-6 text-center text-gray-400">
                 <FilterIcon className="w-12 h-12 mx-auto mb-4 text-gray-500" />
-                <p>Žiadne filtre</p>
+                <p>
+                  {filters.length === 0 
+                    ? 'Žiadne filtre' 
+                    : 'Žiadne filtre nezodpovedajú filtrom'}
+                </p>
                 <p className="text-sm text-gray-500 mt-2">
-                  {selectedCategoryId
-                    ? 'Vytvorte prvý filter pre túto kategóriu'
-                    : 'Vyberte kategóriu alebo vytvorte filter'}
+                  {filters.length === 0
+                    ? (selectedCategoryId
+                        ? 'Vytvorte prvý filter pre túto kategóriu'
+                        : 'Vyberte kategóriu alebo vytvorte filter')
+                    : `Skúste zmeniť filtre (celkom: ${filters.length})`}
                 </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
+                <div className="px-6 py-3 bg-dark border-b border-card text-sm text-gray-400">
+                  Zobrazených: {filteredFilters.length} z {filters.length} filtrov
+                </div>
                 <table className="w-full">
                   <thead className="bg-dark border-b border-card">
                     <tr>
