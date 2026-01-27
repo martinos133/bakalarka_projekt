@@ -89,6 +89,29 @@ export const api = {
       body: JSON.stringify(data),
     }),
   getUserStats: (id: string) => fetchWithAuth(`/users/${id}/stats`),
+  getPendingAdvertisements: () => fetchWithAuth('/advertisements/pending/all'),
+  approveAdvertisement: (id: string) =>
+    fetchWithAuth(`/advertisements/${id}/approve`, {
+      method: 'PATCH',
+    }),
+  rejectAdvertisement: (id: string, reason?: string) =>
+    fetchWithAuth(`/advertisements/${id}/reject`, {
+      method: 'PATCH',
+      body: JSON.stringify({ reason }),
+    }),
+  getPendingReports: () => fetchWithAuth('/reports/pending'),
+  getAllReports: () => fetchWithAuth('/reports'),
+  getReport: (id: string) => fetchWithAuth(`/reports/${id}`),
+  resolveReport: (id: string, data: any) =>
+    fetchWithAuth(`/reports/${id}/resolve`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  deleteReportedAdvertisement: (advertisementId: string, reportId: string) =>
+    fetchWithAuth(`/reports/advertisement/${advertisementId}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ reportId }),
+    }),
 }
 
 export default api

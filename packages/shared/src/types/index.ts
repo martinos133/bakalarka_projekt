@@ -10,6 +10,7 @@ export enum Gender {
 }
 
 export enum AdvertisementStatus {
+  PENDING = 'PENDING',
   DRAFT = 'DRAFT',
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
@@ -173,6 +174,48 @@ export enum PaymentStatus {
   FAILED = 'FAILED',
   CANCELLED = 'CANCELLED',
   REFUNDED = 'REFUNDED',
+}
+
+export enum ReportStatus {
+  PENDING = 'PENDING',
+  RESOLVED = 'RESOLVED',
+  DISMISSED = 'DISMISSED',
+}
+
+export enum ReportReason {
+  SPAM = 'SPAM',
+  INAPPROPRIATE = 'INAPPROPRIATE',
+  FAKE = 'FAKE',
+  SCAM = 'SCAM',
+  COPYRIGHT = 'COPYRIGHT',
+  OTHER = 'OTHER',
+}
+
+export interface Report {
+  id: string;
+  advertisementId: string;
+  reporterId: string;
+  reason: ReportReason;
+  description?: string;
+  status: ReportStatus;
+  resolvedBy?: string;
+  resolvedAt?: Date;
+  resolutionNote?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  advertisement?: Advertisement;
+  reporter?: User;
+}
+
+export interface CreateReportDto {
+  advertisementId: string;
+  reason: ReportReason;
+  description?: string;
+}
+
+export interface ResolveReportDto {
+  status: ReportStatus;
+  resolutionNote?: string;
 }
 
 export interface Payment {

@@ -16,6 +16,7 @@ enum UserRole {
 }
 
 enum AdvertisementStatus {
+  PENDING
   DRAFT
   ACTIVE
   INACTIVE
@@ -55,6 +56,7 @@ model User {
   advertisements Advertisement[]
   paymentsReceived Payment[] @relation("Owner")
   paymentsMade Payment[]     @relation("Renter")
+  reports        Report[]    @relation("Reports")
   
   @@index([banned])
   @@index([bannedUntil])
@@ -121,7 +123,7 @@ model Advertisement {
   title       String
   description String             @db.Text
   price       Float?
-  status      AdvertisementStatus @default(DRAFT)
+  status      AdvertisementStatus @default(PENDING)
   categoryId  String?
   category    Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   location    String?
@@ -131,6 +133,7 @@ model Advertisement {
   userId      String
   user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   payments    Payment[]          @relation("AdvertisementOwner")
+  reports     Report[]
   
   @@index([userId])
   @@index([status])
@@ -158,4 +161,40 @@ model Payment {
   @@index([renterId])
   @@index([ownerId])
   @@index([status])
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  DISMISSED
+}
+
+enum ReportReason {
+  SPAM
+  INAPPROPRIATE
+  FAKE
+  SCAM
+  COPYRIGHT
+  OTHER
+}
+
+model Report {
+  id              String         @id @default(uuid())
+  advertisementId String
+  advertisement   Advertisement  @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+  reporterId      String
+  reporter        User           @relation("Reports", fields: [reporterId], references: [id], onDelete: Cascade)
+  reason          ReportReason
+  description     String?        @db.Text
+  status          ReportStatus   @default(PENDING)
+  resolvedBy      String?        // Admin ID
+  resolvedAt      DateTime?
+  resolutionNote  String?        @db.Text
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  @@index([advertisementId])
+  @@index([reporterId])
+  @@index([status])
+  @@index([createdAt])
 }

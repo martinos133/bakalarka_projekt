@@ -103,4 +103,93 @@ export class AdvertisementsService {
       },
     });
   }
+
+  async findPending() {
+    return prisma.advertisement.findMany({
+      where: {
+        status: 'PENDING',
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+        category: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+  }
+
+  async approve(id: string) {
+    const advertisement = await prisma.advertisement.findUnique({
+      where: { id },
+    });
+
+    if (!advertisement) {
+      throw new NotFoundException('Inzerát nebol nájdený');
+    }
+
+    if (advertisement.status !== 'PENDING') {
+      throw new ForbiddenException('Inzerát už bol spracovaný');
+    }
+
+    return prisma.advertisement.update({
+      where: { id },
+      data: {
+        status: 'ACTIVE',
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+        category: true,
+      },
+    });
+  }
+
+  async reject(id: string, reason?: string) {
+    const advertisement = await prisma.advertisement.findUnique({
+      where: { id },
+    });
+
+    if (!advertisement) {
+      throw new NotFoundException('Inzerát nebol nájdený');
+    }
+
+    if (advertisement.status !== 'PENDING') {
+      throw new ForbiddenException('Inzerát už bol spracovaný');
+    }
+
+    return prisma.advertisement.update({
+      where: { id },
+      data: {
+        status: 'INACTIVE',
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+        category: true,
+      },
+    });
+  }
 }

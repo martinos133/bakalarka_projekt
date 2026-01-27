@@ -12,6 +12,8 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AdvertisementsService } from './advertisements.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { CreateAdvertisementDto, UpdateAdvertisementDto } from '@inzertna-platforma/shared';
 
 @ApiTags('advertisements')
@@ -59,5 +61,32 @@ export class AdvertisementsController {
   @ApiOperation({ summary: 'Odstránenie inzerátu' })
   remove(@Request() req, @Param('id') id: string) {
     return this.advertisementsService.remove(id, req.user.userId);
+  }
+
+  @Get('pending/all')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Získanie všetkých čakajúcich inzerátov (len admin)' })
+  findPending() {
+    return this.advertisementsService.findPending();
+  }
+
+  @Patch(':id/approve')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Schválenie inzerátu (len admin)' })
+  approve(@Param('id') id: string) {
+    return this.advertisementsService.approve(id);
+  }
+
+  @Patch(':id/reject')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Zamietnutie inzerátu (len admin)' })
+  reject(@Param('id') id: string, @Body() body?: { reason?: string }) {
+    return this.advertisementsService.reject(id, body?.reason);
   }
 }
