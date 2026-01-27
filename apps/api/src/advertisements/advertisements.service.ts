@@ -26,6 +26,7 @@ export class AdvertisementsService {
             phone: true,
           },
         },
+        category: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -46,6 +47,7 @@ export class AdvertisementsService {
             phone: true,
           },
         },
+        category: true,
       },
     });
 

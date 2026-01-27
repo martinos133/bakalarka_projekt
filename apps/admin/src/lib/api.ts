@@ -43,6 +43,24 @@ export const api = {
     }),
   getAdvertisement: (id: string) =>
     fetchWithAuth(`/advertisements/${id}`),
+  getCategories: () => fetchWithAuth('/categories'),
+  getActiveCategories: () => fetchWithAuth('/categories/active'),
+  createCategory: (data: any) =>
+    fetchWithAuth('/categories', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateCategory: (id: string, data: any) =>
+    fetchWithAuth(`/categories/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  deleteCategory: (id: string) =>
+    fetchWithAuth(`/categories/${id}`, {
+      method: 'DELETE',
+    }),
+  getCategory: (id: string) =>
+    fetchWithAuth(`/categories/${id}`),
 }
 
 export default api

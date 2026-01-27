@@ -47,7 +47,7 @@ export interface CreateAdvertisementDto {
   title: string;
   description: string;
   price?: number;
-  category?: string;
+  categoryId?: string;
   location?: string;
   images?: string[];
 }
@@ -67,4 +67,31 @@ export interface CreateUserDto {
 export interface LoginDto {
   email: string;
   password: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  _count?: {
+    advertisements: number;
+  };
+}
+
+export interface CreateCategoryDto {
+  name: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateCategoryDto extends Partial<CreateCategoryDto> {
+  isActive?: boolean;
 }

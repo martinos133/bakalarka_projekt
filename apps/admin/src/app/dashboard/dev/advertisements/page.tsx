@@ -6,7 +6,7 @@ import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
-import { Advertisement, AdvertisementStatus, CreateAdvertisementDto } from '@inzertna-platforma/shared'
+import { Advertisement, AdvertisementStatus, CreateAdvertisementDto, Category } from '@inzertna-platforma/shared'
 import { Plus, Edit, Trash2, X, Save, Image as ImageIcon } from 'lucide-react'
 
 export default function DevAdvertisementsPage() {
@@ -15,15 +15,13 @@ export default function DevAdvertisementsPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [categories, setCategories] = useState<string[]>([])
-  const [newCategory, setNewCategory] = useState('')
-  const [showNewCategory, setShowNewCategory] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
   
   const [formData, setFormData] = useState<CreateAdvertisementDto & { status?: AdvertisementStatus }>({
     title: '',
     description: '',
     price: undefined,
-    category: '',
+    categoryId: '',
     location: '',
     images: [],
     status: AdvertisementStatus.DRAFT,
@@ -42,18 +40,27 @@ export default function DevAdvertisementsPage() {
       setLoading(true)
       const data = await api.getAdvertisements()
       setAdvertisements(data)
-      
-      // Extrahuj unikátne kategórie z inzerátov
-      const uniqueCategories = Array.from(
-        new Set(data.map((ad: Advertisement) => ad.category).filter(Boolean))
-      ) as string[]
-      setCategories(uniqueCategories)
     } catch (error) {
       console.error('Chyba pri načítaní inzerátov:', error)
     } finally {
       setLoading(false)
     }
   }
+
+  const loadCategories = async () => {
+    try {
+      const data = await api.getActiveCategories()
+      setCategories(data)
+    } catch (error) {
+      console.error('Chyba pri načítaní kategórií:', error)
+    }
+  }
+
+  useEffect(() => {
+    if (showForm) {
+      loadCategories()
+    }
+  }, [showForm])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -62,6 +69,7 @@ export default function DevAdvertisementsPage() {
         ...formData,
         price: formData.price ? parseFloat(formData.price.toString()) : undefined,
         images: formData.images || [],
+        categoryId: formData.categoryId || undefined,
       }
 
       // Odstráň status z create, ak vytvárame nový inzerát
@@ -81,12 +89,13 @@ export default function DevAdvertisementsPage() {
     }
   }
 
-  const handleEdit = (ad: Advertisement) => {
+  const handleEdit = async (ad: Advertisement) => {
+    await loadCategories()
     setFormData({
       title: ad.title,
       description: ad.description,
       price: ad.price,
-      category: ad.category || '',
+      categoryId: (ad as any).categoryId || '',
       location: ad.location || '',
       images: ad.images || [],
       status: ad.status,
@@ -112,34 +121,13 @@ export default function DevAdvertisementsPage() {
       title: '',
       description: '',
       price: undefined,
-      category: '',
+      categoryId: '',
       location: '',
       images: [],
       status: AdvertisementStatus.DRAFT,
     })
     setEditingId(null)
     setShowForm(false)
-    setShowNewCategory(false)
-    setNewCategory('')
-  }
-
-  const handleCategoryChange = (value: string) => {
-    if (value === '__new__') {
-      setShowNewCategory(true)
-      setFormData({ ...formData, category: '' })
-    } else {
-      setShowNewCategory(false)
-      setFormData({ ...formData, category: value })
-    }
-  }
-
-  const addNewCategory = () => {
-    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
-      setCategories([...categories, newCategory.trim()])
-      setFormData({ ...formData, category: newCategory.trim() })
-      setNewCategory('')
-      setShowNewCategory(false)
-    }
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -300,40 +288,21 @@ export default function DevAdvertisementsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Kategória</label>
-                  <div className="space-y-2">
-                    <select
-                      value={showNewCategory ? '__new__' : formData.category}
-                      onChange={(e) => handleCategoryChange(e.target.value)}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                    >
-                      <option value="">-- Vybrať kategóriu --</option>
-                      {categories.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))}
-                      <option value="__new__">+ Vytvoriť novú kategóriu</option>
-                    </select>
-                    
-                    {showNewCategory && (
-                      <div className="flex space-x-2">
-                        <input
-                          type="text"
-                          value={newCategory}
-                          onChange={(e) => setNewCategory(e.target.value)}
-                          placeholder="Názov novej kategórie"
-                          className="flex-1 bg-card border border-dark rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                        />
-                        <button
-                          type="button"
-                          onClick={addNewCategory}
-                          className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-lg transition-colors"
-                        >
-                          Pridať
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <select
+                    value={formData.categoryId}
+                    onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  >
+                    <option value="">-- Vybrať kategóriu --</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-400 mt-2">
+                    Ak nemáte kategóriu, vytvorte ju v sekcii <a href="/dashboard/dev/categories" className="text-blue-400 hover:text-blue-300">Kategórie</a>
+                  </p>
                 </div>
 
                 <div>
@@ -442,7 +411,7 @@ export default function DevAdvertisementsPage() {
                           <div className="font-medium">{ad.title}</div>
                           <div className="text-sm text-gray-400 line-clamp-1">{ad.description}</div>
                         </td>
-                        <td className="px-6 py-4 text-gray-300">{ad.category || '-'}</td>
+                        <td className="px-6 py-4 text-gray-300">{(ad as any).category?.name || '-'}</td>
                         <td className="px-6 py-4 text-gray-300">
                           {ad.price ? `${ad.price.toFixed(2)} €` : '-'}
                         </td>
