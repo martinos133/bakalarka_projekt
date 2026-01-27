@@ -27,6 +27,22 @@ export const api = {
     fetchWithAuth(`/admin/chart?period=${period}`),
   getUsers: () => fetchWithAuth('/admin/users'),
   getAdvertisements: () => fetchWithAuth('/admin/advertisements'),
+  createAdvertisement: (data: any) => 
+    fetchWithAuth('/advertisements', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateAdvertisement: (id: string, data: any) =>
+    fetchWithAuth(`/advertisements/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  deleteAdvertisement: (id: string) =>
+    fetchWithAuth(`/advertisements/${id}`, {
+      method: 'DELETE',
+    }),
+  getAdvertisement: (id: string) =>
+    fetchWithAuth(`/advertisements/${id}`),
 }
 
 export default api

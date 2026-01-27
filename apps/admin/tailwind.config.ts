@@ -12,6 +12,7 @@ const config: Config = {
         dark: 'rgb(10,10,10)',
         card: 'rgb(28,28,28)',
         cardHover: 'rgb(38,38,38)',
+        primary: 'rgb(36,99,235)',
       },
     },
   },
