@@ -1,0 +1,44 @@
+FROM node:18-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json* ./
+COPY packages/shared/package.json ./packages/shared/
+COPY apps/user/package.json ./apps/user/
+
+# Install dependencies
+RUN npm ci
+
+# Copy source code
+COPY packages/shared ./packages/shared
+COPY apps/user ./apps/user
+
+# Build
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/packages ./packages
+COPY --from=deps /app/apps/user ./apps/user
+
+WORKDIR /app/apps/user
+RUN npm run build
+
+# Production image
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Copy built application
+COPY --from=builder /app/apps/user/.next/standalone ./
+COPY --from=builder /app/apps/user/.next/static ./apps/user/.next/static
+COPY --from=builder /app/apps/user/public ./apps/user/public
+
+WORKDIR /app/apps/user
+
+EXPOSE 3003
+
+CMD ["node", "server.js"]

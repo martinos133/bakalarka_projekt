@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: inzertna-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-inzertna}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-inzertna123}
+      POSTGRES_DB: ${POSTGRES_DB:-inzertna_platforma}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U inzertna"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - inzertna-network
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    container_name: inzertna-api
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-inzertna}:${POSTGRES_PASSWORD:-inzertna123}@postgres:5432/${POSTGRES_DB:-inzertna_platforma}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      PORT: 3001
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - inzertna-network
+    command: sh -c "cd packages/database && npm run db:generate && npm run db:migrate:deploy && cd ../../apps/api && npm run start:prod"
+
+  admin:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.admin
+    container_name: inzertna-admin
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      NODE_ENV: production
+    ports:
+      - "3002:3002"
+    depends_on:
+      - api
+    networks:
+      - inzertna-network
+
+  user:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.user
+    container_name: inzertna-user
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      NODE_ENV: production
+    ports:
+      - "3003:3003"
+    depends_on:
+      - api
+    networks:
+      - inzertna-network
+
+  platform:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.platform
+    container_name: inzertna-platform
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - inzertna-network
+
+volumes:
+  postgres_data:
+
+networks:
+  inzertna-network:
+    driver: bridge
