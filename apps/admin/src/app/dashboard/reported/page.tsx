@@ -52,6 +52,20 @@ export default function ReportedAdvertisementsPage() {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null)
   const [showDetailModal, setShowDetailModal] = useState(false)
   const [resolutionNote, setResolutionNote] = useState('')
+  const [showResolveModal, setShowResolveModal] = useState(false)
+  const [banUser, setBanUser] = useState(false)
+  const [banDuration, setBanDuration] = useState<'minutes' | 'hours' | 'days' | 'months' | 'permanent'>('days')
+  const [banDurationValue, setBanDurationValue] = useState<number>(1)
+  const [banReason, setBanReason] = useState('')
+  const [alertModal, setAlertModal] = useState<{
+    show: boolean
+    message: string
+    type: 'error' | 'success' | 'info'
+  }>({
+    show: false,
+    message: '',
+    type: 'info',
+  })
   const [filters, setFilters] = useState({
     search: '',
     reason: '' as '' | ReportReasonType,
@@ -69,7 +83,7 @@ export default function ReportedAdvertisementsPage() {
   const loadReports = async () => {
     try {
       setLoading(true)
-      const data = await api.getPendingReports()
+      const data = await api.getAllReports()
       setReports(data)
     } catch (error) {
       console.error('Chyba pri načítaní nahlásených inzerátov:', error)
@@ -79,37 +93,122 @@ export default function ReportedAdvertisementsPage() {
   }
 
   const handleResolve = async (id: string, status: ReportStatus) => {
-    if (status === 'RESOLVED' && !resolutionNote.trim()) {
-      alert('Prosím zadajte poznámku k vyriešeniu')
+    if (status === 'RESOLVED') {
+      // Zobraz modálny dialóg pre vyriešenie s možnosťou banu
+      setShowResolveModal(true)
       return
     }
 
+    // Pre DISMISSED jednoducho zamietni bez banu
     try {
       await api.resolveReport(id, {
-        status,
+        status: 'DISMISSED',
         resolutionNote: resolutionNote || undefined,
       })
       await loadReports()
       setShowDetailModal(false)
       setSelectedReport(null)
       setResolutionNote('')
-    } catch (error) {
-      console.error('Chyba pri riešení nahlásenia:', error)
-      alert('Chyba pri riešení nahlásenia')
+      setAlertModal({
+        show: true,
+        message: 'Nahlásenie bolo úspešne zamietnuté',
+        type: 'success',
+      })
+    } catch (error: any) {
+      console.error('Chyba pri zamietnutí nahlásenia:', error)
+      const errorMessage = error?.message || 'Chyba pri zamietnutí nahlásenia'
+      setAlertModal({
+        show: true,
+        message: errorMessage,
+        type: 'error',
+      })
     }
   }
 
-  const handleDeleteAdvertisement = async (advertisementId: string, reportId: string) => {
-    if (!confirm('Naozaj chcete odstrániť tento inzerát? Táto akcia je nezvratná.')) return
+  const handleConfirmResolve = async () => {
+    if (!selectedReport) return
+
+    if (banUser && banDuration !== 'permanent' && (!banDurationValue || banDurationValue <= 0)) {
+      setAlertModal({
+        show: true,
+        message: 'Prosím zadajte platnú hodnotu trvania banu',
+        type: 'error',
+      })
+      return
+    }
 
     try {
-      await api.deleteReportedAdvertisement(advertisementId, reportId)
+      await api.resolveReport(selectedReport.id, {
+        status: 'RESOLVED',
+        resolutionNote: resolutionNote || undefined,
+        banUser: banUser,
+        banDuration: banUser ? banDuration : undefined,
+        banDurationValue: banUser && banDuration !== 'permanent' ? banDurationValue : undefined,
+        banReason: banUser ? (banReason || resolutionNote) : undefined,
+      })
+      await loadReports()
+      setShowDetailModal(false)
+      setShowResolveModal(false)
+      setSelectedReport(null)
+      setResolutionNote('')
+      setBanUser(false)
+      setBanDuration('days')
+      setBanDurationValue(1)
+      setBanReason('')
+      setAlertModal({
+        show: true,
+        message: 'Nahlásenie bolo úspešne vyriešené' + (banUser ? ' a používateľ bol zabanovaný' : ''),
+        type: 'success',
+      })
+    } catch (error: any) {
+      console.error('Chyba pri riešení nahlásenia:', error)
+      const errorMessage = error?.message || 'Chyba pri riešení nahlásenia'
+      setAlertModal({
+        show: true,
+        message: errorMessage,
+        type: 'error',
+      })
+    }
+  }
+
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
+    show: boolean
+    advertisementId: string
+    reportId: string
+  }>({
+    show: false,
+    advertisementId: '',
+    reportId: '',
+  })
+
+  const handleDeleteAdvertisement = async (advertisementId: string, reportId: string) => {
+    setDeleteConfirmModal({
+      show: true,
+      advertisementId,
+      reportId,
+    })
+  }
+
+  const confirmDeleteAdvertisement = async () => {
+    try {
+      await api.deleteReportedAdvertisement(deleteConfirmModal.advertisementId, deleteConfirmModal.reportId)
       await loadReports()
       setShowDetailModal(false)
       setSelectedReport(null)
-    } catch (error) {
+      setDeleteConfirmModal({ show: false, advertisementId: '', reportId: '' })
+      setAlertModal({
+        show: true,
+        message: 'Inzerát bol úspešne odstránený',
+        type: 'success',
+      })
+    } catch (error: any) {
       console.error('Chyba pri odstraňovaní inzerátu:', error)
-      alert('Chyba pri odstraňovaní inzerátu')
+      const errorMessage = error?.message || 'Chyba pri odstraňovaní inzerátu'
+      setAlertModal({
+        show: true,
+        message: errorMessage,
+        type: 'error',
+      })
     }
   }
 
@@ -475,11 +574,222 @@ export default function ReportedAdvertisementsPage() {
                       </button>
                       <button
                         onClick={() => handleResolve(selectedReport.id, 'RESOLVED')}
-                        disabled={!resolutionNote.trim()}
-                        className="px-4 py-2 bg-primary hover:opacity-90 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-colors"
+                        className="px-4 py-2 bg-primary hover:opacity-90 rounded-lg transition-colors"
                       >
                         Vyriešiť nahlásenie
                       </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Resolve Modal with Ban Options */}
+          {showResolveModal && selectedReport && (
+            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4">
+              <div className="bg-card rounded-lg border border-dark max-w-lg w-full shadow-xl">
+                <div className="p-6 border-b border-dark">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-yellow-400" />
+                      Vyriešiť nahlásenie
+                    </h2>
+                    <button
+                      onClick={() => {
+                        setShowResolveModal(false)
+                        setBanUser(false)
+                        setBanDuration('days')
+                        setBanDurationValue(1)
+                        setBanReason('')
+                      }}
+                      className="p-2 hover:bg-dark rounded-lg transition-colors"
+                    >
+                      <X className="w-5 h-5 text-gray-400" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Poznámka k vyriešeniu (voliteľné)
+                    </label>
+                    <textarea
+                      value={resolutionNote}
+                      onChange={(e) => setResolutionNote(e.target.value)}
+                      placeholder="Zadajte poznámku k vyriešeniu nahlásenia..."
+                      className="w-full bg-dark border border-card rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
+                      rows={4}
+                    />
+                  </div>
+
+                  <div className="border-t border-dark pt-4">
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={banUser}
+                        onChange={(e) => setBanUser(e.target.checked)}
+                        className="w-5 h-5 rounded border-card bg-dark text-primary focus:ring-primary focus:ring-offset-dark"
+                      />
+                      <span className="text-sm font-medium text-white">
+                        Zabanovať používateľa
+                      </span>
+                    </label>
+                  </div>
+
+                  {banUser && (
+                    <div className="bg-dark rounded-lg p-4 space-y-4 border border-card">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Trvanie banu
+                        </label>
+                        <select
+                          value={banDuration}
+                          onChange={(e) => setBanDuration(e.target.value as any)}
+                          className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                        >
+                          <option value="minutes">Minúty</option>
+                          <option value="hours">Hodiny</option>
+                          <option value="days">Dni</option>
+                          <option value="months">Mesiace</option>
+                          <option value="permanent">Navždy</option>
+                        </select>
+                      </div>
+
+                      {banDuration !== 'permanent' && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Počet {banDuration === 'minutes' ? 'minút' : banDuration === 'hours' ? 'hodín' : banDuration === 'days' ? 'dní' : 'mesiacov'}
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={banDurationValue}
+                            onChange={(e) => setBanDurationValue(parseInt(e.target.value) || 1)}
+                            className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                          />
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Dôvod banu (voliteľné)
+                        </label>
+                        <textarea
+                          value={banReason}
+                          onChange={(e) => setBanReason(e.target.value)}
+                          placeholder="Zadajte dôvod banu..."
+                          className="w-full bg-dark border border-card rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-end gap-3 pt-4 border-t border-dark">
+                    <button
+                      onClick={() => {
+                        setShowResolveModal(false)
+                        setBanUser(false)
+                        setBanDuration('days')
+                        setBanDurationValue(1)
+                        setBanReason('')
+                      }}
+                      className="px-4 py-2 bg-dark hover:bg-cardHover rounded-lg transition-colors text-sm font-medium"
+                    >
+                      Zrušiť
+                    </button>
+                    <button
+                      onClick={handleConfirmResolve}
+                      disabled={banUser && banDuration !== 'permanent' && (!banDurationValue || banDurationValue <= 0)}
+                      className="px-4 py-2 bg-primary hover:opacity-90 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-colors text-sm font-medium text-white"
+                    >
+                      Potvrdiť vyriešenie
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Delete Confirmation Modal */}
+          {deleteConfirmModal.show && (
+            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+              <div className="bg-card rounded-lg border border-dark max-w-md w-full shadow-xl">
+                <div className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center bg-red-500/20">
+                      <Trash2 className="w-6 h-6 text-red-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-white mb-2">
+                        Odstrániť inzerát
+                      </h3>
+                      <p className="text-gray-300 text-sm mb-6">
+                        Naozaj chcete odstrániť tento inzerát? Táto akcia je nezvratná.
+                      </p>
+                      <div className="flex items-center justify-end space-x-3">
+                        <button
+                          onClick={() => setDeleteConfirmModal({ show: false, advertisementId: '', reportId: '' })}
+                          className="px-4 py-2 bg-dark hover:bg-cardHover rounded-lg transition-colors text-sm font-medium"
+                        >
+                          Zrušiť
+                        </button>
+                        <button
+                          onClick={confirmDeleteAdvertisement}
+                          className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors text-sm font-medium text-white"
+                        >
+                          Odstrániť
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Alert Modal */}
+          {alertModal.show && (
+            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+              <div className="bg-card rounded-lg border border-dark max-w-md w-full shadow-xl">
+                <div className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
+                      alertModal.type === 'success'
+                        ? 'bg-green-500/20'
+                        : alertModal.type === 'error'
+                        ? 'bg-red-500/20'
+                        : 'bg-blue-500/20'
+                    }`}>
+                      {alertModal.type === 'success' ? (
+                        <Check className="w-6 h-6 text-green-400" />
+                      ) : alertModal.type === 'error' ? (
+                        <X className="w-6 h-6 text-red-400" />
+                      ) : (
+                        <AlertCircle className="w-6 h-6 text-blue-400" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-white mb-2">
+                        {alertModal.type === 'success'
+                          ? 'Úspech'
+                          : alertModal.type === 'error'
+                          ? 'Chyba'
+                          : 'Informácia'}
+                      </h3>
+                      <p className="text-gray-300 text-sm mb-6">
+                        {alertModal.message}
+                      </p>
+                      <div className="flex items-center justify-end">
+                        <button
+                          onClick={() => setAlertModal({ ...alertModal, show: false })}
+                          className="px-4 py-2 bg-primary hover:opacity-90 rounded-lg transition-colors text-sm font-medium text-white"
+                        >
+                          OK
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

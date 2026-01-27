@@ -269,6 +269,10 @@ export interface CreateReportDto {
 export interface ResolveReportDto {
   status: ReportStatus;
   resolutionNote?: string;
+  banUser?: boolean;
+  banDuration?: 'minutes' | 'hours' | 'days' | 'months' | 'permanent';
+  banDurationValue?: number;
+  banReason?: string;
 }
 
 export interface Payment {
@@ -298,4 +302,53 @@ export interface UserStats {
   paymentsMadeAmount: number;
   completedPaymentsReceived: number;
   completedPaymentsMade: number;
+}
+
+export enum MessageType {
+  INQUIRY = 'INQUIRY',
+  SYSTEM = 'SYSTEM',
+  BAN_NOTIFICATION = 'BAN_NOTIFICATION',
+  VIOLATION = 'VIOLATION',
+  AD_APPROVED = 'AD_APPROVED',
+  AD_REJECTED = 'AD_REJECTED',
+}
+
+export enum MessageStatus {
+  UNREAD = 'UNREAD',
+  READ = 'READ',
+  ARCHIVED = 'ARCHIVED',
+}
+
+export interface Message {
+  id: string;
+  type: MessageType;
+  subject: string;
+  content: string;
+  status: MessageStatus;
+  recipientId: string;
+  senderId?: string;
+  advertisementId?: string;
+  metadata?: any;
+  createdAt: Date;
+  updatedAt: Date;
+  readAt?: Date;
+  recipient?: User;
+  sender?: User;
+  advertisement?: Advertisement;
+}
+
+export interface CreateMessageDto {
+  type: MessageType;
+  subject: string;
+  content: string;
+  recipientId: string;
+  senderId?: string;
+  advertisementId?: string;
+  metadata?: any;
+}
+
+export interface CreateInquiryDto {
+  advertisementId: string;
+  subject: string;
+  content: string;
 }

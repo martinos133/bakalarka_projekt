@@ -1,10 +1,30 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { prisma } from '@inzertna-platforma/database';
-import { CreateAdvertisementDto, UpdateAdvertisementDto } from '@inzertna-platforma/shared';
+import { CreateAdvertisementDto, UpdateAdvertisementDto, MessageType } from '@inzertna-platforma/shared';
+import { MessagesService } from '../messages/messages.service';
 
 @Injectable()
 export class AdvertisementsService {
+  constructor(private readonly messagesService: MessagesService) {}
   async create(userId: string, createDto: CreateAdvertisementDto) {
+    // Skontroluj, či používateľ nie je zabanovaný
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    }) as any;
+
+    if (!user) {
+      throw new NotFoundException('Používateľ nebol nájdený');
+    }
+
+    if (user.banned) {
+      const now = new Date();
+      if (user.bannedUntil && user.bannedUntil > now) {
+        throw new ForbiddenException('Nemáte oprávnenie vytvárať inzeráty. Váš účet je zabanovaný.');
+      } else if (!user.bannedUntil) {
+        throw new ForbiddenException('Nemáte oprávnenie vytvárať inzeráty. Váš účet je trvalo zabanovaný.');
+      }
+    }
+
     return prisma.advertisement.create({
       data: {
         ...createDto,
@@ -175,7 +195,7 @@ export class AdvertisementsService {
       throw new ForbiddenException('Inzerát už bol spracovaný');
     }
 
-    return prisma.advertisement.update({
+    const updated = await prisma.advertisement.update({
       where: { id },
       data: {
         status: 'ACTIVE' as any,
@@ -193,6 +213,19 @@ export class AdvertisementsService {
         category: true,
       } as any,
     });
+
+    // Vytvor systémovú správu o schválení
+    await this.messagesService.createSystemMessage(
+      advertisement.userId,
+      'AD_APPROVED' as any,
+      'Váš inzerát bol schválený',
+      `Váš inzerát "${advertisement.title}" bol schválený a je teraz aktívny na platforme.`,
+      {
+        advertisementId: id,
+      },
+    );
+
+    return updated;
   }
 
   async reject(id: string, reason?: string) {
@@ -208,7 +241,7 @@ export class AdvertisementsService {
       throw new ForbiddenException('Inzerát už bol spracovaný');
     }
 
-    return prisma.advertisement.update({
+    const updated = await prisma.advertisement.update({
       where: { id },
       data: {
         status: 'INACTIVE' as any,
@@ -226,5 +259,19 @@ export class AdvertisementsService {
         category: true,
       } as any,
     });
+
+    // Vytvor systémovú správu o zamietnutí
+    await this.messagesService.createSystemMessage(
+      advertisement.userId,
+      'AD_REJECTED' as any,
+      'Váš inzerát bol zamietnutý',
+      `Váš inzerát "${advertisement.title}" bol zamietnutý.\n\n${reason ? `Dôvod: ${reason}` : 'Bez uvedeného dôvodu'}`,
+      {
+        advertisementId: id,
+        reason,
+      },
+    );
+
+    return updated;
   }
 }

@@ -62,6 +62,8 @@ model User {
   paymentsReceived Payment[] @relation("Owner")
   paymentsMade Payment[]     @relation("Renter")
   reports        Report[]    @relation("Reports")
+  messagesReceived Message[] @relation("MessageRecipient")
+  messagesSent   Message[]   @relation("MessageSender")
   
   @@index([banned])
   @@index([bannedUntil])
@@ -154,6 +156,7 @@ model Advertisement {
   user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   payments    Payment[]          @relation("AdvertisementOwner")
   reports     Report[]
+  messages   Message[]
   
   @@index([userId])
   @@index([status])
@@ -217,5 +220,45 @@ model Report {
   @@index([advertisementId])
   @@index([reporterId])
   @@index([status])
+  @@index([createdAt])
+}
+
+enum MessageType {
+  INQUIRY           // Správa od záujemcu o inzerát
+  SYSTEM            // Systémová správa
+  BAN_NOTIFICATION  // Notifikácia o banu
+  VIOLATION         // Porušenie pravidiel
+  AD_APPROVED       // Inzerát schválený
+  AD_REJECTED       // Inzerát zamietnutý
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+model Message {
+  id              String        @id @default(uuid())
+  type            MessageType
+  subject         String
+  content         String        @db.Text
+  status          MessageStatus @default(UNREAD)
+  recipientId     String
+  recipient       User          @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  senderId        String?
+  sender          User?          @relation("MessageSender", fields: [senderId], references: [id], onDelete: SetNull)
+  advertisementId String?
+  advertisement   Advertisement? @relation(fields: [advertisementId], references: [id], onDelete: SetNull)
+  metadata        Json?         // Ďalšie informácie (napr. dôvod banu, dátum banu, atď.)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  readAt          DateTime?
+  
+  @@index([recipientId])
+  @@index([senderId])
+  @@index([advertisementId])
+  @@index([status])
+  @@index([type])
   @@index([createdAt])
 }

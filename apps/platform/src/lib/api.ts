@@ -103,6 +103,26 @@ export const api = {
     method: 'POST',
     body: JSON.stringify(data),
   }),
+
+  // Message endpoints
+  getMessages: (status?: string, type?: string) => {
+    const params = new URLSearchParams()
+    if (status) params.append('status', status)
+    if (type) params.append('type', type)
+    return fetchWithAuth(`/messages?${params.toString()}`)
+  },
+  getMessage: (id: string) => fetchWithAuth(`/messages/${id}`),
+  getUnreadCount: () => fetchWithAuth('/messages/unread/count'),
+  markAsRead: (id: string) => fetchWithAuth(`/messages/${id}/read`, {
+    method: 'PATCH',
+  }),
+  markAsArchived: (id: string) => fetchWithAuth(`/messages/${id}/archive`, {
+    method: 'PATCH',
+  }),
+  createInquiry: (data: { advertisementId: string; subject: string; content: string }) => fetchWithAuth('/messages/inquiry', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
 }
 
 export default api

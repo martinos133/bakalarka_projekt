@@ -6,15 +6,19 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { api } from '@/lib/api'
 import { isAuthenticated, getAuthUser } from '@/lib/auth'
-import { User, Building2, Eye, EyeOff, Plus, Edit, Trash2, Save, X, Lock, Mail, Phone, MapPin, Calendar, Briefcase, Image as ImageIcon } from 'lucide-react'
+import { User, Building2, Eye, EyeOff, Plus, Edit, Trash2, Save, X, Lock, Mail, Phone, MapPin, Calendar, Briefcase, Image as ImageIcon, MessageSquare, Archive, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 
 export default function DashboardPage() {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
-  const [activeTab, setActiveTab] = useState<'profile' | 'advertisements' | 'create'>('profile')
+  const [activeTab, setActiveTab] = useState<'profile' | 'advertisements' | 'create' | 'messages'>('profile')
   const [user, setUser] = useState<any>(null)
   const [advertisements, setAdvertisements] = useState<any[]>([])
+  const [messages, setMessages] = useState<any[]>([])
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [selectedMessage, setSelectedMessage] = useState<any>(null)
+  const [messageFilter, setMessageFilter] = useState<'all' | 'unread' | 'inquiry' | 'system'>('all')
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -74,20 +78,93 @@ export default function DashboardPage() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const [userData, adsData, catsData] = await Promise.all([
+      const [userData, adsData, catsData, messagesData, unreadData] = await Promise.all([
         api.getMyProfile(),
         api.getMyAdvertisements(),
         api.getCategories(),
+        api.getMessages(),
+        api.getUnreadCount(),
       ])
       setUser(userData)
       setProfileData(userData)
       setAdvertisements(adsData)
       setCategories(catsData)
+      setMessages(messagesData)
+      setUnreadCount(unreadData.count || 0)
     } catch (err: any) {
       setError(err.message || 'Chyba pri načítaní dát')
     } finally {
       setLoading(false)
     }
+  }
+
+  const loadMessages = async () => {
+    try {
+      const status = messageFilter === 'unread' ? 'UNREAD' : undefined
+      const type = messageFilter === 'inquiry' ? 'INQUIRY' : messageFilter === 'system' ? 'SYSTEM' : undefined
+      const messagesData = await api.getMessages(status, type)
+      setMessages(messagesData)
+      const unreadData = await api.getUnreadCount()
+      setUnreadCount(unreadData.count || 0)
+    } catch (err: any) {
+      setError(err.message || 'Chyba pri načítaní správ')
+    }
+  }
+
+  useEffect(() => {
+    if (activeTab === 'messages') {
+      loadMessages()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, messageFilter])
+
+  const handleMessageClick = async (message: any) => {
+    try {
+      const fullMessage = await api.getMessage(message.id)
+      setSelectedMessage(fullMessage)
+      if (fullMessage.status === 'UNREAD') {
+        await api.markAsRead(message.id)
+        loadMessages()
+      }
+    } catch (err: any) {
+      setError(err.message || 'Chyba pri načítaní správy')
+    }
+  }
+
+  const handleMarkAsArchived = async (id: string) => {
+    try {
+      await api.markAsArchived(id)
+      loadMessages()
+      if (selectedMessage?.id === id) {
+        setSelectedMessage(null)
+      }
+    } catch (err: any) {
+      setError(err.message || 'Chyba pri archivovaní správy')
+    }
+  }
+
+  const getMessageTypeLabel = (type: string) => {
+    const labels: { [key: string]: string } = {
+      INQUIRY: 'Dotaz na inzerát',
+      SYSTEM: 'Systémová správa',
+      BAN_NOTIFICATION: 'Notifikácia o banu',
+      VIOLATION: 'Porušenie pravidiel',
+      AD_APPROVED: 'Inzerát schválený',
+      AD_REJECTED: 'Inzerát zamietnutý',
+    }
+    return labels[type] || type
+  }
+
+  const getMessageTypeColor = (type: string) => {
+    const colors: { [key: string]: string } = {
+      INQUIRY: 'bg-blue-100 text-blue-800',
+      SYSTEM: 'bg-gray-100 text-gray-800',
+      BAN_NOTIFICATION: 'bg-red-100 text-red-800',
+      VIOLATION: 'bg-orange-100 text-orange-800',
+      AD_APPROVED: 'bg-green-100 text-green-800',
+      AD_REJECTED: 'bg-red-100 text-red-800',
+    }
+    return colors[type] || 'bg-gray-100 text-gray-800'
   }
 
   const handleSaveProfile = async () => {
@@ -310,6 +387,21 @@ export default function DashboardPage() {
               }`}
             >
               Vytvoriť inzerát
+            </button>
+            <button
+              onClick={() => setActiveTab('messages')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm relative ${
+                activeTab === 'messages'
+                  ? 'border-[#1dbf73] text-[#1dbf73]'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Správy
+              {unreadCount > 0 && (
+                <span className="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+                  {unreadCount}
+                </span>
+              )}
             </button>
           </nav>
         </div>
@@ -1168,6 +1260,203 @@ export default function DashboardPage() {
                   {saving ? 'Vytváram...' : 'Vytvoriť inzerát'}
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Messages Tab */}
+        {activeTab === 'messages' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Messages List */}
+            <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Správy</h2>
+                <div className="flex gap-2">
+                  <select
+                    value={messageFilter}
+                    onChange={(e) => setMessageFilter(e.target.value as any)}
+                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1dbf73]"
+                  >
+                    <option value="all">Všetky</option>
+                    <option value="unread">Neprečítané</option>
+                    <option value="inquiry">Dotazy</option>
+                    <option value="system">Systémové</option>
+                  </select>
+                </div>
+              </div>
+              <div className="divide-y divide-gray-200 max-h-[600px] overflow-y-auto">
+                {messages.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                    <p>Nemáte žiadne správy</p>
+                  </div>
+                ) : (
+                  messages.map((message) => (
+                    <div
+                      key={message.id}
+                      onClick={() => handleMessageClick(message)}
+                      className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
+                        message.status === 'UNREAD' ? 'bg-blue-50' : ''
+                      } ${selectedMessage?.id === message.id ? 'bg-[#1dbf73]/10' : ''}`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${getMessageTypeColor(message.type)}`}>
+                              {getMessageTypeLabel(message.type)}
+                            </span>
+                            {message.status === 'UNREAD' && (
+                              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                            )}
+                          </div>
+                          <h3 className="font-medium text-gray-900 mb-1">{message.subject}</h3>
+                          <p className="text-sm text-gray-600 line-clamp-2">{message.content}</p>
+                          {message.advertisement && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              Inzerát: {message.advertisement.title}
+                            </p>
+                          )}
+                          <p className="text-xs text-gray-400 mt-2">
+                            {new Date(message.createdAt).toLocaleDateString('sk-SK', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                        </div>
+                        <div className="flex gap-2 ml-4">
+                          {message.status === 'UNREAD' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                api.markAsRead(message.id).then(() => loadMessages())
+                              }}
+                              className="p-1 text-gray-400 hover:text-blue-600"
+                              title="Označiť ako prečítané"
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                            </button>
+                          )}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleMarkAsArchived(message.id)
+                            }}
+                            className="p-1 text-gray-400 hover:text-gray-600"
+                            title="Archivovať"
+                          >
+                            <Archive className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Message Detail */}
+            <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              {selectedMessage ? (
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Detail správy</h3>
+                    <button
+                      onClick={() => setSelectedMessage(null)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="mb-4">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${getMessageTypeColor(selectedMessage.type)}`}>
+                      {getMessageTypeLabel(selectedMessage.type)}
+                    </span>
+                  </div>
+                  <h4 className="font-medium text-gray-900 mb-2">{selectedMessage.subject}</h4>
+                  {selectedMessage.sender && (
+                    <p className="text-sm text-gray-600 mb-2">
+                      Od: {selectedMessage.sender.firstName} {selectedMessage.sender.lastName} ({selectedMessage.sender.email})
+                    </p>
+                  )}
+                  {selectedMessage.advertisement && (
+                    <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="text-sm font-medium text-gray-900 mb-1">Súvisiaci inzerát:</p>
+                      <Link href={`/inzerat/${selectedMessage.advertisement.id}`} className="text-sm text-[#1dbf73] hover:underline">
+                        {selectedMessage.advertisement.title}
+                      </Link>
+                    </div>
+                  )}
+                  <div className="text-sm text-gray-700 whitespace-pre-wrap mb-4">
+                    {selectedMessage.content}
+                  </div>
+                  {selectedMessage.metadata && (
+                    <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="text-xs text-gray-600">
+                        {selectedMessage.metadata.banDuration && (
+                          <>
+                            Trvanie banu: {selectedMessage.metadata.banDuration === 'permanent' 
+                              ? 'Trvalo' 
+                              : `${selectedMessage.metadata.banDurationValue} ${
+                                  selectedMessage.metadata.banDuration === 'minutes' ? 'minút' :
+                                  selectedMessage.metadata.banDuration === 'hours' ? 'hodín' :
+                                  selectedMessage.metadata.banDuration === 'days' ? 'dní' :
+                                  selectedMessage.metadata.banDuration === 'months' ? 'mesiacov' :
+                                  selectedMessage.metadata.banDuration
+                                }`}
+                            {selectedMessage.metadata.bannedUntil && (
+                              <> (do {new Date(selectedMessage.metadata.bannedUntil).toLocaleDateString('sk-SK', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })})</>
+                            )}
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-400">
+                    {new Date(selectedMessage.createdAt).toLocaleDateString('sk-SK', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </p>
+                  <div className="mt-4 flex gap-2">
+                    {selectedMessage.status === 'UNREAD' && (
+                      <button
+                        onClick={() => {
+                          api.markAsRead(selectedMessage.id).then(() => {
+                            loadMessages()
+                            setSelectedMessage({ ...selectedMessage, status: 'READ' })
+                          })
+                        }}
+                        className="flex-1 px-4 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg text-sm"
+                      >
+                        Označiť ako prečítané
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleMarkAsArchived(selectedMessage.id)}
+                      className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50"
+                    >
+                      Archivovať
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center text-gray-500 py-8">
+                  <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                  <p>Vyberte správu na zobrazenie</p>
+                </div>
+              )}
             </div>
           </div>
         )}
