@@ -45,8 +45,9 @@ export class CategoriesService {
     return prisma.category.create({
       data: {
         ...createDto,
-        slug,
+        slug: createDto.slug || slug,
         parentId,
+        status: createDto.status || 'ACTIVE',
       },
     });
   }
@@ -93,13 +94,13 @@ export class CategoriesService {
   async findActive() {
     return prisma.category.findMany({
       where: {
-        isActive: true,
+        status: 'ACTIVE',
       },
       include: {
         parent: true,
         children: {
           where: {
-            isActive: true,
+            status: 'ACTIVE',
           },
           include: {
             _count: {
@@ -236,7 +237,7 @@ export class CategoriesService {
       return prisma.category.update({
         where: { id },
         data: {
-          isActive: false,
+          status: 'INACTIVE',
         },
       });
     }

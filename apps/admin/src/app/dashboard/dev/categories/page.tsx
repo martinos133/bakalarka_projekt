@@ -6,7 +6,7 @@ import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
-import { Category } from '@inzertna-platforma/shared'
+import { Category, CategoryStatus } from '@inzertna-platforma/shared'
 import { Plus, Edit, Trash2, X, Save, FolderTree, Image as ImageIcon, FolderPlus, ChevronDown, ChevronRight, GripVertical, Filter, Search } from 'lucide-react'
 
 export default function DevCategoriesPage() {
@@ -32,11 +32,17 @@ export default function DevCategoriesPage() {
   })
   const [formData, setFormData] = useState({
     name: '',
+    slug: '',
     description: '',
     icon: '',
     color: '',
     image: '',
-    isActive: true,
+    imageAlt: '',
+    metaTitle: '',
+    metaDescription: '',
+    metaKeywords: '',
+    ogImage: '',
+    status: CategoryStatus.ACTIVE,
     parentId: '',
   })
 
@@ -88,14 +94,34 @@ export default function DevCategoriesPage() {
     }
   }
 
+  const generateSlug = (text: string) => {
+    return text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '')
+  }
+
+  const handleNameChange = (name: string) => {
+    const newSlug = generateSlug(name)
+    setFormData({ ...formData, name, slug: newSlug })
+  }
+
   const handleEdit = (category: Category) => {
     setFormData({
       name: category.name,
+      slug: category.slug || '',
       description: category.description || '',
       icon: category.icon || '',
       color: category.color || '',
       image: category.image || '',
-      isActive: category.isActive,
+      imageAlt: category.imageAlt || '',
+      metaTitle: category.metaTitle || '',
+      metaDescription: category.metaDescription || '',
+      metaKeywords: category.metaKeywords || '',
+      ogImage: category.ogImage || '',
+      status: category.status || CategoryStatus.ACTIVE,
       parentId: (category as any).parentId || '',
     })
     setEditingId(category.id)
@@ -105,11 +131,17 @@ export default function DevCategoriesPage() {
   const handleAddSubcategory = (parentCategory: Category) => {
     setFormData({
       name: '',
+      slug: '',
       description: '',
       icon: '',
       color: '',
       image: '',
-      isActive: true,
+      imageAlt: '',
+      metaTitle: '',
+      metaDescription: '',
+      metaKeywords: '',
+      ogImage: '',
+      status: CategoryStatus.ACTIVE,
       parentId: parentCategory.id,
     })
     setEditingId(null)
@@ -144,11 +176,17 @@ export default function DevCategoriesPage() {
       const parentId = formData.parentId
       setFormData({
         name: '',
+        slug: '',
         description: '',
         icon: '',
         color: '',
         image: '',
-        isActive: true,
+        imageAlt: '',
+        metaTitle: '',
+        metaDescription: '',
+        metaKeywords: '',
+        ogImage: '',
+        status: CategoryStatus.ACTIVE,
         parentId: '',
       })
       setShowSubcategoryForm(null)
@@ -282,11 +320,17 @@ export default function DevCategoriesPage() {
   const resetForm = () => {
     setFormData({
       name: '',
+      slug: '',
       description: '',
       icon: '',
       color: '',
       image: '',
-      isActive: true,
+      imageAlt: '',
+      metaTitle: '',
+      metaDescription: '',
+      metaKeywords: '',
+      ogImage: '',
+      status: CategoryStatus.ACTIVE,
       parentId: '',
     })
     setEditingId(null)
@@ -376,8 +420,8 @@ export default function DevCategoriesPage() {
       }
 
       // Status
-      if (filterData.status === 'active' && !cat.isActive) return false
-      if (filterData.status === 'inactive' && cat.isActive) return false
+      if (filterData.status === 'active' && cat.status !== CategoryStatus.ACTIVE) return false
+      if (filterData.status === 'inactive' && cat.status === CategoryStatus.ACTIVE) return false
 
       // Typ (hlavná/podkategória)
       if (filterData.type === 'main' && cat.parentId) return false
@@ -577,7 +621,7 @@ export default function DevCategoriesPage() {
                       type="text"
                       required
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) => handleNameChange(e.target.value)}
                       placeholder="Napríklad: Autá, Nehnuteľnosti, Elektronika..."
                       className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                     />
@@ -612,6 +656,24 @@ export default function DevCategoriesPage() {
                       </p>
                     )}
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Slug *
+                    <span className="ml-2 text-xs text-gray-400">(URL-friendly identifikátor)</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    placeholder="Automaticky generovaný z názvu..."
+                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  />
+                  <p className="mt-1 text-xs text-gray-400">
+                    URL-friendly identifikátor kategórie (automaticky generovaný z názvu)
+                  </p>
                 </div>
 
                 <div>
@@ -699,16 +761,156 @@ export default function DevCategoriesPage() {
                   </div>
                 </div>
 
+                {/* SEO Sekcia */}
+                <div className="border-t border-card pt-6 mt-6">
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    SEO Optimalizácia
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Alt text pre obrázok *
+                        <span className="ml-2 text-xs text-gray-400">(Dôležité pre SEO a prístupnosť)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.imageAlt}
+                        onChange={(e) => setFormData({ ...formData, imageAlt: e.target.value })}
+                        placeholder="Napríklad: Logo kategórie Autá a motocykle"
+                        className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      />
+                      <p className="mt-1 text-xs text-gray-400">
+                        Popis obrázka pre vyhľadávače a používateľov so zrakovým postihnutím
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Meta Title (SEO)
+                        <span className="ml-2 text-xs text-gray-400">(Ak nie je zadané, použije sa názov)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.metaTitle}
+                        onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
+                        placeholder="Napríklad: Autá a motocykle na predaj - Najlepšie ponuky"
+                        maxLength={60}
+                        className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      />
+                      <p className="mt-1 text-xs text-gray-400">
+                        {formData.metaTitle.length}/60 znakov (odporúčané: 50-60 znakov)
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Meta Description (SEO)
+                        <span className="ml-2 text-xs text-gray-400">(Ak nie je zadané, použije sa popis)</span>
+                      </label>
+                      <textarea
+                        value={formData.metaDescription}
+                        onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
+                        placeholder="Napríklad: Nájdite najlepšie autá a motocykle na predaj. Tisíce inzerátov od overených predajcov. Rýchle vyhľadávanie a jednoduchá komunikácia."
+                        maxLength={160}
+                        rows={3}
+                        className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      />
+                      <p className="mt-1 text-xs text-gray-400">
+                        {formData.metaDescription.length}/160 znakov (odporúčané: 150-160 znakov)
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Meta Keywords (SEO)
+                        <span className="ml-2 text-xs text-gray-400">(Voliteľné, oddelené čiarkou)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.metaKeywords}
+                        onChange={(e) => setFormData({ ...formData, metaKeywords: e.target.value })}
+                        placeholder="Napríklad: autá, motocykle, predaj áut, ojazdené autá, nové autá"
+                        className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      />
+                      <p className="mt-1 text-xs text-gray-400">
+                        Kľúčové slová oddelené čiarkou (napr: autá, motocykle, predaj)
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Open Graph obrázok (voliteľné)
+                        <span className="ml-2 text-xs text-gray-400">(Pre zdieľanie na sociálnych sieťach)</span>
+                      </label>
+                      {formData.ogImage ? (
+                        <div className="relative inline-block">
+                          <img
+                            src={formData.ogImage}
+                            alt="OG Preview"
+                            className="w-32 h-32 object-cover rounded-lg border border-card"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, ogImage: '' })}
+                            className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="border-2 border-dashed border-card rounded-lg p-4 text-center hover:border-gray-600 transition-colors">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0]
+                              if (file) {
+                                compressImage(file).then((base64) => {
+                                  setFormData({ ...formData, ogImage: base64 })
+                                })
+                              }
+                            }}
+                            className="hidden"
+                            id="og-image-upload"
+                          />
+                          <label
+                            htmlFor="og-image-upload"
+                            className="cursor-pointer flex flex-col items-center"
+                          >
+                            <ImageIcon className="w-6 h-6 text-gray-400 mb-2" />
+                            <span className="text-xs text-gray-400">
+                              Kliknite pre nahranie OG obrázka
+                            </span>
+                            <span className="text-xs text-gray-500 mt-1">
+                              Odporúčané: 1200x630px
+                            </span>
+                          </label>
+                        </div>
+                      )}
+                      <p className="mt-1 text-xs text-gray-400">
+                        Obrázok zobrazovaný pri zdieľaní na Facebook, Twitter, LinkedIn (odporúčané: 1200x630px)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 <div>
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={formData.isActive}
-                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                      className="w-4 h-4 text-primary bg-dark border-card rounded focus:ring-primary"
-                    />
-                    <span className="text-sm text-gray-300">Aktívna kategória</span>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Stav kategórie *
                   </label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as CategoryStatus })}
+                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  >
+                    <option value={CategoryStatus.ACTIVE}>Aktívna</option>
+                    <option value={CategoryStatus.DRAFT}>Koncept</option>
+                    <option value={CategoryStatus.INACTIVE}>Neaktívna</option>
+                  </select>
+                  <p className="mt-1 text-xs text-gray-400">
+                    Aktívne kategórie sú viditeľné na platforme. Koncept a neaktívne kategórie nie sú viditeľné.
+                  </p>
                 </div>
 
                 <div className="flex justify-end space-x-3 pt-4">
@@ -804,11 +1006,14 @@ export default function DevCategoriesPage() {
                             {/* Status badge */}
                             <div className="flex-shrink-0">
                               <span className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
-                                category.isActive 
+                                category.status === CategoryStatus.ACTIVE
                                   ? 'bg-green-500/20 text-green-400' 
+                                  : category.status === CategoryStatus.DRAFT
+                                  ? 'bg-yellow-500/20 text-yellow-400'
                                   : 'bg-gray-500/20 text-gray-400'
                               }`}>
-                                {category.isActive ? 'Aktívna' : 'Neaktívna'}
+                                {category.status === CategoryStatus.ACTIVE ? 'Aktívna' : 
+                                 category.status === CategoryStatus.DRAFT ? 'Koncept' : 'Neaktívna'}
                               </span>
                             </div>
                             
@@ -931,21 +1136,33 @@ export default function DevCategoriesPage() {
                                     <FolderPlus className="w-4 h-4 text-green-400" />
                                     <h4 className="font-medium text-white">Nová podkategória pre "{category.name}"</h4>
                                   </div>
-                                  <div className="grid grid-cols-2 gap-3">
+                                  <div className="space-y-3">
                                     <input
                                       type="text"
                                       required
                                       value={formData.name}
-                                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                      onChange={(e) => {
+                                        const name = e.target.value
+                                        const slug = generateSlug(name)
+                                        setFormData({ ...formData, name, slug })
+                                      }}
                                       placeholder="Názov podkategórie *"
-                                      className="bg-card border border-dark rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                                      className="w-full bg-card border border-dark rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                                    />
+                                    <input
+                                      type="text"
+                                      required
+                                      value={formData.slug}
+                                      onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                                      placeholder="Slug (automaticky generovaný) *"
+                                      className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
                                     />
                                     <input
                                       type="text"
                                       value={formData.description}
                                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                       placeholder="Popis (voliteľné)"
-                                      className="bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                                      className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
                                     />
                                   </div>
                                   <div className="flex items-center justify-end space-x-2">
@@ -955,11 +1172,12 @@ export default function DevCategoriesPage() {
                                         setShowSubcategoryForm(null)
                                         setFormData({
                                           name: '',
+                                          slug: '',
                                           description: '',
                                           icon: '',
                                           color: '',
                                           image: '',
-                                          isActive: true,
+                                          status: CategoryStatus.ACTIVE,
                                           parentId: '',
                                         })
                                       }}

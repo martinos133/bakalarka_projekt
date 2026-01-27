@@ -28,6 +28,12 @@ enum AdvertisementType {
   RENTAL
 }
 
+enum CategoryStatus {
+  ACTIVE
+  DRAFT
+  INACTIVE
+}
+
 enum Gender {
   MALE
   FEMALE
@@ -71,25 +77,30 @@ model User {
 }
 
 model Category {
-  id            String      @id @default(uuid())
-  name          String      @unique
-  slug          String      @unique
-  description   String?     @db.Text
+  id            String         @id @default(uuid())
+  name          String         @unique
+  slug          String         @unique
+  description   String?        @db.Text
   icon          String?
   color         String?
-  image         String?     // URL alebo base64 obrázka
-  isActive      Boolean     @default(true)
+  image         String?        // URL alebo base64 obrázka
+  imageAlt      String?        // Alt text pre obrázok (SEO)
+  metaTitle     String?        // SEO meta title
+  metaDescription String?      @db.Text // SEO meta description
+  metaKeywords  String?        // SEO meta keywords (oddelené čiarkou)
+  ogImage       String?        // Open Graph obrázok (voliteľné)
+  status        CategoryStatus @default(ACTIVE)
   parentId      String?
-  order         Int         @default(0)
-  parent        Category?   @relation("CategoryChildren", fields: [parentId], references: [id], onDelete: Cascade)
-  children      Category[]  @relation("CategoryChildren")
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  order         Int            @default(0)
+  parent        Category?      @relation("CategoryChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children      Category[]     @relation("CategoryChildren")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   advertisements Advertisement[]
   filters       Filter[]
   
   @@index([slug])
-  @@index([isActive])
+  @@index([status])
   @@index([parentId])
   @@index([order])
 }

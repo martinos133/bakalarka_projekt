@@ -149,6 +149,12 @@ export interface LoginDto {
   password: string;
 }
 
+export enum CategoryStatus {
+  ACTIVE = 'ACTIVE',
+  DRAFT = 'DRAFT',
+  INACTIVE = 'INACTIVE',
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -157,7 +163,12 @@ export interface Category {
   icon?: string;
   color?: string;
   image?: string;
-  isActive: boolean;
+  imageAlt?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
+  ogImage?: string;
+  status: CategoryStatus;
   parentId?: string;
   order: number;
   parent?: Category;
@@ -173,18 +184,22 @@ export interface Category {
 
 export interface CreateCategoryDto {
   name: string;
+  slug?: string;
   description?: string;
   icon?: string;
   color?: string;
   image?: string;
-  isActive?: boolean;
+  imageAlt?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
+  ogImage?: string;
+  status?: CategoryStatus;
   parentId?: string;
   order?: number;
 }
 
-export interface UpdateCategoryDto extends Partial<CreateCategoryDto> {
-  isActive?: boolean;
-}
+export interface UpdateCategoryDto extends Partial<CreateCategoryDto> {}
 
 export enum FilterType {
   TEXT = 'TEXT',

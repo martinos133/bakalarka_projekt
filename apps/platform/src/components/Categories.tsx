@@ -17,7 +17,7 @@ export default function Categories() {
       const data = await api.getCategories()
       // Filtruj len hlavné kategórie (bez parentId) a aktívne
       const mainCategories = data
-        .filter((cat: any) => !cat.parentId && cat.isActive)
+        .filter((cat: any) => !cat.parentId && cat.status === 'ACTIVE')
         .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
       setCategories(mainCategories)
     } catch (error) {
@@ -51,7 +51,7 @@ export default function Categories() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((category) => {
-            const subcategories = (category.children?.filter((child: any) => child.isActive) || [])
+            const subcategories = (category.children?.filter((child: any) => child.status === 'ACTIVE') || [])
               .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
             
             return (
