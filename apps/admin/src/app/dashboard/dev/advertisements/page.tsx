@@ -6,7 +6,7 @@ import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
-import { Advertisement, AdvertisementStatus, CreateAdvertisementDto, Category } from '@inzertna-platforma/shared'
+import { Advertisement, AdvertisementStatus, AdvertisementType, CreateAdvertisementDto, Category } from '@inzertna-platforma/shared'
 import { Plus, Edit, Trash2, X, Save, Image as ImageIcon } from 'lucide-react'
 
 export default function DevAdvertisementsPage() {
@@ -21,6 +21,7 @@ export default function DevAdvertisementsPage() {
     title: '',
     description: '',
     price: undefined,
+    type: AdvertisementType.SERVICE,
     categoryId: '',
     location: '',
     images: [],
@@ -121,6 +122,7 @@ export default function DevAdvertisementsPage() {
       title: '',
       description: '',
       price: undefined,
+      type: AdvertisementType.SERVICE,
       categoryId: '',
       location: '',
       images: [],
@@ -265,6 +267,19 @@ export default function DevAdvertisementsPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Typ inzerátu *</label>
+                    <select
+                      required
+                      value={formData.type}
+                      onChange={(e) => setFormData({ ...formData, type: e.target.value as AdvertisementType })}
+                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    >
+                      <option value={AdvertisementType.SERVICE}>Služba</option>
+                      <option value={AdvertisementType.RENTAL}>Prenájom</option>
+                    </select>
+                  </div>
+
+                  <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Cena</label>
                     <input
                       type="number"
@@ -273,6 +288,33 @@ export default function DevAdvertisementsPage() {
                       onChange={(e) => setFormData({ ...formData, price: e.target.value ? parseFloat(e.target.value) : undefined })}
                       className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                     />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Kategória</label>
+                    <select
+                      value={formData.categoryId}
+                      onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    >
+                      <option value="">-- Vybrať kategóriu --</option>
+                      {categories
+                        .filter((cat) => !cat.parentId)
+                        .map((cat) => (
+                          <>
+                            <option key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </option>
+                            {(cat as any).children?.map((child: Category) => (
+                              <option key={child.id} value={child.id}>
+                                &nbsp;&nbsp;└─ {child.name}
+                              </option>
+                            ))}
+                          </>
+                        ))}
+                    </select>
                   </div>
 
                   <div>
@@ -286,24 +328,9 @@ export default function DevAdvertisementsPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Kategória</label>
-                  <select
-                    value={formData.categoryId}
-                    onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                  >
-                    <option value="">-- Vybrať kategóriu --</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-gray-400 mt-2">
-                    Ak nemáte kategóriu, vytvorte ju v sekcii <a href="/dashboard/dev/categories" className="text-blue-400 hover:text-blue-300">Kategórie</a>
-                  </p>
-                </div>
+                <p className="text-xs text-gray-400">
+                  Ak nemáte kategóriu, vytvorte ju v sekcii <a href="/dashboard/dev/categories" className="text-blue-400 hover:text-blue-300">Kategórie</a>
+                </p>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Fotky</label>
@@ -397,6 +424,7 @@ export default function DevAdvertisementsPage() {
                   <thead className="bg-dark border-b border-card">
                     <tr>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Názov</th>
+                      <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Typ</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Kategória</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Cena</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Status</th>
@@ -410,6 +438,15 @@ export default function DevAdvertisementsPage() {
                         <td className="px-6 py-4">
                           <div className="font-medium">{ad.title}</div>
                           <div className="text-sm text-gray-400 line-clamp-1">{ad.description}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            (ad as any).type === 'SERVICE' || !(ad as any).type
+                              ? 'bg-blue-500/20 text-blue-400'
+                              : 'bg-purple-500/20 text-purple-400'
+                          }`}>
+                            {(ad as any).type === 'SERVICE' || !(ad as any).type ? 'Služba' : 'Prenájom'}
+                          </span>
                         </td>
                         <td className="px-6 py-4 text-gray-300">{(ad as any).category?.name || '-'}</td>
                         <td className="px-6 py-4 text-gray-300">

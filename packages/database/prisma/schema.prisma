@@ -23,6 +23,11 @@ enum AdvertisementStatus {
   ARCHIVED
 }
 
+enum AdvertisementType {
+  SERVICE
+  RENTAL
+}
+
 enum Gender {
   MALE
   FEMALE
@@ -64,20 +69,24 @@ model User {
 }
 
 model Category {
-  id          String    @id @default(uuid())
-  name        String    @unique
-  slug        String    @unique
-  description String?   @db.Text
-  icon        String?
-  color       String?
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String      @id @default(uuid())
+  name          String      @unique
+  slug          String      @unique
+  description   String?     @db.Text
+  icon          String?
+  color         String?
+  isActive      Boolean     @default(true)
+  parentId      String?
+  parent        Category?   @relation("CategoryChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children      Category[]  @relation("CategoryChildren")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
   advertisements Advertisement[]
-  filters     Filter[]
+  filters       Filter[]
   
   @@index([slug])
   @@index([isActive])
+  @@index([parentId])
 }
 
 enum FilterType {
@@ -124,6 +133,7 @@ model Advertisement {
   description String             @db.Text
   price       Float?
   status      AdvertisementStatus @default(PENDING)
+  type        AdvertisementType  @default(SERVICE)
   categoryId  String?
   category    Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   location    String?
@@ -138,6 +148,7 @@ model Advertisement {
   @@index([userId])
   @@index([status])
   @@index([categoryId])
+  @@index([type])
 }
 
 model Payment {

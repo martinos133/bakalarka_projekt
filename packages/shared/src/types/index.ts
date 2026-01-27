@@ -17,6 +17,11 @@ export enum AdvertisementStatus {
   ARCHIVED = 'ARCHIVED',
 }
 
+export enum AdvertisementType {
+  SERVICE = 'SERVICE',
+  RENTAL = 'RENTAL',
+}
+
 export interface JwtPayload {
   userId: string;
   email: string;
@@ -65,6 +70,7 @@ export interface Advertisement {
   description: string;
   price?: number;
   status: AdvertisementStatus;
+  type: AdvertisementType;
   category?: string;
   location?: string;
   images: string[];
@@ -77,6 +83,7 @@ export interface CreateAdvertisementDto {
   title: string;
   description: string;
   price?: number;
+  type?: AdvertisementType;
   categoryId?: string;
   location?: string;
   images?: string[];
@@ -107,6 +114,9 @@ export interface Category {
   icon?: string;
   color?: string;
   isActive: boolean;
+  parentId?: string;
+  parent?: Category;
+  children?: Category[];
   createdAt: Date;
   updatedAt: Date;
   _count?: {

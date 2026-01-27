@@ -15,7 +15,16 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
   })
 
   if (!response.ok) {
-    throw new Error(`API error: ${response.statusText}`)
+    let errorMessage = `API error: ${response.statusText}`
+    try {
+      const errorData = await response.json()
+      errorMessage = errorData.message || errorData.error || errorMessage
+    } catch {
+      // Ak sa nepodarí parsovať JSON, použijeme statusText
+    }
+    const error = new Error(errorMessage)
+    ;(error as any).status = response.status
+    throw error
   }
 
   return response.json()

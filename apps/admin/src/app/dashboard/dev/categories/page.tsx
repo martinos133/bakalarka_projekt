@@ -21,6 +21,7 @@ export default function DevCategoriesPage() {
     icon: '',
     color: '',
     isActive: true,
+    parentId: '',
   })
 
   useEffect(() => {
@@ -74,6 +75,7 @@ export default function DevCategoriesPage() {
       icon: category.icon || '',
       color: category.color || '',
       isActive: category.isActive,
+      parentId: (category as any).parentId || '',
     })
     setEditingId(category.id)
     setShowForm(true)
@@ -98,6 +100,7 @@ export default function DevCategoriesPage() {
       icon: '',
       color: '',
       isActive: true,
+      parentId: '',
     })
     setEditingId(null)
     setShowForm(false)
@@ -136,18 +139,40 @@ export default function DevCategoriesPage() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Názov kategórie *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Napríklad: Autá, Nehnuteľnosti, Elektronika..."
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Názov kategórie *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Napríklad: Autá, Nehnuteľnosti, Elektronika..."
+                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Nadradená kategória
+                    </label>
+                    <select
+                      value={formData.parentId}
+                      onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
+                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    >
+                      <option value="">-- Hlavná kategória --</option>
+                      {categories
+                        .filter((cat) => !cat.parentId && cat.id !== editingId)
+                        .map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div>
@@ -247,49 +272,96 @@ export default function DevCategoriesPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {categories.map((category) => (
-                      <tr key={category.id} className="border-b border-card hover:bg-dark/50 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center space-x-2">
-                            <FolderTree className="w-5 h-5 text-gray-400" />
-                            <span className="font-medium">{category.name}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-gray-300">
-                          {category.description || '-'}
-                        </td>
-                        <td className="px-6 py-4 text-gray-300">
-                          {category._count?.advertisements || 0} {(category._count?.advertisements || 0) === 1 ? 'inzerát' : (category._count?.advertisements || 0) < 5 ? 'inzeráty' : 'inzerátov'}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            category.isActive 
-                              ? 'bg-green-500/20 text-green-400' 
-                              : 'bg-gray-500/20 text-gray-400'
-                          }`}>
-                            {category.isActive ? 'Aktívna' : 'Neaktívna'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center justify-end space-x-2">
-                            <button
-                              onClick={() => handleEdit(category)}
-                              className="p-2 text-blue-400 hover:text-blue-300 hover:bg-cardHover rounded transition-colors"
-                              title="Upraviť"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(category.id)}
-                              className="p-2 text-red-400 hover:text-red-300 hover:bg-cardHover rounded transition-colors"
-                              title="Odstrániť"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                    {categories
+                      .filter((cat) => !cat.parentId)
+                      .map((category) => (
+                        <>
+                          <tr key={category.id} className="border-b border-card hover:bg-dark/50 transition-colors">
+                            <td className="px-6 py-4">
+                              <div className="flex items-center space-x-2">
+                                <FolderTree className="w-5 h-5 text-gray-400" />
+                                <span className="font-medium">{category.name}</span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-gray-300">
+                              {category.description || '-'}
+                            </td>
+                            <td className="px-6 py-4 text-gray-300">
+                              {category._count?.advertisements || 0} {(category._count?.advertisements || 0) === 1 ? 'inzerát' : (category._count?.advertisements || 0) < 5 ? 'inzeráty' : 'inzerátov'}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                category.isActive 
+                                  ? 'bg-green-500/20 text-green-400' 
+                                  : 'bg-gray-500/20 text-gray-400'
+                              }`}>
+                                {category.isActive ? 'Aktívna' : 'Neaktívna'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center justify-end space-x-2">
+                                <button
+                                  onClick={() => handleEdit(category)}
+                                  className="p-2 text-blue-400 hover:text-blue-300 hover:bg-cardHover rounded transition-colors"
+                                  title="Upraviť"
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(category.id)}
+                                  className="p-2 text-red-400 hover:text-red-300 hover:bg-cardHover rounded transition-colors"
+                                  title="Odstrániť"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                          {(category as any).children?.map((child: Category) => (
+                            <tr key={child.id} className="border-b border-card hover:bg-dark/50 transition-colors bg-dark/30">
+                              <td className="px-6 py-4 pl-12">
+                                <div className="flex items-center space-x-2">
+                                  <FolderTree className="w-4 h-4 text-gray-500" />
+                                  <span className="text-sm text-gray-300">└─ {child.name}</span>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-gray-400 text-sm">
+                                {child.description || '-'}
+                              </td>
+                              <td className="px-6 py-4 text-gray-400 text-sm">
+                                {child._count?.advertisements || 0} {(child._count?.advertisements || 0) === 1 ? 'inzerát' : (child._count?.advertisements || 0) < 5 ? 'inzeráty' : 'inzerátov'}
+                              </td>
+                              <td className="px-6 py-4">
+                                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                  child.isActive 
+                                    ? 'bg-green-500/20 text-green-400' 
+                                    : 'bg-gray-500/20 text-gray-400'
+                                }`}>
+                                  {child.isActive ? 'Aktívna' : 'Neaktívna'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex items-center justify-end space-x-2">
+                                  <button
+                                    onClick={() => handleEdit(child)}
+                                    className="p-2 text-blue-400 hover:text-blue-300 hover:bg-cardHover rounded transition-colors"
+                                    title="Upraviť"
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(child.id)}
+                                    className="p-2 text-red-400 hover:text-red-300 hover:bg-cardHover rounded transition-colors"
+                                    title="Odstrániť"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </>
+                      ))}
                   </tbody>
                 </table>
               </div>

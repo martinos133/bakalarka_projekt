@@ -38,15 +38,26 @@ export class CategoriesService {
   async findAll() {
     return prisma.category.findMany({
       include: {
+        parent: true,
+        children: {
+          include: {
+            _count: {
+              select: {
+                advertisements: true,
+              },
+            },
+          },
+        },
         _count: {
           select: {
             advertisements: true,
           },
         },
       },
-      orderBy: {
-        name: 'asc',
-      },
+      orderBy: [
+        { parentId: 'asc' },
+        { name: 'asc' },
+      ],
     });
   }
 
@@ -56,15 +67,29 @@ export class CategoriesService {
         isActive: true,
       },
       include: {
+        parent: true,
+        children: {
+          where: {
+            isActive: true,
+          },
+          include: {
+            _count: {
+              select: {
+                advertisements: true,
+              },
+            },
+          },
+        },
         _count: {
           select: {
             advertisements: true,
           },
         },
       },
-      orderBy: {
-        name: 'asc',
-      },
+      orderBy: [
+        { parentId: 'asc' },
+        { name: 'asc' },
+      ],
     });
   }
 

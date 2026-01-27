@@ -35,6 +35,12 @@ export class AdvertisementsController {
     return this.advertisementsService.findAll();
   }
 
+  @Get('popular/services')
+  @ApiOperation({ summary: 'Získanie populárnych služieb' })
+  findPopularServices() {
+    return this.advertisementsService.findPopularServices(6);
+  }
+
   @Get('user/:userId')
   @ApiOperation({ summary: 'Získanie inzerátov používateľa' })
   findByUser(@Param('userId') userId: string) {

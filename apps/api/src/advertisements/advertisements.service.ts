@@ -10,7 +10,8 @@ export class AdvertisementsService {
         ...createDto,
         userId,
         images: createDto.images || [],
-      },
+        type: (createDto.type as any) || 'SERVICE',
+      } as any,
     });
   }
 
@@ -27,10 +28,35 @@ export class AdvertisementsService {
           },
         },
         category: true,
-      },
+      } as any,
       orderBy: {
         createdAt: 'desc',
       },
+    });
+  }
+
+  async findPopularServices(limit: number = 6) {
+    return prisma.advertisement.findMany({
+      where: {
+        status: 'ACTIVE' as any,
+        type: 'SERVICE' as any,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+        category: true,
+      } as any,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
     });
   }
 
@@ -48,7 +74,7 @@ export class AdvertisementsService {
           },
         },
         category: true,
-      },
+      } as any,
     });
 
     if (!advertisement) {
@@ -73,7 +99,7 @@ export class AdvertisementsService {
 
     return prisma.advertisement.update({
       where: { id },
-      data: updateDto,
+      data: updateDto as any,
     });
   }
 
@@ -107,7 +133,7 @@ export class AdvertisementsService {
   async findPending() {
     return prisma.advertisement.findMany({
       where: {
-        status: 'PENDING',
+        status: 'PENDING' as any,
       },
       include: {
         user: {
@@ -120,7 +146,7 @@ export class AdvertisementsService {
           },
         },
         category: true,
-      },
+      } as any,
       orderBy: {
         createdAt: 'asc',
       },
@@ -136,14 +162,14 @@ export class AdvertisementsService {
       throw new NotFoundException('Inzerát nebol nájdený');
     }
 
-    if (advertisement.status !== 'PENDING') {
+    if ((advertisement.status as string) !== 'PENDING') {
       throw new ForbiddenException('Inzerát už bol spracovaný');
     }
 
     return prisma.advertisement.update({
       where: { id },
       data: {
-        status: 'ACTIVE',
+        status: 'ACTIVE' as any,
       },
       include: {
         user: {
@@ -156,7 +182,7 @@ export class AdvertisementsService {
           },
         },
         category: true,
-      },
+      } as any,
     });
   }
 
@@ -169,14 +195,14 @@ export class AdvertisementsService {
       throw new NotFoundException('Inzerát nebol nájdený');
     }
 
-    if (advertisement.status !== 'PENDING') {
+    if ((advertisement.status as string) !== 'PENDING') {
       throw new ForbiddenException('Inzerát už bol spracovaný');
     }
 
     return prisma.advertisement.update({
       where: { id },
       data: {
-        status: 'INACTIVE',
+        status: 'INACTIVE' as any,
       },
       include: {
         user: {
@@ -189,7 +215,7 @@ export class AdvertisementsService {
           },
         },
         category: true,
-      },
+      } as any,
     });
   }
 }
