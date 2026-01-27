@@ -27,10 +27,26 @@ export class CategoriesService {
       throw new ConflictException('Kategória s týmto názvom už existuje');
     }
 
+    // Ak je parentId prázdny string, nastav ho na null
+    const parentId = createDto.parentId && createDto.parentId.trim() !== '' 
+      ? createDto.parentId 
+      : null;
+
+    // Skontroluj, či parentId existuje (ak nie je null)
+    if (parentId) {
+      const parentExists = await prisma.category.findUnique({
+        where: { id: parentId },
+      });
+      if (!parentExists) {
+        throw new NotFoundException('Nadradená kategória nebola nájdená');
+      }
+    }
+
     return prisma.category.create({
       data: {
         ...createDto,
         slug,
+        parentId,
       },
     });
   }
@@ -47,6 +63,9 @@ export class CategoriesService {
               },
             },
           },
+          orderBy: {
+            order: 'asc',
+          },
         },
         _count: {
           select: {
@@ -56,6 +75,7 @@ export class CategoriesService {
       },
       orderBy: [
         { parentId: 'asc' },
+        { order: 'asc' },
         { name: 'asc' },
       ],
     });
@@ -79,6 +99,9 @@ export class CategoriesService {
               },
             },
           },
+          orderBy: {
+            order: 'asc',
+          },
         },
         _count: {
           select: {
@@ -88,6 +111,7 @@ export class CategoriesService {
       },
       orderBy: [
         { parentId: 'asc' },
+        { order: 'asc' },
         { name: 'asc' },
       ],
     });
@@ -144,11 +168,31 @@ export class CategoriesService {
       }
     }
 
+    // Ak je parentId prázdny string, nastav ho na null
+    let parentId = updateDto.parentId;
+    if (parentId !== undefined) {
+      parentId = parentId && parentId.trim() !== '' ? parentId : null;
+      
+      // Skontroluj, či parentId existuje (ak nie je null) a nie je to tá istá kategória
+      if (parentId) {
+        if (parentId === id) {
+          throw new ConflictException('Kategória nemôže byť sama sebe nadradená');
+        }
+        const parentExists = await prisma.category.findUnique({
+          where: { id: parentId },
+        });
+        if (!parentExists) {
+          throw new NotFoundException('Nadradená kategória nebola nájdená');
+        }
+      }
+    }
+
     return prisma.category.update({
       where: { id },
       data: {
         ...updateDto,
         ...(slug !== category.slug && { slug }),
+        ...(parentId !== undefined && { parentId }),
       },
     });
   }
@@ -183,5 +227,62 @@ export class CategoriesService {
     return prisma.category.delete({
       where: { id },
     });
+  }
+
+  async updateOrder(categoryIds: string[], parentId?: string) {
+    // Ak je zadaný parentId, aktualizuj len podkategórie tejto hlavnej kategórie
+    if (parentId) {
+      // Skontroluj, či všetky kategórie patria k tejto hlavnej kategórii
+      const parentCategory = await prisma.category.findUnique({
+        where: { id: parentId },
+        include: { children: true },
+      });
+
+      if (!parentCategory) {
+        throw new NotFoundException('Nadradená kategória nebola nájdená');
+      }
+
+      const childIds = parentCategory.children.map(c => c.id);
+      const allValid = categoryIds.every(id => childIds.includes(id));
+      
+      if (!allValid) {
+        throw new ConflictException('Niektoré kategórie nepatria k tejto nadradenej kategórii');
+      }
+
+      // Aktualizuj order len pre podkategórie
+      const updates = categoryIds.map((id, index) =>
+        prisma.category.update({
+          where: { id },
+          data: { order: index },
+        })
+      );
+
+      await Promise.all(updates);
+    } else {
+      // Aktualizuj order pre hlavné kategórie
+      // Skontroluj, či všetky kategórie sú hlavné (nemajú parentId)
+      const mainCategories = await prisma.category.findMany({
+        where: { parentId: null },
+      });
+
+      const mainCategoryIds = mainCategories.map(c => c.id);
+      const allValid = categoryIds.every(id => mainCategoryIds.includes(id));
+      
+      if (!allValid) {
+        throw new ConflictException('Niektoré kategórie nie sú hlavné kategórie');
+      }
+
+      // Aktualizuj order pre hlavné kategórie
+      const updates = categoryIds.map((id, index) =>
+        prisma.category.update({
+          where: { id },
+          data: { order: index },
+        })
+      );
+
+      await Promise.all(updates);
+    }
+
+    return this.findAll();
   }
 }

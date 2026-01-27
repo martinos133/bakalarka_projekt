@@ -9,25 +9,33 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
     ...options.headers,
   }
 
-  const response = await fetch(`${API_URL}${url}`, {
-    ...options,
-    headers,
-  })
+  try {
+    const response = await fetch(`${API_URL}${url}`, {
+      ...options,
+      headers,
+    })
 
-  if (!response.ok) {
-    let errorMessage = `API error: ${response.statusText}`
-    try {
-      const errorData = await response.json()
-      errorMessage = errorData.message || errorData.error || errorMessage
-    } catch {
-      // Ak sa nepodarí parsovať JSON, použijeme statusText
+    if (!response.ok) {
+      let errorMessage = `API error: ${response.statusText}`
+      try {
+        const errorData = await response.json()
+        errorMessage = errorData.message || errorData.error || errorMessage
+      } catch {
+        // Ak sa nepodarí parsovať JSON, použijeme statusText
+      }
+      const error = new Error(errorMessage)
+      ;(error as any).status = response.status
+      throw error
     }
-    const error = new Error(errorMessage)
-    ;(error as any).status = response.status
+
+    return response.json()
+  } catch (error: any) {
+    // Ak je to network error (Failed to fetch)
+    if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+      throw new Error(`Nepodarilo sa pripojiť k API serveru na ${API_URL}. Skontrolujte, či API server beží.`)
+    }
     throw error
   }
-
-  return response.json()
 }
 
 export const api = {
@@ -67,6 +75,11 @@ export const api = {
   deleteCategory: (id: string) =>
     fetchWithAuth(`/categories/${id}`, {
       method: 'DELETE',
+    }),
+  updateCategoryOrder: (categoryIds: string[], parentId?: string) =>
+    fetchWithAuth('/categories/order', {
+      method: 'PUT',
+      body: JSON.stringify({ categoryIds, parentId }),
     }),
   getCategory: (id: string) =>
     fetchWithAuth(`/categories/${id}`),

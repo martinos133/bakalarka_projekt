@@ -156,8 +156,10 @@ export interface Category {
   description?: string;
   icon?: string;
   color?: string;
+  image?: string;
   isActive: boolean;
   parentId?: string;
+  order: number;
   parent?: Category;
   children?: Category[];
   createdAt: Date;
@@ -172,7 +174,10 @@ export interface CreateCategoryDto {
   description?: string;
   icon?: string;
   color?: string;
+  image?: string;
   isActive?: boolean;
+  parentId?: string;
+  order?: number;
 }
 
 export interface UpdateCategoryDto extends Partial<CreateCategoryDto> {

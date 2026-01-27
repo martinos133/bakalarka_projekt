@@ -77,8 +77,10 @@ model Category {
   description   String?     @db.Text
   icon          String?
   color         String?
+  image         String?     // URL alebo base64 obrázka
   isActive      Boolean     @default(true)
   parentId      String?
+  order         Int         @default(0)
   parent        Category?   @relation("CategoryChildren", fields: [parentId], references: [id], onDelete: Cascade)
   children      Category[]  @relation("CategoryChildren")
   createdAt     DateTime    @default(now())
@@ -89,6 +91,7 @@ model Category {
   @@index([slug])
   @@index([isActive])
   @@index([parentId])
+  @@index([order])
 }
 
 enum FilterType {

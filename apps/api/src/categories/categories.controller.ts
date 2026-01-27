@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
@@ -64,5 +65,14 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Odstránenie kategórie' })
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(id);
+  }
+
+  @Put('order')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Aktualizácia poradia kategórií' })
+  updateOrder(@Body() body: { categoryIds: string[]; parentId?: string }) {
+    return this.categoriesService.updateOrder(body.categoryIds, body.parentId);
   }
 }
