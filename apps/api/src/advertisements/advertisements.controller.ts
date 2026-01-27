@@ -41,6 +41,12 @@ export class AdvertisementsController {
     return this.advertisementsService.findPopularServices(6);
   }
 
+  @Get('category/:slug')
+  @ApiOperation({ summary: 'Získanie inzerátov podľa slug kategórie' })
+  getByCategorySlug(@Param('slug') slug: string) {
+    return this.advertisementsService.findByCategorySlug(slug);
+  }
+
   @Get('user/:userId')
   @ApiOperation({ summary: 'Získanie inzerátov používateľa' })
   findByUser(@Param('userId') userId: string) {

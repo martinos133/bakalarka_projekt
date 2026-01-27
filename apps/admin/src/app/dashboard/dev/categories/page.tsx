@@ -38,6 +38,8 @@ export default function DevCategoriesPage() {
     color: '',
     image: '',
     imageAlt: '',
+    banner: '',
+    bannerAlt: '',
     metaTitle: '',
     metaDescription: '',
     metaKeywords: '',
@@ -117,6 +119,8 @@ export default function DevCategoriesPage() {
       color: category.color || '',
       image: category.image || '',
       imageAlt: category.imageAlt || '',
+      banner: category.banner || '',
+      bannerAlt: category.bannerAlt || '',
       metaTitle: category.metaTitle || '',
       metaDescription: category.metaDescription || '',
       metaKeywords: category.metaKeywords || '',
@@ -137,6 +141,8 @@ export default function DevCategoriesPage() {
       color: '',
       image: '',
       imageAlt: '',
+      banner: '',
+      bannerAlt: '',
       metaTitle: '',
       metaDescription: '',
       metaKeywords: '',
@@ -182,6 +188,8 @@ export default function DevCategoriesPage() {
         color: '',
         image: '',
         imageAlt: '',
+        banner: '',
+        bannerAlt: '',
         metaTitle: '',
         metaDescription: '',
         metaKeywords: '',
@@ -326,6 +334,8 @@ export default function DevCategoriesPage() {
       color: '',
       image: '',
       imageAlt: '',
+      banner: '',
+      bannerAlt: '',
       metaTitle: '',
       metaDescription: '',
       metaKeywords: '',
@@ -374,6 +384,73 @@ export default function DevCategoriesPage() {
     })
   }
 
+  const compressBannerImage = (file: File, targetWidth: number = 1200, targetHeight: number = 400, quality: number = 0.85): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = (event) => {
+        const img = new Image()
+        img.src = event.target?.result as string
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          canvas.width = targetWidth
+          canvas.height = targetHeight
+
+          const ctx = canvas.getContext('2d')
+          if (!ctx) {
+            reject(new Error('Nepodarilo sa vytvoriť canvas context'))
+            return
+          }
+
+          // Nastav kvalitu vykresľovania pre lepšie výsledky
+          ctx.imageSmoothingEnabled = true
+          ctx.imageSmoothingQuality = 'high'
+
+          // Vypočítaj pomer strán cieľového bannera (3:1)
+          const targetAspectRatio = targetWidth / targetHeight // 3:1
+          const imageAspectRatio = img.width / img.height
+
+          let sourceX = 0
+          let sourceY = 0
+          let sourceWidth = img.width
+          let sourceHeight = img.height
+
+          // Ak je obrázok širší ako cieľový pomer (3:1), orezaj zo strán (centrované)
+          if (imageAspectRatio > targetAspectRatio) {
+            // Obmedz výšku na pôvodnú výšku obrázka a vypočítaj šírku podľa pomeru
+            sourceWidth = img.height * targetAspectRatio
+            sourceX = (img.width - sourceWidth) / 2 // Centrovanie
+          } 
+          // Ak je obrázok vyšší ako cieľový pomer (3:1), orezaj zhora/dole (centrované)
+          else if (imageAspectRatio < targetAspectRatio) {
+            // Obmedz šírku na pôvodnú šírku obrázka a vypočítaj výšku podľa pomeru
+            sourceHeight = img.width / targetAspectRatio
+            sourceY = (img.height - sourceHeight) / 2 // Centrovanie
+          }
+          // Ak má obrázok rovnaký pomer strán, použije sa celý bez orezania
+
+          // Vykresli obrázok s orezaním a prispôsobením na presné cieľové rozmery
+          ctx.drawImage(
+            img,
+            sourceX,
+            sourceY,
+            sourceWidth,
+            sourceHeight,
+            0,
+            0,
+            targetWidth,
+            targetHeight
+          )
+
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', quality)
+          resolve(compressedDataUrl)
+        }
+        img.onerror = reject
+      }
+      reader.onerror = reject
+    })
+  }
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -399,7 +476,35 @@ export default function DevCategoriesPage() {
   }
 
   const removeImage = () => {
-    setFormData({ ...formData, image: '' })
+    setFormData({ ...formData, image: '', imageAlt: '' })
+  }
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      alert('Prosím vyberte obrázok')
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Banner je príliš veľký. Maximálna veľkosť je 10MB.')
+      return
+    }
+
+    try {
+      // Automaticky prispôsobí obrázok na 1200×400px s orezaním ak je potrebné
+      const compressedBanner = await compressBannerImage(file, 1200, 400, 0.85)
+      setFormData({ ...formData, banner: compressedBanner })
+    } catch (error) {
+      console.error('Chyba pri kompresii bannera:', error)
+      alert('Chyba pri nahrávaní bannera')
+    }
+  }
+
+  const removeBanner = () => {
+    setFormData({ ...formData, banner: '', bannerAlt: '' })
   }
 
   const getFilteredCategories = () => {
@@ -687,6 +792,65 @@ export default function DevCategoriesPage() {
                     placeholder="Krátky popis kategórie..."
                     className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Banner kategórie
+                    <span className="ml-2 text-xs text-gray-400">(Zobrazí sa na stránke kategórie)</span>
+                  </label>
+                  {formData.banner ? (
+                    <div className="relative">
+                      <img
+                        src={formData.banner}
+                        alt={formData.bannerAlt || 'Banner preview'}
+                        className="w-full max-h-64 object-cover rounded-lg border border-card"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeBanner}
+                        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-card rounded-lg p-6 text-center hover:border-gray-600 transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleBannerUpload}
+                        className="hidden"
+                        id="banner-upload"
+                      />
+                      <label
+                        htmlFor="banner-upload"
+                        className="cursor-pointer flex flex-col items-center"
+                      >
+                        <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
+                        <span className="text-sm text-gray-400">
+                          Kliknite pre nahranie bannera
+                        </span>
+                        <span className="text-xs text-gray-500 mt-1">
+                          Odporúčaná veľkosť: 1200×400px (max 10MB)
+                        </span>
+                      </label>
+                    </div>
+                  )}
+                  {formData.banner && (
+                    <div className="mt-2">
+                      <input
+                        type="text"
+                        value={formData.bannerAlt}
+                        onChange={(e) => setFormData({ ...formData, bannerAlt: e.target.value })}
+                        placeholder="Alt text pre banner (SEO)"
+                        className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      />
+                      <p className="mt-1 text-xs text-gray-400">
+                        Popis bannera pre vyhľadávače a prístupnosť
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -1177,6 +1341,13 @@ export default function DevCategoriesPage() {
                                           icon: '',
                                           color: '',
                                           image: '',
+                                          imageAlt: '',
+                                          banner: '',
+                                          bannerAlt: '',
+                                          metaTitle: '',
+                                          metaDescription: '',
+                                          metaKeywords: '',
+                                          ogImage: '',
                                           status: CategoryStatus.ACTIVE,
                                           parentId: '',
                                         })
@@ -1234,11 +1405,14 @@ export default function DevCategoriesPage() {
                                     {/* Status badge */}
                                     <div className="flex-shrink-0">
                                       <span className={`px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap ${
-                                        child.isActive 
+                                        child.status === CategoryStatus.ACTIVE
                                           ? 'bg-green-500/20 text-green-400' 
+                                          : child.status === CategoryStatus.DRAFT
+                                          ? 'bg-yellow-500/20 text-yellow-400'
                                           : 'bg-gray-500/20 text-gray-400'
                                       }`}>
-                                        {child.isActive ? 'Aktívna' : 'Neaktívna'}
+                                        {child.status === CategoryStatus.ACTIVE ? 'Aktívna' : 
+                                         child.status === CategoryStatus.DRAFT ? 'Koncept' : 'Neaktívna'}
                                       </span>
                                     </div>
                                     

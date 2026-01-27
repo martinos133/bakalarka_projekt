@@ -51,7 +51,7 @@ export default function Categories() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((category) => {
-            const subcategories = (category.children?.filter((child: any) => child.status === 'ACTIVE') || [])
+            const subcategories = (category.children?.filter((child: any) => child.status === 'ACTIVE') || []).slice(0, 3)
               .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
             
             return (
@@ -82,17 +82,20 @@ export default function Categories() {
                 </h3>
                 {subcategories.length > 0 && (
                   <ul className="space-y-2">
-                    {subcategories.slice(0, 3).map((subcategory: any) => (
-                      <li
-                        key={subcategory.id}
-                        className="text-sm text-gray-600 hover:text-[#1dbf73] transition-colors"
-                      >
-                        {subcategory.name}
+                    {subcategories.map((subcategory: any) => (
+                      <li key={subcategory.id}>
+                        <Link
+                          href={`/kategoria/${subcategory.slug}`}
+                          className="text-sm text-gray-600 hover:text-[#1dbf73] transition-colors block"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {subcategory.name}
+                        </Link>
                       </li>
                     ))}
-                    {subcategories.length > 3 && (
+                    {(category.children?.filter((child: any) => child.status === 'ACTIVE') || []).length > 3 && (
                       <li className="text-sm text-gray-500">
-                        +{subcategories.length - 3} ďalších
+                        +{(category.children?.filter((child: any) => child.status === 'ACTIVE') || []).length - 3} ďalších
                       </li>
                     )}
                   </ul>

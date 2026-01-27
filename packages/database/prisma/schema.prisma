@@ -85,6 +85,8 @@ model Category {
   color         String?
   image         String?        // URL alebo base64 obrázka
   imageAlt      String?        // Alt text pre obrázok (SEO)
+  banner        String?        // Banner obrázok pre stránku kategórie
+  bannerAlt     String?        // Alt text pre banner (SEO)
   metaTitle     String?        // SEO meta title
   metaDescription String?      @db.Text // SEO meta description
   metaKeywords  String?        // SEO meta keywords (oddelené čiarkou)

@@ -164,6 +164,8 @@ export interface Category {
   color?: string;
   image?: string;
   imageAlt?: string;
+  banner?: string;
+  bannerAlt?: string;
   metaTitle?: string;
   metaDescription?: string;
   metaKeywords?: string;
@@ -190,6 +192,8 @@ export interface CreateCategoryDto {
   color?: string;
   image?: string;
   imageAlt?: string;
+  banner?: string;
+  bannerAlt?: string;
   metaTitle?: string;
   metaDescription?: string;
   metaKeywords?: string;

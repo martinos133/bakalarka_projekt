@@ -62,6 +62,8 @@ export const api = {
   getPopularServices: () => fetchAPI('/advertisements/popular/services'),
   getAdvertisement: (id: string) => fetchAPI(`/advertisements/${id}`),
   getCategories: () => fetchAPI('/categories/active'),
+  getCategoryBySlug: (slug: string) => fetchAPI(`/categories/slug/${slug}`),
+  getAdvertisementsByCategory: (slug: string) => fetchAPI(`/advertisements/category/${slug}`),
 
   // Auth endpoints
   register: (data: any) => fetchAPI('/auth/register', {

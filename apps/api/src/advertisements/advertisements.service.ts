@@ -159,6 +159,54 @@ export class AdvertisementsService {
     });
   }
 
+  async findByCategorySlug(slug: string) {
+    // Najprv nájdi kategóriu podľa slug
+    const category = await prisma.category.findUnique({
+      where: { slug },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Kategória nebola nájdená');
+    }
+
+    // Nájdi všetky aktívne inzeráty v tejto kategórii a jej podkategóriách
+    const categoryIds = [category.id];
+    
+    // Pridaj ID všetkých podkategórií
+    const subcategories = await prisma.category.findMany({
+      where: {
+        parentId: category.id,
+        status: 'ACTIVE',
+      },
+      select: {
+        id: true,
+      },
+    });
+    
+    categoryIds.push(...subcategories.map(sub => sub.id));
+
+    return prisma.advertisement.findMany({
+      where: {
+        categoryId: { in: categoryIds },
+        status: 'ACTIVE',
+      } as any,
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+        category: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
   async findPending() {
     return prisma.advertisement.findMany({
       where: {

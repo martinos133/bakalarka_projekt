@@ -43,6 +43,12 @@ export class CategoriesController {
     return this.categoriesService.findActive();
   }
 
+  @Get('slug/:slug')
+  @ApiOperation({ summary: 'Získanie kategórie podľa slug' })
+  findBySlug(@Param('slug') slug: string) {
+    return this.categoriesService.findBySlug(slug);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Získanie kategórie podľa ID' })
   findOne(@Param('id') id: string) {

@@ -155,6 +155,46 @@ export class CategoriesService {
     return category;
   }
 
+  async findBySlug(slug: string) {
+    const category = await prisma.category.findUnique({
+      where: { slug },
+      include: {
+        parent: true,
+        children: {
+          where: {
+            status: 'ACTIVE',
+          },
+          include: {
+            _count: {
+              select: {
+                advertisements: true,
+              },
+            },
+          },
+          orderBy: {
+            order: 'asc',
+          },
+        },
+        _count: {
+          select: {
+            advertisements: true,
+            filters: true,
+          },
+        },
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Kategória nebola nájdená');
+    }
+
+    if (category.status !== 'ACTIVE') {
+      throw new NotFoundException('Kategória nie je aktívna');
+    }
+
+    return category;
+  }
+
   async update(id: string, updateDto: UpdateCategoryDto) {
     const category = await prisma.category.findUnique({
       where: { id },
