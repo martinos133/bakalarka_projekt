@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
@@ -49,8 +49,20 @@ export default function DevFiltersPage() {
       router.push('/login')
       return
     }
+    
     loadCategories()
-    loadFilters()
+    
+    // Skontroluj query parameter pre categoryId
+    const searchParams = new URLSearchParams(window.location.search)
+    const categoryIdFromUrl = searchParams.get('categoryId')
+    if (categoryIdFromUrl) {
+      setSelectedCategoryId(categoryIdFromUrl)
+      setFormData(prev => ({ ...prev, categoryId: categoryIdFromUrl }))
+      loadFilters(categoryIdFromUrl)
+      setShowForm(true)
+    } else {
+      loadFilters()
+    }
   }, [router])
 
   useEffect(() => {

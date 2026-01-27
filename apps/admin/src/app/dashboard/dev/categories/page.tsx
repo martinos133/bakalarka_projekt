@@ -7,7 +7,7 @@ import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { Category } from '@inzertna-platforma/shared'
-import { Plus, Edit, Trash2, X, Save, FolderTree, Image as ImageIcon, FolderPlus, ChevronDown, ChevronRight, GripVertical } from 'lucide-react'
+import { Plus, Edit, Trash2, X, Save, FolderTree, Image as ImageIcon, FolderPlus, ChevronDown, ChevronRight, GripVertical, Filter, Search } from 'lucide-react'
 
 export default function DevCategoriesPage() {
   const router = useRouter()
@@ -19,6 +19,17 @@ export default function DevCategoriesPage() {
   const [showSubcategoryForm, setShowSubcategoryForm] = useState<string | null>(null)
   const [draggedCategoryId, setDraggedCategoryId] = useState<string | null>(null)
   const [draggedOverCategoryId, setDraggedOverCategoryId] = useState<string | null>(null)
+  const [filterData, setFilterData] = useState({
+    search: '',
+    status: '' as '' | 'active' | 'inactive',
+    type: '' as '' | 'main' | 'subcategory',
+    minAdvertisements: '',
+    maxAdvertisements: '',
+    minSubcategories: '',
+    maxSubcategories: '',
+    minFilters: '',
+    maxFilters: '',
+  })
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -347,23 +358,200 @@ export default function DevCategoriesPage() {
     setFormData({ ...formData, image: '' })
   }
 
+  const getFilteredCategories = () => {
+    return categories.filter((cat) => {
+      // Filtrovanie len hlavných kategórií
+      if (cat.parentId) return false
+
+      // Vyhľadávanie
+      if (filterData.search) {
+        const searchLower = filterData.search.toLowerCase()
+        if (
+          !cat.name.toLowerCase().includes(searchLower) &&
+          !cat.description?.toLowerCase().includes(searchLower) &&
+          !cat.slug.toLowerCase().includes(searchLower)
+        ) {
+          return false
+        }
+      }
+
+      // Status
+      if (filterData.status === 'active' && !cat.isActive) return false
+      if (filterData.status === 'inactive' && cat.isActive) return false
+
+      // Typ (hlavná/podkategória)
+      if (filterData.type === 'main' && cat.parentId) return false
+      if (filterData.type === 'subcategory' && !cat.parentId) return false
+
+      // Počet inzerátov
+      const adCount = cat._count?.advertisements || 0
+      if (filterData.minAdvertisements && adCount < parseInt(filterData.minAdvertisements)) return false
+      if (filterData.maxAdvertisements && adCount > parseInt(filterData.maxAdvertisements)) return false
+
+      // Počet podkategórií
+      const subCount = (cat as any).children?.length || 0
+      if (filterData.minSubcategories && subCount < parseInt(filterData.minSubcategories)) return false
+      if (filterData.maxSubcategories && subCount > parseInt(filterData.maxSubcategories)) return false
+
+      // Počet filtrov
+      const filterCount = cat._count?.filters || 0
+      if (filterData.minFilters && filterCount < parseInt(filterData.minFilters)) return false
+      if (filterData.maxFilters && filterCount > parseInt(filterData.maxFilters)) return false
+
+      return true
+    })
+  }
+
+  const clearFilters = () => {
+    setFilterData({
+      search: '',
+      status: '',
+      type: '',
+      minAdvertisements: '',
+      maxAdvertisements: '',
+      minSubcategories: '',
+      maxSubcategories: '',
+      minFilters: '',
+      maxFilters: '',
+    })
+  }
+
+  const hasActiveFilters = () => {
+    return Object.values(filterData).some(value => value !== '')
+  }
+
   return (
     <div className="min-h-screen bg-dark text-white flex">
       <Sidebar />
       <div className="flex-1 ml-64">
         <Header />
         <main className="p-6">
-          <div className="mb-6 flex items-center justify-end">
-            {!showForm && (
-              <button
-                onClick={() => setShowForm(true)}
-                className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-              >
-                <Plus className="w-5 h-5" />
-                <span>Nová kategória</span>
-              </button>
-            )}
-          </div>
+          {/* Filtre hore */}
+          {!showForm && (
+            <div className="bg-card rounded-lg p-4 border border-dark mb-6">
+              <div className="flex items-center gap-4 flex-wrap">
+                {/* Vyhľadávanie */}
+                <div className="flex-1 min-w-[200px]">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      value={filterData.search}
+                      onChange={(e) => setFilterData({ ...filterData, search: e.target.value })}
+                      placeholder="Vyhľadať kategórie..."
+                      className="w-full bg-dark border border-card rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 text-sm"
+                    />
+                  </div>
+                </div>
+
+                {/* Status */}
+                <div className="w-40">
+                  <select
+                    value={filterData.status}
+                    onChange={(e) => setFilterData({ ...filterData, status: e.target.value as '' | 'active' | 'inactive' })}
+                    className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                  >
+                    <option value="">Všetky</option>
+                    <option value="active">Aktívne</option>
+                    <option value="inactive">Neaktívne</option>
+                  </select>
+                </div>
+
+                {/* Typ */}
+                <div className="w-48">
+                  <select
+                    value={filterData.type}
+                    onChange={(e) => setFilterData({ ...filterData, type: e.target.value as '' | 'main' | 'subcategory' })}
+                    className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                  >
+                    <option value="">Všetky typy</option>
+                    <option value="main">Hlavné</option>
+                    <option value="subcategory">Podkategórie</option>
+                  </select>
+                </div>
+
+                {/* Počet inzerátov */}
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    value={filterData.minAdvertisements}
+                    onChange={(e) => setFilterData({ ...filterData, minAdvertisements: e.target.value })}
+                    placeholder="Min inz."
+                    className="w-24 bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                  />
+                  <input
+                    type="number"
+                    value={filterData.maxAdvertisements}
+                    onChange={(e) => setFilterData({ ...filterData, maxAdvertisements: e.target.value })}
+                    placeholder="Max inz."
+                    className="w-24 bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                  />
+                </div>
+
+                {/* Počet podkategórií */}
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    value={filterData.minSubcategories}
+                    onChange={(e) => setFilterData({ ...filterData, minSubcategories: e.target.value })}
+                    placeholder="Min pod."
+                    className="w-24 bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                  />
+                  <input
+                    type="number"
+                    value={filterData.maxSubcategories}
+                    onChange={(e) => setFilterData({ ...filterData, maxSubcategories: e.target.value })}
+                    placeholder="Max pod."
+                    className="w-24 bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                  />
+                </div>
+
+                {/* Počet filtrov */}
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    value={filterData.minFilters}
+                    onChange={(e) => setFilterData({ ...filterData, minFilters: e.target.value })}
+                    placeholder="Min filt."
+                    className="w-24 bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                  />
+                  <input
+                    type="number"
+                    value={filterData.maxFilters}
+                    onChange={(e) => setFilterData({ ...filterData, maxFilters: e.target.value })}
+                    placeholder="Max filt."
+                    className="w-24 bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                  />
+                </div>
+
+                {/* Vymazať filtre */}
+                {hasActiveFilters() && (
+                  <button
+                    onClick={clearFilters}
+                    className="px-3 py-2 text-gray-400 hover:text-white transition-colors flex items-center gap-1 text-sm"
+                    title="Vymazať všetky filtre"
+                  >
+                    <X className="w-4 h-4" />
+                    Vymazať
+                  </button>
+                )}
+
+                {/* Počítadlo a tlačidlo */}
+                <div className="flex items-center gap-4 ml-auto">
+                  <div className="text-xs text-gray-400 whitespace-nowrap">
+                    {getFilteredCategories().length} z {categories.filter(c => !c.parentId).length}
+                  </div>
+                  <button
+                    onClick={() => setShowForm(true)}
+                    className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors whitespace-nowrap"
+                  >
+                    <Plus className="w-5 h-5" />
+                    <span>Nová kategória</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {showForm && (
             <div className="bg-card rounded-lg p-6 border border-dark mb-6" data-form="category-form">
@@ -555,25 +743,30 @@ export default function DevCategoriesPage() {
                 </p>
               </div>
             ) : (
-              <div className="p-6 space-y-3">
-                {categories
-                  .filter((cat) => !cat.parentId)
-                  .sort((a, b) => (a.order || 0) - (b.order || 0))
-                  .map((category) => {
-                    const children = (category as any).children || []
-                    const isExpanded = expandedCategories.has(category.id)
-                    const showForm = showSubcategoryForm === category.id
+              <div>
+                  {getFilteredCategories()
+                    .sort((a, b) => (a.order || 0) - (b.order || 0))
+                    .map((category, index, array) => {
+                      const children = (category as any).children || []
+                      const isExpanded = expandedCategories.has(category.id)
+                      const showForm = showSubcategoryForm === category.id
+                      const isFirst = index === 0
+                      const isLast = index === array.length - 1
+                      const hasExpandedAfter = array.slice(index + 1).some((cat: Category) => expandedCategories.has(cat.id))
+                      const shouldRoundBottom = isLast && !isExpanded && !hasExpandedAfter
 
                     return (
                       <div 
                         key={category.id} 
-                        className={`bg-dark rounded-lg border overflow-hidden transition-all cursor-move ${
+                        className={`bg-card border overflow-hidden transition-all cursor-move ${
+                          isFirst ? 'rounded-t-lg' : ''
+                        } ${shouldRoundBottom ? 'rounded-b-lg' : ''} ${
                           draggedCategoryId === category.id 
                             ? 'border-primary opacity-50 scale-95' 
                             : draggedOverCategoryId === category.id
                             ? 'border-green-500 border-2 scale-105'
-                            : 'border-card'
-                        }`}
+                            : 'border-dark border-t-0'
+                        } ${!isFirst ? 'border-t-0' : ''}`}
                         draggable
                         onDragStart={(e) => handleDragStart(e, category.id)}
                         onDragOver={(e) => handleDragOver(e, category.id)}
@@ -581,68 +774,105 @@ export default function DevCategoriesPage() {
                         onDrop={(e) => handleDrop(e, category.id)}
                       >
                         {/* Hlavná kategória */}
-                        <div className="p-4 hover:bg-cardHover transition-colors">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3 flex-1">
-                              <div className="cursor-move">
-                                <GripVertical className="w-5 h-5 text-gray-500 hover:text-gray-300" />
-                              </div>
-                              <button
-                                onClick={() => toggleCategory(category.id)}
-                                className="p-1 hover:bg-card rounded transition-colors"
-                                disabled={children.length === 0}
-                              >
-                                {children.length > 0 ? (
-                                  isExpanded ? (
-                                    <ChevronDown className="w-4 h-4 text-gray-400" />
-                                  ) : (
-                                    <ChevronRight className="w-4 h-4 text-gray-400" />
-                                  )
-                                ) : (
-                                  <div className="w-4 h-4" />
-                                )}
-                              </button>
+                        <div className="p-4 hover:bg-cardHover transition-colors bg-card">
+                          <div className="flex items-center gap-4">
+                            {/* Drag handle vľavo */}
+                            <div className="cursor-move flex-shrink-0">
+                              <GripVertical className="w-5 h-5 text-gray-500 hover:text-gray-300" />
+                            </div>
+                            
+                            {/* Logo/Fotka */}
+                            <div className="flex-shrink-0">
                               {category.image ? (
                                 <img
                                   src={category.image}
                                   alt={category.name}
-                                  className="w-10 h-10 object-cover rounded-lg"
+                                  className="w-16 h-16 object-cover rounded-lg"
                                 />
                               ) : (
-                                <div className="w-10 h-10 bg-card rounded-lg flex items-center justify-center">
-                                  <FolderTree className="w-5 h-5 text-gray-400" />
+                                <div className="w-16 h-16 bg-dark rounded-lg flex items-center justify-center">
+                                  <FolderTree className="w-8 h-8 text-gray-400" />
                                 </div>
                               )}
-                              <div className="flex-1">
-                                <div className="flex items-center space-x-2">
-                                  <h3 className="font-semibold text-white">{category.name}</h3>
-                                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                                    category.isActive 
-                                      ? 'bg-green-500/20 text-green-400' 
-                                      : 'bg-gray-500/20 text-gray-400'
-                                  }`}>
-                                    {category.isActive ? 'Aktívna' : 'Neaktívna'}
-                                  </span>
-                                </div>
-                                {category.description && (
-                                  <p className="text-sm text-gray-400 mt-1">{category.description}</p>
-                                )}
-                                <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
-                                  <span>{category._count?.advertisements || 0} inzerátov</span>
-                                  {children.length > 0 && (
-                                    <span>{children.length} {children.length === 1 ? 'podkategória' : 'podkategórií'}</span>
-                                  )}
-                                </div>
-                              </div>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            
+                            {/* Názov kategórie */}
+                            <div className="flex-shrink-0">
+                              <h3 className="font-semibold text-white text-lg whitespace-nowrap">{category.name}</h3>
+                            </div>
+                            
+                            {/* Status badge */}
+                            <div className="flex-shrink-0">
+                              <span className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
+                                category.isActive 
+                                  ? 'bg-green-500/20 text-green-400' 
+                                  : 'bg-gray-500/20 text-gray-400'
+                              }`}>
+                                {category.isActive ? 'Aktívna' : 'Neaktívna'}
+                              </span>
+                            </div>
+                            
+                            {/* Počet inzerátov */}
+                            <div className="flex-shrink-0 text-sm text-gray-400">
+                              <span className="whitespace-nowrap">{category._count?.advertisements || 0} inzerátov</span>
+                            </div>
+                            
+                            {/* Počet podkategórií */}
+                            {children.length > 0 && (
+                              <>
+                                <div className="flex-shrink-0 text-gray-600">•</div>
+                                <div className="flex-shrink-0 text-sm text-blue-400 font-medium">
+                                  <span className="whitespace-nowrap">{children.length} {children.length === 1 ? 'podkategória' : children.length < 5 ? 'podkategórie' : 'podkategórií'}</span>
+                                </div>
+                              </>
+                            )}
+                            
+                            {/* Počet filtrov */}
+                            {(category._count?.filters || 0) > 0 && (
+                              <>
+                                <div className="flex-shrink-0 text-gray-600">•</div>
+                                <div className="flex-shrink-0 text-sm text-purple-400 font-medium">
+                                  <span className="whitespace-nowrap">{category._count?.filters || 0} {(category._count?.filters || 0) === 1 ? 'filter' : (category._count?.filters || 0) < 5 ? 'filtre' : 'filtrov'}</span>
+                                </div>
+                              </>
+                            )}
+                            
+                            {/* Popis (ak existuje) */}
+                            {category.description && (
+                              <>
+                                <div className="flex-shrink-0 text-gray-600">•</div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs text-gray-400 truncate">{category.description}</p>
+                                </div>
+                              </>
+                            )}
+                            
+                            {/* Expand/Collapse tlačidlo */}
+                            {children.length > 0 && (
+                              <div className="flex-shrink-0 ml-auto">
+                                <button
+                                  onClick={() => toggleCategory(category.id)}
+                                  className="p-2 hover:bg-cardHover rounded transition-colors"
+                                  title={isExpanded ? 'Zbaliť' : 'Rozbaliť'}
+                                >
+                                  {isExpanded ? (
+                                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                                  ) : (
+                                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                                  )}
+                                </button>
+                              </div>
+                            )}
+                            
+                            {/* Akcie vpravo */}
+                            <div className="flex items-center gap-2 flex-shrink-0">
                               <button
                                 onClick={() => handleAddSubcategory(category)}
-                                className="px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm flex items-center space-x-1 transition-colors"
+                                className="px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm flex items-center gap-1.5 transition-colors whitespace-nowrap"
                                 title="Pridať podkategóriu"
                               >
                                 <FolderPlus className="w-4 h-4" />
-                                <span>Pridať podkategóriu</span>
+                                <span>Pridať</span>
                               </button>
                               <button
                                 onClick={() => handleEdit(category)}
@@ -651,7 +881,7 @@ export default function DevCategoriesPage() {
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
-                              <button
+                                <button
                                 onClick={() => handleDelete(category.id)}
                                 className="p-2 text-red-400 hover:text-red-300 hover:bg-cardHover rounded transition-colors"
                                 title="Odstrániť"
@@ -664,7 +894,35 @@ export default function DevCategoriesPage() {
 
                         {/* Expandovaná sekcia s podkategóriami */}
                         {isExpanded && (
-                          <div className="border-t border-card bg-dark/50">
+                          <div className="border-t border-dark bg-dark/30 rounded-b-lg">
+                            {/* Filtre */}
+                            {category.filters && category.filters.length > 0 && (
+                              <div className="p-4 border-b border-dark/50">
+                                <div className="flex items-center justify-between mb-3">
+                                  <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+                                    <span className="w-1 h-4 bg-purple-400 rounded"></span>
+                                    Filtre ({category.filters.length})
+                                  </h4>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {category.filters.map((filter: any) => (
+                                    <div
+                                      key={filter.id}
+                                      className="px-3 py-1.5 bg-purple-500/20 border border-purple-500/30 rounded-lg text-xs text-purple-300 flex items-center gap-2"
+                                    >
+                                      <span className="font-medium">{filter.name}</span>
+                                      <span className="text-purple-400/70">({filter.type})</span>
+                                      {filter.isRequired && (
+                                        <span className="px-1.5 py-0.5 bg-purple-500/30 rounded text-[10px] font-medium">
+                                          Povinný
+                                        </span>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
                             {/* Formulár pre pridanie podkategórie */}
                             {showForm && (
                               <div className="p-4 bg-card/50 border-b border-card">
@@ -680,7 +938,7 @@ export default function DevCategoriesPage() {
                                       value={formData.name}
                                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                       placeholder="Názov podkategórie *"
-                                      className="bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                                      className="bg-card border border-dark rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
                                     />
                                     <input
                                       type="text"
@@ -723,16 +981,16 @@ export default function DevCategoriesPage() {
 
                             {/* Zoznam podkategórií */}
                             {children.length > 0 && (
-                              <div className="p-4 space-y-2">
+                              <div className="p-5 space-y-2">
                                 {[...children].sort((a: any, b: any) => (a.order || 0) - (b.order || 0)).map((child: Category) => (
                                   <div
                                     key={child.id}
-                                    className={`flex items-center justify-between p-3 rounded-lg transition-all cursor-move ${
+                                    className={`flex items-center gap-3 p-3 rounded-lg transition-all cursor-move ${
                                       draggedCategoryId === child.id 
                                         ? 'bg-primary/20 opacity-50 border-2 border-primary scale-95' 
                                         : draggedOverCategoryId === child.id
                                         ? 'bg-green-500/20 border-2 border-green-500 scale-105'
-                                        : 'bg-card/30 hover:bg-card/50'
+                                        : 'bg-dark/50 hover:bg-dark/70 border border-dark/50'
                                     }`}
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, child.id)}
@@ -740,33 +998,39 @@ export default function DevCategoriesPage() {
                                     onDragLeave={handleDragLeave}
                                     onDrop={(e) => handleDrop(e, child.id, true, category.id)}
                                   >
-                                    <div className="flex items-center space-x-3 flex-1">
-                                      <div className="cursor-move">
-                                        <GripVertical className="w-4 h-4 text-gray-500 hover:text-gray-300" />
-                                      </div>
-                                      <div className="w-8 h-8 bg-dark rounded-lg flex items-center justify-center">
-                                        <FolderTree className="w-4 h-4 text-gray-500" />
-                                      </div>
-                                      <div className="flex-1">
-                                        <div className="flex items-center space-x-2">
-                                          <span className="font-medium text-gray-200">{child.name}</span>
-                                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                                            child.isActive 
-                                              ? 'bg-green-500/20 text-green-400' 
-                                              : 'bg-gray-500/20 text-gray-400'
-                                          }`}>
-                                            {child.isActive ? 'Aktívna' : 'Neaktívna'}
-                                          </span>
-                                        </div>
-                                        {child.description && (
-                                          <p className="text-xs text-gray-400 mt-1">{child.description}</p>
-                                        )}
-                                        <span className="text-xs text-gray-500 mt-1">
-                                          {child._count?.advertisements || 0} inzerátov
-                                        </span>
-                                      </div>
+                                    {/* Drag handle vľavo */}
+                                    <div className="cursor-move flex-shrink-0">
+                                      <GripVertical className="w-4 h-4 text-gray-500 hover:text-gray-300" />
                                     </div>
-                                    <div className="flex items-center space-x-2">
+                                    
+                                    {/* Ikona */}
+                                    <div className="w-12 h-12 bg-dark rounded-lg flex items-center justify-center flex-shrink-0">
+                                      <FolderTree className="w-6 h-6 text-gray-500" />
+                                    </div>
+                                    
+                                    {/* Názov podkategórie */}
+                                    <div className="flex-shrink-0">
+                                      <span className="font-medium text-gray-200 whitespace-nowrap">{child.name}</span>
+                                    </div>
+                                    
+                                    {/* Status badge */}
+                                    <div className="flex-shrink-0">
+                                      <span className={`px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap ${
+                                        child.isActive 
+                                          ? 'bg-green-500/20 text-green-400' 
+                                          : 'bg-gray-500/20 text-gray-400'
+                                      }`}>
+                                        {child.isActive ? 'Aktívna' : 'Neaktívna'}
+                                      </span>
+                                    </div>
+                                    
+                                    {/* Počet inzerátov */}
+                                    <div className="flex-shrink-0 text-sm text-gray-400">
+                                      <span className="whitespace-nowrap">{child._count?.advertisements || 0} inzerátov</span>
+                                    </div>
+                                    
+                                    {/* Akcie vpravo */}
+                                    <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
                                       <button
                                         onClick={() => handleEdit(child)}
                                         className="p-1.5 text-blue-400 hover:text-blue-300 hover:bg-cardHover rounded transition-colors"

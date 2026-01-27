@@ -67,9 +67,18 @@ export class CategoriesService {
             order: 'asc',
           },
         },
+        filters: {
+          where: {
+            isActive: true,
+          },
+          orderBy: {
+            order: 'asc',
+          },
+        },
         _count: {
           select: {
             advertisements: true,
+            filters: true,
           },
         },
       },
@@ -103,9 +112,18 @@ export class CategoriesService {
             order: 'asc',
           },
         },
+        filters: {
+          where: {
+            isActive: true,
+          },
+          orderBy: {
+            order: 'asc',
+          },
+        },
         _count: {
           select: {
             advertisements: true,
+            filters: true,
           },
         },
       },

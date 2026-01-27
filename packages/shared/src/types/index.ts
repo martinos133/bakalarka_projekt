@@ -162,10 +162,12 @@ export interface Category {
   order: number;
   parent?: Category;
   children?: Category[];
+  filters?: Filter[];
   createdAt: Date;
   updatedAt: Date;
   _count?: {
     advertisements: number;
+    filters?: number;
   };
 }
 
