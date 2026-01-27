@@ -6,7 +6,7 @@ import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
-import { Advertisement, AdvertisementStatus, AdvertisementType, CreateAdvertisementDto, Category } from '@inzertna-platforma/shared'
+import { Advertisement, AdvertisementStatus, AdvertisementType, CreateAdvertisementDto, Category, ServicePackage, FAQ } from '@inzertna-platforma/shared'
 import { Plus, Edit, Trash2, X, Save, Image as ImageIcon } from 'lucide-react'
 
 export default function DevAdvertisementsPage() {
@@ -26,6 +26,28 @@ export default function DevAdvertisementsPage() {
     location: '',
     images: [],
     status: AdvertisementStatus.DRAFT,
+    pricingType: 'FIXED',
+    hourlyRate: undefined,
+    dailyRate: undefined,
+    packages: [],
+    deliveryTime: '',
+    revisions: '',
+    features: [],
+    faq: [],
+  })
+  
+  const [newFeature, setNewFeature] = useState('')
+  const [newPackage, setNewPackage] = useState<Partial<ServicePackage>>({
+    name: '',
+    description: '',
+    price: undefined,
+    deliveryTime: '',
+    features: [],
+  })
+  const [newPackageFeature, setNewPackageFeature] = useState('')
+  const [newFAQ, setNewFAQ] = useState<Partial<FAQ>>({
+    question: '',
+    answer: '',
   })
 
   useEffect(() => {
@@ -127,7 +149,19 @@ export default function DevAdvertisementsPage() {
       location: '',
       images: [],
       status: AdvertisementStatus.DRAFT,
+      pricingType: 'FIXED',
+      hourlyRate: undefined,
+      dailyRate: undefined,
+      packages: [],
+      deliveryTime: '',
+      revisions: '',
+      features: [],
+      faq: [],
     })
+    setNewFeature('')
+    setNewPackage({ name: '', description: '', price: undefined, deliveryTime: '', features: [] })
+    setNewPackageFeature('')
+    setNewFAQ({ question: '', answer: '' })
     setEditingId(null)
     setShowForm(false)
   }
@@ -331,6 +365,341 @@ export default function DevAdvertisementsPage() {
                 <p className="text-xs text-gray-400">
                   Ak nemáte kategóriu, vytvorte ju v sekcii <a href="/dashboard/dev/categories" className="text-blue-400 hover:text-blue-300">Kategórie</a>
                 </p>
+
+                {/* Service-specific fields */}
+                {formData.type === AdvertisementType.SERVICE && (
+                  <>
+                    <div className="border-t border-card pt-4 mt-4">
+                      <h3 className="text-lg font-semibold text-white mb-4">Detaily služby</h3>
+                      
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">Typ sadzby *</label>
+                          <select
+                            required
+                            value={formData.pricingType}
+                            onChange={(e) => setFormData({ ...formData, pricingType: e.target.value as any })}
+                            className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                          >
+                            <option value="FIXED">Fixná cena</option>
+                            <option value="HOURLY">Hodinová sadzba</option>
+                            <option value="DAILY">Denná sadzba</option>
+                            <option value="PACKAGE">Balíčky</option>
+                          </select>
+                        </div>
+
+                        {formData.pricingType === 'HOURLY' && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">Hodinová sadzba (€/h) *</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              required
+                              value={formData.hourlyRate || ''}
+                              onChange={(e) => setFormData({ ...formData, hourlyRate: e.target.value ? parseFloat(e.target.value) : undefined })}
+                              className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                            />
+                          </div>
+                        )}
+
+                        {formData.pricingType === 'DAILY' && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">Denná sadzba (€/deň) *</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              required
+                              value={formData.dailyRate || ''}
+                              onChange={(e) => setFormData({ ...formData, dailyRate: e.target.value ? parseFloat(e.target.value) : undefined })}
+                              className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">Čas dodania</label>
+                          <input
+                            type="text"
+                            value={formData.deliveryTime || ''}
+                            onChange={(e) => setFormData({ ...formData, deliveryTime: e.target.value })}
+                            placeholder="Napríklad: 3-5 dní, 1 týždeň..."
+                            className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">Revízie</label>
+                          <input
+                            type="text"
+                            value={formData.revisions || ''}
+                            onChange={(e) => setFormData({ ...formData, revisions: e.target.value })}
+                            placeholder="Napríklad: Neobmedzené, 3 revízie..."
+                            className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Features */}
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Čo je zahrnuté</label>
+                        <div className="flex gap-2 mb-2">
+                          <input
+                            type="text"
+                            value={newFeature}
+                            onChange={(e) => setNewFeature(e.target.value)}
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault()
+                                if (newFeature.trim()) {
+                                  setFormData({ ...formData, features: [...(formData.features || []), newFeature.trim()] })
+                                  setNewFeature('')
+                                }
+                              }
+                            }}
+                            placeholder="Pridajte funkciu a stlačte Enter"
+                            className="flex-1 bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (newFeature.trim()) {
+                                setFormData({ ...formData, features: [...(formData.features || []), newFeature.trim()] })
+                                setNewFeature('')
+                              }
+                            }}
+                            className="px-4 py-2 bg-primary hover:opacity-90 text-white rounded-lg"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {formData.features?.map((feature, idx) => (
+                            <span key={idx} className="px-3 py-1 bg-card rounded-lg text-sm text-white flex items-center gap-2">
+                              {feature}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setFormData({ ...formData, features: formData.features?.filter((_, i) => i !== idx) })
+                                }}
+                                className="text-red-400 hover:text-red-300"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Packages */}
+                      {formData.pricingType === 'PACKAGE' && (
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium text-gray-300 mb-2">Balíčky služieb</label>
+                          <div className="space-y-4 p-4 bg-dark rounded-lg border border-card">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-xs text-gray-400 mb-1">Názov balíčka</label>
+                                <input
+                                  type="text"
+                                  value={newPackage.name || ''}
+                                  onChange={(e) => setNewPackage({ ...newPackage, name: e.target.value })}
+                                  className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                                  placeholder="Napríklad: Základný"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-400 mb-1">Cena (€)</label>
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={newPackage.price || ''}
+                                  onChange={(e) => setNewPackage({ ...newPackage, price: e.target.value ? parseFloat(e.target.value) : undefined })}
+                                  className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-400 mb-1">Popis balíčka</label>
+                              <textarea
+                                value={newPackage.description || ''}
+                                onChange={(e) => setNewPackage({ ...newPackage, description: e.target.value })}
+                                rows={2}
+                                className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                                placeholder="Popis toho, čo obsahuje tento balíček"
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-xs text-gray-400 mb-1">Čas dodania</label>
+                                <input
+                                  type="text"
+                                  value={newPackage.deliveryTime || ''}
+                                  onChange={(e) => setNewPackage({ ...newPackage, deliveryTime: e.target.value })}
+                                  className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                                  placeholder="Napríklad: 3-5 dní"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-400 mb-1">Funkcie balíčka</label>
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={newPackageFeature}
+                                    onChange={(e) => setNewPackageFeature(e.target.value)}
+                                    onKeyPress={(e) => {
+                                      if (e.key === 'Enter') {
+                                        e.preventDefault()
+                                        if (newPackageFeature.trim()) {
+                                          setNewPackage({ ...newPackage, features: [...(newPackage.features || []), newPackageFeature.trim()] })
+                                          setNewPackageFeature('')
+                                        }
+                                      }
+                                    }}
+                                    className="flex-1 bg-dark border border-card rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                                    placeholder="Pridajte funkciu"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (newPackageFeature.trim()) {
+                                        setNewPackage({ ...newPackage, features: [...(newPackage.features || []), newPackageFeature.trim()] })
+                                        setNewPackageFeature('')
+                                      }
+                                    }}
+                                    className="px-3 py-2 bg-primary hover:opacity-90 text-white rounded-lg text-sm"
+                                  >
+                                    <Plus className="w-3 h-3" />
+                                  </button>
+                                </div>
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                  {newPackage.features?.map((feature, idx) => (
+                                    <span key={idx} className="px-2 py-1 bg-card rounded text-xs text-white flex items-center gap-1">
+                                      {feature}
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setNewPackage({ ...newPackage, features: newPackage.features?.filter((_, i) => i !== idx) })
+                                        }}
+                                        className="text-red-400 hover:text-red-300"
+                                      >
+                                        <X className="w-2 h-2" />
+                                      </button>
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (newPackage.name && newPackage.price) {
+                                  setFormData({ ...formData, packages: [...(formData.packages || []), newPackage as ServicePackage] })
+                                  setNewPackage({ name: '', description: '', price: undefined, deliveryTime: '', features: [] })
+                                  setNewPackageFeature('')
+                                }
+                              }}
+                              className="w-full px-4 py-2 bg-primary hover:opacity-90 text-white rounded-lg text-sm flex items-center justify-center gap-2"
+                            >
+                              <Plus className="w-4 h-4" />
+                              Pridať balíček
+                            </button>
+                          </div>
+                          <div className="mt-4 space-y-2">
+                            {formData.packages?.map((pkg, idx) => (
+                              <div key={idx} className="p-3 bg-card rounded-lg border border-dark flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="font-medium text-white">{pkg.name}</div>
+                                  <div className="text-sm text-gray-400">{pkg.description}</div>
+                                  <div className="text-sm text-gray-300 mt-1">
+                                    <span className="font-semibold">{pkg.price}€</span> • {pkg.deliveryTime}
+                                  </div>
+                                  {pkg.features && pkg.features.length > 0 && (
+                                    <div className="flex flex-wrap gap-1 mt-2">
+                                      {pkg.features.map((feature, fIdx) => (
+                                        <span key={fIdx} className="px-2 py-1 bg-dark rounded text-xs text-gray-300">
+                                          {feature}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setFormData({ ...formData, packages: formData.packages?.filter((_, i) => i !== idx) })
+                                  }}
+                                  className="ml-4 text-red-400 hover:text-red-300"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* FAQ */}
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Často kladené otázky (FAQ)</label>
+                        <div className="space-y-2 p-4 bg-dark rounded-lg border border-card">
+                          <div>
+                            <label className="block text-xs text-gray-400 mb-1">Otázka</label>
+                            <input
+                              type="text"
+                              value={newFAQ.question || ''}
+                              onChange={(e) => setNewFAQ({ ...newFAQ, question: e.target.value })}
+                              className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 mb-2"
+                              placeholder="Napríklad: Ako dlho trvá dodanie?"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-400 mb-1">Odpoveď</label>
+                            <textarea
+                              value={newFAQ.answer || ''}
+                              onChange={(e) => setNewFAQ({ ...newFAQ, answer: e.target.value })}
+                              rows={2}
+                              className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                              placeholder="Odpoveď na otázku"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (newFAQ.question && newFAQ.answer) {
+                                setFormData({ ...formData, faq: [...(formData.faq || []), newFAQ as FAQ] })
+                                setNewFAQ({ question: '', answer: '' })
+                              }
+                            }}
+                            className="w-full px-4 py-2 bg-primary hover:opacity-90 text-white rounded-lg text-sm flex items-center justify-center gap-2"
+                          >
+                            <Plus className="w-4 h-4" />
+                            Pridať FAQ
+                          </button>
+                        </div>
+                        <div className="mt-4 space-y-2">
+                          {formData.faq?.map((faq, idx) => (
+                            <div key={idx} className="p-3 bg-card rounded-lg border border-dark flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="font-medium text-white mb-1">{faq.question}</div>
+                                <div className="text-sm text-gray-400">{faq.answer}</div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setFormData({ ...formData, faq: formData.faq?.filter((_, i) => i !== idx) })
+                                }}
+                                className="ml-4 text-red-400 hover:text-red-300"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Fotky</label>

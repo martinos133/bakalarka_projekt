@@ -11,6 +11,9 @@ export class AdvertisementsService {
         userId,
         images: createDto.images || [],
         type: (createDto.type as any) || 'SERVICE',
+        features: createDto.features || [],
+        packages: createDto.packages ? JSON.parse(JSON.stringify(createDto.packages)) : null,
+        faq: createDto.faq ? JSON.parse(JSON.stringify(createDto.faq)) : null,
       } as any,
     });
   }
@@ -40,7 +43,7 @@ export class AdvertisementsService {
       where: {
         status: 'ACTIVE' as any,
         type: 'SERVICE' as any,
-      },
+      } as any,
       include: {
         user: {
           select: {
@@ -99,7 +102,13 @@ export class AdvertisementsService {
 
     return prisma.advertisement.update({
       where: { id },
-      data: updateDto as any,
+      data: {
+        ...updateDto,
+        images: updateDto.images !== undefined ? updateDto.images : advertisement.images,
+        features: updateDto.features !== undefined ? updateDto.features : (advertisement as any).features,
+        packages: updateDto.packages !== undefined ? (updateDto.packages ? JSON.parse(JSON.stringify(updateDto.packages)) : null) : (advertisement as any).packages,
+        faq: updateDto.faq !== undefined ? (updateDto.faq ? JSON.parse(JSON.stringify(updateDto.faq)) : null) : (advertisement as any).faq,
+      } as any,
     });
   }
 

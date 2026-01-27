@@ -64,6 +64,19 @@ export interface BanUserDto {
   banReason?: string;
 }
 
+export interface ServicePackage {
+  name: string;
+  description: string;
+  price: number;
+  deliveryTime: string;
+  features: string[];
+}
+
+export interface FAQ {
+  question: string;
+  answer: string;
+}
+
 export interface Advertisement {
   id: string;
   title: string;
@@ -74,6 +87,15 @@ export interface Advertisement {
   category?: string;
   location?: string;
   images: string[];
+  // Service-specific fields
+  pricingType?: 'FIXED' | 'HOURLY' | 'DAILY' | 'PACKAGE';
+  hourlyRate?: number;
+  dailyRate?: number;
+  packages?: ServicePackage[];
+  deliveryTime?: string;
+  revisions?: string;
+  features?: string[];
+  faq?: FAQ[];
   userId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -87,6 +109,15 @@ export interface CreateAdvertisementDto {
   categoryId?: string;
   location?: string;
   images?: string[];
+  // Service-specific fields
+  pricingType?: 'FIXED' | 'HOURLY' | 'DAILY' | 'PACKAGE';
+  hourlyRate?: number;
+  dailyRate?: number;
+  packages?: ServicePackage[];
+  deliveryTime?: string;
+  revisions?: string;
+  features?: string[];
+  faq?: FAQ[];
 }
 
 export interface UpdateAdvertisementDto extends Partial<CreateAdvertisementDto> {

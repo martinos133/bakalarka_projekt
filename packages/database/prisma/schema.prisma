@@ -138,6 +138,15 @@ model Advertisement {
   category    Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   location    String?
   images      String[]
+  // Service-specific fields
+  pricingType String?            // 'FIXED', 'HOURLY', 'DAILY', 'PACKAGE'
+  hourlyRate  Float?
+  dailyRate   Float?
+  packages    Json?              // Array of package objects with name, description, price, deliveryTime
+  deliveryTime String?           // e.g., "3-5 dní", "1 týždeň"
+  revisions   String?            // e.g., "Neobmedzené", "3 revízie"
+  features    String[]           // Array of features/included items
+  faq         Json?              // Array of FAQ objects with question and answer
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
   userId      String

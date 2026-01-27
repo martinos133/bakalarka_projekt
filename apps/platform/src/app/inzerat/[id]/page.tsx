@@ -7,6 +7,20 @@ import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
 import ImageCarousel from '@/components/ImageCarousel'
 import { api } from '@/lib/api'
+import { ChevronDown, ChevronUp } from 'lucide-react'
+
+interface ServicePackage {
+  name: string
+  description: string
+  price: number
+  deliveryTime: string
+  features: string[]
+}
+
+interface FAQ {
+  question: string
+  answer: string
+}
 
 interface Advertisement {
   id: string
@@ -25,6 +39,15 @@ interface Advertisement {
     email?: string
   }
   createdAt: string
+  type?: 'SERVICE' | 'RENTAL'
+  pricingType?: 'FIXED' | 'HOURLY' | 'DAILY' | 'PACKAGE'
+  hourlyRate?: number
+  dailyRate?: number
+  packages?: ServicePackage[]
+  deliveryTime?: string
+  revisions?: string
+  features?: string[]
+  faq?: FAQ[]
 }
 
 export default function AdvertisementDetailPage({
@@ -35,6 +58,7 @@ export default function AdvertisementDetailPage({
   const { id } = use(params)
   const [advertisement, setAdvertisement] = useState<Advertisement | null>(null)
   const [loading, setLoading] = useState(true)
+  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null)
 
   useEffect(() => {
     loadAdvertisement()
@@ -178,6 +202,104 @@ export default function AdvertisementDetailPage({
               </div>
             </div>
 
+            {/* Service Details */}
+            {advertisement.type === 'SERVICE' && (
+              <>
+                {/* Features */}
+                {advertisement.features && advertisement.features.length > 0 && (
+                  <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                      Čo je zahrnuté
+                    </h2>
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {advertisement.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <svg className="w-5 h-5 text-[#1dbf73] mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <span className="text-gray-700">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Packages */}
+                {advertisement.pricingType === 'PACKAGE' && advertisement.packages && advertisement.packages.length > 0 && (
+                  <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                      Balíčky služieb
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {advertisement.packages.map((pkg, idx) => (
+                        <div key={idx} className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">{pkg.name}</h3>
+                          <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
+                          <div className="mb-4">
+                            <div className="text-3xl font-bold text-gray-900 mb-1">{pkg.price}€</div>
+                            {pkg.deliveryTime && (
+                              <div className="text-sm text-gray-500">Dodanie: {pkg.deliveryTime}</div>
+                            )}
+                          </div>
+                          {pkg.features && pkg.features.length > 0 && (
+                            <ul className="space-y-2 mb-4">
+                              {pkg.features.map((feature, fIdx) => (
+                                <li key={fIdx} className="flex items-start gap-2 text-sm text-gray-700">
+                                  <svg className="w-4 h-4 text-[#1dbf73] mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                  </svg>
+                                  <span>{feature}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          <button className="w-full bg-[#1dbf73] text-white py-2 rounded-md font-semibold hover:bg-[#19a463] transition-colors">
+                            Vybrať balíček
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* FAQ */}
+                {advertisement.faq && advertisement.faq.length > 0 && (
+                  <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                      Často kladené otázky
+                    </h2>
+                    <div className="space-y-3">
+                      {advertisement.faq.map((faq, idx) => (
+                        <div 
+                          key={idx} 
+                          className="border border-gray-200 rounded-lg overflow-hidden bg-white hover:shadow-md transition-shadow"
+                        >
+                          <button
+                            onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
+                            className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                          >
+                            <h3 className="font-semibold text-gray-900 pr-4">{faq.question}</h3>
+                            <div className="flex-shrink-0">
+                              {expandedFAQ === idx ? (
+                                <ChevronUp className="w-5 h-5 text-gray-500" />
+                              ) : (
+                                <ChevronDown className="w-5 h-5 text-gray-500" />
+                              )}
+                            </div>
+                          </button>
+                          {expandedFAQ === idx && (
+                            <div className="px-6 pb-4 pt-0">
+                              <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
             {/* Reviews Section */}
             <div className="border-t border-gray-200 pt-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
@@ -195,14 +317,49 @@ export default function AdvertisementDetailPage({
               {/* Price Card */}
               <div className="border border-gray-200 rounded-lg p-6 mb-6">
                 <div className="mb-4">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-gray-900">
-                      {advertisement.price ? `${advertisement.price.toFixed(2)}€` : 'Na dohodu'}
-                    </span>
-                    {advertisement.price && (
-                      <span className="text-gray-500">Začínajúc od</span>
-                    )}
-                  </div>
+                  {advertisement.type === 'SERVICE' && advertisement.pricingType === 'HOURLY' && advertisement.hourlyRate ? (
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold text-gray-900">
+                          {advertisement.hourlyRate.toFixed(2)}€
+                        </span>
+                        <span className="text-gray-500">/ hodina</span>
+                      </div>
+                      {advertisement.deliveryTime && (
+                        <div className="text-sm text-gray-600 mt-2">
+                          ⏱ Dodanie: {advertisement.deliveryTime}
+                        </div>
+                      )}
+                    </div>
+                  ) : advertisement.type === 'SERVICE' && advertisement.pricingType === 'DAILY' && advertisement.dailyRate ? (
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold text-gray-900">
+                          {advertisement.dailyRate.toFixed(2)}€
+                        </span>
+                        <span className="text-gray-500">/ deň</span>
+                      </div>
+                      {advertisement.deliveryTime && (
+                        <div className="text-sm text-gray-600 mt-2">
+                          ⏱ Dodanie: {advertisement.deliveryTime}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-bold text-gray-900">
+                        {advertisement.price ? `${advertisement.price.toFixed(2)}€` : 'Na dohodu'}
+                      </span>
+                      {advertisement.price && (
+                        <span className="text-gray-500">Začínajúc od</span>
+                      )}
+                    </div>
+                  )}
+                  {advertisement.type === 'SERVICE' && advertisement.revisions && (
+                    <div className="text-sm text-gray-600 mt-2">
+                      🔄 Revízie: {advertisement.revisions}
+                    </div>
+                  )}
                 </div>
                 <button className="w-full bg-[#1dbf73] text-white py-3 rounded-md font-semibold hover:bg-[#19a463] transition-colors mb-4">
                   Pokračovať
