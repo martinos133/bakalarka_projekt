@@ -1,11 +1,26 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
+import {
+  LayoutDashboard,
+  FileText,
+  Users,
+  FolderTree,
+  Mail,
+  Clock,
+  Flag,
+  Settings,
+  Code,
+  Filter,
+  Navigation,
+  Boxes,
+  Sliders,
+} from 'lucide-react'
 
 interface NavItem {
   label: string
   path: string
-  icon?: string
+  icon: React.ComponentType<{ className?: string }>
 }
 
 interface NavSection {
@@ -17,28 +32,39 @@ const navigation: NavSection[] = [
   {
     title: 'Nástenky',
     items: [
-      { label: 'Dashboard', path: '/dashboard' },
-      { label: 'Inzeráty', path: '/dashboard/advertisements' },
-      { label: 'Používatelia', path: '/dashboard/users' },
-      { label: 'Kategórie', path: '/dashboard/categories' },
+      { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+      { label: 'Inzeráty', path: '/dashboard/advertisements', icon: FileText },
+      { label: 'Používatelia', path: '/dashboard/users', icon: Users },
+      { label: 'Kategórie', path: '/dashboard/categories', icon: FolderTree },
     ],
   },
   {
     title: 'Komunikácia',
     items: [
-      { label: 'Kontaktné formuláre', path: '/dashboard/contact-forms' },
+      { label: 'Kontaktné formuláre', path: '/dashboard/contact-forms', icon: Mail },
     ],
   },
   {
     title: 'Moderácia',
     items: [
-      { label: 'Čakajúce inzeráty', path: '/dashboard/pending' },
-      { label: 'Nahlásené inzeráty', path: '/dashboard/reported' },
+      { label: 'Čakajúce inzeráty', path: '/dashboard/pending', icon: Clock },
+      { label: 'Nahlásené inzeráty', path: '/dashboard/reported', icon: Flag },
+    ],
+  },
+  {
+    title: 'Development',
+    items: [
+      { label: 'Kategórie', path: '/dashboard/dev/categories', icon: FolderTree },
+      { label: 'Inzeráty', path: '/dashboard/dev/advertisements', icon: FileText },
+      { label: 'Filtre', path: '/dashboard/dev/filters', icon: Filter },
+      { label: 'Navbar', path: '/dashboard/dev/navbar', icon: Navigation },
+      { label: 'Komponenty', path: '/dashboard/dev/components', icon: Boxes },
+      { label: 'Konfigurácia', path: '/dashboard/dev/config', icon: Sliders },
     ],
   },
   {
     items: [
-      { label: 'Nastavenia', path: '/dashboard/settings' },
+      { label: 'Nastavenia', path: '/dashboard/settings', icon: Settings },
     ],
   },
 ]
@@ -66,19 +92,21 @@ export default function Sidebar() {
             <nav className="space-y-1">
               {section.items.map((item) => {
                 const isActive = pathname === item.path
+                const Icon = item.icon
                 return (
                   <button
                     key={item.path}
                     onClick={() => handleNavigation(item.path)}
                     className={`
-                      w-full text-left px-3 py-2 rounded-lg transition-colors
+                      w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center space-x-3
                       ${isActive 
                         ? 'bg-card text-white font-medium' 
                         : 'text-gray-300 bg-transparent hover:bg-cardHover hover:text-white'
                       }
                     `}
                   >
-                    {item.label}
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    <span>{item.label}</span>
                   </button>
                 )
               })}
