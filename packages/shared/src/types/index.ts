@@ -86,6 +86,7 @@ export interface Advertisement {
   type: AdvertisementType;
   category?: string;
   location?: string;
+  postalCode?: string;
   images: string[];
   // Service-specific fields
   pricingType?: 'FIXED' | 'HOURLY' | 'DAILY' | 'PACKAGE';
@@ -108,6 +109,7 @@ export interface CreateAdvertisementDto {
   type?: AdvertisementType;
   categoryId?: string;
   location?: string;
+  postalCode?: string;
   images?: string[];
   // Service-specific fields
   pricingType?: 'FIXED' | 'HOURLY' | 'DAILY' | 'PACKAGE';

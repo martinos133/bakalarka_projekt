@@ -137,6 +137,7 @@ model Advertisement {
   categoryId  String?
   category    Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   location    String?
+  postalCode String?
   images      String[]
   // Service-specific fields
   pricingType String?            // 'FIXED', 'HOURLY', 'DAILY', 'PACKAGE'

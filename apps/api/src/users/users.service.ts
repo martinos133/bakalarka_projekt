@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { prisma } from '@inzertna-platforma/database';
 import { BanUserDto } from '@inzertna-platforma/shared';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -129,5 +130,82 @@ export class UsersService {
       completedPaymentsReceived,
       completedPaymentsMade,
     };
+  }
+
+  async updateProfile(userId: string, updateData: any) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Používateľ nebol nájdený');
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        firstName: updateData.firstName,
+        lastName: updateData.lastName,
+        phone: updateData.phone,
+        dateOfBirth: updateData.dateOfBirth ? new Date(updateData.dateOfBirth) : null,
+        gender: updateData.gender as any,
+        isCompany: updateData.isCompany || false,
+        companyName: updateData.companyName,
+        companyId: updateData.companyId,
+        companyTaxId: updateData.companyTaxId,
+        address: updateData.address,
+        city: updateData.city,
+        postalCode: updateData.postalCode,
+        country: updateData.country,
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        dateOfBirth: true,
+        gender: true,
+        isCompany: true,
+        companyName: true,
+        companyId: true,
+        companyTaxId: true,
+        address: true,
+        city: true,
+        postalCode: true,
+        country: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return updated;
+  }
+
+  async changePassword(userId: string, oldPassword: string, newPassword: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Používateľ nebol nájdený');
+    }
+
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Pôvodné heslo je nesprávne');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    return { message: 'Heslo bolo úspešne zmenené' };
   }
 }

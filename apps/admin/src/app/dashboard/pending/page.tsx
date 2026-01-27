@@ -7,7 +7,7 @@ import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { Advertisement } from '@inzertna-platforma/shared'
-import { Check, X, Eye, Calendar, User, MapPin, DollarSign, Image as ImageIcon, Search, Filter as FilterIcon } from 'lucide-react'
+import { Check, X, Eye, Calendar, User, MapPin, DollarSign, Image as ImageIcon, Search, Filter as FilterIcon, AlertCircle } from 'lucide-react'
 
 export default function PendingAdvertisementsPage() {
   const router = useRouter()
@@ -23,6 +23,26 @@ export default function PendingAdvertisementsPage() {
     minPrice: '',
     maxPrice: '',
     location: '',
+  })
+  const [confirmModal, setConfirmModal] = useState<{
+    show: boolean
+    type: 'approve' | 'reject'
+    message: string
+    onConfirm: () => void
+  }>({
+    show: false,
+    type: 'approve',
+    message: '',
+    onConfirm: () => {},
+  })
+  const [alertModal, setAlertModal] = useState<{
+    show: boolean
+    message: string
+    type: 'error' | 'success' | 'info'
+  }>({
+    show: false,
+    message: '',
+    type: 'info',
   })
 
   useEffect(() => {
@@ -56,39 +76,79 @@ export default function PendingAdvertisementsPage() {
   }
 
   const handleApprove = async (id: string) => {
-    if (!confirm('Naozaj chcete schváliť tento inzerát?')) return
-
-    try {
-      await api.approveAdvertisement(id)
-      await loadPendingAdvertisements()
-      if (selectedAd?.id === id) {
-        setShowDetailModal(false)
-        setSelectedAd(null)
-      }
-    } catch (error) {
-      console.error('Chyba pri schvaľovaní inzerátu:', error)
-      alert('Chyba pri schvaľovaní inzerátu')
-    }
+    setConfirmModal({
+      show: true,
+      type: 'approve',
+      message: 'Naozaj chcete schváliť tento inzerát?',
+      onConfirm: async () => {
+        setConfirmModal({ ...confirmModal, show: false })
+        try {
+          await api.approveAdvertisement(id)
+          await loadPendingAdvertisements()
+          if (selectedAd?.id === id) {
+            setShowDetailModal(false)
+            setSelectedAd(null)
+          }
+          setAlertModal({
+            show: true,
+            message: 'Inzerát bol úspešne schválený',
+            type: 'success',
+          })
+        } catch (error: any) {
+          console.error('Chyba pri schvaľovaní inzerátu:', error)
+          const errorMessage = error?.message || 'Chyba pri schvaľovaní inzerátu'
+          setAlertModal({
+            show: true,
+            message: errorMessage,
+            type: 'error',
+          })
+          // Obnovíme zoznam, aby sa odstránil už spracovaný inzerát
+          await loadPendingAdvertisements()
+        }
+      },
+    })
   }
 
   const handleReject = async (id: string) => {
     if (!rejectReason.trim()) {
-      alert('Prosím zadajte dôvod zamietnutia')
+      setAlertModal({
+        show: true,
+        message: 'Prosím zadajte dôvod zamietnutia',
+        type: 'error',
+      })
       return
     }
 
-    if (!confirm('Naozaj chcete zamietnuť tento inzerát?')) return
-
-    try {
-      await api.rejectAdvertisement(id, rejectReason)
-      await loadPendingAdvertisements()
-      setShowDetailModal(false)
-      setSelectedAd(null)
-      setRejectReason('')
-    } catch (error) {
-      console.error('Chyba pri zamietnutí inzerátu:', error)
-      alert('Chyba pri zamietnutí inzerátu')
-    }
+    setConfirmModal({
+      show: true,
+      type: 'reject',
+      message: 'Naozaj chcete zamietnuť tento inzerát?',
+      onConfirm: async () => {
+        setConfirmModal({ ...confirmModal, show: false })
+        try {
+          await api.rejectAdvertisement(id, rejectReason)
+          await loadPendingAdvertisements()
+          setShowDetailModal(false)
+          setSelectedAd(null)
+          setRejectReason('')
+          setAlertModal({
+            show: true,
+            message: 'Inzerát bol úspešne zamietnutý',
+            type: 'success',
+          })
+        } catch (error: any) {
+          console.error('Chyba pri zamietnutí inzerátu:', error)
+          const errorMessage = error?.message || 'Chyba pri zamietnutí inzerátu'
+          setAlertModal({
+            show: true,
+            message: errorMessage,
+            type: 'error',
+          })
+          // Obnovíme zoznam, aby sa odstránil už spracovaný inzerát
+          await loadPendingAdvertisements()
+        }
+      },
+    })
   }
 
   const handleViewDetail = (ad: Advertisement) => {
@@ -494,6 +554,102 @@ export default function PendingAdvertisementsPage() {
                     >
                       Schváliť
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Confirmation Modal */}
+          {confirmModal.show && (
+            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+              <div className="bg-card rounded-lg border border-dark max-w-md w-full shadow-xl">
+                <div className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
+                      confirmModal.type === 'approve' 
+                        ? 'bg-green-500/20' 
+                        : 'bg-red-500/20'
+                    }`}>
+                      <AlertCircle className={`w-6 h-6 ${
+                        confirmModal.type === 'approve' 
+                          ? 'text-green-400' 
+                          : 'text-red-400'
+                      }`} />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-white mb-2">
+                        {confirmModal.type === 'approve' ? 'Schváliť inzerát' : 'Zamietnuť inzerát'}
+                      </h3>
+                      <p className="text-gray-300 text-sm mb-6">
+                        {confirmModal.message}
+                      </p>
+                      <div className="flex items-center justify-end space-x-3">
+                        <button
+                          onClick={() => setConfirmModal({ ...confirmModal, show: false })}
+                          className="px-4 py-2 bg-dark hover:bg-cardHover rounded-lg transition-colors text-sm font-medium"
+                        >
+                          Zrušiť
+                        </button>
+                        <button
+                          onClick={confirmModal.onConfirm}
+                          className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium text-white ${
+                            confirmModal.type === 'approve'
+                              ? 'bg-primary hover:opacity-90'
+                              : 'bg-red-600 hover:bg-red-700'
+                          }`}
+                        >
+                          OK
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Alert Modal */}
+          {alertModal.show && (
+            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+              <div className="bg-card rounded-lg border border-dark max-w-md w-full shadow-xl">
+                <div className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
+                      alertModal.type === 'success'
+                        ? 'bg-green-500/20'
+                        : alertModal.type === 'error'
+                        ? 'bg-red-500/20'
+                        : 'bg-blue-500/20'
+                    }`}>
+                      {alertModal.type === 'success' ? (
+                        <Check className="w-6 h-6 text-green-400" />
+                      ) : alertModal.type === 'error' ? (
+                        <X className="w-6 h-6 text-red-400" />
+                      ) : (
+                        <AlertCircle className="w-6 h-6 text-blue-400" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-white mb-2">
+                        {alertModal.type === 'success'
+                          ? 'Úspech'
+                          : alertModal.type === 'error'
+                          ? 'Chyba'
+                          : 'Informácia'}
+                      </h3>
+                      <p className="text-gray-300 text-sm mb-6">
+                        {alertModal.message}
+                      </p>
+                      <div className="flex items-center justify-end">
+                        <button
+                          onClick={() => setAlertModal({ ...alertModal, show: false })}
+                          className="px-4 py-2 bg-primary hover:opacity-90 rounded-lg transition-colors text-sm font-medium text-white"
+                        >
+                          OK
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

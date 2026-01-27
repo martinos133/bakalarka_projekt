@@ -7,7 +7,8 @@ import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
 import ImageCarousel from '@/components/ImageCarousel'
 import { api } from '@/lib/api'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { isAuthenticated } from '@/lib/auth'
+import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check } from 'lucide-react'
 
 interface ServicePackage {
   name: string
@@ -59,6 +60,11 @@ export default function AdvertisementDetailPage({
   const [advertisement, setAdvertisement] = useState<Advertisement | null>(null)
   const [loading, setLoading] = useState(true)
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [reportReason, setReportReason] = useState<string>('')
+  const [reportDescription, setReportDescription] = useState<string>('')
+  const [reportSubmitting, setReportSubmitting] = useState(false)
+  const [reportSuccess, setReportSuccess] = useState(false)
 
   useEffect(() => {
     loadAdvertisement()
@@ -115,6 +121,48 @@ export default function AdvertisementDetailPage({
   const sellerName = advertisement.user 
     ? `${advertisement.user.firstName || ''} ${advertisement.user.lastName || ''}`.trim() || 'Anonymný používateľ'
     : 'Anonymný používateľ'
+
+  const handleReport = async () => {
+    if (!reportReason) {
+      return
+    }
+
+    if (!isAuthenticated()) {
+      // Presmerovať na prihlásenie
+      window.location.href = '/signin?redirect=' + encodeURIComponent(window.location.pathname)
+      return
+    }
+
+    try {
+      setReportSubmitting(true)
+      await api.createReport({
+        advertisementId: id,
+        reason: reportReason,
+        description: reportDescription || undefined,
+      })
+      setReportSuccess(true)
+      setTimeout(() => {
+        setShowReportModal(false)
+        setReportReason('')
+        setReportDescription('')
+        setReportSuccess(false)
+      }, 2000)
+    } catch (error: any) {
+      console.error('Chyba pri nahlásení inzerátu:', error)
+      alert(error?.message || 'Chyba pri nahlásení inzerátu')
+    } finally {
+      setReportSubmitting(false)
+    }
+  }
+
+  const reportReasons = [
+    { value: 'SPAM', label: 'Spam' },
+    { value: 'INAPPROPRIATE', label: 'Nevhodný obsah' },
+    { value: 'FAKE', label: 'Falošný inzerát' },
+    { value: 'SCAM', label: 'Podvod' },
+    { value: 'COPYRIGHT', label: 'Porušenie autorských práv' },
+    { value: 'OTHER', label: 'Iné' },
+  ]
 
   return (
     <div className="min-h-screen bg-white">
@@ -364,9 +412,16 @@ export default function AdvertisementDetailPage({
                 <button className="w-full bg-[#1dbf73] text-white py-3 rounded-md font-semibold hover:bg-[#19a463] transition-colors mb-4">
                   Pokračovať
                 </button>
-                <button className="w-full border-2 border-gray-300 text-gray-900 py-3 rounded-md font-semibold hover:border-gray-400 transition-colors">
-                  Uložiť do obľúbených
-                </button>
+                  <button className="w-full border-2 border-gray-300 text-gray-900 py-3 rounded-md font-semibold hover:border-gray-400 transition-colors mb-4">
+                    Uložiť do obľúbených
+                  </button>
+                  <button
+                    onClick={() => setShowReportModal(true)}
+                    className="w-full flex items-center justify-center gap-2 border-2 border-red-300 text-red-600 py-3 rounded-md font-semibold hover:border-red-400 hover:bg-red-50 transition-colors"
+                  >
+                    <Flag className="w-4 h-4" />
+                    Nahlásiť inzerát
+                  </button>
               </div>
 
               {/* Seller Card */}
@@ -416,6 +471,108 @@ export default function AdvertisementDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full shadow-xl">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <Flag className="w-5 h-5 text-red-600" />
+                  Nahlásiť inzerát
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowReportModal(false)
+                    setReportReason('')
+                    setReportDescription('')
+                    setReportSuccess(false)
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            {reportSuccess ? (
+              <div className="p-6 text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Check className="w-8 h-8 text-green-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Ďakujeme za nahlásenie
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Váš report bol úspešne odoslaný. Náš tím to skontroluje.
+                </p>
+              </div>
+            ) : (
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Dôvod nahlásenia <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={reportReason}
+                    onChange={(e) => setReportReason(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                  >
+                    <option value="">Vyberte dôvod...</option>
+                    {reportReasons.map((reason) => (
+                      <option key={reason.value} value={reason.value}>
+                        {reason.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Popis problému (voliteľné)
+                  </label>
+                  <textarea
+                    value={reportDescription}
+                    onChange={(e) => setReportDescription(e.target.value)}
+                    placeholder="Poskytnite viac informácií o probléme..."
+                    rows={4}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent resize-none"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                  <p>
+                    Nahlásené inzeráty sú kontrolované našim tímom. Inzerát zostane aktívny, pokiaľ ho nerozhodneme odstrániť.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+                  <button
+                    onClick={() => {
+                      setShowReportModal(false)
+                      setReportReason('')
+                      setReportDescription('')
+                    }}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                  >
+                    Zrušiť
+                  </button>
+                  <button
+                    onClick={handleReport}
+                    disabled={!reportReason || reportSubmitting}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {reportSubmitting ? 'Odosielam...' : 'Nahlásiť'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   )

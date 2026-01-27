@@ -47,6 +47,14 @@ export class AdvertisementsController {
     return this.advertisementsService.findByUser(userId);
   }
 
+  @Get('me/my-advertisements')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Získanie vlastných inzerátov' })
+  getMyAdvertisements(@Request() req) {
+    return this.advertisementsService.findByUser(req.user.userId);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Získanie inzerátu podľa ID' })
   findOne(@Param('id') id: string) {

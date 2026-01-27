@@ -24,6 +24,7 @@ export default function DevAdvertisementsPage() {
     type: AdvertisementType.SERVICE,
     categoryId: '',
     location: '',
+    postalCode: '',
     images: [],
     status: AdvertisementStatus.DRAFT,
     pricingType: 'FIXED',
@@ -120,6 +121,7 @@ export default function DevAdvertisementsPage() {
       price: ad.price,
       categoryId: (ad as any).categoryId || '',
       location: ad.location || '',
+      postalCode: ad.postalCode || '',
       images: ad.images || [],
       status: ad.status,
     })
@@ -147,6 +149,7 @@ export default function DevAdvertisementsPage() {
       type: AdvertisementType.SERVICE,
       categoryId: '',
       location: '',
+      postalCode: '',
       images: [],
       status: AdvertisementStatus.DRAFT,
       pricingType: 'FIXED',
@@ -360,6 +363,17 @@ export default function DevAdvertisementsPage() {
                       className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">PSČ</label>
+                    <input
+                      type="text"
+                      value={formData.postalCode || ''}
+                      onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      placeholder="Napríklad: 811 01"
+                    />
+                  </div>
                 </div>
 
                 <p className="text-xs text-gray-400">
@@ -387,6 +401,21 @@ export default function DevAdvertisementsPage() {
                             <option value="PACKAGE">Balíčky</option>
                           </select>
                         </div>
+
+                        {formData.pricingType === 'FIXED' && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">Fixná cena (€) *</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              required
+                              value={formData.price || ''}
+                              onChange={(e) => setFormData({ ...formData, price: e.target.value ? parseFloat(e.target.value) : undefined })}
+                              className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                              placeholder="0.00"
+                            />
+                          </div>
+                        )}
 
                         {formData.pricingType === 'HOURLY' && (
                           <div>
@@ -798,6 +827,7 @@ export default function DevAdvertisementsPage() {
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Cena</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Status</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Lokalita</th>
+                      <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">PSČ</th>
                       <th className="text-right px-6 py-3 text-sm font-semibold text-gray-300">Akcie</th>
                     </tr>
                   </thead>
@@ -827,6 +857,7 @@ export default function DevAdvertisementsPage() {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-gray-300">{ad.location || '-'}</td>
+                        <td className="px-6 py-4 text-gray-300">{ad.postalCode || '-'}</td>
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-end space-x-2">
                             <button
