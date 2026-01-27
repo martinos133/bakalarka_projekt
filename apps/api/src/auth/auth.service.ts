@@ -62,6 +62,28 @@ export class AuthService {
       throw new UnauthorizedException('Neplatné prihlasovacie údaje');
     }
 
+    // Kontrola banu
+    if (user.banned) {
+      const now = new Date();
+      if (user.bannedUntil && user.bannedUntil > now) {
+        const daysLeft = Math.ceil((user.bannedUntil.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        throw new UnauthorizedException(
+          `Váš účet je zablokovaný do ${user.bannedUntil.toLocaleDateString('sk-SK')} (${daysLeft} ${daysLeft === 1 ? 'deň' : 'dní'}). Dôvod: ${user.banReason || 'Porušenie podmienok'}`
+        );
+      } else if (!user.bannedUntil) {
+        // Trvalý ban
+        throw new UnauthorizedException(
+          `Váš účet je trvalo zablokovaný. Dôvod: ${user.banReason || 'Porušenie podmienok'}`
+        );
+      } else {
+        // Ban vypršal, odblokuj používateľa
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { banned: false, bannedUntil: null, banReason: null },
+        });
+      }
+    }
+
     const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
 
     if (!isPasswordValid) {
@@ -70,6 +92,12 @@ export class AuthService {
     }
 
     console.log(`[Auth] Successful login for user: ${user.email}`);
+
+    // Aktualizuj čas posledného prihlásenia
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    });
 
     const token = this.jwtService.sign({
       userId: user.id,

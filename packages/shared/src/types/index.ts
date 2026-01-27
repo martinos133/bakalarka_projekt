@@ -3,6 +3,12 @@ export enum UserRole {
   USER = 'USER',
 }
 
+export enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  OTHER = 'OTHER',
+}
+
 export enum AdvertisementStatus {
   DRAFT = 'DRAFT',
   ACTIVE = 'ACTIVE',
@@ -24,9 +30,32 @@ export interface User {
   firstName?: string;
   lastName?: string;
   phone?: string;
+  dateOfBirth?: Date;
+  gender?: Gender;
+  isCompany: boolean;
+  companyName?: string;
+  companyId?: string;
+  companyTaxId?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
   role: UserRole;
+  banned: boolean;
+  bannedUntil?: Date;
+  banReason?: string;
+  lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;
+  _count?: {
+    advertisements: number;
+  };
+}
+
+export interface BanUserDto {
+  banned: boolean;
+  bannedUntil?: Date;
+  banReason?: string;
 }
 
 export interface Advertisement {
@@ -136,4 +165,41 @@ export interface CreateFilterDto {
 export interface UpdateFilterDto extends Partial<CreateFilterDto> {
   isActive?: boolean;
   order?: number;
+}
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+  REFUNDED = 'REFUNDED',
+}
+
+export interface Payment {
+  id: string;
+  advertisementId: string;
+  renterId: string;
+  ownerId: string;
+  amount: number;
+  status: PaymentStatus;
+  paymentDate?: Date;
+  startDate?: Date;
+  endDate?: Date;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  advertisement?: Advertisement;
+  renter?: User;
+  owner?: User;
+}
+
+export interface UserStats {
+  totalAdvertisements: number;
+  activeAdvertisements: number;
+  paymentsReceived: number;
+  paymentsReceivedAmount: number;
+  paymentsMade: number;
+  paymentsMadeAmount: number;
+  completedPaymentsReceived: number;
+  completedPaymentsMade: number;
 }

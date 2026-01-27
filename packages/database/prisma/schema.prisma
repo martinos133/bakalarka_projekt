@@ -22,6 +22,12 @@ enum AdvertisementStatus {
   ARCHIVED
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
 model User {
   id            String    @id @default(uuid())
   email         String    @unique
@@ -29,10 +35,30 @@ model User {
   firstName     String?
   lastName      String?
   phone         String?
+  dateOfBirth   DateTime?
+  gender        Gender?
+  isCompany     Boolean   @default(false)
+  companyName   String?
+  companyId     String?   // IČO
+  companyTaxId  String?   // DIČ
+  address       String?
+  city          String?
+  postalCode    String?
+  country       String?
   role          UserRole  @default(USER)
+  banned        Boolean   @default(false)
+  bannedUntil   DateTime?
+  banReason     String?
+  lastLoginAt   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   advertisements Advertisement[]
+  paymentsReceived Payment[] @relation("Owner")
+  paymentsMade Payment[]     @relation("Renter")
+  
+  @@index([banned])
+  @@index([bannedUntil])
+  @@index([isCompany])
 }
 
 model Category {
@@ -82,6 +108,14 @@ model Filter {
   @@index([isActive])
 }
 
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
 model Advertisement {
   id          String             @id @default(uuid())
   title       String
@@ -96,8 +130,32 @@ model Advertisement {
   updatedAt   DateTime           @updatedAt
   userId      String
   user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments    Payment[]          @relation("AdvertisementOwner")
   
   @@index([userId])
   @@index([status])
   @@index([categoryId])
+}
+
+model Payment {
+  id              String         @id @default(uuid())
+  advertisementId String
+  advertisement   Advertisement  @relation("AdvertisementOwner", fields: [advertisementId], references: [id], onDelete: Cascade)
+  renterId        String
+  renter          User           @relation("Renter", fields: [renterId], references: [id], onDelete: Cascade)
+  ownerId         String
+  owner           User           @relation("Owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  amount          Float
+  status          PaymentStatus  @default(PENDING)
+  paymentDate     DateTime?
+  startDate       DateTime?
+  endDate         DateTime?
+  notes           String?        @db.Text
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  @@index([advertisementId])
+  @@index([renterId])
+  @@index([ownerId])
+  @@index([status])
 }

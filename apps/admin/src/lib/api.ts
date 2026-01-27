@@ -25,7 +25,7 @@ export const api = {
   getStats: () => fetchWithAuth('/admin/stats'),
   getChartData: (period: '7d' | '30d' | '3m' = '30d') => 
     fetchWithAuth(`/admin/chart?period=${period}`),
-  getUsers: () => fetchWithAuth('/admin/users'),
+  getUsers: () => fetchWithAuth('/users'),
   getAdvertisements: () => fetchWithAuth('/admin/advertisements'),
   createAdvertisement: (data: any) => 
     fetchWithAuth('/advertisements', {
@@ -81,6 +81,14 @@ export const api = {
     }),
   getFilter: (id: string) =>
     fetchWithAuth(`/filters/${id}`),
+  getUsers: () => fetchWithAuth('/users'),
+  getUser: (id: string) => fetchWithAuth(`/users/${id}`),
+  banUser: (id: string, data: any) =>
+    fetchWithAuth(`/users/${id}/ban`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  getUserStats: (id: string) => fetchWithAuth(`/users/${id}/stats`),
 }
 
 export default api
