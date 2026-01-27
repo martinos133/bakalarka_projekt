@@ -61,6 +61,26 @@ export const api = {
     }),
   getCategory: (id: string) =>
     fetchWithAuth(`/categories/${id}`),
+  getFilters: (categoryId?: string) =>
+    fetchWithAuth(categoryId ? `/filters?categoryId=${categoryId}` : '/filters'),
+  getActiveFilters: (categoryId?: string) =>
+    fetchWithAuth(categoryId ? `/filters/active?categoryId=${categoryId}` : '/filters/active'),
+  createFilter: (data: any) =>
+    fetchWithAuth('/filters', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateFilter: (id: string, data: any) =>
+    fetchWithAuth(`/filters/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  deleteFilter: (id: string) =>
+    fetchWithAuth(`/filters/${id}`, {
+      method: 'DELETE',
+    }),
+  getFilter: (id: string) =>
+    fetchWithAuth(`/filters/${id}`),
 }
 
 export default api

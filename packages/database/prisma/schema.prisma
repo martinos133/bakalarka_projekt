@@ -46,8 +46,39 @@ model Category {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   advertisements Advertisement[]
+  filters     Filter[]
   
   @@index([slug])
+  @@index([isActive])
+}
+
+enum FilterType {
+  TEXT
+  NUMBER
+  SELECT
+  MULTISELECT
+  BOOLEAN
+  DATE
+  RANGE
+}
+
+model Filter {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String
+  type        FilterType
+  categoryId  String
+  category    Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  description String?    @db.Text
+  options     String[]   // Pre SELECT a MULTISELECT typy
+  isRequired  Boolean    @default(false)
+  isActive    Boolean    @default(true)
+  order       Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  @@unique([categoryId, slug])
+  @@index([categoryId])
   @@index([isActive])
 }
 

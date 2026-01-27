@@ -95,3 +95,45 @@ export interface CreateCategoryDto {
 export interface UpdateCategoryDto extends Partial<CreateCategoryDto> {
   isActive?: boolean;
 }
+
+export enum FilterType {
+  TEXT = 'TEXT',
+  NUMBER = 'NUMBER',
+  SELECT = 'SELECT',
+  MULTISELECT = 'MULTISELECT',
+  BOOLEAN = 'BOOLEAN',
+  DATE = 'DATE',
+  RANGE = 'RANGE',
+}
+
+export interface Filter {
+  id: string;
+  name: string;
+  slug: string;
+  type: FilterType;
+  categoryId: string;
+  description?: string;
+  options: string[];
+  isRequired: boolean;
+  isActive: boolean;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+  category?: Category;
+}
+
+export interface CreateFilterDto {
+  name: string;
+  type: FilterType;
+  categoryId: string;
+  description?: string;
+  options?: string[];
+  isRequired?: boolean;
+  isActive?: boolean;
+  order?: number;
+}
+
+export interface UpdateFilterDto extends Partial<CreateFilterDto> {
+  isActive?: boolean;
+  order?: number;
+}
