@@ -14,7 +14,8 @@
     "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules",
     "db:generate": "npm run db:generate --workspace=packages/database",
     "db:migrate": "npm run db:migrate --workspace=packages/database",
-    "db:studio": "npm run db:studio --workspace=packages/database"
+    "db:studio": "npm run db:studio --workspace=packages/database",
+    "db:seed": "npm run db:seed --workspace=packages/database"
   },
   "devDependencies": {
     "typescript": "^5.3.3"
@@ -22,5 +23,6 @@
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

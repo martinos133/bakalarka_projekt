@@ -1,5 +1,5 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, UseGuards, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -30,5 +30,12 @@ export class AdminController {
   @ApiOperation({ summary: 'Získanie všetkých inzerátov (admin)' })
   getAllAdvertisements() {
     return this.adminService.getAllAdvertisements();
+  }
+
+  @Get('chart')
+  @ApiOperation({ summary: 'Získanie dát pre graf' })
+  @ApiQuery({ name: 'period', enum: ['7d', '30d', '3m'], required: false, description: 'Časové obdobie' })
+  getChartData(@Query('period') period: '7d' | '30d' | '3m' = '30d') {
+    return this.adminService.getChartData(period);
   }
 }

@@ -7,7 +7,13 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        dark: 'rgb(10,10,10)',
+        card: 'rgb(28,28,28)',
+        cardHover: 'rgb(38,38,38)',
+      },
+    },
   },
   plugins: [],
 }

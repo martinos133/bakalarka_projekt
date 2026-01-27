@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { prisma } from '@inzertna-platforma/database';
-import { signToken } from '@inzertna-platforma/shared';
+import { UserRole } from '@inzertna-platforma/shared';
 import { LoginDto, CreateUserDto } from '@inzertna-platforma/shared';
 
 @Injectable()
@@ -40,10 +40,10 @@ export class AuthService {
       },
     });
 
-    const token = signToken({
+    const token = this.jwtService.sign({
       userId: user.id,
       email: user.email,
-      role: user.role,
+      role: user.role as UserRole,
     });
 
     return {
@@ -58,19 +58,23 @@ export class AuthService {
     });
 
     if (!user) {
+      console.error(`[Auth] User not found: ${loginDto.email}`);
       throw new UnauthorizedException('Neplatné prihlasovacie údaje');
     }
 
     const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
 
     if (!isPasswordValid) {
+      console.error(`[Auth] Invalid password for user: ${loginDto.email}`);
       throw new UnauthorizedException('Neplatné prihlasovacie údaje');
     }
 
-    const token = signToken({
+    console.log(`[Auth] Successful login for user: ${user.email}`);
+
+    const token = this.jwtService.sign({
       userId: user.id,
       email: user.email,
-      role: user.role,
+      role: user.role as UserRole,
     });
 
     return {
