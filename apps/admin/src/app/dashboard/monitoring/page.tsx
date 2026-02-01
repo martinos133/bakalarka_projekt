@@ -279,12 +279,6 @@ export default function MonitoringPage() {
                 1 min ← → 8 hodín ({liveSliderMinutes} min)
               </p>
             </div>
-            {/* Nápoveda, ak sú Live vždy 0 – chýba tabuľka v DB */}
-            {live1m && liveCustomStats && live1m.total === 0 && liveCustomStats.total === 0 && (
-              <div className="mt-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-200 text-sm">
-                <strong>Live kliknutia sú 0?</strong> Aby sa kliky z platformy ukladali a zobrazovali tu, musí v databáze existovať tabuľka <code className="bg-dark/60 px-1 rounded">ClickEvent</code>. V termináli (v koreni projektu, s nastavenou <code className="bg-dark/60 px-1 rounded">DATABASE_URL</code>) spusti: <code className="block mt-2 bg-dark/80 p-2 rounded text-xs overflow-x-auto">cd packages/database && npx prisma migrate deploy</code> Potom reštartuj API a klikni na platforme na kategórie/inzeráty – čísla sa naplnia.
-              </div>
-            )}
           </div>
 
           {loading ? (
