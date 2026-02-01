@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
-import Link from 'next/link'
+import TrackedLink from '@/components/TrackedLink'
 
 export default function Categories() {
   const [categories, setCategories] = useState<any[]>([])
@@ -59,8 +59,10 @@ export default function Categories() {
                 key={category.id}
                 className="bg-white p-6 rounded-lg hover:shadow-lg transition-shadow cursor-pointer group"
               >
-                <Link
+                <TrackedLink
                   href={`/kategoria/${category.slug}`}
+                  targetType="CATEGORY"
+                  targetId={category.id}
                   className="block"
                 >
                   {category.image ? (
@@ -83,17 +85,19 @@ export default function Categories() {
                   <h3 className="text-lg font-semibold text-gray-900 mb-3 group-hover:text-[#1dbf73] transition-colors">
                     {category.name}
                   </h3>
-                </Link>
+                </TrackedLink>
                 {subcategories.length > 0 && (
                   <ul className="space-y-2">
                     {subcategories.map((subcategory: any) => (
                       <li key={subcategory.id}>
-                        <Link
+                        <TrackedLink
                           href={`/kategoria/${subcategory.slug}`}
+                          targetType="CATEGORY"
+                          targetId={subcategory.id}
                           className="text-sm text-gray-600 hover:text-[#1dbf73] transition-colors block"
                         >
                           {subcategory.name}
-                        </Link>
+                        </TrackedLink>
                       </li>
                     ))}
                     {(category.children?.filter((child: any) => child.status === 'ACTIVE') || []).length > 3 && (

@@ -133,6 +133,8 @@ export const api = {
       method: 'DELETE',
       body: JSON.stringify({ reportId }),
     }),
+  getClickStats: (period: '1m' | '5m' | '1d' | '7d' | '30d' | '3m' = '30d') =>
+    fetchWithAuth(`/analytics/stats?period=${period}`),
 }
 
 export default api

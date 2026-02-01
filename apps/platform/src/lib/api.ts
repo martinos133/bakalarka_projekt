@@ -125,6 +125,21 @@ export const api = {
     method: 'POST',
     body: JSON.stringify(data),
   }),
+
+  // Monitoring kliknutí (verejné – bez auth)
+  recordClick: (data: {
+    eventType?: string
+    targetType?: string
+    targetId?: string
+    sessionId?: string
+    userId?: string
+    gender?: string
+    isCompany?: boolean
+  }) =>
+    fetchAPI('/analytics/click', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 }
 
 export default api

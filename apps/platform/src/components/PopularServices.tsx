@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import TrackedLink from '@/components/TrackedLink'
 import { api } from '@/lib/api'
 
 interface Service {
@@ -68,10 +68,12 @@ export default function PopularServices() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
           {services.map((service) => (
-            <Link
+            <TrackedLink
               key={service.id}
               href={`/inzerat/${service.id}`}
-              className="group cursor-pointer hover:shadow-lg transition-shadow duration-300"
+              targetType="AD"
+              targetId={service.id}
+              className="group cursor-pointer hover:shadow-lg transition-shadow duration-300 block"
             >
               <div className="relative overflow-hidden rounded-lg mb-3">
                 <img
@@ -103,7 +105,7 @@ export default function PopularServices() {
                   </span>
                 </div>
               </div>
-            </Link>
+            </TrackedLink>
           ))}
         </div>
       </div>

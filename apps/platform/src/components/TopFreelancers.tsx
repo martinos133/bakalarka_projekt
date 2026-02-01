@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import TrackedLink from '@/components/TrackedLink'
 
 // Funkcia na konzistentné formátovanie čísel bez locale závislosti
 function formatNumber(num: number): string {
@@ -68,10 +68,12 @@ export default function TopFreelancers() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {freelancers.map((freelancer, index) => (
-            <Link
+            <TrackedLink
               key={freelancer.id}
               href={`/inzerat/${freelancer.id}`}
-              className="bg-white p-6 rounded-lg hover:shadow-lg transition-shadow cursor-pointer group"
+              targetType="AD"
+              targetId={freelancer.id}
+              className="bg-white p-6 rounded-lg hover:shadow-lg transition-shadow cursor-pointer group block"
             >
               <div className="flex items-center gap-4 mb-4">
                 <div className="relative">
@@ -111,7 +113,7 @@ export default function TopFreelancers() {
                   Od {freelancer.price}€
                 </span>
               </div>
-            </Link>
+            </TrackedLink>
           ))}
         </div>
       </div>

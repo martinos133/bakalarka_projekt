@@ -15,6 +15,7 @@ import {
   Navigation,
   Boxes,
   Sliders,
+  MousePointerClick,
 } from 'lucide-react'
 
 interface NavItem {
@@ -36,6 +37,7 @@ const navigation: NavSection[] = [
       { label: 'Inzeráty', path: '/dashboard/advertisements', icon: FileText },
       { label: 'Používatelia', path: '/dashboard/users', icon: Users },
       { label: 'Kategórie', path: '/dashboard/categories', icon: FolderTree },
+      { label: 'Monitoring kliknutí', path: '/dashboard/monitoring', icon: MousePointerClick },
     ],
   },
   {

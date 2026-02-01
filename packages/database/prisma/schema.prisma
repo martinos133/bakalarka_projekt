@@ -278,3 +278,22 @@ model Message {
   @@index([type])
   @@index([createdAt])
 }
+
+// Monitoring kliknutí – ženy, muži, firmy, fyzické osoby
+model ClickEvent {
+  id          String   @id @default(uuid())
+  userId      String?   // ak je používateľ prihlásený
+  sessionId   String?   // pre anonymné návštevy
+  gender      Gender?   // MALE, FEMALE, OTHER
+  isCompany   Boolean?  // true = firma, false = fyzická osoba
+  eventType   String    @default("CLICK") // CLICK, VIEW, ...
+  targetType  String?   // AD, CATEGORY, ...
+  targetId    String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([gender])
+  @@index([isCompany])
+  @@index([createdAt])
+  @@index([eventType])
+}

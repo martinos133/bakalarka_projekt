@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { api } from '@/lib/api'
 import Link from 'next/link'
+import TrackedLink from '@/components/TrackedLink'
 import Image from 'next/image'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -165,10 +166,12 @@ export default function CategoryPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Podkategórie</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {subcategories.map((subcategory) => (
-                <Link
+                <TrackedLink
                   key={subcategory.id}
                   href={`/kategoria/${subcategory.slug}`}
-                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 border border-gray-200"
+                  targetType="CATEGORY"
+                  targetId={subcategory.id}
+                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 border border-gray-200 block"
                 >
                   {subcategory.image && (
                     <img
@@ -188,7 +191,7 @@ export default function CategoryPage() {
                       {subcategory._count.advertisements} {subcategory._count.advertisements === 1 ? 'inzerát' : 'inzerátov'}
                     </p>
                   )}
-                </Link>
+                </TrackedLink>
               ))}
             </div>
           </div>
@@ -215,10 +218,12 @@ export default function CategoryPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {advertisements.map((ad) => (
-                <Link
+                <TrackedLink
                   key={ad.id}
                   href={`/inzerat/${ad.id}`}
-                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden group"
+                  targetType="AD"
+                  targetId={ad.id}
+                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden group block"
                 >
                   {ad.images && ad.images.length > 0 && (
                     <div className="relative w-full h-48 overflow-hidden">
@@ -251,7 +256,7 @@ export default function CategoryPage() {
                       )}
                     </div>
                   </div>
-                </Link>
+                </TrackedLink>
               ))}
             </div>
           )}

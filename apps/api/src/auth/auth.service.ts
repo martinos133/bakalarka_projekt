@@ -123,6 +123,8 @@ export class AuthService {
         lastName: user.lastName,
         phone: user.phone,
         role: user.role,
+        gender: user.gender,
+        isCompany: user.isCompany,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
