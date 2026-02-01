@@ -7,7 +7,7 @@ import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { User } from '@inzertna-platforma/shared'
-import { Ban, Unlock, Eye, Calendar, Shield, Mail, Phone, User as UserIcon, MapPin, Building2, IdCard, X, FileText, DollarSign, TrendingUp, TrendingDown, Search, Filter as FilterIcon } from 'lucide-react'
+import { Ban, Unlock, Eye, Calendar, Shield, Mail, Phone, User as UserIcon, MapPin, Building2, CreditCard, X, FileText, Euro, TrendingUp, TrendingDown, Search, Filter as FilterIcon } from 'lucide-react'
 
 export default function UsersPage() {
   const router = useRouter()
@@ -460,7 +460,7 @@ export default function UsersPage() {
                         </div>
                         <div>
                           <label className="text-sm text-gray-400 flex items-center space-x-1">
-                            <IdCard className="w-4 h-4" />
+                            <CreditCard className="w-4 h-4" />
                             <span>IČO</span>
                           </label>
                           <p className="text-white">{selectedUser.companyId || '-'}</p>

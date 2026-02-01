@@ -14,7 +14,7 @@ import { AdvertisementsService } from './advertisements.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { CreateAdvertisementDto, UpdateAdvertisementDto } from '@inzertna-platforma/shared';
+import { CreateAdvertisementDto, UpdateAdvertisementDto, UserRole } from '@inzertna-platforma/shared';
 
 @ApiTags('advertisements')
 @Controller('advertisements')
@@ -85,7 +85,7 @@ export class AdvertisementsController {
 
   @Get('pending/all')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Získanie všetkých čakajúcich inzerátov (len admin)' })
   findPending() {
@@ -94,7 +94,7 @@ export class AdvertisementsController {
 
   @Patch(':id/approve')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Schválenie inzerátu (len admin)' })
   approve(@Param('id') id: string) {
@@ -103,7 +103,7 @@ export class AdvertisementsController {
 
   @Patch(':id/reject')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Zamietnutie inzerátu (len admin)' })
   reject(@Param('id') id: string, @Body() body?: { reason?: string }) {

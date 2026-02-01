@@ -7,7 +7,7 @@ import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { Advertisement } from '@inzertna-platforma/shared'
-import { Check, X, Eye, Calendar, User, MapPin, DollarSign, Image as ImageIcon, Search, Filter as FilterIcon, AlertCircle } from 'lucide-react'
+import { Check, X, Eye, Calendar, User, MapPin, Euro, Image as ImageIcon, Search, Filter as FilterIcon, AlertCircle } from 'lucide-react'
 
 export default function PendingAdvertisementsPage() {
   const router = useRouter()
@@ -364,7 +364,7 @@ export default function PendingAdvertisementsPage() {
                           <td className="px-6 py-4">
                             {ad.price ? (
                               <div className="flex items-center space-x-1">
-                                <DollarSign className="w-4 h-4 text-gray-400" />
+                                <Euro className="w-4 h-4 text-gray-400" />
                                 <span>{ad.price.toFixed(2)} €</span>
                               </div>
                             ) : (

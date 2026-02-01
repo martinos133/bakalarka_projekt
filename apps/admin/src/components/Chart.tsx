@@ -25,7 +25,7 @@ export default function Chart() {
         setData(chartData)
         
         // Vypočítame celkové hodnoty
-        const totalAds = chartData.reduce((sum, item) => sum + item.advertisements, 0)
+        const totalAds = chartData.reduce((sum: number, item: { advertisements: number }) => sum + item.advertisements, 0)
         setTotalAdvertisements(totalAds)
         // Návštevníci zatiaľ nie sú implementované, takže 0
         setTotalVisitors(0)

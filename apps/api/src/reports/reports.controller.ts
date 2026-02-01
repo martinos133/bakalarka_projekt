@@ -14,7 +14,7 @@ import { ReportsService } from './reports.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { CreateReportDto, ResolveReportDto } from '@inzertna-platforma/shared';
+import { CreateReportDto, ResolveReportDto, UserRole } from '@inzertna-platforma/shared';
 
 @ApiTags('reports')
 @Controller('reports')
@@ -31,7 +31,7 @@ export class ReportsController {
 
   @Get('pending')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Získanie všetkých čakajúcich nahlásení (len admin)' })
   findAllPending() {
@@ -40,7 +40,7 @@ export class ReportsController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Získanie všetkých nahlásení (len admin)' })
   findAll() {
@@ -49,7 +49,7 @@ export class ReportsController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Získanie nahlásenia podľa ID (len admin)' })
   findOne(@Param('id') id: string) {
@@ -58,7 +58,7 @@ export class ReportsController {
 
   @Patch(':id/resolve')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Vyriešenie nahlásenia (len admin)' })
   resolve(@Request() req, @Param('id') id: string, @Body() resolveDto: ResolveReportDto) {
@@ -67,7 +67,7 @@ export class ReportsController {
 
   @Delete('advertisement/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Odstránenie nahláseného inzerátu (len admin)' })
   deleteAdvertisement(@Param('id') id: string, @Body() body: { reportId: string }) {

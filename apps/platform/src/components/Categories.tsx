@@ -55,31 +55,35 @@ export default function Categories() {
               .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
             
             return (
-              <Link
+              <div
                 key={category.id}
-                href={`/kategoria/${category.slug}`}
                 className="bg-white p-6 rounded-lg hover:shadow-lg transition-shadow cursor-pointer group"
               >
-                {category.image ? (
-                  <div className="mb-4">
-                    <img
-                      src={category.image}
-                      alt={category.name}
-                      className="w-16 h-16 object-cover rounded-lg"
-                    />
-                  </div>
-                ) : category.icon ? (
-                  <div className="text-4xl mb-4">{category.icon}</div>
-                ) : (
-                  <div className="w-16 h-16 bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
-                    <span className="text-2xl text-gray-400">
-                      {category.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                )}
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 group-hover:text-[#1dbf73] transition-colors">
-                  {category.name}
-                </h3>
+                <Link
+                  href={`/kategoria/${category.slug}`}
+                  className="block"
+                >
+                  {category.image ? (
+                    <div className="mb-4">
+                      <img
+                        src={category.image}
+                        alt={category.name}
+                        className="w-16 h-16 object-cover rounded-lg"
+                      />
+                    </div>
+                  ) : category.icon ? (
+                    <div className="text-4xl mb-4">{category.icon}</div>
+                  ) : (
+                    <div className="w-16 h-16 bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
+                      <span className="text-2xl text-gray-400">
+                        {category.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 group-hover:text-[#1dbf73] transition-colors">
+                    {category.name}
+                  </h3>
+                </Link>
                 {subcategories.length > 0 && (
                   <ul className="space-y-2">
                     {subcategories.map((subcategory: any) => (
@@ -87,7 +91,6 @@ export default function Categories() {
                         <Link
                           href={`/kategoria/${subcategory.slug}`}
                           className="text-sm text-gray-600 hover:text-[#1dbf73] transition-colors block"
-                          onClick={(e) => e.stopPropagation()}
                         >
                           {subcategory.name}
                         </Link>
@@ -100,7 +103,7 @@ export default function Categories() {
                     )}
                   </ul>
                 )}
-              </Link>
+              </div>
             )
           })}
         </div>

@@ -103,7 +103,6 @@ export const api = {
     }),
   getFilter: (id: string) =>
     fetchWithAuth(`/filters/${id}`),
-  getUsers: () => fetchWithAuth('/users'),
   getUser: (id: string) => fetchWithAuth(`/users/${id}`),
   banUser: (id: string, data: any) =>
     fetchWithAuth(`/users/${id}/ban`, {

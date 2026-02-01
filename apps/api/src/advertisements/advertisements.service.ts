@@ -161,7 +161,7 @@ export class AdvertisementsService {
 
   async findByCategorySlug(slug: string) {
     // Najprv nájdi kategóriu podľa slug
-    const category = await prisma.category.findUnique({
+    const category = await (prisma as any).category.findUnique({
       where: { slug },
     });
 
@@ -173,7 +173,7 @@ export class AdvertisementsService {
     const categoryIds = [category.id];
     
     // Pridaj ID všetkých podkategórií
-    const subcategories = await prisma.category.findMany({
+    const subcategories = await (prisma as any).category.findMany({
       where: {
         parentId: category.id,
         status: 'ACTIVE',
@@ -199,8 +199,14 @@ export class AdvertisementsService {
             phone: true,
           },
         },
-        category: true,
-      },
+        category: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+      } as any,
       orderBy: {
         createdAt: 'desc',
       },

@@ -7,7 +7,7 @@ import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { Report, ReportStatus } from '@inzertna-platforma/shared'
-import { Check, X, Eye, Calendar, User, MapPin, DollarSign, Image as ImageIcon, Search, Filter as FilterIcon, Trash2, AlertTriangle } from 'lucide-react'
+import { Check, X, Eye, Calendar, User, MapPin, Euro, Image as ImageIcon, Search, Filter as FilterIcon, Trash2, AlertTriangle, AlertCircle } from 'lucide-react'
 
 // Dôvody nahlásenia ako string literály (kvôli problémom s enum importom v Next.js)
 type ReportReasonType = 'SPAM' | 'INAPPROPRIATE' | 'FAKE' | 'SCAM' | 'COPYRIGHT' | 'OTHER'
@@ -93,7 +93,7 @@ export default function ReportedAdvertisementsPage() {
   }
 
   const handleResolve = async (id: string, status: ReportStatus) => {
-    if (status === 'RESOLVED') {
+    if (status === ReportStatus.RESOLVED) {
       // Zobraz modálny dialóg pre vyriešenie s možnosťou banu
       setShowResolveModal(true)
       return
@@ -102,7 +102,7 @@ export default function ReportedAdvertisementsPage() {
     // Pre DISMISSED jednoducho zamietni bez banu
     try {
       await api.resolveReport(id, {
-        status: 'DISMISSED',
+        status: ReportStatus.DISMISSED,
         resolutionNote: resolutionNote || undefined,
       })
       await loadReports()
@@ -567,13 +567,13 @@ export default function ReportedAdvertisementsPage() {
                         Zrušiť
                       </button>
                       <button
-                        onClick={() => handleResolve(selectedReport.id, 'DISMISSED')}
+                        onClick={() => handleResolve(selectedReport.id, ReportStatus.DISMISSED)}
                         className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors"
                       >
                         Zamietnuť nahlásenie
                       </button>
                       <button
-                        onClick={() => handleResolve(selectedReport.id, 'RESOLVED')}
+                        onClick={() => handleResolve(selectedReport.id, ReportStatus.RESOLVED)}
                         className="px-4 py-2 bg-primary hover:opacity-90 rounded-lg transition-colors"
                       >
                         Vyriešiť nahlásenie
