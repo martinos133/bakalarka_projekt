@@ -133,10 +133,19 @@ export const api = {
       method: 'DELETE',
       body: JSON.stringify({ reportId }),
     }),
-  getClickStats: (period: '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m' = '30d', minutes?: number) =>
-    minutes != null && minutes >= 1 && minutes <= 480
-      ? fetchWithAuth(`/analytics/stats?minutes=${Math.floor(minutes)}`)
-      : fetchWithAuth(`/analytics/stats?period=${period}`),
+  getClickStats: (
+    period: '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m' = '30d',
+    minutes?: number,
+    gender?: string,
+    accountType?: string,
+  ) => {
+    const params = new URLSearchParams()
+    if (minutes != null && minutes >= 1 && minutes <= 480) params.set('minutes', String(Math.floor(minutes)))
+    else params.set('period', period)
+    if (gender && gender !== 'all') params.set('gender', gender)
+    if (accountType && accountType !== 'all') params.set('accountType', accountType)
+    return fetchWithAuth(`/analytics/stats?${params.toString()}`)
+  },
   getClickBreakdown: (period: '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m' = '30d') =>
     fetchWithAuth(`/analytics/stats/breakdown?period=${period}`),
 }

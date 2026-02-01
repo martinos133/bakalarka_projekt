@@ -26,9 +26,8 @@ export function trackClick(targetType: string, targetId: string, eventType = 'CL
   }
   if (user) {
     payload.userId = user.id
-    const u = user as { gender?: string; isCompany?: boolean }
-    if (u.gender) payload.gender = u.gender
-    if (u.isCompany !== undefined) payload.isCompany = u.isCompany
+    if (user.gender) payload.gender = user.gender
+    if (user.isCompany !== undefined) payload.isCompany = user.isCompany
   }
   const isDev = typeof window !== 'undefined' && process.env.NODE_ENV === 'development'
   if (isDev) console.log('[trackClick] Odosielam klik:', targetType, targetId)

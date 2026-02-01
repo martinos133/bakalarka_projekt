@@ -59,11 +59,13 @@ export default function MonitoringPage() {
   const [breakdownLoading, setBreakdownLoading] = useState(false)
   const [breakdownFilter, setBreakdownFilter] = useState<'all' | 'categories' | 'ads'>('all')
   const [breakdownPeriod, setBreakdownPeriod] = useState<BreakdownPeriod>('30d')
+  const [filterGender, setFilterGender] = useState<string>('all')
+  const [filterAccountType, setFilterAccountType] = useState<string>('all')
 
   const loadStats = useCallback(async () => {
     try {
       setLoading(true)
-      const data = await api.getClickStats(period)
+      const data = await api.getClickStats(period, undefined, filterGender, filterAccountType)
       setStats(data)
     } catch (error) {
       console.error('Chyba pri načítaní štatistík kliknutí:', error)
@@ -71,13 +73,13 @@ export default function MonitoringPage() {
     } finally {
       setLoading(false)
     }
-  }, [period])
+  }, [period, filterGender, filterAccountType])
 
   const loadLiveStats = useCallback(async () => {
     try {
       const [data1m, dataCustom] = await Promise.all([
-        api.getClickStats('1m'),
-        api.getClickStats('30d', liveSliderMinutes),
+        api.getClickStats('1m', undefined, filterGender, filterAccountType),
+        api.getClickStats('30d', liveSliderMinutes, filterGender, filterAccountType),
       ])
       setLive1m(data1m)
       setLiveCustomStats(dataCustom)
@@ -85,7 +87,7 @@ export default function MonitoringPage() {
       setLive1m(null)
       setLiveCustomStats(null)
     }
-  }, [liveSliderMinutes])
+  }, [liveSliderMinutes, filterGender, filterAccountType])
 
   const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const val = Number(e.target.value)
@@ -178,18 +180,49 @@ export default function MonitoringPage() {
                 Kto kliká: ženy, muži, firmy, fyzické osoby. Dáta z platformy (prihlásení používatelia).
               </p>
             </div>
-            <div className="flex gap-2">
-              {(['1d', '7d', '30d', '3m'] as const).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPeriod(p)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    period === p ? 'bg-primary text-gray-100' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
-                  }`}
-                >
-                  {periodLabel[p]}
-                </button>
-              ))}
+            <div className="flex flex-wrap gap-4 items-center">
+              <div className="flex gap-2">
+                {(['1d', '7d', '30d', '3m'] as const).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPeriod(p)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      period === p ? 'bg-primary text-gray-100' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                    }`}
+                  >
+                    {periodLabel[p]}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-3 items-center border-l border-dark pl-4">
+                <label className="flex items-center gap-2 text-sm text-gray-400">
+                  Pohlavie:
+                  <select
+                    value={filterGender}
+                    onChange={(e) => setFilterGender(e.target.value)}
+                    className="bg-card border border-dark rounded-lg px-2 py-1.5 text-gray-200 text-sm"
+                  >
+                    <option value="all">Všetci</option>
+                    <option value="MALE">Muži</option>
+                    <option value="FEMALE">Ženy</option>
+                    <option value="OTHER">Iné</option>
+                    <option value="unspecified">Nešpecifikované</option>
+                  </select>
+                </label>
+                <label className="flex items-center gap-2 text-sm text-gray-400">
+                  Typ účtu:
+                  <select
+                    value={filterAccountType}
+                    onChange={(e) => setFilterAccountType(e.target.value)}
+                    className="bg-card border border-dark rounded-lg px-2 py-1.5 text-gray-200 text-sm"
+                  >
+                    <option value="all">Všetky</option>
+                    <option value="company">Firmy</option>
+                    <option value="individual">Fyzické osoby</option>
+                    <option value="unspecified">Nešpecifikované</option>
+                  </select>
+                </label>
+              </div>
             </div>
           </div>
 

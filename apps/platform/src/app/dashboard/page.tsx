@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { api } from '@/lib/api'
-import { isAuthenticated, getAuthUser } from '@/lib/auth'
+import { isAuthenticated, getAuthUser, setAuthUser } from '@/lib/auth'
 import { User, Building2, Eye, EyeOff, Plus, Edit, Trash2, Save, X, Lock, Mail, Phone, MapPin, Calendar, Briefcase, Image as ImageIcon, MessageSquare, Archive, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 
@@ -87,6 +87,7 @@ export default function DashboardPage() {
       ])
       setUser(userData)
       setProfileData(userData)
+      setAuthUser(userData)
       setAdvertisements(adsData)
       setCategories(catsData)
       setMessages(messagesData)
@@ -174,6 +175,7 @@ export default function DashboardPage() {
       const updated = await api.updateMyProfile(profileData)
       setUser(updated)
       setProfileData(updated)
+      setAuthUser(updated)
       setEditing(false)
       setSuccess('Profil bol úspešne aktualizovaný')
       setTimeout(() => setSuccess(''), 3000)
@@ -494,6 +496,53 @@ export default function DashboardPage() {
                   disabled={!editing}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Pohlavie
+                </label>
+                <select
+                  value={profileData.gender || ''}
+                  onChange={(e) => setProfileData({ ...profileData, gender: e.target.value || undefined })}
+                  disabled={!editing}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                >
+                  <option value="">-- Vybrať --</option>
+                  <option value="MALE">Muž</option>
+                  <option value="FEMALE">Žena</option>
+                  <option value="OTHER">Iné</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Typ účtu
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="isCompany"
+                      checked={profileData.isCompany === false}
+                      onChange={() => setProfileData({ ...profileData, isCompany: false })}
+                      disabled={!editing}
+                      className="rounded border-gray-300"
+                    />
+                    <span className="text-gray-700">Fyzická osoba</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="isCompany"
+                      checked={profileData.isCompany === true}
+                      onChange={() => setProfileData({ ...profileData, isCompany: true })}
+                      disabled={!editing}
+                      className="rounded border-gray-300"
+                    />
+                    <span className="text-gray-700">Firma</span>
+                  </label>
+                </div>
               </div>
 
               {profileData.isCompany && (

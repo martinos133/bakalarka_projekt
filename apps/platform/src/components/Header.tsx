@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { isAuthenticated, getAuthUser, logout } from '@/lib/auth'
+import { isAuthenticated, getAuthUser, setAuthUser, logout } from '@/lib/auth'
+import { api } from '@/lib/api'
 import { User, LogOut, ChevronDown } from 'lucide-react'
 
 export default function Header() {
@@ -17,6 +18,18 @@ export default function Header() {
     if (isAuthenticated()) {
       setUser(getAuthUser())
     }
+  }, [])
+
+  // Pri každom načítaní stránky (keď je používateľ prihlásený) stiahneme profil z API
+  // a uložíme do localStorage – aby trackClick mal vždy aktuálne pohlavie a typ účtu
+  useEffect(() => {
+    if (!isAuthenticated()) return
+    api.getMyProfile()
+      .then((profile) => {
+        setAuthUser(profile)
+        setUser(getAuthUser())
+      })
+      .catch(() => {})
   }, [])
 
   const handleLogout = () => {

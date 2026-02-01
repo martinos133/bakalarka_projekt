@@ -59,7 +59,12 @@ export class AnalyticsService {
     }
   }
 
-  async getClickStats(period: '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m' = '30d', minutesParam?: number) {
+  async getClickStats(
+    period: '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m' = '30d',
+    minutesParam?: number,
+    genderFilter?: string,
+    accountTypeFilter?: string,
+  ) {
     const now = new Date();
     let startDate: Date;
     const minutes = minutesParam != null && Number.isFinite(minutesParam) ? Math.max(1, Math.min(480, Math.floor(minutesParam))) : null;
@@ -99,7 +104,13 @@ export class AnalyticsService {
         return this.emptyStats(effectivePeriod);
       }
 
-      const where = { createdAt: { gte: startDate } };
+      const where: { createdAt: { gte: Date }; gender?: null | string; isCompany?: boolean | null } = { createdAt: { gte: startDate } };
+      if (genderFilter && genderFilter !== 'all') {
+        where.gender = genderFilter === 'unspecified' ? null : genderFilter;
+      }
+      if (accountTypeFilter && accountTypeFilter !== 'all') {
+        where.isCompany = accountTypeFilter === 'company' ? true : accountTypeFilter === 'individual' ? false : null;
+      }
 
       const [total, byGenderRows, byCompanyRows] = await Promise.all([
         prisma.clickEvent.count({ where }),

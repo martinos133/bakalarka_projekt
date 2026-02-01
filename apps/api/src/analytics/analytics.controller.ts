@@ -18,12 +18,16 @@ export class AnalyticsController {
   @ApiOperation({ summary: 'Štatistiky kliknutí podľa pohlavia a typu účtu (admin)' })
   @ApiQuery({ name: 'period', enum: ['1m', '5m', '8h', '1d', '7d', '30d', '3m'], required: false })
   @ApiQuery({ name: 'minutes', description: 'Obdobie v minútach (1–480), má prednosť pred period', required: false })
+  @ApiQuery({ name: 'gender', description: 'Filter podľa pohlavia: MALE, FEMALE, OTHER, unspecified', required: false })
+  @ApiQuery({ name: 'accountType', description: 'Filter podľa typu účtu: company, individual, unspecified', required: false })
   getClickStats(
     @Query('period') period: '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m' = '30d',
     @Query('minutes') minutes?: string,
+    @Query('gender') gender?: string,
+    @Query('accountType') accountType?: string,
   ) {
     const minutesNum = minutes != null ? parseInt(minutes, 10) : undefined;
-    return this.analyticsService.getClickStats(period, minutesNum);
+    return this.analyticsService.getClickStats(period, minutesNum, gender, accountType);
   }
 
   @Get('stats/breakdown')

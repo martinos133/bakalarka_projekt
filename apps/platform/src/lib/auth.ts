@@ -4,6 +4,8 @@ export interface User {
   firstName?: string
   lastName?: string
   role: string
+  gender?: string
+  isCompany?: boolean
 }
 
 export function getAuthToken(): string | null {
@@ -20,6 +22,14 @@ export function getAuthUser(): User | null {
   } catch {
     return null
   }
+}
+
+/** Aktualizuje uloženého používateľa (napr. po načítaní profilu) – aby trackClick mal aktuálne gender/isCompany */
+export function setAuthUser(updates: Partial<User>) {
+  if (typeof window === 'undefined') return
+  const current = getAuthUser()
+  const merged = current ? { ...current, ...updates } : { ...updates } as User
+  localStorage.setItem('user_user', JSON.stringify(merged))
 }
 
 export function isAuthenticated(): boolean {
