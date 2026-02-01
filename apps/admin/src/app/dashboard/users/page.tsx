@@ -1,13 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
-import { User } from '@inzertna-platforma/shared'
-import { Ban, Unlock, Eye, Calendar, Shield, Mail, Phone, User as UserIcon, MapPin, Building2, CreditCard, X, FileText, Euro, TrendingUp, TrendingDown, Search, Filter as FilterIcon } from 'lucide-react'
+import { User, Gender } from '@inzertna-platforma/shared'
+import { Ban, Unlock, Eye, Calendar, Shield, Mail, Phone, User as UserIcon, MapPin, Building2, CreditCard, X, FileText, Euro, TrendingUp, TrendingDown, Search, Filter as FilterIcon, Users, UserCheck, UserX, Building, UserCog } from 'lucide-react'
+import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import AlertDialog from '@/components/AlertDialog'
 
@@ -27,6 +28,9 @@ export default function UsersPage() {
     role: '' as '' | 'ADMIN' | 'USER',
     status: '' as '' | 'active' | 'banned',
     accountType: '' as '' | 'company' | 'private',
+    gender: '' as '' | Gender,
+    minAge: '',
+    maxAge: '',
   })
   const [banForm, setBanForm] = useState({
     banned: true,
@@ -123,6 +127,26 @@ export default function UsersPage() {
     })
   }
 
+  const getAge = (dateOfBirth?: Date | string | null): number | null => {
+    if (!dateOfBirth) return null
+    const dob = typeof dateOfBirth === 'string' ? new Date(dateOfBirth) : dateOfBirth
+    const today = new Date()
+    let age = today.getFullYear() - dob.getFullYear()
+    const m = today.getMonth() - dob.getMonth()
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--
+    return age >= 0 ? age : null
+  }
+
+  const getGenderLabel = (gender?: Gender | string | null) => {
+    if (!gender) return '-'
+    if (gender === Gender.MALE) return 'Muž'
+    if (gender === Gender.FEMALE) return 'Žena'
+    if (gender === Gender.OTHER) return 'Iné'
+    return '-'
+  }
+
+  const getAccountTypeLabel = (isCompany: boolean) => (isCompany ? 'Firma' : 'Osoba')
+
   const getBanStatus = (user: User) => {
     if (!user.banned) return null
 
@@ -171,8 +195,104 @@ export default function UsersPage() {
     if (filters.accountType === 'company' && !user.isCompany) return false
     if (filters.accountType === 'private' && user.isCompany) return false
 
+    // Pohlavie
+    if (filters.gender && user.gender !== filters.gender) return false
+
+    // Vek
+    const age = getAge(user.dateOfBirth)
+    if (filters.minAge) {
+      const min = parseInt(filters.minAge, 10)
+      if (!isNaN(min) && (age === null || age < min)) return false
+    }
+    if (filters.maxAge) {
+      const max = parseInt(filters.maxAge, 10)
+      if (!isNaN(max) && (age === null || age > max)) return false
+    }
+
     return true
   })
+
+  const byRole = useMemo(() => ({
+    admin: users.filter((u) => u.role === 'ADMIN').length,
+    user: users.filter((u) => u.role === 'USER').length,
+  }), [users])
+
+  const byStatus = useMemo(() => ({
+    active: users.filter((u) => !u.banned).length,
+    banned: users.filter((u) => u.banned).length,
+  }), [users])
+
+  const byAccountType = useMemo(() => ({
+    company: users.filter((u) => u.isCompany).length,
+    private: users.filter((u) => !u.isCompany).length,
+  }), [users])
+
+  const byMonth = useMemo(() => {
+    const map = new Map<string, number>()
+    users.forEach((u) => {
+      const d = new Date(u.createdAt)
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      map.set(key, (map.get(key) || 0) + 1)
+    })
+    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0])).slice(-6)
+  }, [users])
+
+  const chartDataByRole = useMemo(() => [
+    { name: 'Admin', count: byRole.admin, fill: '#a855f7' },
+    { name: 'Používateľ', count: byRole.user, fill: '#3b82f6' },
+  ].map((d) => ({ ...d, percent: users.length > 0 ? ((d.count / users.length) * 100).toFixed(1) : '0' })), [byRole, users.length])
+
+  const byGender = useMemo(() => ({
+    male: users.filter((u) => u.gender === Gender.MALE).length,
+    female: users.filter((u) => u.gender === Gender.FEMALE).length,
+    other: users.filter((u) => u.gender === Gender.OTHER).length,
+    unspecified: users.filter((u) => !u.gender).length,
+  }), [users])
+
+  const chartDataByStatus = useMemo(() => {
+    const total = byStatus.active + byStatus.banned
+    return [
+      { name: 'Aktívni', count: byStatus.active, fill: '#22c55e' },
+      { name: 'Zablokovaní', count: byStatus.banned, fill: '#ef4444' },
+    ].map((d) => ({ ...d, percent: total > 0 ? ((d.count / total) * 100).toFixed(1) : '0' }))
+  }, [byStatus])
+
+  const chartDataByGender = useMemo(() => [
+    { name: 'Muž', count: byGender.male, fill: '#3b82f6' },
+    { name: 'Žena', count: byGender.female, fill: '#ec4899' },
+    { name: 'Iné', count: byGender.other, fill: '#8b5cf6' },
+    { name: 'Nešpecifikované', count: byGender.unspecified, fill: '#6b7280' },
+  ].filter((d) => d.count > 0), [byGender])
+
+  const usersWithAge = useMemo(() => users.filter((u) => getAge(u.dateOfBirth) != null), [users])
+  const avgAge = useMemo(() => {
+    if (usersWithAge.length === 0) return null
+    const sum = usersWithAge.reduce((acc, u) => acc + (getAge(u.dateOfBirth) ?? 0), 0)
+    return Math.round((sum / usersWithAge.length) * 10) / 10
+  }, [usersWithAge])
+
+  const avgAgeByGender = useMemo(() => {
+    const male = users.filter((u) => u.gender === Gender.MALE)
+    const female = users.filter((u) => u.gender === Gender.FEMALE)
+    const other = users.filter((u) => u.gender === Gender.OTHER)
+    const unspecified = users.filter((u) => !u.gender)
+    const calcAvg = (list: User[]) => {
+      const withAge = list.filter((u) => getAge(u.dateOfBirth) != null)
+      if (withAge.length === 0) return null
+      const sum = withAge.reduce((acc, u) => acc + (getAge(u.dateOfBirth) ?? 0), 0)
+      return Math.round((sum / withAge.length) * 10) / 10
+    }
+    return [
+      { name: 'Muž', avgAge: calcAvg(male), count: male.length, fill: '#3b82f6' },
+      { name: 'Žena', avgAge: calcAvg(female), count: female.length, fill: '#ec4899' },
+      { name: 'Iné', avgAge: calcAvg(other), count: other.length, fill: '#8b5cf6' },
+      { name: 'Nešpecifikované', avgAge: calcAvg(unspecified), count: unspecified.length, fill: '#6b7280' },
+    ].filter((d) => d.avgAge != null) as { name: string; avgAge: number; count: number; fill: string }[]
+  }, [users])
+
+  const chartDataByMonth = useMemo(() =>
+    byMonth.map(([month, count]) => ({ month, count, fill: count > 0 ? '#6366f1' : '#374151' })),
+  [byMonth])
 
   return (
     <div className="min-h-screen bg-dark text-white flex">
@@ -180,13 +300,339 @@ export default function UsersPage() {
       <div className="flex-1 ml-64">
         <Header />
         <main className="p-6">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-200">Používatelia</h1>
+            <p className="text-sm text-gray-400 mt-1">Prehľad používateľov a štatistiky.</p>
+          </div>
+
+          {/* KPI karty */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="bg-card rounded-lg p-6 border border-dark">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/20">
+                  <Users className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400">Celkom používateľov</span>
+                  <div className="text-2xl font-bold text-gray-200">{users.length}</div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-card rounded-lg p-6 border border-dark">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-green-500/20">
+                  <UserCheck className="w-5 h-5 text-green-400" />
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400">Aktívni</span>
+                  <div className="text-2xl font-bold text-gray-200">{byStatus.active}</div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-card rounded-lg p-6 border border-dark">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-red-500/20">
+                  <UserX className="w-5 h-5 text-red-400" />
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400">Zablokovaní</span>
+                  <div className="text-2xl font-bold text-gray-200">{byStatus.banned}</div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-card rounded-lg p-6 border border-dark">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-purple-500/20">
+                  <UserCog className="w-5 h-5 text-purple-400" />
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400">Admini / Používatelia</span>
+                  <div className="text-xl font-bold text-gray-200">{byRole.admin} / {byRole.user}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Grafy */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div className="bg-card rounded-lg border border-dark overflow-hidden">
+              <div className="p-4 border-b border-dark">
+                <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wide text-gray-400">Rozloženie podľa role</h3>
+              </div>
+              <div className="p-4 grid grid-cols-2 gap-4">
+                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0" />
+                    <span className="text-sm font-medium text-gray-300">Admin</span>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-200 tabular-nums">{byRole.admin}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">používateľov</div>
+                  {users.length > 0 && (
+                    <div className="mt-2 h-1.5 rounded-full bg-dark overflow-hidden">
+                      <div className="h-full rounded-full bg-purple-500 transition-all" style={{ width: `${(byRole.admin / users.length) * 100}%` }} />
+                    </div>
+                  )}
+                </div>
+                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                    <span className="text-sm font-medium text-gray-300">Používateľ</span>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-200 tabular-nums">{byRole.user}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">používateľov</div>
+                  {users.length > 0 && (
+                    <div className="mt-2 h-1.5 rounded-full bg-dark overflow-hidden">
+                      <div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${(byRole.user / users.length) * 100}%` }} />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="px-4 pb-4 pt-0">
+                <div className="pt-1">
+                  <p className="text-xs text-gray-500 mb-2">Graf podľa role</p>
+                  <ResponsiveContainer width="100%" height={120}>
+                    <BarChart
+                      data={[
+                        { name: 'Admin', count: byRole.admin, fill: '#a855f7' },
+                        { name: 'Používateľ', count: byRole.user, fill: '#3b82f6' },
+                      ]}
+                      layout="vertical"
+                      margin={{ top: 8, right: 36, left: 56, bottom: 8 }}
+                      barCategoryGap={12}
+                    >
+                      <XAxis type="number" domain={[0, Math.max(byRole.admin, byRole.user, 1)]} hide />
+                      <YAxis type="category" dataKey="name" width={52} tick={{ fill: '#9ca3af', fontSize: 13 }} axisLine={false} tickLine={false} />
+                      <Tooltip contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }} labelStyle={{ color: '#9ca3af' }} cursor={false} formatter={(value: number) => [value, '']} />
+                      <Bar dataKey="count" nameKey="name" radius={[0, 6, 6, 0]} barSize={28} minPointSize={4}>
+                        {[
+                          { name: 'Admin', count: byRole.admin, fill: '#a855f7' },
+                          { name: 'Používateľ', count: byRole.user, fill: '#3b82f6' },
+                        ].map((entry, index) => (
+                          <Cell key={index} fill={entry.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+            <div className="bg-card rounded-lg p-6 border border-dark">
+              <h3 className="text-lg font-semibold text-gray-200 mb-1">Podľa statusu</h3>
+              <p className="text-xs text-gray-500 mb-4">Aktívni vs. zablokovaní.</p>
+              <div className="flex items-center justify-center" style={{ minHeight: 200 }}>
+                <ResponsiveContainer width="100%" height={200}>
+                  <RechartsPieChart>
+                    <Pie
+                      data={chartDataByStatus}
+                      dataKey="count"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={56}
+                      outerRadius={76}
+                      paddingAngle={2}
+                      stroke="transparent"
+                    >
+                      {chartDataByStatus.map((entry, index) => (
+                        <Cell key={index} fill={entry.fill} stroke="#1f2937" strokeWidth={2} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }} labelStyle={{ color: '#9ca3af' }} cursor={false} formatter={(value: number, name: string, props: { payload: { percent: string } }) => [`${value} (${props.payload.percent}%)`, name]} />
+                    <Legend layout="vertical" align="right" verticalAlign="middle" wrapperStyle={{ fontSize: '12px' }} formatter={(value) => <span className="text-gray-300">{value}</span>} />
+                  </RechartsPieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-4 pt-4 border-t border-dark overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-400 border-b border-dark">
+                      <th className="py-2 px-3 font-medium">Status</th>
+                      <th className="py-2 px-3 font-medium text-right">Počet</th>
+                      <th className="py-2 px-3 font-medium text-right">Podiel</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {chartDataByStatus.map((d) => (
+                      <tr key={d.name} className="border-b border-dark/50 last:border-0 hover:bg-dark/30">
+                        <td className="py-2 px-3 flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.fill }} />
+                          <span className="text-gray-200">{d.name}</span>
+                        </td>
+                        <td className="py-2 px-3 text-right text-gray-200 font-medium">{d.count}</td>
+                        <td className="py-2 px-3 text-right text-gray-400">{d.percent} %</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {chartDataByMonth.length > 0 && (
+              <div className="bg-card rounded-lg p-6 border border-dark">
+                <h3 className="text-lg font-semibold text-gray-200 mb-4">Registrácie za mesiace</h3>
+                <p className="text-xs text-gray-500 mb-2">Posledných 6 mesiacov.</p>
+                <div className="pt-1">
+                  <ResponsiveContainer width="100%" height={220}>
+                    <BarChart data={chartDataByMonth} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="month" stroke="#9ca3af" style={{ fontSize: '11px' }} tick={{ fill: '#9ca3af' }} />
+                      <YAxis stroke="#9ca3af" style={{ fontSize: '11px' }} tick={{ fill: '#9ca3af' }} />
+                      <Tooltip contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }} labelStyle={{ color: '#9ca3af' }} cursor={false} />
+                      <Bar dataKey="count" name="Počet" radius={[4, 4, 0, 0]} minPointSize={2}>
+                        {chartDataByMonth.map((entry, index) => (
+                          <Cell key={index} fill={entry.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+            <div className="bg-card rounded-lg border border-dark overflow-hidden">
+              <div className="p-4 border-b border-dark">
+                <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wide text-gray-400">Typ účtu</h3>
+              </div>
+              <div className="p-4 grid grid-cols-2 gap-4">
+                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Building className="w-4 h-4 text-amber-400" />
+                    <span className="text-sm font-medium text-gray-300">Spoločnosti</span>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-200 tabular-nums">{byAccountType.company}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">používateľov</div>
+                  {users.length > 0 && (
+                    <div className="mt-2 h-1.5 rounded-full bg-dark overflow-hidden">
+                      <div className="h-full rounded-full bg-amber-500 transition-all" style={{ width: `${(byAccountType.company / users.length) * 100}%` }} />
+                    </div>
+                  )}
+                </div>
+                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <UserIcon className="w-4 h-4 text-cyan-400" />
+                    <span className="text-sm font-medium text-gray-300">Súkromné osoby</span>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-200 tabular-nums">{byAccountType.private}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">používateľov</div>
+                  {users.length > 0 && (
+                    <div className="mt-2 h-1.5 rounded-full bg-dark overflow-hidden">
+                      <div className="h-full rounded-full bg-cyan-500 transition-all" style={{ width: `${(byAccountType.private / users.length) * 100}%` }} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="bg-card rounded-lg p-6 border border-dark">
+              <h3 className="text-lg font-semibold text-gray-200 mb-1">Pohlavie</h3>
+              <p className="text-xs text-gray-500 mb-4">Muž / Žena / Iné (iba osoby s vyplneným pohlavím).</p>
+              {chartDataByGender.length > 0 ? (
+                <>
+                  <div className="flex items-center justify-center" style={{ minHeight: 180 }}>
+                    <ResponsiveContainer width="100%" height={180}>
+                      <RechartsPieChart>
+                        <Pie
+                          data={chartDataByGender}
+                          dataKey="count"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={48}
+                          outerRadius={68}
+                          paddingAngle={2}
+                          stroke="transparent"
+                        >
+                          {chartDataByGender.map((entry, index) => (
+                            <Cell key={index} fill={entry.fill} stroke="#1f2937" strokeWidth={2} />
+                          ))}
+                        </Pie>
+                        <Tooltip contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }} labelStyle={{ color: '#9ca3af' }} cursor={false} />
+                        <Legend layout="vertical" align="right" verticalAlign="middle" wrapperStyle={{ fontSize: '11px' }} formatter={(value) => <span className="text-gray-300">{value}</span>} />
+                      </RechartsPieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-dark overflow-hidden">
+                    <table className="w-full text-sm">
+                      <tbody>
+                        {chartDataByGender.map((d) => (
+                          <tr key={d.name} className="border-b border-dark/50 last:border-0">
+                            <td className="py-1.5 px-3 flex items-center gap-2">
+                              <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.fill }} />
+                              <span className="text-gray-200">{d.name}</span>
+                            </td>
+                            <td className="py-1.5 px-3 text-right text-gray-200 font-medium">{d.count}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-gray-500 py-4">Žiadne dáta o pohlaví.</p>
+              )}
+            </div>
+            <div className="bg-card rounded-lg p-6 border border-dark">
+              <h3 className="text-lg font-semibold text-gray-200 mb-1">Priemerný vek</h3>
+              <p className="text-xs text-gray-500 mb-4">Celkový priemer a podľa pohlavia (iba používatelia s dátumom narodenia).</p>
+              {avgAge != null ? (
+                <>
+                  <div className="mb-4 flex items-baseline gap-2">
+                    <span className="text-3xl font-bold text-gray-200 tabular-nums">{avgAge}</span>
+                    <span className="text-gray-400 text-sm">rokov</span>
+                  </div>
+                  {avgAgeByGender.length > 0 && (
+                    <div className="pt-2">
+                      <p className="text-xs text-gray-500 mb-2">Priemer veku podľa pohlavia</p>
+                      <ResponsiveContainer width="100%" height={Math.max(120, avgAgeByGender.length * 44)}>
+                        <BarChart
+                          data={avgAgeByGender}
+                          layout="vertical"
+                          margin={{ top: 8, right: 72, left: 64, bottom: 8 }}
+                          barCategoryGap={12}
+                        >
+                          <XAxis type="number" domain={[0, 'auto']} hide />
+                          <YAxis type="category" dataKey="name" width={58} tick={{ fill: '#d1d5db', fontSize: 13 }} axisLine={false} tickLine={false} />
+                          <Tooltip contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }} labelStyle={{ color: '#9ca3af' }} cursor={false} formatter={(value: number) => [`${value} rokov`, 'Priem. vek']} />
+                          <Bar dataKey="avgAge" nameKey="name" radius={[0, 4, 4, 0]} barSize={24} minPointSize={4}>
+                            {avgAgeByGender.map((entry, index) => (
+                              <Cell key={index} fill={entry.fill} />
+                            ))}
+                            <LabelList dataKey="avgAge" position="right" fill="#d1d5db" fontSize={13} fontWeight={600} formatter={(v: number) => `${v} rokov`} />
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                      <table className="w-full text-sm mt-4 border-t border-dark pt-3">
+                        <thead>
+                          <tr className="text-left text-gray-400 border-b border-dark/50">
+                            <th className="py-2 px-0 font-medium">Pohlavie</th>
+                            <th className="py-2 px-0 font-medium text-right">Priem. vek</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {avgAgeByGender.map((d) => (
+                            <tr key={d.name} className="border-b border-dark/50 last:border-0">
+                              <td className="py-2 px-0 flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.fill }} />
+                                <span className="text-gray-200">{d.name}</span>
+                              </td>
+                              <td className="py-2 px-0 text-right text-gray-200 font-semibold tabular-nums">{d.avgAge} rokov</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p className="text-sm text-gray-500 py-4">Žiadne dáta o veku (žiadny používateľ nemá vyplnený dátum narodenia).</p>
+              )}
+            </div>
+          </div>
+
           {/* Filtre */}
           <div className="bg-card rounded-lg p-4 border border-dark mb-6">
             <div className="flex items-center space-x-2 mb-4">
               <FilterIcon className="w-5 h-5 text-gray-400" />
               <h3 className="text-sm font-semibold text-gray-300">Filtre</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Vyhľadávanie</label>
                 <div className="relative">
@@ -236,11 +682,48 @@ export default function UsersPage() {
                   <option value="private">Súkromná osoba</option>
                 </select>
               </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-2">Pohlavie</label>
+                <select
+                  value={filters.gender}
+                  onChange={(e) => setFilters({ ...filters, gender: e.target.value as '' | Gender })}
+                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                >
+                  <option value="">Všetky</option>
+                  <option value={Gender.MALE}>Muž</option>
+                  <option value={Gender.FEMALE}>Žena</option>
+                  <option value={Gender.OTHER}>Iné</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-2">Vek od</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={120}
+                  placeholder="napr. 18"
+                  value={filters.minAge}
+                  onChange={(e) => setFilters({ ...filters, minAge: e.target.value })}
+                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-2">Vek do</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={120}
+                  placeholder="napr. 65"
+                  value={filters.maxAge}
+                  onChange={(e) => setFilters({ ...filters, maxAge: e.target.value })}
+                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                />
+              </div>
             </div>
-            {(filters.search || filters.role || filters.status || filters.accountType) && (
+            {(filters.search || filters.role || filters.status || filters.accountType || filters.gender || filters.minAge || filters.maxAge) && (
               <div className="mt-4 flex items-center justify-end">
                 <button
-                  onClick={() => setFilters({ search: '', role: '', status: '', accountType: '' })}
+                  onClick={() => setFilters({ search: '', role: '', status: '', accountType: '', gender: '', minAge: '', maxAge: '' })}
                   className="text-sm text-gray-400 hover:text-white transition-colors"
                 >
                   Vymazať filtre
@@ -266,6 +749,9 @@ export default function UsersPage() {
                     <tr>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Používateľ</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Kontakt</th>
+                      <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Typ</th>
+                      <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Pohlavie</th>
+                      <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Vek</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Rola</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Posledné prihlásenie</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Registrácia</th>
@@ -306,6 +792,17 @@ export default function UsersPage() {
                                 </div>
                               )}
                             </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${user.isCompany ? 'bg-amber-500/20 text-amber-400' : 'bg-cyan-500/20 text-cyan-400'}`}>
+                              {getAccountTypeLabel(user.isCompany)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-gray-300 text-sm">
+                            {getGenderLabel(user.gender)}
+                          </td>
+                          <td className="px-6 py-4 text-gray-300 text-sm tabular-nums">
+                            {getAge(user.dateOfBirth) != null ? `${getAge(user.dateOfBirth)} rokov` : '-'}
                           </td>
                           <td className="px-6 py-4">
                             <span className={`px-2 py-1 rounded text-xs font-medium ${
@@ -436,20 +933,26 @@ export default function UsersPage() {
                         <p className="text-white">{selectedUser.phone || '-'}</p>
                       </div>
                       <div>
+                        <label className="text-sm text-gray-400">Typ účtu</label>
+                        <p className="text-white">{getAccountTypeLabel(selectedUser.isCompany)}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-400">Pohlavie</label>
+                        <p className="text-white">{getGenderLabel(selectedUser.gender)}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-400">Vek</label>
+                        <p className="text-white">
+                          {getAge(selectedUser.dateOfBirth) != null ? `${getAge(selectedUser.dateOfBirth)} rokov` : '-'}
+                        </p>
+                      </div>
+                      <div>
                         <label className="text-sm text-gray-400 flex items-center space-x-1">
                           <Calendar className="w-4 h-4" />
                           <span>Dátum narodenia</span>
                         </label>
                         <p className="text-white">
                           {selectedUser.dateOfBirth ? formatDate(selectedUser.dateOfBirth) : '-'}
-                        </p>
-                      </div>
-                      <div>
-                        <label className="text-sm text-gray-400">Pohlavie</label>
-                        <p className="text-white">
-                          {selectedUser.gender === 'MALE' ? 'Muž' : 
-                           selectedUser.gender === 'FEMALE' ? 'Žena' : 
-                           selectedUser.gender === 'OTHER' ? 'Iné' : '-'}
                         </p>
                       </div>
                     </div>
