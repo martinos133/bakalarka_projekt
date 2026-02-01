@@ -8,6 +8,8 @@ import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { User } from '@inzertna-platforma/shared'
 import { Ban, Unlock, Eye, Calendar, Shield, Mail, Phone, User as UserIcon, MapPin, Building2, CreditCard, X, FileText, Euro, TrendingUp, TrendingDown, Search, Filter as FilterIcon } from 'lucide-react'
+import ConfirmDialog from '@/components/ConfirmDialog'
+import AlertDialog from '@/components/AlertDialog'
 
 export default function UsersPage() {
   const router = useRouter()
@@ -16,6 +18,8 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showBanModal, setShowBanModal] = useState(false)
   const [showDetailModal, setShowDetailModal] = useState(false)
+  const [unblockConfirmUser, setUnblockConfirmUser] = useState<User | null>(null)
+  const [alertMessage, setAlertMessage] = useState<{ title: string; message: string } | null>(null)
   const [userStats, setUserStats] = useState<any>(null)
   const [loadingStats, setLoadingStats] = useState(false)
   const [filters, setFilters] = useState({
@@ -62,9 +66,14 @@ export default function UsersPage() {
     setShowBanModal(true)
   }
 
-  const handleUnban = async (user: User) => {
-    if (!confirm(`Naozaj chcete odblokovať používateľa ${user.email}?`)) return
+  const handleUnbanClick = (user: User) => {
+    setUnblockConfirmUser(user)
+  }
 
+  const handleUnbanConfirm = async () => {
+    if (!unblockConfirmUser) return
+    const user = unblockConfirmUser
+    setUnblockConfirmUser(null)
     try {
       await api.banUser(user.id, {
         banned: false,
@@ -74,7 +83,7 @@ export default function UsersPage() {
       await loadUsers()
     } catch (error) {
       console.error('Chyba pri odblokovaní používateľa:', error)
-      alert('Chyba pri odblokovaní používateľa')
+      setAlertMessage({ title: 'Chyba', message: 'Chyba pri odblokovaní používateľa.' })
     }
   }
 
@@ -98,7 +107,7 @@ export default function UsersPage() {
       setSelectedUser(null)
     } catch (error) {
       console.error('Chyba pri banovaní používateľa:', error)
-      alert('Chyba pri banovaní používateľa')
+      setAlertMessage({ title: 'Chyba', message: 'Chyba pri banovaní používateľa.' })
     }
   }
 
@@ -354,7 +363,7 @@ export default function UsersPage() {
                               </button>
                               {user.banned ? (
                                 <button
-                                  onClick={() => handleUnban(user)}
+                                  onClick={() => handleUnbanClick(user)}
                                   className="p-2 text-green-400 hover:text-green-300 hover:bg-cardHover rounded transition-colors"
                                   title="Odblokovať"
                                 >
@@ -666,7 +675,7 @@ export default function UsersPage() {
                       <button
                         onClick={() => {
                           setShowDetailModal(false)
-                          handleUnban(selectedUser)
+                          handleUnbanClick(selectedUser)
                         }}
                         className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center space-x-2 transition-colors"
                       >
@@ -766,6 +775,28 @@ export default function UsersPage() {
               </div>
             </div>
           )}
+
+          <ConfirmDialog
+            open={!!unblockConfirmUser}
+            title="Odblokovať používateľa"
+            message={
+              unblockConfirmUser
+                ? `Naozaj chcete odblokovať používateľa ${unblockConfirmUser.email}?`
+                : ''
+            }
+            confirmLabel="Odblokovať"
+            cancelLabel="Zrušiť"
+            variant="success"
+            onConfirm={handleUnbanConfirm}
+            onCancel={() => setUnblockConfirmUser(null)}
+          />
+
+          <AlertDialog
+            open={!!alertMessage}
+            title={alertMessage?.title ?? ''}
+            message={alertMessage?.message ?? ''}
+            onClose={() => setAlertMessage(null)}
+          />
         </main>
       </div>
     </div>
