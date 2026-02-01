@@ -80,6 +80,41 @@ export class MessagesService {
     });
   }
 
+  async findAllForAdmin(status?: MessageStatus, type?: MessageType) {
+    const where: any = {};
+    if (status) where.status = status;
+    if (type) where.type = type;
+    return prisma.message.findMany({
+      where,
+      include: {
+        sender: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        recipient: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        advertisement: {
+          select: {
+            id: true,
+            title: true,
+            images: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async findAll(userId: string, status?: MessageStatus, type?: MessageType) {
     const where: any = {
       recipientId: userId,

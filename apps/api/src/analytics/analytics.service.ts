@@ -14,7 +14,16 @@ export class AnalyticsService {
       endDate: now.toISOString(),
       byGender: { male: 0, female: 0, other: 0, unspecified: 0 },
       byAccountType: { company: 0, individual: 0, unspecified: 0 },
+      averageAge: null as number | null,
     };
+  }
+
+  private static ageFromDateOfBirth(dateOfBirth: Date): number {
+    const now = new Date();
+    let age = now.getFullYear() - dateOfBirth.getFullYear();
+    const m = now.getMonth() - dateOfBirth.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < dateOfBirth.getDate())) age--;
+    return age;
   }
 
   private async clickEventTableExists(): Promise<boolean> {
@@ -112,7 +121,7 @@ export class AnalyticsService {
         where.isCompany = accountTypeFilter === 'company' ? true : accountTypeFilter === 'individual' ? false : null;
       }
 
-      const [total, byGenderRows, byCompanyRows] = await Promise.all([
+      const [total, byGenderRows, byCompanyRows, clickUserIds] = await Promise.all([
         prisma.clickEvent.count({ where }),
         prisma.clickEvent.groupBy({
           by: ['gender'],
@@ -124,7 +133,24 @@ export class AnalyticsService {
           where: { ...where, isCompany: { not: null } },
           _count: { id: true },
         }),
+        prisma.clickEvent.findMany({
+          where: { ...where, userId: { not: null } },
+          select: { userId: true },
+        }),
       ]);
+
+      const userIds = [...new Set((clickUserIds as { userId: string | null }[]).map((e) => e.userId).filter(Boolean))] as string[];
+      let averageAge: number | null = null;
+      if (userIds.length > 0) {
+        const usersWithDob = await prisma.user.findMany({
+          where: { id: { in: userIds }, dateOfBirth: { not: null } },
+          select: { dateOfBirth: true },
+        });
+        if (usersWithDob.length > 0) {
+          const ages = usersWithDob.map((u) => AnalyticsService.ageFromDateOfBirth(u.dateOfBirth!));
+          averageAge = Math.round((ages.reduce((a, b) => a + b, 0) / ages.length) * 10) / 10;
+        }
+      }
 
       const byGender = {
         male: 0,
@@ -158,6 +184,7 @@ export class AnalyticsService {
         endDate: now.toISOString(),
         byGender,
         byAccountType,
+        averageAge,
       };
     } catch (err) {
       console.error('[Analytics] getClickStats failed (table may not exist, run migration):', err);

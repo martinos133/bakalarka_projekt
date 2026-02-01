@@ -40,6 +40,12 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
 
 export const api = {
   getStats: () => fetchWithAuth('/admin/stats'),
+  getAdminMessages: (status?: string, type?: string) => {
+    const params = new URLSearchParams()
+    if (status) params.set('status', status)
+    if (type) params.set('type', type)
+    return fetchWithAuth(`/admin/messages?${params.toString()}`)
+  },
   getChartData: (period: '7d' | '30d' | '3m' = '30d') => 
     fetchWithAuth(`/admin/chart?period=${period}`),
   getUsers: () => fetchWithAuth('/users'),

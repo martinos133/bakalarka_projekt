@@ -6,7 +6,7 @@ import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
-import { MousePointerClick, UserCheck, Building, User, Radio, FolderTree, FileText } from 'lucide-react'
+import { MousePointerClick, UserCheck, Building, User, Radio, FolderTree, FileText, Calendar } from 'lucide-react'
 import { PieChart as RechartsPieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 type Period = '1d' | '7d' | '30d' | '3m'
@@ -19,6 +19,7 @@ interface ClickStats {
   endDate: string
   byGender: { male: number; female: number; other: number; unspecified: number }
   byAccountType: { company: number; individual: number; unspecified: number }
+  averageAge?: number | null
 }
 
 interface ClickBreakdown {
@@ -292,7 +293,7 @@ export default function MonitoringPage() {
           ) : (
             <>
               {/* KPI */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
                 <div className="bg-card rounded-lg p-6 border border-dark">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-primary/20">
@@ -337,6 +338,20 @@ export default function MonitoringPage() {
                       <div className="text-xl font-bold text-gray-200">
                         {stats.byAccountType.company} / {stats.byAccountType.individual}
                       </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-card rounded-lg p-6 border border-dark">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-cyan-500/20">
+                      <Calendar className="w-5 h-5 text-cyan-400" />
+                    </div>
+                    <div>
+                      <span className="text-xs text-gray-400">Vekový priemer</span>
+                      <div className="text-2xl font-bold text-gray-200">
+                        {stats.averageAge != null ? `${stats.averageAge} rokov` : '–'}
+                      </div>
+                      <span className="text-xs text-gray-500">prihlásení s dátumom nar.</span>
                     </div>
                   </div>
                 </div>
