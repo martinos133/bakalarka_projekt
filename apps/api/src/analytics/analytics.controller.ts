@@ -16,9 +16,24 @@ export class AnalyticsController {
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Štatistiky kliknutí podľa pohlavia a typu účtu (admin)' })
-  @ApiQuery({ name: 'period', enum: ['1m', '5m', '1d', '7d', '30d', '3m'], required: false })
-  getClickStats(@Query('period') period: '1m' | '5m' | '1d' | '7d' | '30d' | '3m' = '30d') {
-    return this.analyticsService.getClickStats(period);
+  @ApiQuery({ name: 'period', enum: ['1m', '5m', '8h', '1d', '7d', '30d', '3m'], required: false })
+  @ApiQuery({ name: 'minutes', description: 'Obdobie v minútach (1–480), má prednosť pred period', required: false })
+  getClickStats(
+    @Query('period') period: '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m' = '30d',
+    @Query('minutes') minutes?: string,
+  ) {
+    const minutesNum = minutes != null ? parseInt(minutes, 10) : undefined;
+    return this.analyticsService.getClickStats(period, minutesNum);
+  }
+
+  @Get('stats/breakdown')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Rozklad kliknutí podľa kategórií a inzerátov (admin)' })
+  @ApiQuery({ name: 'period', enum: ['1m', '5m', '8h', '1d', '7d', '30d', '3m'], required: false })
+  getClickBreakdown(@Query('period') period: '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m' = '30d') {
+    return this.analyticsService.getClickBreakdown(period);
   }
 
   @Post('click')

@@ -6,10 +6,11 @@ import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
-import { MousePointerClick, UserCheck, Building, User, Radio } from 'lucide-react'
+import { MousePointerClick, UserCheck, Building, User, Radio, FolderTree, FileText } from 'lucide-react'
 import { PieChart as RechartsPieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 type Period = '1d' | '7d' | '30d' | '3m'
+type BreakdownPeriod = '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m'
 
 interface ClickStats {
   total: number
@@ -20,7 +21,30 @@ interface ClickStats {
   byAccountType: { company: number; individual: number; unspecified: number }
 }
 
+interface ClickBreakdown {
+  period: string
+  startDate: string
+  endDate: string
+  byTargetType: Record<string, number>
+  topCategories: { categoryId: string; name: string; slug: string; count: number }[]
+  topAdvertisements: { advertisementId: string; title: string; count: number }[]
+}
+
 const LIVE_REFRESH_SEC = 10
+const LIVE_SLIDER_MIN = 1
+const LIVE_SLIDER_MAX = 480 // 8 hodín
+
+function formatMinutesLabel(minutes: number): string {
+  if (minutes < 60) {
+    if (minutes === 1) return '1 minútu'
+    if (minutes >= 2 && minutes <= 4) return `${minutes} minúty`
+    return `${minutes} minút`
+  }
+  const h = Math.floor(minutes / 60)
+  if (h === 1) return '1 hodinu'
+  if (h >= 2 && h <= 4) return `${h} hodiny`
+  return `${h} hodín`
+}
 
 export default function MonitoringPage() {
   const router = useRouter()
@@ -28,8 +52,13 @@ export default function MonitoringPage() {
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState<Period>('30d')
   const [live1m, setLive1m] = useState<ClickStats | null>(null)
-  const [live5m, setLive5m] = useState<ClickStats | null>(null)
+  const [liveCustomStats, setLiveCustomStats] = useState<ClickStats | null>(null)
+  const [liveSliderMinutes, setLiveSliderMinutes] = useState(480) // 8 hodín
   const [liveCountdown, setLiveCountdown] = useState(LIVE_REFRESH_SEC)
+  const [breakdown, setBreakdown] = useState<ClickBreakdown | null>(null)
+  const [breakdownLoading, setBreakdownLoading] = useState(false)
+  const [breakdownFilter, setBreakdownFilter] = useState<'all' | 'categories' | 'ads'>('all')
+  const [breakdownPeriod, setBreakdownPeriod] = useState<BreakdownPeriod>('30d')
 
   const loadStats = useCallback(async () => {
     try {
@@ -46,17 +75,37 @@ export default function MonitoringPage() {
 
   const loadLiveStats = useCallback(async () => {
     try {
-      const [data1m, data5m] = await Promise.all([
+      const [data1m, dataCustom] = await Promise.all([
         api.getClickStats('1m'),
-        api.getClickStats('5m'),
+        api.getClickStats('30d', liveSliderMinutes),
       ])
       setLive1m(data1m)
-      setLive5m(data5m)
+      setLiveCustomStats(dataCustom)
     } catch {
       setLive1m(null)
-      setLive5m(null)
+      setLiveCustomStats(null)
     }
+  }, [liveSliderMinutes])
+
+  const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Number(e.target.value)
+    const clamped = Math.max(LIVE_SLIDER_MIN, Math.min(LIVE_SLIDER_MAX, val))
+    setLiveSliderMinutes(clamped)
+    setLiveCustomStats(null) // hneď zobraz „–“, kým sa nenačítajú nové dáta
   }, [])
+
+  const loadBreakdown = useCallback(async () => {
+    try {
+      setBreakdownLoading(true)
+      const data = await api.getClickBreakdown(breakdownPeriod)
+      setBreakdown(data)
+    } catch (err) {
+      console.error('Chyba pri načítaní rozkladu:', err)
+      setBreakdown(null)
+    } finally {
+      setBreakdownLoading(false)
+    }
+  }, [breakdownPeriod])
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -65,6 +114,11 @@ export default function MonitoringPage() {
     }
     loadStats()
   }, [router, period, loadStats])
+
+  useEffect(() => {
+    if (!isAuthenticated()) return
+    loadBreakdown()
+  }, [loadBreakdown])
 
   useEffect(() => {
     loadLiveStats()
@@ -101,6 +155,15 @@ export default function MonitoringPage() {
   }, [stats])
 
   const periodLabel: Record<Period, string> = { '1d': 'Za deň', '7d': '7 dní', '30d': '30 dní', '3m': '3 mesiace' }
+  const breakdownPeriodLabel: Record<BreakdownPeriod, string> = {
+    '1m': '1 min',
+    '5m': '5 min',
+    '8h': '8 hodín',
+    '1d': 'Za deň',
+    '7d': '7 dní',
+    '30d': '30 dní',
+    '3m': '3 mesiace',
+  }
 
   return (
     <div className="min-h-screen bg-dark text-gray-200 flex">
@@ -150,15 +213,41 @@ export default function MonitoringPage() {
                 <span className="text-xs text-gray-500">kliknutí</span>
               </div>
               <div className="bg-dark/50 rounded-lg p-4 border border-dark/80">
-                <span className="text-xs text-gray-400">Za posledných 5 minút</span>
+                <span className="text-xs text-gray-400">
+                  Za posledných {formatMinutesLabel(liveSliderMinutes).toLowerCase()}
+                </span>
                 <div className="text-2xl font-bold text-gray-200 tabular-nums mt-1">
-                  {live5m ? live5m.total : '–'}
+                  {liveCustomStats ? liveCustomStats.total : '–'}
                 </div>
                 <span className="text-xs text-gray-500">kliknutí</span>
               </div>
             </div>
+            {/* Časový slider – 1 min až 8 hodín po minútach */}
+            <div className="mt-4 pt-4 border-t border-dark/60">
+              <label className="block text-xs font-medium text-gray-400 mb-2">
+                Časové obdobie (druhý blok): ťahaj sliderom (1 min – 8 hodín)
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min={LIVE_SLIDER_MIN}
+                  max={LIVE_SLIDER_MAX}
+                  step={1}
+                  value={liveSliderMinutes}
+                  onInput={handleSliderChange}
+                  onChange={handleSliderChange}
+                  className="flex-1 h-2 rounded-lg appearance-none bg-dark/80 accent-primary cursor-pointer"
+                />
+                <span className="text-sm font-medium text-gray-200 min-w-[8rem] tabular-nums">
+                  {formatMinutesLabel(liveSliderMinutes)}
+                </span>
+              </div>
+              <p className="mt-1 text-[10px] text-gray-500">
+                1 min ← → 8 hodín ({liveSliderMinutes} min)
+              </p>
+            </div>
             {/* Nápoveda, ak sú Live vždy 0 – chýba tabuľka v DB */}
-            {live1m && live5m && live1m.total === 0 && live5m.total === 0 && (
+            {live1m && liveCustomStats && live1m.total === 0 && liveCustomStats.total === 0 && (
               <div className="mt-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-200 text-sm">
                 <strong>Live kliknutia sú 0?</strong> Aby sa kliky z platformy ukladali a zobrazovali tu, musí v databáze existovať tabuľka <code className="bg-dark/60 px-1 rounded">ClickEvent</code>. V termináli (v koreni projektu, s nastavenou <code className="bg-dark/60 px-1 rounded">DATABASE_URL</code>) spusti: <code className="block mt-2 bg-dark/80 p-2 rounded text-xs overflow-x-auto">cd packages/database && npx prisma migrate deploy</code> Potom reštartuj API a klikni na platforme na kategórie/inzeráty – čísla sa naplnia.
               </div>
@@ -353,6 +442,165 @@ export default function MonitoringPage() {
               </div>
             </>
           )}
+
+          {/* Rozklad podľa kategórií a inzerátov – vždy zobrazený */}
+          <div className="mb-6">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+              <h2 className="text-lg font-semibold text-gray-200">Rozklad podľa kategórií a inzerátov</h2>
+              <div className="flex flex-wrap gap-3 items-center">
+                <span className="text-xs text-gray-500">Obdobie:</span>
+                {(['1m', '5m', '8h', '1d', '7d', '30d', '3m'] as const).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setBreakdownPeriod(p)}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                      breakdownPeriod === p ? 'bg-primary text-gray-100' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                    }`}
+                  >
+                    {breakdownPeriodLabel[p]}
+                  </button>
+                ))}
+                <span className="text-gray-600">|</span>
+                {(['all', 'categories', 'ads'] as const).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setBreakdownFilter(f)}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                      breakdownFilter === f
+                        ? 'bg-primary text-gray-100'
+                        : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                    }`}
+                  >
+                    {f === 'all' ? 'Všetko' : f === 'categories' ? 'Kategórie' : 'Inzeráty'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {breakdownLoading ? (
+              <div className="bg-card rounded-lg border border-dark p-8 text-center text-gray-400">
+                Načítavam rozklad...
+              </div>
+            ) : breakdown ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-card rounded-lg p-4 border border-dark flex items-center gap-4">
+                    <div className="p-2 rounded-lg bg-emerald-500/20">
+                      <FolderTree className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div>
+                      <span className="text-xs text-gray-400">Kliknutia na kategórie</span>
+                      <div className="text-2xl font-bold text-gray-200 tabular-nums">
+                        {breakdown.byTargetType?.CATEGORY ?? 0}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-card rounded-lg p-4 border border-dark flex items-center gap-4">
+                    <div className="p-2 rounded-lg bg-sky-500/20">
+                      <FileText className="w-5 h-5 text-sky-400" />
+                    </div>
+                    <div>
+                      <span className="text-xs text-gray-400">Kliknutia na inzeráty</span>
+                      <div className="text-2xl font-bold text-gray-200 tabular-nums">
+                        {breakdown.byTargetType?.AD ?? 0}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {(breakdownFilter === 'all' || breakdownFilter === 'categories') && (
+                  <div className="bg-card rounded-lg border border-dark overflow-hidden">
+                    <h3 className="text-sm font-semibold text-gray-200 p-4 border-b border-dark">
+                      Podľa kategórie ({breakdownPeriodLabel[breakdownPeriod]})
+                    </h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-dark/50 text-left text-gray-400">
+                            <th className="py-3 px-4 font-medium">Kategória</th>
+                            <th className="py-3 px-4 font-medium text-right">Kliknutia</th>
+                            <th className="py-3 px-4 font-medium text-right">%</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {!breakdown.topCategories?.length ? (
+                            <tr>
+                              <td colSpan={3} className="py-6 px-4 text-center text-gray-500">
+                                Žiadne kliknutia na kategórie v tomto období.
+                              </td>
+                            </tr>
+                          ) : (
+                            (() => {
+                              const totalCat = breakdown.topCategories.reduce((s, r) => s + r.count, 0)
+                              return breakdown.topCategories.map((row) => (
+                                <tr key={row.categoryId} className="border-b border-dark/50 last:border-0 hover:bg-dark/30">
+                                  <td className="py-2.5 px-4 text-gray-200">
+                                    <span className="font-medium">{row.name}</span>
+                                    <span className="text-gray-500 ml-2 text-xs">/{row.slug}</span>
+                                  </td>
+                                  <td className="py-2.5 px-4 text-right text-gray-200 font-semibold tabular-nums">{row.count}</td>
+                                  <td className="py-2.5 px-4 text-right text-gray-400 tabular-nums">
+                                    {totalCat > 0 ? ((100 * row.count) / totalCat).toFixed(1) : 0}%
+                                  </td>
+                                </tr>
+                              ))
+                            })()
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {(breakdownFilter === 'all' || breakdownFilter === 'ads') && (
+                  <div className="bg-card rounded-lg border border-dark overflow-hidden">
+                    <h3 className="text-sm font-semibold text-gray-200 p-4 border-b border-dark">
+                      Podľa inzerátu ({breakdownPeriodLabel[breakdownPeriod]})
+                    </h3>
+                    <div className="overflow-x-auto max-h-96 overflow-y-auto">
+                      <table className="w-full text-sm">
+                        <thead className="sticky top-0 bg-card z-10">
+                          <tr className="bg-dark/50 text-left text-gray-400">
+                            <th className="py-3 px-4 font-medium">Inzerát</th>
+                            <th className="py-3 px-4 font-medium text-right">Kliknutia</th>
+                            <th className="py-3 px-4 font-medium text-right">%</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {!breakdown.topAdvertisements?.length ? (
+                            <tr>
+                              <td colSpan={3} className="py-6 px-4 text-center text-gray-500">
+                                Žiadne kliknutia na inzeráty v tomto období.
+                              </td>
+                            </tr>
+                          ) : (
+                            (() => {
+                              const totalAd = breakdown.topAdvertisements.reduce((s, r) => s + r.count, 0)
+                              return breakdown.topAdvertisements.map((row) => (
+                                <tr key={row.advertisementId} className="border-b border-dark/50 last:border-0 hover:bg-dark/30">
+                                  <td className="py-2.5 px-4 text-gray-200">
+                                    <span className="line-clamp-2" title={row.title}>{row.title}</span>
+                                  </td>
+                                  <td className="py-2.5 px-4 text-right text-gray-200 font-semibold tabular-nums">{row.count}</td>
+                                  <td className="py-2.5 px-4 text-right text-gray-400 tabular-nums">
+                                    {totalAd > 0 ? ((100 * row.count) / totalAd).toFixed(1) : 0}%
+                                  </td>
+                                </tr>
+                              ))
+                            })()
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="bg-card rounded-lg border border-dark p-6 text-center text-gray-500 text-sm">
+                Nepodarilo sa načítať rozklad alebo ešte nie sú dáta.
+              </div>
+            )}
+          </div>
         </main>
       </div>
     </div>
