@@ -103,15 +103,15 @@ export default function Chart() {
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: 'rgb(28,28,28)',
-              border: '1px solid rgb(10,10,10)',
-              borderRadius: '8px',
-              color: '#fff',
+              backgroundColor: 'transparent',
+              border: 'none',
+              color: '#9ca3af',
             }}
+            cursor={false}
             labelFormatter={(label) => formatDate(label)}
           />
           <Legend
-            wrapperStyle={{ color: '#fff' }}
+            wrapperStyle={{ color: '#9ca3af' }}
           />
           <Line
             yAxisId="left"

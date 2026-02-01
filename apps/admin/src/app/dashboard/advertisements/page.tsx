@@ -8,7 +8,7 @@ import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { Advertisement, AdvertisementStatus, AdvertisementType, Category } from '@inzertna-platforma/shared'
 import { Search, Filter as FilterIcon, TrendingUp, Euro, Tag, BarChart3, Calendar, MapPin, PieChart, FileText, Briefcase, Home } from 'lucide-react'
-import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts'
 
 type TypeView = 'all' | AdvertisementType.SERVICE | AdvertisementType.RENTAL
 
@@ -189,19 +189,19 @@ export default function AdvertisementsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark text-white flex">
+    <div className="min-h-screen bg-dark text-gray-200 flex">
       <Sidebar />
       <div className="flex-1 ml-64">
         <Header />
         <main className="p-6">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-white">Inzeráty – prehľad pre CEO</h1>
+            <h1 className="text-2xl font-bold text-gray-200">Inzeráty – prehľad pre CEO</h1>
             <p className="text-sm text-gray-400 mt-1">Podrobné štatistiky a agregácie. Správa inzerátov v sekcii Development → Inzeráty.</p>
             <div className="flex flex-wrap gap-2 mt-4">
               <button
                 onClick={() => setTypeView('all')}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                  typeView === 'all' ? 'bg-primary text-white' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                  typeView === 'all' ? 'bg-primary text-gray-200' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <BarChart3 className="w-4 h-4" />
@@ -210,7 +210,7 @@ export default function AdvertisementsPage() {
               <button
                 onClick={() => setTypeView(AdvertisementType.SERVICE)}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                  typeView === AdvertisementType.SERVICE ? 'bg-blue-600 text-white' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                  typeView === AdvertisementType.SERVICE ? 'bg-blue-600 text-gray-200' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <Briefcase className="w-4 h-4" />
@@ -219,7 +219,7 @@ export default function AdvertisementsPage() {
               <button
                 onClick={() => setTypeView(AdvertisementType.RENTAL)}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                  typeView === AdvertisementType.RENTAL ? 'bg-purple-600 text-white' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                  typeView === AdvertisementType.RENTAL ? 'bg-purple-600 text-gray-200' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <Home className="w-4 h-4" />
@@ -235,7 +235,7 @@ export default function AdvertisementsPage() {
                 <span className="text-sm text-gray-400">Celkom inzerátov</span>
                 <BarChart3 className="w-5 h-5 text-blue-400" />
               </div>
-              <div className="text-3xl font-bold text-white">{displayAds.length}</div>
+              <div className="text-3xl font-bold text-gray-200">{displayAds.length}</div>
               <div className="text-xs text-gray-500 mt-2">Aktívnych: {byStatus.active} • Konceptov: {byStatus.draft}</div>
             </div>
             <div className="bg-card rounded-lg p-6 border border-dark">
@@ -253,7 +253,7 @@ export default function AdvertisementsPage() {
                 <span className="text-sm text-gray-400">Priemerná cena</span>
                 <Euro className="w-5 h-5 text-yellow-400" />
               </div>
-              <div className="text-3xl font-bold text-white">{avgPrice.toFixed(2)} €</div>
+              <div className="text-3xl font-bold text-gray-200">{avgPrice.toFixed(2)} €</div>
               <div className="text-xs text-gray-500 mt-2">Celková hodnota: {totalValue.toFixed(2)} €</div>
             </div>
             <div className="bg-card rounded-lg p-6 border border-dark">
@@ -261,42 +261,88 @@ export default function AdvertisementsPage() {
                 <span className="text-sm text-gray-400">Služby / Prenájom</span>
                 <Tag className="w-5 h-5 text-purple-400" />
               </div>
-              <div className="text-3xl font-bold text-white">{byType.services} / {byType.rentals}</div>
+              <div className="text-3xl font-bold text-gray-200">{byType.services} / {byType.rentals}</div>
               <div className="text-xs text-gray-500 mt-2">Čakajúcich: {byStatus.pending}</div>
             </div>
           </div>
 
           {/* Grafy */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            {chartDataByType.length > 0 && (
-              <div className="bg-card rounded-lg p-6 border border-dark">
-                <h3 className="text-lg font-semibold text-white mb-4">Rozloženie podľa typu</h3>
-                <ResponsiveContainer width="100%" height={220}>
-                  <RechartsPieChart>
-                    <Pie
-                      data={chartDataByType}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      label={({ name, value }) => `${name}: ${value}`}
-                    >
-                      {chartDataByType.map((entry, index) => (
-                        <Cell key={index} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
-                      formatter={(value: number) => [value, '']}
-                      labelFormatter={(name) => name}
-                    />
-                  </RechartsPieChart>
-                </ResponsiveContainer>
+            <div className="bg-card rounded-lg border border-dark overflow-hidden">
+              <div className="p-4 border-b border-dark">
+                <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wide text-gray-400">Rozloženie podľa typu</h3>
               </div>
-            )}
+              <div className="p-4 grid grid-cols-2 gap-4">
+                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                    <span className="text-sm font-medium text-gray-300">Služby</span>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-200 tabular-nums">{byType.services}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">inzerátov</div>
+                  {displayAds.length > 0 && (
+                    <div className="mt-2 h-1.5 rounded-full bg-dark overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-blue-500 transition-all"
+                        style={{ width: `${(byType.services / displayAds.length) * 100}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0" />
+                    <span className="text-sm font-medium text-gray-300">Prenájom</span>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-200 tabular-nums">{byType.rentals}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">inzerátov</div>
+                  {displayAds.length > 0 && (
+                    <div className="mt-2 h-1.5 rounded-full bg-dark overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-purple-500 transition-all"
+                        style={{ width: `${(byType.rentals / displayAds.length) * 100}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="px-4 pb-4 pt-0">
+                <div className="pt-1">
+                  <p className="text-xs text-gray-500 mb-2">Graf podľa typu</p>
+                  <ResponsiveContainer width="100%" height={120}>
+                    <BarChart
+                      data={[
+                        { name: 'Služby', count: byType.services, fill: '#3b82f6' },
+                        { name: 'Prenájom', count: byType.rentals, fill: '#a855f7' },
+                      ]}
+                      layout="vertical"
+                      margin={{ top: 8, right: 36, left: 56, bottom: 8 }}
+                      barCategoryGap={12}
+                    >
+                      <XAxis type="number" domain={[0, Math.max(byType.services, byType.rentals, 1)]} hide />
+                      <YAxis type="category" dataKey="name" width={52} tick={{ fill: '#9ca3af', fontSize: 13 }} axisLine={false} tickLine={false} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }}
+                        labelStyle={{ color: '#9ca3af' }}
+                        cursor={false}
+                        formatter={(value: number) => [value, '']}
+                      />
+                      <Bar dataKey="count" nameKey="name" radius={[0, 6, 6, 0]} barSize={28} minPointSize={4}>
+                        {[
+                          { name: 'Služby', count: byType.services, fill: '#3b82f6' },
+                          { name: 'Prenájom', count: byType.rentals, fill: '#a855f7' },
+                        ].map((entry, index) => (
+                          <Cell key={index} fill={entry.fill} />
+                        ))}
+                        <LabelList dataKey="count" position="right" fill="#9ca3af" fontSize={13} fontWeight={600} />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
             <div className="bg-card rounded-lg p-6 border border-dark">
-              <h3 className="text-lg font-semibold text-white mb-1">Podľa statusu</h3>
+              <h3 className="text-lg font-semibold text-gray-200 mb-1">Podľa statusu</h3>
               <p className="text-xs text-gray-500 mb-4">Vizuálny prehľad podielov. Presné čísla v tabuľke pod grafom.</p>
               <div className="flex items-center justify-center" style={{ minHeight: 240 }}>
                 <ResponsiveContainer width="100%" height={240}>
@@ -317,7 +363,9 @@ export default function AdvertisementsPage() {
                       ))}
                     </Pie>
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
+                      contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }}
+                      labelStyle={{ color: '#9ca3af' }}
+                      cursor={false}
                       formatter={(value: number, name: string, props: { payload: { percent: string } }) => [
                         `${value} (${props.payload.percent}%)`,
                         name,
@@ -333,7 +381,7 @@ export default function AdvertisementsPage() {
                   </RechartsPieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-4 pt-4 border-t border-dark rounded-lg overflow-hidden bg-dark/30">
+              <div className="mt-4 pt-4 border-t border-dark overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-gray-400 border-b border-dark">
@@ -349,7 +397,7 @@ export default function AdvertisementsPage() {
                           <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.fill }} />
                           <span className="text-gray-200">{d.name}</span>
                         </td>
-                        <td className="py-2 px-3 text-right text-white font-medium">{d.count}</td>
+                        <td className="py-2 px-3 text-right text-gray-200 font-medium">{d.count}</td>
                         <td className="py-2 px-3 text-right text-gray-400">{d.percent} %</td>
                       </tr>
                     ))}
@@ -359,17 +407,18 @@ export default function AdvertisementsPage() {
             </div>
             {chartDataByMonth.length > 0 && (
               <div className="bg-card rounded-lg p-6 border border-dark">
-                <h3 className="text-lg font-semibold text-white mb-4">Inzeráty za mesiace</h3>
+                <h3 className="text-lg font-semibold text-gray-200 mb-4">Inzeráty za mesiace</h3>
                 <p className="text-xs text-gray-500 mb-2">Posledných 6 mesiacov. Tmavší stĺpec = 0 inzerátov.</p>
-                <div className="bg-dark/50 rounded-lg p-2">
+                <div className="pt-1">
                   <ResponsiveContainer width="100%" height={220}>
                     <BarChart data={chartDataByMonth} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                       <XAxis dataKey="month" stroke="#9ca3af" style={{ fontSize: '11px' }} tick={{ fill: '#9ca3af' }} />
                       <YAxis stroke="#9ca3af" style={{ fontSize: '11px' }} tick={{ fill: '#9ca3af' }} />
                       <Tooltip
-                        contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
-                        cursor={{ fill: 'rgba(55, 65, 81, 0.5)' }}
+                        contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }}
+                        labelStyle={{ color: '#9ca3af' }}
+                        cursor={false}
                       />
                       <Bar dataKey="count" name="Počet" radius={[4, 4, 0, 0]} minPointSize={2}>
                         {chartDataByMonth.map((entry, index) => (
@@ -406,15 +455,15 @@ export default function AdvertisementsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-card rounded-lg p-4 border border-dark">
               <span className="text-xs text-gray-400">Min. cena</span>
-              <div className="text-xl font-bold text-white">{minPrice.toFixed(2)} €</div>
+              <div className="text-xl font-bold text-gray-200">{minPrice.toFixed(2)} €</div>
             </div>
             <div className="bg-card rounded-lg p-4 border border-dark">
               <span className="text-xs text-gray-400">Max. cena</span>
-              <div className="text-xl font-bold text-white">{maxPrice.toFixed(2)} €</div>
+              <div className="text-xl font-bold text-gray-200">{maxPrice.toFixed(2)} €</div>
             </div>
             <div className="bg-card rounded-lg p-4 border border-dark">
               <span className="text-xs text-gray-400">S cenou / Bez ceny</span>
-              <div className="text-xl font-bold text-white">{adsWithPrice.length} / {adsWithoutPrice.length}</div>
+              <div className="text-xl font-bold text-gray-200">{adsWithPrice.length} / {adsWithoutPrice.length}</div>
             </div>
           </div>
 
@@ -423,13 +472,13 @@ export default function AdvertisementsPage() {
             <div className="bg-card rounded-lg p-6 border border-dark">
               <div className="flex items-center gap-2 mb-4">
                 <PieChart className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-semibold text-white">Top kategórie</h3>
+                <h3 className="text-lg font-semibold text-gray-200">Top kategórie</h3>
               </div>
               <ul className="space-y-2">
                 {byCategory.length ? byCategory.map(([name, count]) => (
                   <li key={name} className="flex justify-between text-sm">
                     <span className="text-gray-300">{name}</span>
-                    <span className="font-semibold text-white">{count}</span>
+                    <span className="font-semibold text-gray-200">{count}</span>
                   </li>
                 )) : (
                   <li className="text-sm text-gray-500">Žiadne dáta</li>
@@ -439,13 +488,13 @@ export default function AdvertisementsPage() {
             <div className="bg-card rounded-lg p-6 border border-dark">
               <div className="flex items-center gap-2 mb-4">
                 <MapPin className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-semibold text-white">Top lokality</h3>
+                <h3 className="text-lg font-semibold text-gray-200">Top lokality</h3>
               </div>
               <ul className="space-y-2">
                 {byLocation.length ? byLocation.map(([loc, count]) => (
                   <li key={loc} className="flex justify-between text-sm">
                     <span className="text-gray-300">{loc}</span>
-                    <span className="font-semibold text-white">{count}</span>
+                    <span className="font-semibold text-gray-200">{count}</span>
                   </li>
                 )) : (
                   <li className="text-sm text-gray-500">Žiadne dáta</li>
@@ -459,13 +508,13 @@ export default function AdvertisementsPage() {
             <div className="bg-card rounded-lg p-6 border border-dark mb-6">
               <div className="flex items-center gap-2 mb-4">
                 <Calendar className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-semibold text-white">Inzeráty za mesiace</h3>
+                <h3 className="text-lg font-semibold text-gray-200">Inzeráty za mesiace</h3>
               </div>
               <div className="flex flex-wrap gap-4">
                 {byMonth.map(([month, count]) => (
                   <div key={month} className="flex items-center gap-2">
                     <span className="text-sm text-gray-400">{month}</span>
-                    <span className="font-semibold text-white">{count}</span>
+                    <span className="font-semibold text-gray-200">{count}</span>
                   </div>
                 ))}
               </div>
@@ -478,7 +527,7 @@ export default function AdvertisementsPage() {
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                  showFilters ? 'bg-primary text-white' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                  showFilters ? 'bg-primary text-gray-200' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <FilterIcon className="w-4 h-4" />
@@ -490,17 +539,17 @@ export default function AdvertisementsPage() {
                 )}
               </button>
               <span className="text-sm text-gray-400">
-                Zobrazených: <span className="text-white font-semibold">{filteredAdvertisements.length}</span> z {displayAds.length}
+                Zobrazených: <span className="text-gray-200 font-semibold">{filteredAdvertisements.length}</span> z {displayAds.length}
               </span>
             </div>
-            <button onClick={clearFilters} className="text-sm text-gray-400 hover:text-white transition-colors">
+            <button onClick={clearFilters} className="text-sm text-gray-400 hover:text-gray-200 transition-colors">
               Vymazať filtre
             </button>
           </div>
 
           {showFilters && (
             <div className="bg-card rounded-lg p-6 border border-dark mb-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Filtre pre prehľad</h3>
+              <h3 className="text-lg font-semibold text-gray-200 mb-4">Filtre pre prehľad</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="lg:col-span-2">
                   <label className="block text-xs text-gray-400 mb-2">Vyhľadávanie</label>
@@ -511,7 +560,7 @@ export default function AdvertisementsPage() {
                       value={filters.search}
                       onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                       placeholder="Názov, popis, lokalita..."
-                      className="w-full bg-dark border border-card rounded-lg pl-10 pr-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                      className="w-full bg-dark border border-card rounded-lg pl-10 pr-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
                     />
                   </div>
                 </div>
@@ -520,7 +569,7 @@ export default function AdvertisementsPage() {
                   <select
                     value={filters.status}
                     onChange={(e) => setFilters({ ...filters, status: e.target.value as '' | AdvertisementStatus })}
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
                   >
                     <option value="">Všetky</option>
                     <option value={AdvertisementStatus.ACTIVE}>Aktívne</option>
@@ -535,7 +584,7 @@ export default function AdvertisementsPage() {
                   <select
                     value={filters.type}
                     onChange={(e) => setFilters({ ...filters, type: e.target.value as '' | AdvertisementType })}
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
                   >
                     <option value="">Všetky</option>
                     <option value={AdvertisementType.SERVICE}>Služby</option>
@@ -547,7 +596,7 @@ export default function AdvertisementsPage() {
                   <select
                     value={filters.categoryId}
                     onChange={(e) => setFilters({ ...filters, categoryId: e.target.value })}
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
                   >
                     <option value="">Všetky kategórie</option>
                     {categories.map((cat) => (
@@ -562,7 +611,7 @@ export default function AdvertisementsPage() {
                     value={filters.location}
                     onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                     placeholder="Mesto, región..."
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
                   />
                 </div>
                 <div className="lg:col-span-2">
@@ -574,7 +623,7 @@ export default function AdvertisementsPage() {
                       value={filters.minPrice}
                       onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
                       placeholder="Min"
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
                     />
                     <span className="text-gray-400 self-center">–</span>
                     <input
@@ -583,7 +632,7 @@ export default function AdvertisementsPage() {
                       value={filters.maxPrice}
                       onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
                       placeholder="Max"
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
                     />
                   </div>
                 </div>
@@ -594,14 +643,14 @@ export default function AdvertisementsPage() {
                       type="date"
                       value={filters.dateFrom}
                       onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
                     />
                     <span className="text-gray-400 self-center">–</span>
                     <input
                       type="date"
                       value={filters.dateTo}
                       onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
                     />
                   </div>
                 </div>
@@ -613,7 +662,7 @@ export default function AdvertisementsPage() {
           <div className="bg-card rounded-lg border border-dark">
             <div className="flex items-center gap-2 p-4 border-b border-dark">
               <FileText className="w-5 h-5 text-gray-400" />
-              <h3 className="text-lg font-semibold text-white">Zoznam inzerátov (podľa filtrov)</h3>
+              <h3 className="text-lg font-semibold text-gray-200">Zoznam inzerátov (podľa filtrov)</h3>
             </div>
             {loading ? (
               <div className="p-6 text-center text-gray-400">Načítavam...</div>
@@ -639,7 +688,7 @@ export default function AdvertisementsPage() {
                     {filteredAdvertisements.map((ad) => (
                       <tr key={ad.id} className="border-b border-card hover:bg-dark/50">
                         <td className="px-6 py-4">
-                          <div className="font-medium text-white truncate max-w-[200px]">{ad.title}</div>
+                          <div className="font-medium text-gray-200 truncate max-w-[200px]">{ad.title}</div>
                           <div className="text-sm text-gray-400 line-clamp-1 max-w-[200px]">{ad.description}</div>
                         </td>
                         <td className="px-6 py-4 text-gray-300">
