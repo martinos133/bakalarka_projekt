@@ -1,9 +1,35 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { api } from '@/lib/api'
+
+interface PopularCategory {
+  id: string
+  label: string
+  href: string
+  order: number
+}
 
 export default function Hero() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [popularCategories, setPopularCategories] = useState<PopularCategory[]>(
+    []
+  )
+
+  useEffect(() => {
+    api
+      .getPopularCategories()
+      .then((data: { items?: PopularCategory[] }) => {
+        const items = data?.items ?? []
+        setPopularCategories(
+          Array.isArray(items)
+            ? items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            : []
+        )
+      })
+      .catch(() => setPopularCategories([]))
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -66,23 +92,22 @@ export default function Hero() {
           </form>
 
           {/* Popular Categories */}
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-white text-sm font-medium">Populárne:</span>
-            {[
-              'Dizajn webu',
-              'WordPress',
-              'Dizajn loga',
-              'Úprava videa',
-              'Hlasové prevedenie',
-            ].map((category) => (
-              <button
-                key={category}
-                className="px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full hover:bg-white/20 transition-colors text-sm border border-white/20"
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+          {popularCategories.length > 0 && (
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-white text-sm font-medium">
+                Populárne:
+              </span>
+              {popularCategories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={category.href || '#'}
+                  className="px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full hover:bg-white/20 transition-colors text-sm border border-white/20"
+                >
+                  {category.label}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

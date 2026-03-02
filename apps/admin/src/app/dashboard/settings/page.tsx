@@ -19,6 +19,8 @@ interface PlatformConfig {
   instagramUrl?: string
   copyrightText?: string
   defaultLanguage?: string
+  topFreelancersTitle?: string
+  topFreelancersLimit?: number
 }
 
 interface AdminConfig {
@@ -47,6 +49,8 @@ export default function SettingsPage() {
     instagramUrl: '',
     copyrightText: '',
     defaultLanguage: 'sk',
+    topFreelancersTitle: 'Top freelanceri',
+    topFreelancersLimit: 4,
   })
 
   const [adminConfig, setAdminConfig] = useState<AdminConfig>({
@@ -108,7 +112,7 @@ export default function SettingsPage() {
     }
   }
 
-  const updatePlatform = (field: keyof PlatformConfig, value: string) => {
+  const updatePlatform = (field: keyof PlatformConfig, value: string | number) => {
     setPlatformConfig((p) => ({ ...p, [field]: value }))
   }
 
@@ -268,6 +272,45 @@ export default function SettingsPage() {
                       <option value="en">English</option>
                       <option value="cs">Čeština</option>
                     </select>
+                  </div>
+                  <div className="md:col-span-2 border-t border-dark pt-4 mt-4">
+                    <h3 className="text-white font-medium mb-3">Sekcia Top freelanceri</h3>
+                    <p className="text-gray-500 text-sm mb-3">
+                      Zobrazuje používateľov s aktívnymi inzerátmi (zoradených podľa počtu inzerátov)
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-gray-400 text-sm mb-2">Názov sekcie</label>
+                        <input
+                          type="text"
+                          value={platformConfig.topFreelancersTitle || ''}
+                          onChange={(e) =>
+                            updatePlatform('topFreelancersTitle', e.target.value)
+                          }
+                          className="w-full bg-dark border border-dark rounded-lg px-3 py-2 text-white"
+                          placeholder="Top freelanceri"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-gray-400 text-sm mb-2">
+                          Počet zobrazených (1–12)
+                        </label>
+                        <input
+                          type="number"
+                          min={1}
+                          max={12}
+                          value={platformConfig.topFreelancersLimit ?? 4}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value, 10)
+                            updatePlatform(
+                              'topFreelancersLimit',
+                              isNaN(val) ? 4 : Math.min(12, Math.max(1, val))
+                            )
+                          }}
+                          className="w-full bg-dark border border-dark rounded-lg px-3 py-2 text-white"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <button

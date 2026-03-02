@@ -63,6 +63,14 @@ export const api = {
   getFooter: () => fetchAPI('/menu/footer', { cache: 'no-store' }),
   getCategoryNav: () => fetchAPI('/menu/categoryNav', { cache: 'no-store' }),
   getMadeOnRentMe: () => fetchAPI('/menu/madeOnRentMe', { cache: 'no-store' }),
+  getPopularCategories: () =>
+    fetchAPI('/menu/popularCategories', { cache: 'no-store' }),
+  getPlatformConfig: () => fetchAPI('/config/platform', { cache: 'no-store' }),
+  getTopFreelancers: (limit?: number) =>
+    fetchAPI(
+      limit ? `/advertisements/top-freelancers?limit=${limit}` : '/advertisements/top-freelancers',
+      { cache: 'no-store' }
+    ),
   getPopularServices: () => fetchAPI('/advertisements/popular/services'),
   getAdvertisement: (id: string) => fetchAPI(`/advertisements/${id}`),
   getCategories: () => fetchAPI('/categories/active'),

@@ -12,6 +12,8 @@ export interface PlatformConfig {
   instagramUrl?: string;
   copyrightText?: string;
   defaultLanguage?: string;
+  topFreelancersTitle?: string;
+  topFreelancersLimit?: number;
 }
 
 export interface AdminConfig {
@@ -28,6 +30,8 @@ const DEFAULT_PLATFORM: PlatformConfig = {
   supportEmail: 'podpora@rentme.sk',
   copyrightText: '© RentMe International Ltd. 2024',
   defaultLanguage: 'sk',
+  topFreelancersTitle: 'Top freelanceri',
+  topFreelancersLimit: 4,
 };
 
 const DEFAULT_ADMIN: AdminConfig = {

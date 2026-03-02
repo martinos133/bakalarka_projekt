@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AdvertisementsService } from './advertisements.service';
@@ -39,6 +40,13 @@ export class AdvertisementsController {
   @ApiOperation({ summary: 'Získanie populárnych služieb' })
   findPopularServices() {
     return this.advertisementsService.findPopularServices(6);
+  }
+
+  @Get('top-freelancers')
+  @ApiOperation({ summary: 'Získanie top freelancerov (používatelia s aktívnymi inzerátmi)' })
+  findTopFreelancers(@Query('limit') limit?: string) {
+    const limitNum = limit ? Math.min(Math.max(parseInt(limit, 10) || 4, 1), 12) : 4;
+    return this.advertisementsService.findTopFreelancers(limitNum);
   }
 
   @Get('category/:slug')

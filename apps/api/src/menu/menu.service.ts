@@ -34,6 +34,7 @@ export type NavbarData = { items: NavbarItem[] };
 export type FooterData = { sections: FooterSection[] };
 export type CategoryNavData = { items: NavbarItem[]; visibleCount?: number };
 export type MadeOnRentMeData = { items: MadeOnRentMeItem[] };
+export type PopularCategoriesData = { items: NavbarItem[] };
 
 const DEFAULT_NAVBAR: NavbarData = {
   items: [
@@ -118,6 +119,16 @@ const DEFAULT_CATEGORY_NAV: CategoryNavData = {
   visibleCount: 5,
 };
 
+const DEFAULT_POPULAR_CATEGORIES: PopularCategoriesData = {
+  items: [
+    { id: '1', label: 'Dizajn webu', href: '/kategoria/grafika-a-dizajn', order: 0 },
+    { id: '2', label: 'WordPress', href: '/kategoria/programovanie-a-technologie', order: 1 },
+    { id: '3', label: 'Dizajn loga', href: '/kategoria/grafika-a-dizajn', order: 2 },
+    { id: '4', label: 'Úprava videa', href: '/kategoria/video-a-animacia', order: 3 },
+    { id: '5', label: 'Hlasové prevedenie', href: '/kategoria/hudba-a-audio', order: 4 },
+  ],
+};
+
 const DEFAULT_MADE_ON_RENT_ME: MadeOnRentMeData = {
   items: [
     {
@@ -158,12 +169,13 @@ const DEFAULT_MADE_ON_RENT_ME: MadeOnRentMeData = {
 @Injectable()
 export class MenuService {
   private async getOrCreate(
-    type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe',
+    type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe' | 'popularCategories',
     defaultData:
       | NavbarData
       | FooterData
       | CategoryNavData
       | MadeOnRentMeData
+      | PopularCategoriesData
   ) {
     let menu = await prisma.siteMenu.findUnique({
       where: { type },
@@ -201,22 +213,50 @@ export class MenuService {
     return menu.data as MadeOnRentMeData;
   }
 
+  async getPopularCategories(): Promise<PopularCategoriesData> {
+    const menu = await this.getOrCreate('popularCategories', DEFAULT_POPULAR_CATEGORIES);
+    return menu.data as PopularCategoriesData;
+  }
+
   async getMenu(
-    type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe'
-  ): Promise<NavbarData | FooterData | CategoryNavData | MadeOnRentMeData> {
+    type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe' | 'popularCategories'
+  ): Promise<
+    | NavbarData
+    | FooterData
+    | CategoryNavData
+    | MadeOnRentMeData
+    | PopularCategoriesData
+  > {
     if (type === 'navbar') return this.getNavbar();
     if (type === 'footer') return this.getFooter();
     if (type === 'categoryNav') return this.getCategoryNav();
     if (type === 'madeOnRentMe') return this.getMadeOnRentMe();
+    if (type === 'popularCategories') return this.getPopularCategories();
     throw new BadRequestException(
-      'Neplatný typ menu. Povolené: navbar, footer, categoryNav, madeOnRentMe'
+      'Neplatný typ menu. Povolené: navbar, footer, categoryNav, madeOnRentMe, popularCategories'
     );
   }
 
   async updateMenu(
-    type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe',
-    data: NavbarData | FooterData | CategoryNavData | MadeOnRentMeData,
-  ): Promise<NavbarData | FooterData | CategoryNavData | MadeOnRentMeData> {
+    type:
+      | 'navbar'
+      | 'footer'
+      | 'categoryNav'
+      | 'madeOnRentMe'
+      | 'popularCategories',
+    data:
+      | NavbarData
+      | FooterData
+      | CategoryNavData
+      | MadeOnRentMeData
+      | PopularCategoriesData,
+  ): Promise<
+    | NavbarData
+    | FooterData
+    | CategoryNavData
+    | MadeOnRentMeData
+    | PopularCategoriesData
+  > {
     if (type === 'navbar') {
       const validated = data as NavbarData;
       if (!Array.isArray(validated.items)) {
@@ -237,6 +277,13 @@ export class MenuService {
       if (!Array.isArray(validated.items)) {
         throw new BadRequestException('MadeOnRentMe musí obsahovať pole items');
       }
+    } else if (type === 'popularCategories') {
+      const validated = data as PopularCategoriesData;
+      if (!Array.isArray(validated.items)) {
+        throw new BadRequestException(
+          'PopularCategories musí obsahovať pole items'
+        );
+      }
     }
 
     const menu = await prisma.siteMenu.upsert({
@@ -245,6 +292,11 @@ export class MenuService {
       update: { data: data as object },
     });
 
-    return menu.data as NavbarData | FooterData | CategoryNavData | MadeOnRentMeData;
+    return menu.data as
+      | NavbarData
+      | FooterData
+      | CategoryNavData
+      | MadeOnRentMeData
+      | PopularCategoriesData;
   }
 }

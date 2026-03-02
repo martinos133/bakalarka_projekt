@@ -83,6 +83,59 @@ export class AdvertisementsService {
     });
   }
 
+  async findTopFreelancers(limit: number = 4) {
+    const usersWithAds = await prisma.user.findMany({
+      where: {
+        banned: false,
+        advertisements: {
+          some: { status: 'ACTIVE' as any },
+        },
+      },
+      include: {
+        advertisements: {
+          where: { status: 'ACTIVE' as any },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          select: {
+            id: true,
+            title: true,
+            price: true,
+            images: true,
+          },
+        },
+        _count: {
+          select: { advertisements: true },
+        },
+      },
+      take: limit * 3,
+    })
+
+    const sorted = usersWithAds
+      .filter((u) => u.advertisements.length > 0)
+      .sort((a, b) => (b._count as any).advertisements - (a._count as any).advertisements)
+      .slice(0, limit)
+
+    return sorted.map((user) => {
+      const ad = user.advertisements[0] as any
+      const displayName =
+        user.firstName && user.lastName
+          ? `${user.firstName} ${user.lastName}`
+          : user.firstName || user.email?.split('@')[0] || 'Predajca'
+      const image =
+        ad?.images?.[0] ||
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop'
+      return {
+        id: user.id,
+        adId: ad?.id,
+        name: displayName,
+        title: ad?.title || 'Služby',
+        image,
+        adsCount: (user._count as any).advertisements,
+        price: ad?.price ?? 0,
+      }
+    })
+  }
+
   async findOne(id: string) {
     const advertisement = await prisma.advertisement.findUnique({
       where: { id },

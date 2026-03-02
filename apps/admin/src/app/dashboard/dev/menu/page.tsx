@@ -18,6 +18,7 @@ import {
   FolderTree,
   List,
   Image as ImageIcon,
+  Star,
 } from 'lucide-react'
 
 interface CategoryOption {
@@ -58,7 +59,7 @@ interface MadeOnRentMeItem {
   order: number
 }
 
-type TabType = 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe'
+type TabType = 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe' | 'popularCategories'
 
 function generateId() {
   return Math.random().toString(36).slice(2, 11)
@@ -78,10 +79,13 @@ export default function DevMenuPage() {
   const [madeOnRentMeData, setMadeOnRentMeData] = useState<{
     items: MadeOnRentMeItem[]
   }>({ items: [] })
+  const [popularCategoriesData, setPopularCategoriesData] = useState<{
+    items: NavbarItem[]
+  }>({ items: [] })
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
   const [categories, setCategories] = useState<CategoryOption[]>([])
   const [showCategoryPicker, setShowCategoryPicker] = useState<
-    'navbar' | 'categoryNav' | 'madeOnRentMe' | string | null
+    'navbar' | 'categoryNav' | 'madeOnRentMe' | 'popularCategories' | string | null
   >(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
@@ -108,18 +112,23 @@ export default function DevMenuPage() {
   const loadMenu = async () => {
     try {
       setLoading(true)
-      const [navbar, footer, categoryNav, madeOnRentMe] = await Promise.all([
-        api.getMenu('navbar'),
-        api.getMenu('footer'),
-        api.getMenu('categoryNav'),
-        api.getMenu('madeOnRentMe'),
-      ])
+      const [navbar, footer, categoryNav, madeOnRentMe, popularCategories] =
+        await Promise.all([
+          api.getMenu('navbar'),
+          api.getMenu('footer'),
+          api.getMenu('categoryNav'),
+          api.getMenu('madeOnRentMe'),
+          api.getMenu('popularCategories'),
+        ])
       setNavbarData(navbar as { items: NavbarItem[] })
       setFooterData(footer as { sections: FooterSection[] })
       setCategoryNavData(
         categoryNav as { items: NavbarItem[]; visibleCount?: number }
       )
       setMadeOnRentMeData(madeOnRentMe as { items: MadeOnRentMeItem[] })
+      setPopularCategoriesData(
+        popularCategories as { items: NavbarItem[] }
+      )
       const sections = (footer as { sections: FooterSection[] }).sections
       setExpandedSections(new Set(sections.map((s) => s.id)))
     } catch (error) {
@@ -290,6 +299,58 @@ export default function DevMenuPage() {
   const removeMadeOnRentMeItem = (id: string) => {
     setMadeOnRentMeData({
       items: madeOnRentMeData.items
+        .filter((item) => item.id !== id)
+        .map((item, i) => ({ ...item, order: i })),
+    })
+  }
+
+  const handleSavePopularCategories = async () => {
+    try {
+      setSaving(true)
+      setSuccessMessage(null)
+      await api.updateMenu('popularCategories', popularCategoriesData)
+      setSuccessMessage('Zmeny sú uložené')
+      setTimeout(() => setSuccessMessage(null), 3000)
+    } catch (error: any) {
+      alert(error?.message || 'Chyba pri ukladaní populárnych kategórií')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const addCategoryToPopularCategories = (cat: CategoryOption) => {
+    const newItem: NavbarItem = {
+      id: generateId(),
+      label: cat.name,
+      href: `/kategoria/${cat.slug}`,
+      order: popularCategoriesData.items.length,
+    }
+    setPopularCategoriesData({
+      ...popularCategoriesData,
+      items: [...popularCategoriesData.items, newItem].sort(
+        (a, b) => a.order - b.order
+      ),
+    })
+    setShowCategoryPicker(null)
+  }
+
+  const updatePopularCategoriesItem = (
+    id: string,
+    field: keyof NavbarItem,
+    value: string | number
+  ) => {
+    setPopularCategoriesData({
+      ...popularCategoriesData,
+      items: popularCategoriesData.items.map((item) =>
+        item.id === id ? { ...item, [field]: value } : item
+      ),
+    })
+  }
+
+  const removePopularCategoriesItem = (id: string) => {
+    setPopularCategoriesData({
+      ...popularCategoriesData,
+      items: popularCategoriesData.items
         .filter((item) => item.id !== id)
         .map((item, i) => ({ ...item, order: i })),
     })
@@ -493,6 +554,17 @@ export default function DevMenuPage() {
             >
               <ImageIcon className="w-5 h-5" />
               Vytvorené na RentMe
+            </button>
+            <button
+              onClick={() => setActiveTab('popularCategories')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                activeTab === 'popularCategories'
+                  ? 'bg-card text-white'
+                  : 'bg-cardHover text-gray-400 hover:text-white'
+              }`}
+            >
+              <Star className="w-5 h-5" />
+              Populárne
             </button>
           </div>
 
@@ -878,6 +950,123 @@ export default function DevMenuPage() {
                 {madeOnRentMeData.items.length === 0 && (
                   <p className="text-gray-500 py-4">
                     Žiadne položky. Kliknite na „Pridať kategóriu“ alebo „Pridať položku“.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* PopularCategories tab */}
+          {activeTab === 'popularCategories' && (
+            <div className="bg-card rounded-lg p-6 border border-dark">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold">
+                  Populárne kategórie (v Hero sekcii)
+                </h2>
+                <div className="flex gap-2">
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowCategoryPicker(
+                          showCategoryPicker === 'popularCategories'
+                            ? null
+                            : 'popularCategories'
+                        )
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
+                    >
+                      <FolderTree className="w-4 h-4" />
+                      Pridať kategóriu
+                    </button>
+                    {showCategoryPicker === 'popularCategories' && (
+                      <div
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-dark border border-dark rounded-lg shadow-lg z-20"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {categories.length === 0 ? (
+                          <p className="p-3 text-gray-500 text-sm">
+                            Žiadne kategórie
+                          </p>
+                        ) : (
+                          categories.map((cat) => (
+                            <button
+                              key={cat.id}
+                              onClick={() =>
+                                addCategoryToPopularCategories(cat)
+                              }
+                              className="w-full text-left px-3 py-2 hover:bg-cardHover text-sm flex items-center gap-2"
+                            >
+                              {cat.parentName ? (
+                                <>
+                                  <span className="text-gray-500">
+                                    {cat.parentName}
+                                  </span>
+                                  <span>→</span>
+                                  <span>{cat.name}</span>
+                                </>
+                              ) : (
+                                <span>{cat.name}</span>
+                              )}
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleSavePopularCategories}
+                    disabled={saving}
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors disabled:opacity-50"
+                  >
+                    <Save className="w-4 h-4" />
+                    {saving ? 'Ukladám...' : 'Uložiť'}
+                  </button>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm mb-4">
+                Kategórie zobrazené ako tlačidlá pod vyhľadávacím poľom na
+                úvodnej stránke.
+              </p>
+              <div className="space-y-3">
+                {popularCategoriesData.items.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-3 p-3 bg-dark rounded-lg border border-dark"
+                  >
+                    <GripVertical className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                    <span className="text-gray-500 w-8">{index + 1}.</span>
+                    <input
+                      type="text"
+                      value={item.label}
+                      onChange={(e) =>
+                        updatePopularCategoriesItem(item.id, 'label', e.target.value)
+                      }
+                      className="flex-1 bg-card border border-dark rounded px-3 py-2 text-white placeholder-gray-500"
+                      placeholder="Názov"
+                    />
+                    <input
+                      type="text"
+                      value={item.href}
+                      onChange={(e) =>
+                        updatePopularCategoriesItem(item.id, 'href', e.target.value)
+                      }
+                      className="flex-1 bg-card border border-dark rounded px-3 py-2 text-white placeholder-gray-500"
+                      placeholder="Odkaz (href)"
+                    />
+                    <button
+                      onClick={() => removePopularCategoriesItem(item.id)}
+                      className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded transition-colors"
+                      title="Odstrániť"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+                {popularCategoriesData.items.length === 0 && (
+                  <p className="text-gray-500 py-4">
+                    Žiadne položky. Kliknite na „Pridať kategóriu“.
                   </p>
                 )}
               </div>

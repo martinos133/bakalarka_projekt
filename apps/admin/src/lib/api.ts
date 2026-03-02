@@ -166,15 +166,29 @@ export const api = {
   },
   getClickBreakdown: (period: '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m' = '30d') =>
     fetchWithAuth(`/analytics/stats/breakdown?period=${period}`),
-  getMenu: (type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe') =>
-    fetchWithAuth(`/menu/${type}`),
+  getMenu: (
+    type:
+      | 'navbar'
+      | 'footer'
+      | 'categoryNav'
+      | 'madeOnRentMe'
+      | 'popularCategories'
+  ) => fetchWithAuth(`/menu/${type}`),
   getConfig: (key: 'platform' | 'admin') => fetchWithAuth(`/config/${key}`),
   updateConfig: (key: 'platform' | 'admin', data: object) =>
     fetchWithAuth(`/config/${key}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
-  updateMenu: (type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe', data: object) =>
+  updateMenu: (
+    type:
+      | 'navbar'
+      | 'footer'
+      | 'categoryNav'
+      | 'madeOnRentMe'
+      | 'popularCategories',
+    data: object
+  ) =>
     fetchWithAuth(`/menu/${type}`, {
       method: 'PUT',
       body: JSON.stringify(data),

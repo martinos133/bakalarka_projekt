@@ -6,6 +6,7 @@ import {
   FooterData,
   CategoryNavData,
   MadeOnRentMeData,
+  PopularCategoriesData,
 } from './menu.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -41,12 +42,21 @@ export class MenuController {
     return this.menuService.getMadeOnRentMe();
   }
 
+  @Get('popularCategories')
+  @ApiOperation({ summary: 'Získanie populárnych kategórií pre Hero (verejné)' })
+  getPopularCategories() {
+    return this.menuService.getPopularCategories();
+  }
+
   @Get(':type')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Získanie menu podľa typu (admin)' })
-  getMenu(@Param('type') type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe') {
+  getMenu(
+    @Param('type')
+    type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe' | 'popularCategories',
+  ) {
     return this.menuService.getMenu(type);
   }
 
@@ -56,8 +66,15 @@ export class MenuController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Aktualizácia menu (admin)' })
   updateMenu(
-    @Param('type') type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe',
-    @Body() data: NavbarData | FooterData | CategoryNavData | MadeOnRentMeData,
+    @Param('type')
+    type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe' | 'popularCategories',
+    @Body()
+    data:
+      | NavbarData
+      | FooterData
+      | CategoryNavData
+      | MadeOnRentMeData
+      | PopularCategoriesData,
   ) {
     return this.menuService.updateMenu(type, data);
   }
