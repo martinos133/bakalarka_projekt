@@ -21,9 +21,19 @@ export interface FooterSection {
   links: FooterLink[];
 }
 
+export interface MadeOnRentMeItem {
+  id: string;
+  title: string;
+  image: string;
+  description: string;
+  href: string;
+  order: number;
+}
+
 export type NavbarData = { items: NavbarItem[] };
 export type FooterData = { sections: FooterSection[] };
 export type CategoryNavData = { items: NavbarItem[]; visibleCount?: number };
+export type MadeOnRentMeData = { items: MadeOnRentMeItem[] };
 
 const DEFAULT_NAVBAR: NavbarData = {
   items: [
@@ -108,11 +118,52 @@ const DEFAULT_CATEGORY_NAV: CategoryNavData = {
   visibleCount: 5,
 };
 
+const DEFAULT_MADE_ON_RENT_ME: MadeOnRentMeData = {
+  items: [
+    {
+      id: '1',
+      title: 'Dizajn loga',
+      image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop',
+      description: 'Profesionálny dizajn loga pre vašu značku',
+      href: '/kategoria/grafika-a-dizajn',
+      order: 0,
+    },
+    {
+      id: '2',
+      title: 'Vývoj webu',
+      image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop',
+      description: 'Vlastný web vytvorený podľa vašich špecifikácií',
+      href: '/kategoria/programovanie-a-technologie',
+      order: 1,
+    },
+    {
+      id: '3',
+      title: 'Produkcia videa',
+      image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44b?w=400&h=300&fit=crop',
+      description: 'Vysokokvalitný video obsah pre váš biznis',
+      href: '/kategoria/video-a-animacia',
+      order: 2,
+    },
+    {
+      id: '4',
+      title: 'Písanie obsahu',
+      image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=300&fit=crop',
+      description: 'Pútavý obsah, ktorý konvertuje',
+      href: '/kategoria/pisanie-a-preklad',
+      order: 3,
+    },
+  ],
+};
+
 @Injectable()
 export class MenuService {
   private async getOrCreate(
-    type: 'navbar' | 'footer' | 'categoryNav',
-    defaultData: NavbarData | FooterData | CategoryNavData
+    type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe',
+    defaultData:
+      | NavbarData
+      | FooterData
+      | CategoryNavData
+      | MadeOnRentMeData
   ) {
     let menu = await prisma.siteMenu.findUnique({
       where: { type },
@@ -145,19 +196,27 @@ export class MenuService {
     return menu.data as CategoryNavData;
   }
 
+  async getMadeOnRentMe(): Promise<MadeOnRentMeData> {
+    const menu = await this.getOrCreate('madeOnRentMe', DEFAULT_MADE_ON_RENT_ME);
+    return menu.data as MadeOnRentMeData;
+  }
+
   async getMenu(
-    type: 'navbar' | 'footer' | 'categoryNav'
-  ): Promise<NavbarData | FooterData | CategoryNavData> {
+    type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe'
+  ): Promise<NavbarData | FooterData | CategoryNavData | MadeOnRentMeData> {
     if (type === 'navbar') return this.getNavbar();
     if (type === 'footer') return this.getFooter();
     if (type === 'categoryNav') return this.getCategoryNav();
-    throw new BadRequestException('Neplatný typ menu. Povolené: navbar, footer, categoryNav');
+    if (type === 'madeOnRentMe') return this.getMadeOnRentMe();
+    throw new BadRequestException(
+      'Neplatný typ menu. Povolené: navbar, footer, categoryNav, madeOnRentMe'
+    );
   }
 
   async updateMenu(
-    type: 'navbar' | 'footer' | 'categoryNav',
-    data: NavbarData | FooterData | CategoryNavData,
-  ): Promise<NavbarData | FooterData | CategoryNavData> {
+    type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe',
+    data: NavbarData | FooterData | CategoryNavData | MadeOnRentMeData,
+  ): Promise<NavbarData | FooterData | CategoryNavData | MadeOnRentMeData> {
     if (type === 'navbar') {
       const validated = data as NavbarData;
       if (!Array.isArray(validated.items)) {
@@ -173,6 +232,11 @@ export class MenuService {
       if (!Array.isArray(validated.items)) {
         throw new BadRequestException('CategoryNav musí obsahovať pole items');
       }
+    } else if (type === 'madeOnRentMe') {
+      const validated = data as MadeOnRentMeData;
+      if (!Array.isArray(validated.items)) {
+        throw new BadRequestException('MadeOnRentMe musí obsahovať pole items');
+      }
     }
 
     const menu = await prisma.siteMenu.upsert({
@@ -181,6 +245,6 @@ export class MenuService {
       update: { data: data as object },
     });
 
-    return menu.data as NavbarData | FooterData | CategoryNavData;
+    return menu.data as NavbarData | FooterData | CategoryNavData | MadeOnRentMeData;
   }
 }

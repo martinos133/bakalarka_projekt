@@ -166,7 +166,7 @@ export const api = {
   },
   getClickBreakdown: (period: '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m' = '30d') =>
     fetchWithAuth(`/analytics/stats/breakdown?period=${period}`),
-  getMenu: (type: 'navbar' | 'footer' | 'categoryNav') =>
+  getMenu: (type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe') =>
     fetchWithAuth(`/menu/${type}`),
   getConfig: (key: 'platform' | 'admin') => fetchWithAuth(`/config/${key}`),
   updateConfig: (key: 'platform' | 'admin', data: object) =>
@@ -174,7 +174,7 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
-  updateMenu: (type: 'navbar' | 'footer' | 'categoryNav', data: object) =>
+  updateMenu: (type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe', data: object) =>
     fetchWithAuth(`/menu/${type}`, {
       method: 'PUT',
       body: JSON.stringify(data),

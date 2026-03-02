@@ -1,6 +1,12 @@
 import { Controller, Get, Put, Body, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { MenuService, NavbarData, FooterData, CategoryNavData } from './menu.service';
+import {
+  MenuService,
+  NavbarData,
+  FooterData,
+  CategoryNavData,
+  MadeOnRentMeData,
+} from './menu.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -29,12 +35,18 @@ export class MenuController {
     return this.menuService.getCategoryNav();
   }
 
+  @Get('madeOnRentMe')
+  @ApiOperation({ summary: 'Získanie Vytvorené na RentMe položiek (verejné)' })
+  getMadeOnRentMe() {
+    return this.menuService.getMadeOnRentMe();
+  }
+
   @Get(':type')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Získanie menu podľa typu (admin)' })
-  getMenu(@Param('type') type: 'navbar' | 'footer' | 'categoryNav') {
+  getMenu(@Param('type') type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe') {
     return this.menuService.getMenu(type);
   }
 
@@ -44,8 +56,8 @@ export class MenuController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Aktualizácia menu (admin)' })
   updateMenu(
-    @Param('type') type: 'navbar' | 'footer' | 'categoryNav',
-    @Body() data: NavbarData | FooterData | CategoryNavData,
+    @Param('type') type: 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe',
+    @Body() data: NavbarData | FooterData | CategoryNavData | MadeOnRentMeData,
   ) {
     return this.menuService.updateMenu(type, data);
   }

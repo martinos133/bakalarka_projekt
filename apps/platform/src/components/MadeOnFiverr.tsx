@@ -1,34 +1,31 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { api } from '@/lib/api'
+
+interface MadeOnRentMeItem {
+  id: string
+  title: string
+  image: string
+  description: string
+  href: string
+  order: number
+}
 
 export default function MadeOnRentMe() {
-  const examples = [
-    {
-      id: '1',
-      title: 'Dizajn loga',
-      image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop',
-      description: 'Profesionálny dizajn loga pre vašu značku',
-    },
-    {
-      id: '2',
-      title: 'Vývoj webu',
-      image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop',
-      description: 'Vlastný web vytvorený podľa vašich špecifikácií',
-    },
-    {
-      id: '4',
-      title: 'Produkcia videa',
-      image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44b?w=400&h=300&fit=crop',
-      description: 'Vysokokvalitný video obsah pre váš biznis',
-    },
-    {
-      id: '7',
-      title: 'Písanie obsahu',
-      image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=300&fit=crop',
-      description: 'Pútavý obsah, ktorý konvertuje',
-    },
-  ]
+  const [items, setItems] = useState<MadeOnRentMeItem[]>([])
+
+  useEffect(() => {
+    api
+      .getMadeOnRentMe()
+      .then((data: { items: MadeOnRentMeItem[] }) => {
+        setItems((data.items || []).sort((a, b) => a.order - b.order))
+      })
+      .catch(() => {})
+  }, [])
+
+  if (items.length === 0) return null
 
   return (
     <section className="py-16 bg-white">
@@ -39,25 +36,25 @@ export default function MadeOnRentMe() {
           </h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {examples.map((example, index) => (
+          {items.map((item) => (
             <Link
-              key={example.id}
-              href={`/inzerat/${example.id}`}
+              key={item.id}
+              href={item.href}
               className="group cursor-pointer overflow-hidden rounded-lg"
             >
               <div className="relative overflow-hidden">
                 <img
-                  src={example.image}
-                  alt={example.title}
+                  src={item.image}
+                  alt={item.title}
                   className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
               </div>
               <div className="mt-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-1 group-hover:text-[#1dbf73] transition-colors">
-                  {example.title}
+                  {item.title}
                 </h3>
-                <p className="text-sm text-gray-600">{example.description}</p>
+                <p className="text-sm text-gray-600">{item.description}</p>
               </div>
             </Link>
           ))}

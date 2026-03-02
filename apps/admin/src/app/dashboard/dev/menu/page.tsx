@@ -17,6 +17,7 @@ import {
   ChevronRight,
   FolderTree,
   List,
+  Image as ImageIcon,
 } from 'lucide-react'
 
 interface CategoryOption {
@@ -24,6 +25,8 @@ interface CategoryOption {
   name: string
   slug: string
   parentName?: string
+  image?: string
+  description?: string
 }
 
 interface NavbarItem {
@@ -46,7 +49,16 @@ interface FooterSection {
   links: FooterLink[]
 }
 
-type TabType = 'navbar' | 'footer' | 'categoryNav'
+interface MadeOnRentMeItem {
+  id: string
+  title: string
+  image: string
+  description: string
+  href: string
+  order: number
+}
+
+type TabType = 'navbar' | 'footer' | 'categoryNav' | 'madeOnRentMe'
 
 function generateId() {
   return Math.random().toString(36).slice(2, 11)
@@ -63,10 +75,13 @@ export default function DevMenuPage() {
     items: NavbarItem[]
     visibleCount?: number
   }>({ items: [], visibleCount: 5 })
+  const [madeOnRentMeData, setMadeOnRentMeData] = useState<{
+    items: MadeOnRentMeItem[]
+  }>({ items: [] })
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
   const [categories, setCategories] = useState<CategoryOption[]>([])
   const [showCategoryPicker, setShowCategoryPicker] = useState<
-    'navbar' | 'categoryNav' | string | null
+    'navbar' | 'categoryNav' | 'madeOnRentMe' | string | null
   >(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
@@ -93,16 +108,18 @@ export default function DevMenuPage() {
   const loadMenu = async () => {
     try {
       setLoading(true)
-      const [navbar, footer, categoryNav] = await Promise.all([
+      const [navbar, footer, categoryNav, madeOnRentMe] = await Promise.all([
         api.getMenu('navbar'),
         api.getMenu('footer'),
         api.getMenu('categoryNav'),
+        api.getMenu('madeOnRentMe'),
       ])
       setNavbarData(navbar as { items: NavbarItem[] })
       setFooterData(footer as { sections: FooterSection[] })
       setCategoryNavData(
         categoryNav as { items: NavbarItem[]; visibleCount?: number }
       )
+      setMadeOnRentMeData(madeOnRentMe as { items: MadeOnRentMeItem[] })
       const sections = (footer as { sections: FooterSection[] }).sections
       setExpandedSections(new Set(sections.map((s) => s.id)))
     } catch (error) {
@@ -122,17 +139,27 @@ export default function DevMenuPage() {
           id: string
           name: string
           slug: string
+          image?: string
+          description?: string
           parentId?: string | null
-          children?: { id: string; name: string; slug: string }[]
+          children?: { id: string; name: string; slug: string; image?: string; description?: string }[]
         }
         if (!parent.parentId) {
-          options.push({ id: parent.id, name: parent.name, slug: parent.slug || '' })
+          options.push({
+            id: parent.id,
+            name: parent.name,
+            slug: parent.slug || '',
+            image: parent.image,
+            description: parent.description,
+          })
           for (const child of parent.children || []) {
             options.push({
               id: child.id,
               name: child.name,
               slug: child.slug || '',
               parentName: parent.name,
+              image: child.image,
+              description: child.description,
             })
           }
         }
@@ -212,6 +239,57 @@ export default function DevMenuPage() {
     setCategoryNavData({
       ...categoryNavData,
       items: categoryNavData.items
+        .filter((item) => item.id !== id)
+        .map((item, i) => ({ ...item, order: i })),
+    })
+  }
+
+  const handleSaveMadeOnRentMe = async () => {
+    try {
+      setSaving(true)
+      setSuccessMessage(null)
+      await api.updateMenu('madeOnRentMe', madeOnRentMeData)
+      setSuccessMessage('Zmeny sú uložené')
+      setTimeout(() => setSuccessMessage(null), 3000)
+    } catch (error: any) {
+      alert(error?.message || 'Chyba pri ukladaní')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const addCategoryToMadeOnRentMe = (cat: CategoryOption) => {
+    const defaultImage =
+      'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop'
+    const newItem: MadeOnRentMeItem = {
+      id: generateId(),
+      title: cat.name,
+      image: cat.image || defaultImage,
+      description: cat.description || `Služby v kategórii ${cat.name}`,
+      href: `/kategoria/${cat.slug}`,
+      order: madeOnRentMeData.items.length,
+    }
+    setMadeOnRentMeData({
+      items: [...madeOnRentMeData.items, newItem].sort((a, b) => a.order - b.order),
+    })
+    setShowCategoryPicker(null)
+  }
+
+  const updateMadeOnRentMeItem = (
+    id: string,
+    field: keyof MadeOnRentMeItem,
+    value: string | number
+  ) => {
+    setMadeOnRentMeData({
+      items: madeOnRentMeData.items.map((item) =>
+        item.id === id ? { ...item, [field]: value } : item
+      ),
+    })
+  }
+
+  const removeMadeOnRentMeItem = (id: string) => {
+    setMadeOnRentMeData({
+      items: madeOnRentMeData.items
         .filter((item) => item.id !== id)
         .map((item, i) => ({ ...item, order: i })),
     })
@@ -404,6 +482,17 @@ export default function DevMenuPage() {
             >
               <List className="w-5 h-5" />
               Kategórie (pruh)
+            </button>
+            <button
+              onClick={() => setActiveTab('madeOnRentMe')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                activeTab === 'madeOnRentMe'
+                  ? 'bg-card text-white'
+                  : 'bg-cardHover text-gray-400 hover:text-white'
+              }`}
+            >
+              <ImageIcon className="w-5 h-5" />
+              Vytvorené na RentMe
             </button>
           </div>
 
@@ -641,6 +730,152 @@ export default function DevMenuPage() {
                   </div>
                 ))}
                 {categoryNavData.items.length === 0 && (
+                  <p className="text-gray-500 py-4">
+                    Žiadne položky. Kliknite na „Pridať kategóriu“ alebo „Pridať položku“.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* MadeOnRentMe tab */}
+          {activeTab === 'madeOnRentMe' && (
+            <div className="bg-card rounded-lg p-6 border border-dark">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold">Vytvorené na RentMe</h2>
+                <div className="flex gap-2">
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowCategoryPicker(
+                          showCategoryPicker === 'madeOnRentMe' ? null : 'madeOnRentMe'
+                        )
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
+                    >
+                      <FolderTree className="w-4 h-4" />
+                      Pridať kategóriu
+                    </button>
+                    {showCategoryPicker === 'madeOnRentMe' && (
+                      <div
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-dark border border-dark rounded-lg shadow-lg z-20"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {categories.length === 0 ? (
+                          <p className="p-3 text-gray-500 text-sm">Žiadne kategórie</p>
+                        ) : (
+                          categories.map((cat) => (
+                            <button
+                              key={cat.id}
+                              onClick={() => addCategoryToMadeOnRentMe(cat)}
+                              className="w-full text-left px-3 py-2 hover:bg-cardHover text-sm flex items-center gap-2"
+                            >
+                              {cat.parentName ? (
+                                <>
+                                  <span className="text-gray-500">{cat.parentName}</span>
+                                  <span>→</span>
+                                  <span>{cat.name}</span>
+                                </>
+                              ) : (
+                                <span>{cat.name}</span>
+                              )}
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => {
+                      const newItem: MadeOnRentMeItem = {
+                        id: generateId(),
+                        title: 'Nová položka',
+                        image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop',
+                        description: '',
+                        href: '#',
+                        order: madeOnRentMeData.items.length,
+                      }
+                      setMadeOnRentMeData({
+                        items: [...madeOnRentMeData.items, newItem].sort(
+                          (a, b) => a.order - b.order
+                        ),
+                      })
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463] transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Pridať položku
+                  </button>
+                  <button
+                    onClick={handleSaveMadeOnRentMe}
+                    disabled={saving}
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors disabled:opacity-50"
+                  >
+                    <Save className="w-4 h-4" />
+                    {saving ? 'Ukladám...' : 'Uložiť'}
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-4">
+                {madeOnRentMeData.items.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="flex flex-col md:flex-row gap-4 p-4 bg-dark rounded-lg border border-dark"
+                  >
+                    <div className="flex items-start gap-3 flex-1">
+                      <GripVertical className="w-5 h-5 text-gray-500 flex-shrink-0 mt-2" />
+                      <span className="text-gray-500 w-8 flex-shrink-0">{index + 1}.</span>
+                      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <input
+                          type="text"
+                          value={item.title}
+                          onChange={(e) =>
+                            updateMadeOnRentMeItem(item.id, 'title', e.target.value)
+                          }
+                          className="bg-card border border-dark rounded px-3 py-2 text-white"
+                          placeholder="Názov"
+                        />
+                        <input
+                          type="text"
+                          value={item.href}
+                          onChange={(e) =>
+                            updateMadeOnRentMeItem(item.id, 'href', e.target.value)
+                          }
+                          className="bg-card border border-dark rounded px-3 py-2 text-white"
+                          placeholder="Odkaz"
+                        />
+                        <input
+                          type="text"
+                          value={item.image}
+                          onChange={(e) =>
+                            updateMadeOnRentMeItem(item.id, 'image', e.target.value)
+                          }
+                          className="md:col-span-2 bg-card border border-dark rounded px-3 py-2 text-white"
+                          placeholder="URL obrázka"
+                        />
+                        <input
+                          type="text"
+                          value={item.description}
+                          onChange={(e) =>
+                            updateMadeOnRentMeItem(item.id, 'description', e.target.value)
+                          }
+                          className="md:col-span-2 bg-card border border-dark rounded px-3 py-2 text-white"
+                          placeholder="Popis"
+                        />
+                      </div>
+                      <button
+                        onClick={() => removeMadeOnRentMeItem(item.id)}
+                        className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded transition-colors flex-shrink-0"
+                        title="Odstrániť"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {madeOnRentMeData.items.length === 0 && (
                   <p className="text-gray-500 py-4">
                     Žiadne položky. Kliknite na „Pridať kategóriu“ alebo „Pridať položku“.
                   </p>
