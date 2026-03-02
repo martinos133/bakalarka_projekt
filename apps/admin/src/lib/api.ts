@@ -31,12 +31,18 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
       let errorMessage = `API error: ${response.statusText}`
       try {
         const errorData = await response.json()
-        errorMessage = errorData.message || errorData.error || errorMessage
+        const msg = errorData.message || errorData.error
+        errorMessage = Array.isArray(msg) ? msg.join(', ') : (msg || errorMessage)
+        if (response.status >= 500) {
+          errorMessage += ` (${response.status} ${url})`
+        }
       } catch {
         // Ak sa nepodarí parsovať JSON, použijeme statusText
+        errorMessage = `${response.status} ${response.statusText}: ${url}`
       }
       const error = new Error(errorMessage)
       ;(error as any).status = response.status
+      ;(error as any).url = url
       throw error
     }
 
@@ -179,6 +185,38 @@ export const api = {
     fetchWithAuth(`/config/${key}`, {
       method: 'PUT',
       body: JSON.stringify(data),
+    }),
+  getStaticPages: () => fetchWithAuth('/static-pages'),
+  getStaticPage: (id: string) => fetchWithAuth(`/static-pages/${id}`),
+  createStaticPage: (data: any) =>
+    fetchWithAuth('/static-pages', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateStaticPage: (id: string, data: any) =>
+    fetchWithAuth(`/static-pages/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  deleteStaticPage: (id: string) =>
+    fetchWithAuth(`/static-pages/${id}`, {
+      method: 'DELETE',
+    }),
+  getBlogPosts: () => fetchWithAuth('/blog'),
+  getBlogPost: (id: string) => fetchWithAuth(`/blog/${id}`),
+  createBlogPost: (data: any) =>
+    fetchWithAuth('/blog', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateBlogPost: (id: string, data: any) =>
+    fetchWithAuth(`/blog/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  deleteBlogPost: (id: string) =>
+    fetchWithAuth(`/blog/${id}`, {
+      method: 'DELETE',
     }),
   updateMenu: (
     type:

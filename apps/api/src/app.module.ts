@@ -13,6 +13,8 @@ import { MenuModule } from './menu/menu.module';
 import { SiteConfigModule } from './config/config.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { SearchModule } from './search/search.module';
+import { StaticPagesModule } from './static-pages/static-pages.module';
+import { BlogModule } from './blog/blog.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { SearchModule } from './search/search.module';
     SiteConfigModule,
     FavoritesModule,
     SearchModule,
+    StaticPagesModule,
+    BlogModule,
   ],
 })
 export class AppModule {}

@@ -78,6 +78,10 @@ export const api = {
   getAdvertisementsByCategory: (slug: string) => fetchAPI(`/advertisements/category/${slug}`),
   searchAdvertisements: (q: string) => fetchAPI(`/advertisements?q=${encodeURIComponent(q)}`),
   getSearchSuggestions: (q: string) => fetchAPI(`/search/suggestions?q=${encodeURIComponent(q)}`),
+  getStaticPage: (slug: string) => fetchAPI(`/static-pages/slug/${slug}`),
+  getBlogPosts: (limit?: number) =>
+    fetchAPI(limit ? `/blog/posts?limit=${limit}` : '/blog/posts'),
+  getBlogPost: (slug: string) => fetchAPI(`/blog/posts/slug/${slug}`),
 
   // Auth endpoints
   register: (data: any) => fetchAPI('/auth/register', {

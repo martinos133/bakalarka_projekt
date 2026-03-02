@@ -16,6 +16,8 @@ import {
   Boxes,
   Sliders,
   MousePointerClick,
+  FileCode,
+  BookOpen,
 } from 'lucide-react'
 
 interface NavItem {
@@ -51,6 +53,13 @@ const navigation: NavSection[] = [
     items: [
       { label: 'Čakajúce inzeráty', path: '/dashboard/pending', icon: Clock },
       { label: 'Nahlásené inzeráty', path: '/dashboard/reported', icon: Flag },
+    ],
+  },
+  {
+    title: 'Obsah',
+    items: [
+      { label: 'Statické stránky', path: '/dashboard/dev/static-pages', icon: FileCode },
+      { label: 'Blog', path: '/dashboard/dev/blog', icon: BookOpen },
     ],
   },
   {
