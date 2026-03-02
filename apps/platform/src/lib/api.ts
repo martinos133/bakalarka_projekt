@@ -145,6 +145,16 @@ export const api = {
     body: JSON.stringify(data),
   }),
 
+  // Favorites endpoints
+  getFavorites: () => fetchWithAuth('/favorites'),
+  checkFavorite: (advertisementId: string) => fetchWithAuth(`/favorites/check/${advertisementId}`),
+  addFavorite: (advertisementId: string) => fetchWithAuth(`/favorites/${advertisementId}`, {
+    method: 'POST',
+  }),
+  removeFavorite: (advertisementId: string) => fetchWithAuth(`/favorites/${advertisementId}`, {
+    method: 'DELETE',
+  }),
+
   // Monitoring kliknutí (verejné – bez auth)
   recordClick: (data: {
     eventType?: string

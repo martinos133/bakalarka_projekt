@@ -6,16 +6,17 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { api } from '@/lib/api'
 import { isAuthenticated, getAuthUser, setAuthUser } from '@/lib/auth'
-import { User, Building2, Eye, EyeOff, Plus, Edit, Trash2, Save, X, Lock, Mail, Phone, MapPin, Calendar, Briefcase, Image as ImageIcon, MessageSquare, Archive, CheckCircle, Paperclip, FileText, Download } from 'lucide-react'
+import { User, Building2, Eye, EyeOff, Plus, Edit, Trash2, Save, X, Lock, Mail, Phone, MapPin, Calendar, Briefcase, Image as ImageIcon, MessageSquare, Archive, CheckCircle, Paperclip, FileText, Download, Heart } from 'lucide-react'
 import Link from 'next/link'
 
 export default function DashboardPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [mounted, setMounted] = useState(false)
-  const [activeTab, setActiveTab] = useState<'profile' | 'advertisements' | 'create' | 'messages'>('profile')
+  const [activeTab, setActiveTab] = useState<'profile' | 'advertisements' | 'favorites' | 'create' | 'messages'>('profile')
   const [user, setUser] = useState<any>(null)
   const [advertisements, setAdvertisements] = useState<any[]>([])
+  const [favorites, setFavorites] = useState<any[]>([])
   const [messages, setMessages] = useState<any[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [selectedMessage, setSelectedMessage] = useState<any>(null)
@@ -84,7 +85,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const tab = searchParams.get('tab')
-    if (tab === 'messages' || tab === 'profile' || tab === 'advertisements' || tab === 'create') {
+    if (tab === 'messages' || tab === 'profile' || tab === 'advertisements' || tab === 'favorites' || tab === 'create') {
       setActiveTab(tab)
     }
   }, [searchParams])
@@ -92,9 +93,10 @@ export default function DashboardPage() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const [userData, adsData, catsData, messagesData, unreadData] = await Promise.all([
+      const [userData, adsData, favData, catsData, messagesData, unreadData] = await Promise.all([
         api.getMyProfile(),
         api.getMyAdvertisements(),
+        api.getFavorites(),
         api.getCategories(),
         api.getMessages(),
         api.getUnreadCount(),
@@ -103,6 +105,7 @@ export default function DashboardPage() {
       setProfileData(userData)
       setAuthUser(userData)
       setAdvertisements(adsData)
+      setFavorites(favData)
       setCategories(catsData)
       setMessages(messagesData)
       setUnreadCount(unreadData.count || 0)
@@ -126,9 +129,21 @@ export default function DashboardPage() {
     }
   }
 
+  const loadFavorites = async () => {
+    try {
+      const favData = await api.getFavorites()
+      setFavorites(favData)
+    } catch (err: any) {
+      setError(err.message || 'Chyba pri načítaní obľúbených')
+    }
+  }
+
   useEffect(() => {
     if (activeTab === 'messages') {
       loadMessages()
+    }
+    if (activeTab === 'favorites') {
+      loadFavorites()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, messageFilter])
@@ -479,6 +494,16 @@ export default function DashboardPage() {
               }`}
             >
               Moje inzeráty ({advertisements.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('favorites')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'favorites'
+                  ? 'border-[#1dbf73] text-[#1dbf73]'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Obľúbené inzeráty ({favorites.length})
             </button>
             <button
               onClick={() => {
@@ -934,6 +959,85 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Favorites Tab */}
+        {activeTab === 'favorites' && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">Obľúbené inzeráty</h2>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {favorites.length === 0 ? (
+                <div className="p-12 text-center">
+                  <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 mb-4">Zatiaľ nemáte žiadne obľúbené inzeráty</p>
+                  <p className="text-sm text-gray-400 mb-4">Kliknite na „Uložiť do obľúbených“ pri inzeráte, ktorý sa vám páči</p>
+                  <Link
+                    href="/"
+                    className="inline-block px-4 py-2 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463]"
+                  >
+                    Prehľadať inzeráty
+                  </Link>
+                </div>
+              ) : (
+                favorites.map((fav: any) => {
+                  const ad = fav.advertisement
+                  if (!ad) return null
+                  return (
+                    <div key={fav.id} className="p-6 hover:bg-gray-50 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-lg font-semibold text-gray-900">{ad.title}</h3>
+                            {ad.status && (
+                              <span className={`px-2 py-1 text-xs rounded-full ${
+                                ad.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
+                                ad.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {ad.status === 'ACTIVE' ? 'Aktívny' :
+                                 ad.status === 'PENDING' ? 'Čaká na schválenie' : 'Neaktívny'}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-gray-600 mb-2 line-clamp-2">{ad.description}</p>
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            {ad.price && <span>Cena: {ad.price}€</span>}
+                            {ad.location && <span>Lokalita: {ad.location}</span>}
+                            {ad.category && <span>Kategória: {ad.category.name}</span>}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 ml-4">
+                          <Link
+                            href={`/inzerat/${ad.id}`}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Zobraziť"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Link>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await api.removeFavorite(ad.id)
+                                setFavorites((prev) => prev.filter((f: any) => f.advertisement?.id !== ad.id))
+                              } catch (err: any) {
+                                setError(err.message || 'Chyba pri odstránení')
+                              }
+                            }}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Odstrániť z obľúbených"
+                          >
+                            <Heart className="w-4 h-4 fill-current" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })
               )}
             </div>
           </div>

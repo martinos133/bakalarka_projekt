@@ -70,6 +70,7 @@ model User {
   reports        Report[]    @relation("Reports")
   messagesReceived Message[] @relation("MessageRecipient")
   messagesSent   Message[]   @relation("MessageSender")
+  favorites      Favorite[]
   
   @@index([banned])
   @@index([bannedUntil])
@@ -173,6 +174,7 @@ model Advertisement {
   payments    Payment[]          @relation("AdvertisementOwner")
   reports     Report[]
   messages   Message[]
+  favorites  Favorite[]
   
   @@index([userId])
   @@index([status])
@@ -282,6 +284,20 @@ model Message {
   @@index([status])
   @@index([type])
   @@index([createdAt])
+}
+
+// Obľúbené inzeráty používateľa
+model Favorite {
+  id              String        @id @default(uuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  advertisementId String
+  advertisement   Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  
+  @@unique([userId, advertisementId])
+  @@index([userId])
+  @@index([advertisementId])
 }
 
 // Nastavenia platformy a adminu

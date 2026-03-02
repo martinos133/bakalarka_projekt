@@ -8,7 +8,7 @@ import Footer from '@/components/Footer'
 import ImageCarousel from '@/components/ImageCarousel'
 import { api } from '@/lib/api'
 import { isAuthenticated } from '@/lib/auth'
-import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone } from 'lucide-react'
+import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone, Heart } from 'lucide-react'
 
 interface ServicePackage {
   name: string
@@ -72,6 +72,8 @@ export default function AdvertisementDetailPage({
   const [inquiryContent, setInquiryContent] = useState('')
   const [inquirySubmitting, setInquirySubmitting] = useState(false)
   const [inquirySuccess, setInquirySuccess] = useState(false)
+  const [isFavorite, setIsFavorite] = useState(false)
+  const [favoriteLoading, setFavoriteLoading] = useState(false)
 
   useEffect(() => {
     loadAdvertisement()
@@ -82,10 +84,39 @@ export default function AdvertisementDetailPage({
       setLoading(true)
       const data = await api.getAdvertisement(id)
       setAdvertisement(data)
+      if (isAuthenticated()) {
+        try {
+          const { isFavorite: fav } = await api.checkFavorite(id)
+          setIsFavorite(fav)
+        } catch {
+          setIsFavorite(false)
+        }
+      }
     } catch (error) {
       console.error('Chyba pri načítaní inzerátu:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleToggleFavorite = async () => {
+    if (!isAuthenticated()) {
+      window.location.href = `/signin?redirect=/inzerat/${id}`
+      return
+    }
+    try {
+      setFavoriteLoading(true)
+      if (isFavorite) {
+        await api.removeFavorite(id)
+        setIsFavorite(false)
+      } else {
+        await api.addFavorite(id)
+        setIsFavorite(true)
+      }
+    } catch (err: any) {
+      console.error('Chyba pri obľúbených:', err)
+    } finally {
+      setFavoriteLoading(false)
     }
   }
 
@@ -460,8 +491,17 @@ export default function AdvertisementDetailPage({
                 <button className="w-full bg-[#1dbf73] text-white py-3 rounded-md font-semibold hover:bg-[#19a463] transition-colors mb-4">
                   Pokračovať
                 </button>
-                  <button className="w-full border-2 border-gray-300 text-gray-900 py-3 rounded-md font-semibold hover:border-gray-400 transition-colors mb-4">
-                    Uložiť do obľúbených
+                  <button
+                    onClick={handleToggleFavorite}
+                    disabled={favoriteLoading}
+                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-md font-semibold transition-colors mb-4 ${
+                      isFavorite
+                        ? 'border-2 border-[#1dbf73] bg-[#1dbf73]/10 text-[#1dbf73] hover:bg-[#1dbf73]/20'
+                        : 'border-2 border-gray-300 text-gray-900 hover:border-gray-400'
+                    }`}
+                  >
+                    <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
+                    {isFavorite ? 'V obľúbených' : 'Uložiť do obľúbených'}
                   </button>
                   <button
                     onClick={() => setShowReportModal(true)}

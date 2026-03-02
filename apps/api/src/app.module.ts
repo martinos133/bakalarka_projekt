@@ -11,6 +11,7 @@ import { MessagesModule } from './messages/messages.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { MenuModule } from './menu/menu.module';
 import { SiteConfigModule } from './config/config.module';
+import { FavoritesModule } from './favorites/favorites.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SiteConfigModule } from './config/config.module';
     AnalyticsModule,
     MenuModule,
     SiteConfigModule,
+    FavoritesModule,
   ],
 })
 export class AppModule {}
