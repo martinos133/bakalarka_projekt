@@ -16,6 +16,7 @@ import {
   ChevronDown,
   ChevronRight,
   FolderTree,
+  List,
 } from 'lucide-react'
 
 interface CategoryOption {
@@ -45,7 +46,7 @@ interface FooterSection {
   links: FooterLink[]
 }
 
-type TabType = 'navbar' | 'footer'
+type TabType = 'navbar' | 'footer' | 'categoryNav'
 
 function generateId() {
   return Math.random().toString(36).slice(2, 11)
@@ -58,9 +59,15 @@ export default function DevMenuPage() {
   const [saving, setSaving] = useState(false)
   const [navbarData, setNavbarData] = useState<{ items: NavbarItem[] }>({ items: [] })
   const [footerData, setFooterData] = useState<{ sections: FooterSection[] }>({ sections: [] })
+  const [categoryNavData, setCategoryNavData] = useState<{
+    items: NavbarItem[]
+    visibleCount?: number
+  }>({ items: [], visibleCount: 5 })
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
   const [categories, setCategories] = useState<CategoryOption[]>([])
-  const [showCategoryPicker, setShowCategoryPicker] = useState<'navbar' | string | null>(null)
+  const [showCategoryPicker, setShowCategoryPicker] = useState<
+    'navbar' | 'categoryNav' | string | null
+  >(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   useEffect(() => {
@@ -86,12 +93,16 @@ export default function DevMenuPage() {
   const loadMenu = async () => {
     try {
       setLoading(true)
-      const [navbar, footer] = await Promise.all([
+      const [navbar, footer, categoryNav] = await Promise.all([
         api.getMenu('navbar'),
         api.getMenu('footer'),
+        api.getMenu('categoryNav'),
       ])
       setNavbarData(navbar as { items: NavbarItem[] })
       setFooterData(footer as { sections: FooterSection[] })
+      setCategoryNavData(
+        categoryNav as { items: NavbarItem[]; visibleCount?: number }
+      )
       const sections = (footer as { sections: FooterSection[] }).sections
       setExpandedSections(new Set(sections.map((s) => s.id)))
     } catch (error) {
@@ -158,6 +169,52 @@ export default function DevMenuPage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  const handleSaveCategoryNav = async () => {
+    try {
+      setSaving(true)
+      setSuccessMessage(null)
+      await api.updateMenu('categoryNav', categoryNavData)
+      setSuccessMessage('Zmeny sú uložené')
+      setTimeout(() => setSuccessMessage(null), 3000)
+    } catch (error: any) {
+      alert(error?.message || 'Chyba pri ukladaní navigácie kategórií')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const addCategoryToCategoryNav = (cat: CategoryOption) => {
+    const newItem: NavbarItem = {
+      id: generateId(),
+      label: cat.name,
+      href: `/kategoria/${cat.slug}`,
+      order: categoryNavData.items.length,
+    }
+    setCategoryNavData({
+      ...categoryNavData,
+      items: [...categoryNavData.items, newItem].sort((a, b) => a.order - b.order),
+    })
+    setShowCategoryPicker(null)
+  }
+
+  const updateCategoryNavItem = (id: string, field: keyof NavbarItem, value: string | number) => {
+    setCategoryNavData({
+      ...categoryNavData,
+      items: categoryNavData.items.map((item) =>
+        item.id === id ? { ...item, [field]: value } : item
+      ),
+    })
+  }
+
+  const removeCategoryNavItem = (id: string) => {
+    setCategoryNavData({
+      ...categoryNavData,
+      items: categoryNavData.items
+        .filter((item) => item.id !== id)
+        .map((item, i) => ({ ...item, order: i })),
+    })
   }
 
   const addNavbarItem = () => {
@@ -337,6 +394,17 @@ export default function DevMenuPage() {
               <Layout className="w-5 h-5" />
               Footer
             </button>
+            <button
+              onClick={() => setActiveTab('categoryNav')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                activeTab === 'categoryNav'
+                  ? 'bg-card text-white'
+                  : 'bg-cardHover text-gray-400 hover:text-white'
+              }`}
+            >
+              <List className="w-5 h-5" />
+              Kategórie (pruh)
+            </button>
           </div>
 
           {/* Navbar tab */}
@@ -436,6 +504,146 @@ export default function DevMenuPage() {
                 ))}
                 {navbarData.items.length === 0 && (
                   <p className="text-gray-500 py-4">Žiadne položky. Kliknite na „Pridať položku“.</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* CategoryNav tab */}
+          {activeTab === 'categoryNav' && (
+            <div className="bg-card rounded-lg p-6 border border-dark">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold">Pruh kategórií (pod navbarom)</h2>
+                <div className="flex gap-2">
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowCategoryPicker(
+                          showCategoryPicker === 'categoryNav' ? null : 'categoryNav'
+                        )
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
+                    >
+                      <FolderTree className="w-4 h-4" />
+                      Pridať kategóriu
+                    </button>
+                    {showCategoryPicker === 'categoryNav' && (
+                      <div
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-dark border border-dark rounded-lg shadow-lg z-20"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {categories.length === 0 ? (
+                          <p className="p-3 text-gray-500 text-sm">Žiadne kategórie</p>
+                        ) : (
+                          categories.map((cat) => (
+                            <button
+                              key={cat.id}
+                              onClick={() => addCategoryToCategoryNav(cat)}
+                              className="w-full text-left px-3 py-2 hover:bg-cardHover text-sm flex items-center gap-2"
+                            >
+                              {cat.parentName ? (
+                                <>
+                                  <span className="text-gray-500">{cat.parentName}</span>
+                                  <span>→</span>
+                                  <span>{cat.name}</span>
+                                </>
+                              ) : (
+                                <span>{cat.name}</span>
+                              )}
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => {
+                      const newItem: NavbarItem = {
+                        id: generateId(),
+                        label: 'Nová položka',
+                        href: '#',
+                        order: categoryNavData.items.length,
+                      }
+                      setCategoryNavData({
+                        ...categoryNavData,
+                        items: [...categoryNavData.items, newItem].sort(
+                          (a, b) => a.order - b.order
+                        ),
+                      })
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463] transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Pridať položku
+                  </button>
+                  <button
+                    onClick={handleSaveCategoryNav}
+                    disabled={saving}
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors disabled:opacity-50"
+                  >
+                    <Save className="w-4 h-4" />
+                    {saving ? 'Ukladám...' : 'Uložiť'}
+                  </button>
+                </div>
+              </div>
+              <div className="mb-4 flex items-center gap-2">
+                <label className="text-gray-400 text-sm">
+                  Počet zobrazených pred „Viac“:
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={categoryNavData.visibleCount ?? 5}
+                  onChange={(e) =>
+                    setCategoryNavData({
+                      ...categoryNavData,
+                      visibleCount: Math.max(1, parseInt(e.target.value) || 5),
+                    })
+                  }
+                  className="w-20 bg-card border border-dark rounded px-3 py-2 text-white text-sm"
+                />
+              </div>
+              <div className="space-y-3">
+                {categoryNavData.items.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-3 p-3 bg-dark rounded-lg border border-dark"
+                  >
+                    <GripVertical className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                    <span className="text-gray-500 w-8">{index + 1}.</span>
+                    <input
+                      type="text"
+                      value={item.label}
+                      onChange={(e) =>
+                        updateCategoryNavItem(item.id, 'label', e.target.value)
+                      }
+                      className="flex-1 bg-card border border-dark rounded px-3 py-2 text-white placeholder-gray-500"
+                      placeholder="Názov"
+                    />
+                    <input
+                      type="text"
+                      value={item.href}
+                      onChange={(e) =>
+                        updateCategoryNavItem(item.id, 'href', e.target.value)
+                      }
+                      className="flex-1 bg-card border border-dark rounded px-3 py-2 text-white placeholder-gray-500"
+                      placeholder="Odkaz (href)"
+                    />
+                    <button
+                      onClick={() => removeCategoryNavItem(item.id)}
+                      className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded transition-colors"
+                      title="Odstrániť"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+                {categoryNavData.items.length === 0 && (
+                  <p className="text-gray-500 py-4">
+                    Žiadne položky. Kliknite na „Pridať kategóriu“ alebo „Pridať položku“.
+                  </p>
                 )}
               </div>
             </div>

@@ -59,8 +59,9 @@ export async function fetchAPI(url: string, options: RequestInit = {}) {
 
 export const api = {
   // Public endpoints
-  getNavbar: () => fetchAPI('/menu/navbar'),
-  getFooter: () => fetchAPI('/menu/footer'),
+  getNavbar: () => fetchAPI('/menu/navbar', { cache: 'no-store' }),
+  getFooter: () => fetchAPI('/menu/footer', { cache: 'no-store' }),
+  getCategoryNav: () => fetchAPI('/menu/categoryNav', { cache: 'no-store' }),
   getPopularServices: () => fetchAPI('/advertisements/popular/services'),
   getAdvertisement: (id: string) => fetchAPI(`/advertisements/${id}`),
   getCategories: () => fetchAPI('/categories/active'),

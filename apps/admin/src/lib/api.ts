@@ -166,8 +166,9 @@ export const api = {
   },
   getClickBreakdown: (period: '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m' = '30d') =>
     fetchWithAuth(`/analytics/stats/breakdown?period=${period}`),
-  getMenu: (type: 'navbar' | 'footer') => fetchWithAuth(`/menu/${type}`),
-  updateMenu: (type: 'navbar' | 'footer', data: object) =>
+  getMenu: (type: 'navbar' | 'footer' | 'categoryNav') =>
+    fetchWithAuth(`/menu/${type}`),
+  updateMenu: (type: 'navbar' | 'footer' | 'categoryNav', data: object) =>
     fetchWithAuth(`/menu/${type}`, {
       method: 'PUT',
       body: JSON.stringify(data),

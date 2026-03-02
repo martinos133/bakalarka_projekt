@@ -1,24 +1,48 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
+import { api } from '@/lib/api'
+
+interface CategoryNavItem {
+  id: string
+  label: string
+  href: string
+  order: number
+}
 
 export default function CategoryNav() {
+  const pathname = usePathname()
   const [showMore, setShowMore] = useState(false)
+  const [items, setItems] = useState<CategoryNavItem[]>([])
+  const [visibleCount, setVisibleCount] = useState(5)
 
-  const categories = [
-    'Grafika a dizajn',
-    'Programovanie a technológie',
-    'Digitálny marketing',
-    'Video a animácia',
-    'Písanie a preklad',
-    'Hudba a audio',
-    'Podnikanie',
-    'Dáta',
-    'Fotografia',
-    'Životný štýl',
-  ]
+  const fetchCategoryNav = () => {
+    api
+      .getCategoryNav()
+      .then((data: { items: CategoryNavItem[]; visibleCount?: number }) => {
+        setItems((data.items || []).sort((a, b) => a.order - b.order))
+        const count = Number(data.visibleCount)
+        setVisibleCount(!isNaN(count) && count >= 1 ? count : 5)
+      })
+      .catch(() => {})
+  }
 
-  const visibleCategories = showMore ? categories : categories.slice(0, 5)
+  useEffect(() => {
+    fetchCategoryNav()
+  }, [pathname])
+
+  useEffect(() => {
+    const onFocus = () => fetchCategoryNav()
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
+  }, [])
+
+  const visibleItems = showMore ? items : items.slice(0, visibleCount)
+  const hasMore = items.length > visibleCount
+
+  if (items.length === 0) return null
 
   return (
     <nav className="bg-white border-b border-gray-200">
@@ -34,17 +58,18 @@ export default function CategoryNav() {
             </svg>
             <span className="text-sm">Trendy</span>
           </div>
-          {visibleCategories.map((category, index) => (
-            <a
-              key={index}
-              href="#"
+          {visibleItems.map((item) => (
+            <Link
+              key={item.id}
+              href={item.href}
               className="text-sm text-gray-700 hover:text-[#1dbf73] transition-colors whitespace-nowrap py-3 border-b-2 border-transparent hover:border-[#1dbf73] flex-shrink-0"
             >
-              {category}
-            </a>
+              {item.label}
+            </Link>
           ))}
-          {!showMore && (
+          {hasMore && !showMore && (
             <button
+              type="button"
               onClick={() => setShowMore(true)}
               className="flex items-center gap-1 text-sm text-gray-700 hover:text-[#1dbf73] transition-colors whitespace-nowrap py-3 flex-shrink-0"
             >

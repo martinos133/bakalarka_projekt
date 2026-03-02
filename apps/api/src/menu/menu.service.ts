@@ -23,6 +23,7 @@ export interface FooterSection {
 
 export type NavbarData = { items: NavbarItem[] };
 export type FooterData = { sections: FooterSection[] };
+export type CategoryNavData = { items: NavbarItem[]; visibleCount?: number };
 
 const DEFAULT_NAVBAR: NavbarData = {
   items: [
@@ -91,9 +92,28 @@ const DEFAULT_FOOTER: FooterData = {
   ],
 };
 
+const DEFAULT_CATEGORY_NAV: CategoryNavData = {
+  items: [
+    { id: '1', label: 'Grafika a dizajn', href: '/kategoria/grafika-a-dizajn', order: 0 },
+    { id: '2', label: 'Programovanie a technológie', href: '/kategoria/programovanie-a-technologie', order: 1 },
+    { id: '3', label: 'Digitálny marketing', href: '/kategoria/digitalny-marketing', order: 2 },
+    { id: '4', label: 'Video a animácia', href: '/kategoria/video-a-animacia', order: 3 },
+    { id: '5', label: 'Písanie a preklad', href: '/kategoria/pisanie-a-preklad', order: 4 },
+    { id: '6', label: 'Hudba a audio', href: '/kategoria/hudba-a-audio', order: 5 },
+    { id: '7', label: 'Podnikanie', href: '/kategoria/podnikanie', order: 6 },
+    { id: '8', label: 'Dáta', href: '/kategoria/data', order: 7 },
+    { id: '9', label: 'Fotografia', href: '/kategoria/fotografia', order: 8 },
+    { id: '10', label: 'Životný štýl', href: '/kategoria/zivotny-styl', order: 9 },
+  ],
+  visibleCount: 5,
+};
+
 @Injectable()
 export class MenuService {
-  private async getOrCreate(type: 'navbar' | 'footer', defaultData: NavbarData | FooterData) {
+  private async getOrCreate(
+    type: 'navbar' | 'footer' | 'categoryNav',
+    defaultData: NavbarData | FooterData | CategoryNavData
+  ) {
     let menu = await prisma.siteMenu.findUnique({
       where: { type },
     });
@@ -120,16 +140,24 @@ export class MenuService {
     return menu.data as FooterData;
   }
 
-  async getMenu(type: 'navbar' | 'footer'): Promise<NavbarData | FooterData> {
+  async getCategoryNav(): Promise<CategoryNavData> {
+    const menu = await this.getOrCreate('categoryNav', DEFAULT_CATEGORY_NAV);
+    return menu.data as CategoryNavData;
+  }
+
+  async getMenu(
+    type: 'navbar' | 'footer' | 'categoryNav'
+  ): Promise<NavbarData | FooterData | CategoryNavData> {
     if (type === 'navbar') return this.getNavbar();
     if (type === 'footer') return this.getFooter();
-    throw new BadRequestException('Neplatný typ menu. Povolené: navbar, footer');
+    if (type === 'categoryNav') return this.getCategoryNav();
+    throw new BadRequestException('Neplatný typ menu. Povolené: navbar, footer, categoryNav');
   }
 
   async updateMenu(
-    type: 'navbar' | 'footer',
-    data: NavbarData | FooterData,
-  ): Promise<NavbarData | FooterData> {
+    type: 'navbar' | 'footer' | 'categoryNav',
+    data: NavbarData | FooterData | CategoryNavData,
+  ): Promise<NavbarData | FooterData | CategoryNavData> {
     if (type === 'navbar') {
       const validated = data as NavbarData;
       if (!Array.isArray(validated.items)) {
@@ -140,6 +168,11 @@ export class MenuService {
       if (!Array.isArray(validated.sections)) {
         throw new BadRequestException('Footer musí obsahovať pole sections');
       }
+    } else if (type === 'categoryNav') {
+      const validated = data as CategoryNavData;
+      if (!Array.isArray(validated.items)) {
+        throw new BadRequestException('CategoryNav musí obsahovať pole items');
+      }
     }
 
     const menu = await prisma.siteMenu.upsert({
@@ -148,6 +181,6 @@ export class MenuService {
       update: { data: data as object },
     });
 
-    return menu.data as NavbarData | FooterData;
+    return menu.data as NavbarData | FooterData | CategoryNavData;
   }
 }
