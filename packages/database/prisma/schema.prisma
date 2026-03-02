@@ -279,6 +279,14 @@ model Message {
   @@index([createdAt])
 }
 
+// Menu – navbar a footer položky (editovateľné v admin paneli)
+model SiteMenu {
+  id        String   @id @default(uuid())
+  type      String   @unique // 'navbar' | 'footer'
+  data      Json     // Štruktúra závisí od typu
+  updatedAt DateTime @updatedAt
+}
+
 // Monitoring kliknutí – ženy, muži, firmy, fyzické osoby
 model ClickEvent {
   id          String   @id @default(uuid())

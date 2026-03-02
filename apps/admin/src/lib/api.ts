@@ -16,6 +16,18 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
     })
 
     if (!response.ok) {
+      // Ak je 401 Unauthorized, vymaž token a presmeruj na login
+      if (response.status === 401) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('admin_token')
+          localStorage.removeItem('admin_user')
+          // Presmerovanie na login stránku iba ak nie sme už na login stránke
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login'
+          }
+        }
+      }
+
       let errorMessage = `API error: ${response.statusText}`
       try {
         const errorData = await response.json()
@@ -154,6 +166,12 @@ export const api = {
   },
   getClickBreakdown: (period: '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m' = '30d') =>
     fetchWithAuth(`/analytics/stats/breakdown?period=${period}`),
+  getMenu: (type: 'navbar' | 'footer') => fetchWithAuth(`/menu/${type}`),
+  updateMenu: (type: 'navbar' | 'footer', data: object) =>
+    fetchWithAuth(`/menu/${type}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
 }
 
 export default api

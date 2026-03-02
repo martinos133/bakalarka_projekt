@@ -59,7 +59,7 @@ const navigation: NavSection[] = [
       { label: 'Kategórie', path: '/dashboard/dev/categories', icon: FolderTree },
       { label: 'Inzeráty', path: '/dashboard/dev/advertisements', icon: FileText },
       { label: 'Filtre', path: '/dashboard/dev/filters', icon: Filter },
-      { label: 'Navbar', path: '/dashboard/dev/navbar', icon: Navigation },
+      { label: 'Menu', path: '/dashboard/dev/menu', icon: Navigation },
       { label: 'Komponenty', path: '/dashboard/dev/components', icon: Boxes },
       { label: 'Konfigurácia', path: '/dashboard/dev/config', icon: Sliders },
     ],

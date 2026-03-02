@@ -6,18 +6,32 @@ import { isAuthenticated, getAuthUser, setAuthUser, logout } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { User, LogOut, ChevronDown } from 'lucide-react'
 
+interface NavbarItem {
+  id: string
+  label: string
+  href: string
+  order: number
+}
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [mounted, setMounted] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [navbarItems, setNavbarItems] = useState<NavbarItem[]>([])
 
   useEffect(() => {
     setMounted(true)
     if (isAuthenticated()) {
       setUser(getAuthUser())
     }
+  }, [])
+
+  useEffect(() => {
+    api.getNavbar().then((data: { items: NavbarItem[] }) => {
+      setNavbarItems((data.items || []).sort((a, b) => a.order - b.order))
+    }).catch(() => {})
   }, [])
 
   // Pri každom načítaní stránky (keď je používateľ prihlásený) stiahneme profil z API
@@ -125,48 +139,15 @@ export default function Header() {
 
           {/* Right side - Navigation */}
           <nav className="hidden lg:flex items-center gap-6 flex-shrink-0">
-            <div className="relative group">
-              <button className="flex items-center gap-1 text-gray-900 hover:text-[#1dbf73] transition-colors text-sm font-medium">
-                RentMe Pro
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-            </div>
-            <div className="relative group">
-              <button className="flex items-center gap-1 text-gray-900 hover:text-[#1dbf73] transition-colors text-sm font-medium">
-                Preskúmať
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-            </div>
-            <Link
-              href="/become-seller"
-              className="text-gray-900 hover:text-[#1dbf73] transition-colors text-sm font-medium"
-            >
-              Stať sa predajcom
-            </Link>
+            {navbarItems.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                className="text-gray-900 hover:text-[#1dbf73] transition-colors text-sm font-medium"
+              >
+                {item.label}
+              </Link>
+            ))}
             {mounted && user ? (
               <div className="relative">
                 <button
@@ -291,44 +272,16 @@ export default function Header() {
       {isMenuOpen && (
         <div className="lg:hidden border-t border-gray-200 bg-white">
           <div className="px-4 py-4 space-y-3">
-            <button className="flex items-center justify-between w-full text-gray-900">
-              RentMe Pro
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {navbarItems.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                className="block text-gray-900"
+                onClick={() => setIsMenuOpen(false)}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-            <button className="flex items-center justify-between w-full text-gray-900">
-              Preskúmať
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-            <Link
-              href="/become-seller"
-              className="block text-gray-900"
-            >
-              Stať sa predajcom
-            </Link>
+                {item.label}
+              </Link>
+            ))}
           </div>
         </div>
       )}

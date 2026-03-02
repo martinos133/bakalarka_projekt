@@ -1,109 +1,56 @@
 'use client'
 
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import { api } from '@/lib/api'
+
+interface FooterLink {
+  id: string
+  label: string
+  href: string
+}
+
+interface FooterSection {
+  id: string
+  key: string
+  title: string
+  links: FooterLink[]
+}
 
 export default function Footer() {
-  const footerLinks = {
-    categories: [
-      'Grafika a dizajn',
-      'Digitálny marketing',
-      'Písanie a preklad',
-      'Video a animácia',
-      'Hudba a audio',
-      'Programovanie a technológie',
-      'Podnikanie',
-      'Životný štýl',
-    ],
-    about: [
-      'Kariéra',
-      'Tlačové správy',
-      'Partnerstvá',
-      'Zásady ochrany súkromia',
-      'Podmienky služby',
-      'Nároky na duševné vlastníctvo',
-      'Vzťahy s investormi',
-    ],
-    support: [
-      'Pomoc a podpora',
-      'Dôvera a bezpečnosť',
-      'Predaj na RentMe',
-      'Nákup na RentMe',
-      'Sprievodcovia RentMe',
-    ],
-    community: [
-      'Udalosti',
-      'Blog',
-      'Podcast',
-      'Pozvať priateľa',
-      'Stať sa predajcom',
-      'Komunitné štandardy',
-    ],
+  const [sections, setSections] = useState<FooterSection[]>([])
+
+  useEffect(() => {
+    api.getFooter().then((data: { sections: FooterSection[] }) => {
+      setSections(data.sections || [])
+    }).catch(() => {})
+  }, [])
+
+  if (sections.length === 0) {
+    return null
   }
 
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
-          <div>
-            <h3 className="font-semibold mb-4">Kategórie</h3>
-            <ul className="space-y-2">
-              {footerLinks.categories.map((link, index) => (
-                <li key={index}>
-                  <Link
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors text-sm"
-                  >
-                    {link}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-4">O nás</h3>
-            <ul className="space-y-2">
-              {footerLinks.about.map((link, index) => (
-                <li key={index}>
-                  <Link
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors text-sm"
-                  >
-                    {link}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-4">Podpora</h3>
-            <ul className="space-y-2">
-              {footerLinks.support.map((link, index) => (
-                <li key={index}>
-                  <Link
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors text-sm"
-                  >
-                    {link}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-4">Komunita</h3>
-            <ul className="space-y-2">
-              {footerLinks.community.map((link, index) => (
-                <li key={index}>
-                  <Link
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors text-sm"
-                  >
-                    {link}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {sections.map((section) => (
+            <div key={section.id}>
+              <h3 className="font-semibold mb-4">{section.title}</h3>
+              <ul className="space-y-2">
+                {section.links.map((link) => (
+                  <li key={link.id}>
+                    <Link
+                      href={link.href}
+                      className="text-gray-400 hover:text-white transition-colors text-sm"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
           <div>
             <h3 className="font-semibold mb-4">Sledujte nás</h3>
             <div className="flex gap-4 mb-4">

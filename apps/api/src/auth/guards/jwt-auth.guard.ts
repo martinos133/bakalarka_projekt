@@ -1,4 +1,4 @@
-import { Injectable, ExecutionContext } from '@nestjs/common';
+import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 
@@ -10,7 +10,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
   handleRequest(err: any, user: any, info: any) {
     if (err || !user) {
-      throw err || new Error('Unauthorized');
+      if (info?.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token expiroval');
+      }
+      if (info?.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Neplatný token');
+      }
+      throw err || new UnauthorizedException('Nie ste autorizovaní');
     }
     return user;
   }

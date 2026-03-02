@@ -59,6 +59,8 @@ export async function fetchAPI(url: string, options: RequestInit = {}) {
 
 export const api = {
   // Public endpoints
+  getNavbar: () => fetchAPI('/menu/navbar'),
+  getFooter: () => fetchAPI('/menu/footer'),
   getPopularServices: () => fetchAPI('/advertisements/popular/services'),
   getAdvertisement: (id: string) => fetchAPI(`/advertisements/${id}`),
   getCategories: () => fetchAPI('/categories/active'),
