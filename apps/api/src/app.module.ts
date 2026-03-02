@@ -10,6 +10,7 @@ import { ReportsModule } from './reports/reports.module';
 import { MessagesModule } from './messages/messages.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { MenuModule } from './menu/menu.module';
+import { SiteConfigModule } from './config/config.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { MenuModule } from './menu/menu.module';
     MessagesModule,
     AnalyticsModule,
     MenuModule,
+    SiteConfigModule,
   ],
 })
 export class AppModule {}

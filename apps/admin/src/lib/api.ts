@@ -168,6 +168,12 @@ export const api = {
     fetchWithAuth(`/analytics/stats/breakdown?period=${period}`),
   getMenu: (type: 'navbar' | 'footer' | 'categoryNav') =>
     fetchWithAuth(`/menu/${type}`),
+  getConfig: (key: 'platform' | 'admin') => fetchWithAuth(`/config/${key}`),
+  updateConfig: (key: 'platform' | 'admin', data: object) =>
+    fetchWithAuth(`/config/${key}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
   updateMenu: (type: 'navbar' | 'footer' | 'categoryNav', data: object) =>
     fetchWithAuth(`/menu/${type}`, {
       method: 'PUT',
