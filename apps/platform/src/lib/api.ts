@@ -126,6 +126,13 @@ export const api = {
     return fetchWithAuth(`/messages?${params.toString()}`)
   },
   getMessage: (id: string) => fetchWithAuth(`/messages/${id}`),
+  getConversation: (id: string) =>
+    fetchWithAuth(`/messages/${id}/conversation`),
+  createReply: (messageId: string, content: string, attachments?: string[]) =>
+    fetchWithAuth(`/messages/${messageId}/reply`, {
+      method: 'POST',
+      body: JSON.stringify({ content, attachments: attachments || [] }),
+    }),
   getUnreadCount: () => fetchWithAuth('/messages/unread/count'),
   markAsRead: (id: string) => fetchWithAuth(`/messages/${id}/read`, {
     method: 'PATCH',

@@ -117,7 +117,7 @@ export class MessagesService {
 
   async findAll(userId: string, status?: MessageStatus, type?: MessageType) {
     const where: any = {
-      recipientId: userId,
+      OR: [{ recipientId: userId }, { senderId: userId, type: 'INQUIRY' as any }],
     };
 
     if (status) {
@@ -128,10 +128,18 @@ export class MessagesService {
       where.type = type;
     }
 
-    return prisma.message.findMany({
+    const all = await prisma.message.findMany({
       where,
       include: {
         sender: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        recipient: {
           select: {
             id: true,
             email: true,
@@ -151,6 +159,18 @@ export class MessagesService {
         createdAt: 'desc',
       },
     });
+
+    const inquiryIds = new Set<string>()
+    const result: typeof all = []
+    for (const m of all) {
+      if (m.type === 'INQUIRY') {
+        const rootId = (m as any).parentId || m.id
+        if (inquiryIds.has(rootId)) continue
+        inquiryIds.add(rootId)
+      }
+      result.push(m)
+    }
+    return result
   }
 
   async findOne(userId: string, id: string) {
@@ -240,6 +260,160 @@ export class MessagesService {
       where: { id },
       data: {
         status: 'ARCHIVED' as any,
+      },
+    });
+  }
+
+  async getConversation(userId: string, messageId: string) {
+    const message = await prisma.message.findUnique({
+      where: { id: messageId },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        advertisement: {
+          select: {
+            id: true,
+            title: true,
+            images: true,
+          },
+        },
+      },
+    });
+
+    if (!message) {
+      throw new NotFoundException('Správa nebola nájdená');
+    }
+
+    const rootId = message.parentId || message.id;
+    const root = await prisma.message.findUnique({
+      where: { id: rootId },
+    });
+
+    if (!root) {
+      throw new NotFoundException('Konverzácia nebola nájdená');
+    }
+
+    const isParticipant =
+      root.senderId === userId || root.recipientId === userId;
+    if (!isParticipant) {
+      throw new ForbiddenException('Nemáte oprávnenie zobraziť túto konverzáciu');
+    }
+
+    const messages = await prisma.message.findMany({
+      where: {
+        OR: [{ id: rootId }, { parentId: rootId }],
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        advertisement: {
+          select: {
+            id: true,
+            title: true,
+            images: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    for (const msg of messages) {
+      if (msg.recipientId === userId && msg.status !== 'READ') {
+        await prisma.message.update({
+          where: { id: msg.id },
+          data: { status: 'READ' as any, readAt: new Date() },
+        });
+      }
+    }
+
+    return messages.map((m) => ({
+      ...m,
+      status: m.recipientId === userId ? 'READ' : m.status,
+    }));
+  }
+
+  async createReply(
+    userId: string,
+    parentId: string,
+    content: string,
+    attachments: string[] = [],
+  ) {
+    const parent = await prisma.message.findUnique({
+      where: { id: parentId },
+      include: {
+        advertisement: true,
+      },
+    });
+
+    if (!parent) {
+      throw new NotFoundException('Správa nebola nájdená');
+    }
+
+    const rootId = parent.parentId || parent.id;
+    const root = await prisma.message.findUnique({
+      where: { id: rootId },
+    });
+
+    if (!root) {
+      throw new NotFoundException('Koreňová správa nebola nájdená');
+    }
+
+    const isParticipant =
+      root.senderId === userId || root.recipientId === userId;
+    if (!isParticipant) {
+      throw new ForbiddenException('Nemáte oprávnenie odpovedať na túto správu');
+    }
+
+    const recipientId =
+      parent.senderId === userId ? parent.recipientId : parent.senderId;
+
+    if (!recipientId) {
+      throw new ForbiddenException('Nemôžete odpovedať na túto správu');
+    }
+
+    const safeAttachments = Array.isArray(attachments)
+      ? attachments.slice(0, 5).filter((a) => typeof a === 'string' && a.length < 5_000_000)
+      : [];
+
+    return prisma.message.create({
+      data: {
+        type: 'INQUIRY' as any,
+        subject: parent.subject,
+        content: content.trim(),
+        recipientId,
+        senderId: userId,
+        advertisementId: parent.advertisementId,
+        parentId: rootId,
+        attachments: safeAttachments,
+      } as any,
+      include: {
+        sender: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        advertisement: {
+          select: {
+            id: true,
+            title: true,
+            images: true,
+          },
+        },
       },
     });
   }

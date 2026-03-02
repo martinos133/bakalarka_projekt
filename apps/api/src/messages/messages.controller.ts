@@ -48,6 +48,30 @@ export class MessagesController {
     return { count: await this.messagesService.getUnreadCount(req.user.userId) };
   }
 
+  @Get(':id/conversation')
+  @ApiOperation({ summary: 'Získať celú konverzáciu (chat)' })
+  async getConversation(
+    @Request() req,
+    @Param('id') id: string,
+  ) {
+    return this.messagesService.getConversation(req.user.userId, id);
+  }
+
+  @Post(':id/reply')
+  @ApiOperation({ summary: 'Odpovedať na správu v konverzácii' })
+  async createReply(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() body: { content?: string; attachments?: string[] },
+  ) {
+    return this.messagesService.createReply(
+      req.user.userId,
+      id,
+      body.content || '',
+      body.attachments || [],
+    );
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Získať detail správy' })
   async findOne(

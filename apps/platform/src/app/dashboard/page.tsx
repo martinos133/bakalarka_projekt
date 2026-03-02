@@ -1,16 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { api } from '@/lib/api'
 import { isAuthenticated, getAuthUser, setAuthUser } from '@/lib/auth'
-import { User, Building2, Eye, EyeOff, Plus, Edit, Trash2, Save, X, Lock, Mail, Phone, MapPin, Calendar, Briefcase, Image as ImageIcon, MessageSquare, Archive, CheckCircle } from 'lucide-react'
+import { User, Building2, Eye, EyeOff, Plus, Edit, Trash2, Save, X, Lock, Mail, Phone, MapPin, Calendar, Briefcase, Image as ImageIcon, MessageSquare, Archive, CheckCircle, Paperclip, FileText, Download } from 'lucide-react'
 import Link from 'next/link'
 
 export default function DashboardPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState<'profile' | 'advertisements' | 'create' | 'messages'>('profile')
   const [user, setUser] = useState<any>(null)
@@ -18,6 +19,10 @@ export default function DashboardPage() {
   const [messages, setMessages] = useState<any[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [selectedMessage, setSelectedMessage] = useState<any>(null)
+  const [conversationMessages, setConversationMessages] = useState<any[]>([])
+  const [replyContent, setReplyContent] = useState('')
+  const [replyAttachments, setReplyAttachments] = useState<string[]>([])
+  const [replySubmitting, setReplySubmitting] = useState(false)
   const [messageFilter, setMessageFilter] = useState<'all' | 'unread' | 'inquiry' | 'system'>('all')
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -75,6 +80,13 @@ export default function DashboardPage() {
     loadData()
   }, [router])
 
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab === 'messages' || tab === 'profile' || tab === 'advertisements' || tab === 'create') {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
+
   const loadData = async () => {
     try {
       setLoading(true)
@@ -121,14 +133,63 @@ export default function DashboardPage() {
 
   const handleMessageClick = async (message: any) => {
     try {
-      const fullMessage = await api.getMessage(message.id)
-      setSelectedMessage(fullMessage)
-      if (fullMessage.status === 'UNREAD') {
-        await api.markAsRead(message.id)
-        loadMessages()
+      setSelectedMessage(message)
+      setReplyContent('')
+      setReplyAttachments([])
+      if (message.type === 'INQUIRY') {
+        const conv = await api.getConversation(message.id)
+        setConversationMessages(conv)
+        if (message.status === 'UNREAD') {
+          await api.markAsRead(message.id)
+          loadMessages()
+        }
+      } else {
+        const fullMessage = await api.getMessage(message.id)
+        setSelectedMessage(fullMessage)
+        setConversationMessages([])
+        if (fullMessage.status === 'UNREAD') {
+          await api.markAsRead(message.id)
+          loadMessages()
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Chyba pri načítaní správy')
+    }
+  }
+
+  const handleReplyFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || replyAttachments.length >= 5) return
+    Array.from(files).slice(0, 5 - replyAttachments.length).forEach((file) => {
+      if (file.size > 5 * 1024 * 1024) return
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const result = reader.result as string
+        if (result && result.length < 6_000_000) {
+          setReplyAttachments((prev) => [...prev, result].slice(0, 5))
+        }
+      }
+      reader.readAsDataURL(file)
+    })
+    e.target.value = ''
+  }
+
+  const handleSendReply = async () => {
+    if (!selectedMessage || conversationMessages.length === 0) return
+    if (!replyContent.trim() && replyAttachments.length === 0) return
+    const rootMsg = conversationMessages.find((m) => !m.parentId) || conversationMessages[0]
+    const rootId = rootMsg.id
+    try {
+      setReplySubmitting(true)
+      const newMsg = await api.createReply(rootId, replyContent.trim(), replyAttachments)
+      setConversationMessages((prev) => [...prev, newMsg])
+      setReplyContent('')
+      setReplyAttachments([])
+      loadMessages()
+    } catch (err: any) {
+      setError(err.message || 'Chyba pri odoslaní odpovede')
+    } finally {
+      setReplySubmitting(false)
     }
   }
 
@@ -1407,99 +1468,299 @@ export default function DashboardPage() {
             </div>
 
             {/* Message Detail */}
-            <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col">
               {selectedMessage ? (
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Detail správy</h3>
-                    <button
-                      onClick={() => setSelectedMessage(null)}
-                      className="text-gray-400 hover:text-gray-600"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <div className="mb-4">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${getMessageTypeColor(selectedMessage.type)}`}>
-                      {getMessageTypeLabel(selectedMessage.type)}
-                    </span>
-                  </div>
-                  <h4 className="font-medium text-gray-900 mb-2">{selectedMessage.subject}</h4>
-                  {selectedMessage.sender && (
-                    <p className="text-sm text-gray-600 mb-2">
-                      Od: {selectedMessage.sender.firstName} {selectedMessage.sender.lastName} ({selectedMessage.sender.email})
-                    </p>
-                  )}
-                  {selectedMessage.advertisement && (
-                    <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                      <p className="text-sm font-medium text-gray-900 mb-1">Súvisiaci inzerát:</p>
-                      <Link href={`/inzerat/${selectedMessage.advertisement.id}`} className="text-sm text-[#1dbf73] hover:underline">
-                        {selectedMessage.advertisement.title}
-                      </Link>
+                selectedMessage.type === 'INQUIRY' && conversationMessages.length > 0 ? (
+                  /* Chat view pre Dotaz na inzerát */
+                  <div className="flex flex-col flex-1 min-h-0">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-gray-900">Konverzácia</h3>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={async () => {
+                            const root = conversationMessages.find((m) => !m.parentId) || conversationMessages[0]
+                            if (root) {
+                              await handleMarkAsArchived(root.id)
+                              setSelectedMessage(null)
+                              setConversationMessages([])
+                            }
+                          }}
+                          className="p-2 text-gray-400 hover:text-gray-600"
+                          title="Archivovať"
+                        >
+                          <Archive className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedMessage(null)
+                            setConversationMessages([])
+                          }}
+                          className="p-2 text-gray-400 hover:text-gray-600"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
-                  )}
-                  <div className="text-sm text-gray-700 whitespace-pre-wrap mb-4">
-                    {selectedMessage.content}
-                  </div>
-                  {selectedMessage.metadata && (
-                    <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                      <p className="text-xs text-gray-600">
-                        {selectedMessage.metadata.banDuration && (
-                          <>
-                            Trvanie banu: {selectedMessage.metadata.banDuration === 'permanent' 
-                              ? 'Trvalo' 
-                              : `${selectedMessage.metadata.banDurationValue} ${
-                                  selectedMessage.metadata.banDuration === 'minutes' ? 'minút' :
-                                  selectedMessage.metadata.banDuration === 'hours' ? 'hodín' :
-                                  selectedMessage.metadata.banDuration === 'days' ? 'dní' :
-                                  selectedMessage.metadata.banDuration === 'months' ? 'mesiacov' :
-                                  selectedMessage.metadata.banDuration
-                                }`}
-                            {selectedMessage.metadata.bannedUntil && (
-                              <> (do {new Date(selectedMessage.metadata.bannedUntil).toLocaleDateString('sk-SK', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })})</>
-                            )}
-                          </>
-                        )}
-                      </p>
+                    {conversationMessages[0]?.advertisement && (
+                      <div className="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <p className="text-xs font-medium text-gray-500 mb-1">Inzerát:</p>
+                        <Link href={`/inzerat/${conversationMessages[0].advertisement.id}`} className="text-sm text-[#1dbf73] hover:underline">
+                          {conversationMessages[0].advertisement.title}
+                        </Link>
+                      </div>
+                    )}
+                    <div className="flex-1 overflow-y-auto space-y-3 mb-4 max-h-[320px] min-h-[200px]">
+                      {conversationMessages.map((msg) => {
+                        const isMe = msg.senderId === user?.id
+                        return (
+                          <div
+                            key={msg.id}
+                            className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+                          >
+                            <div
+                              className={`max-w-[85%] rounded-lg px-4 py-2 ${
+                                isMe
+                                  ? 'bg-[#1dbf73] text-white'
+                                  : 'bg-gray-100 text-gray-900'
+                              }`}
+                            >
+                              {!isMe && msg.sender && (
+                                <p className="text-xs font-medium text-gray-500 mb-1">
+                                  {msg.sender.firstName} {msg.sender.lastName}
+                                </p>
+                              )}
+                              {msg.content && (
+                                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                              )}
+                              {msg.attachments && msg.attachments.length > 0 && (
+                                <div className="mt-2 space-y-2 flex flex-wrap gap-2">
+                                  {msg.attachments.map((att: string, i: number) => {
+                                    const isImage = /^data:image\//i.test(att)
+                                    const mime = att.match(/^data:([^;]+)/)?.[1] || ''
+                                    const isPdf = mime.includes('pdf')
+                                    const isWord = mime.includes('word') || mime.includes('msword') || mime.includes('document')
+                                    return isImage ? (
+                                      <a
+                                        key={i}
+                                        href={att}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-200 ring-1 ring-black/5 hover:ring-black/10"
+                                      >
+                                        <img
+                                          src={att}
+                                          alt={`Fotka ${i + 1}`}
+                                          className="max-w-[220px] max-h-[200px] w-auto h-auto object-cover block"
+                                        />
+                                      </a>
+                                    ) : (
+                                      <a
+                                        key={i}
+                                        href={att}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        download
+                                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                                          isMe
+                                            ? 'bg-white/95 text-gray-800 hover:bg-white shadow-sm hover:shadow'
+                                            : 'bg-white text-gray-800 border border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                                        } min-w-[180px]`}
+                                      >
+                                        <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+                                          isMe ? 'bg-[#1dbf73]/15 text-[#1dbf73]' : 'bg-gray-100 text-gray-600'
+                                        }`}>
+                                          <FileText className="w-5 h-5" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-sm font-semibold text-gray-900 truncate">
+                                            {isPdf ? 'PDF dokument' : isWord ? 'Word dokument' : 'Príloha'}
+                                          </p>
+                                          <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                            <Download className="w-3.5 h-3.5" />
+                                            Stiahnuť
+                                          </p>
+                                        </div>
+                                      </a>
+                                    )
+                                  })}
+                                </div>
+                              )}
+                              <p className={`text-xs mt-2 ${msg.attachments?.length ? 'pt-2 border-t ' + (isMe ? 'border-white/25' : 'border-gray-200') : ''} ${isMe ? 'text-white/85' : 'text-gray-500'}`}>
+                                {new Date(msg.createdAt).toLocaleString('sk-SK', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                        )
+                      })}
                     </div>
-                  )}
-                  <p className="text-xs text-gray-400">
-                    {new Date(selectedMessage.createdAt).toLocaleDateString('sk-SK', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </p>
-                  <div className="mt-4 flex gap-2">
-                    {selectedMessage.status === 'UNREAD' && (
+                    <div className="border-t border-gray-200 pt-3">
+                      {replyAttachments.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {replyAttachments.map((att, i) => {
+                            const isImg = /^data:image\//i.test(att)
+                            const mime = att.match(/^data:([^;]+)/)?.[1] || ''
+                            const isPdf = mime.includes('pdf')
+                            const isWord = mime.includes('word') || mime.includes('msword')
+                            return (
+                              <div key={i} className="relative">
+                                {isImg ? (
+                                  <img
+                                    src={att}
+                                    alt=""
+                                    className="w-20 h-20 object-cover rounded-xl border border-gray-200 shadow-sm"
+                                  />
+                                ) : (
+                                  <div className="w-20 h-20 rounded-xl border border-gray-200 flex flex-col items-center justify-center bg-white">
+                                    <FileText className="w-8 h-8 text-gray-400" />
+                                    <span className="text-xs font-medium text-gray-600 mt-1">{isPdf ? 'PDF' : isWord ? 'Word' : 'Súbor'}</span>
+                                  </div>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setReplyAttachments((prev) => prev.filter((_, j) => j !== i))
+                                  }
+                                  className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 shadow-md"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                      <div className="flex gap-2 mb-2">
+                        <label className="flex items-center justify-center w-10 h-10 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex-shrink-0">
+                          <Paperclip className="w-5 h-5 text-gray-500" />
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/*,.pdf,.doc,.docx,.txt"
+                            onChange={handleReplyFileSelect}
+                            className="hidden"
+                          />
+                        </label>
+                        <textarea
+                          value={replyContent}
+                          onChange={(e) => setReplyContent(e.target.value)}
+                          placeholder="Napíšte odpoveď... (môžete pridať fotky alebo súbory)"
+                          rows={2}
+                          className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent resize-none text-sm"
+                        />
+                      </div>
+                      <button
+                        onClick={handleSendReply}
+                        disabled={
+                          (!replyContent.trim() && replyAttachments.length === 0) || replySubmitting
+                        }
+                        className="w-full px-4 py-2 bg-[#1dbf73] hover:bg-[#19a463] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium"
+                      >
+                        {replySubmitting ? 'Odosielam...' : 'Odoslať odpoveď'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Statický detail pre ostatné typy správ */
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-gray-900">Detail správy</h3>
                       <button
                         onClick={() => {
-                          api.markAsRead(selectedMessage.id).then(() => {
-                            loadMessages()
-                            setSelectedMessage({ ...selectedMessage, status: 'READ' })
-                          })
+                          setSelectedMessage(null)
+                          setConversationMessages([])
                         }}
-                        className="flex-1 px-4 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg text-sm"
+                        className="text-gray-400 hover:text-gray-600"
                       >
-                        Označiť ako prečítané
+                        <X className="w-5 h-5" />
                       </button>
+                    </div>
+                    <div className="mb-4">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${getMessageTypeColor(selectedMessage.type)}`}>
+                        {getMessageTypeLabel(selectedMessage.type)}
+                      </span>
+                    </div>
+                    <h4 className="font-medium text-gray-900 mb-2">{selectedMessage.subject}</h4>
+                    {selectedMessage.sender && (
+                      <p className="text-sm text-gray-600 mb-2">
+                        Od: {selectedMessage.sender.firstName} {selectedMessage.sender.lastName} ({selectedMessage.sender.email})
+                      </p>
                     )}
-                    <button
-                      onClick={() => handleMarkAsArchived(selectedMessage.id)}
-                      className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50"
-                    >
-                      Archivovať
-                    </button>
+                    {selectedMessage.advertisement && (
+                      <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <p className="text-sm font-medium text-gray-900 mb-1">Súvisiaci inzerát:</p>
+                        <Link href={`/inzerat/${selectedMessage.advertisement.id}`} className="text-sm text-[#1dbf73] hover:underline">
+                          {selectedMessage.advertisement.title}
+                        </Link>
+                      </div>
+                    )}
+                    <div className="text-sm text-gray-700 whitespace-pre-wrap mb-4">
+                      {selectedMessage.content}
+                    </div>
+                    {selectedMessage.metadata && (
+                      <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <p className="text-xs text-gray-600">
+                          {selectedMessage.metadata.banDuration && (
+                            <>
+                              Trvanie banu: {selectedMessage.metadata.banDuration === 'permanent' 
+                                ? 'Trvalo' 
+                                : `${selectedMessage.metadata.banDurationValue} ${
+                                    selectedMessage.metadata.banDuration === 'minutes' ? 'minút' :
+                                    selectedMessage.metadata.banDuration === 'hours' ? 'hodín' :
+                                    selectedMessage.metadata.banDuration === 'days' ? 'dní' :
+                                    selectedMessage.metadata.banDuration === 'months' ? 'mesiacov' :
+                                    selectedMessage.metadata.banDuration
+                                  }`}
+                              {selectedMessage.metadata.bannedUntil && (
+                                <> (do {new Date(selectedMessage.metadata.bannedUntil).toLocaleDateString('sk-SK', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })})</>
+                              )}
+                            </>
+                          )}
+                        </p>
+                      </div>
+                    )}
+                    <p className="text-xs text-gray-400">
+                      {new Date(selectedMessage.createdAt).toLocaleDateString('sk-SK', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                    <div className="mt-4 flex gap-2">
+                      {selectedMessage.status === 'UNREAD' && (
+                        <button
+                          onClick={() => {
+                            api.markAsRead(selectedMessage.id).then(() => {
+                              loadMessages()
+                              setSelectedMessage({ ...selectedMessage, status: 'READ' })
+                            })
+                          }}
+                          className="flex-1 px-4 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg text-sm"
+                        >
+                          Označiť ako prečítané
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleMarkAsArchived(selectedMessage.id)}
+                        className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50"
+                      >
+                        Archivovať
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )
               ) : (
                 <div className="text-center text-gray-500 py-8">
                   <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />

@@ -8,7 +8,7 @@ import Footer from '@/components/Footer'
 import ImageCarousel from '@/components/ImageCarousel'
 import { api } from '@/lib/api'
 import { isAuthenticated } from '@/lib/auth'
-import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check } from 'lucide-react'
+import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone } from 'lucide-react'
 
 interface ServicePackage {
   name: string
@@ -38,6 +38,7 @@ interface Advertisement {
     firstName?: string
     lastName?: string
     email?: string
+    phone?: string
   }
   createdAt: string
   type?: 'SERVICE' | 'RENTAL'
@@ -65,6 +66,12 @@ export default function AdvertisementDetailPage({
   const [reportDescription, setReportDescription] = useState<string>('')
   const [reportSubmitting, setReportSubmitting] = useState(false)
   const [reportSuccess, setReportSuccess] = useState(false)
+  const [showContactModal, setShowContactModal] = useState(false)
+  const [contactMode, setContactMode] = useState<'choice' | 'chat' | 'phone'>('choice')
+  const [inquirySubject, setInquirySubject] = useState('')
+  const [inquiryContent, setInquiryContent] = useState('')
+  const [inquirySubmitting, setInquirySubmitting] = useState(false)
+  const [inquirySuccess, setInquirySuccess] = useState(false)
 
   useEffect(() => {
     loadAdvertisement()
@@ -152,6 +159,47 @@ export default function AdvertisementDetailPage({
       alert(error?.message || 'Chyba pri nahlásení inzerátu')
     } finally {
       setReportSubmitting(false)
+    }
+  }
+
+  const handleContactClick = () => {
+    setShowContactModal(true)
+    setContactMode('choice')
+    setInquirySubject(`Dotaz k inzerátu: ${advertisement?.title || ''}`)
+    setInquiryContent('')
+  }
+
+  const handleContactChat = () => {
+    if (!isAuthenticated()) {
+      window.location.href = '/signin?redirect=' + encodeURIComponent(window.location.pathname)
+      return
+    }
+    setContactMode('chat')
+  }
+
+  const handleContactPhone = () => {
+    setContactMode('phone')
+  }
+
+  const handleInquirySubmit = async () => {
+    if (!inquirySubject.trim() || !inquiryContent.trim()) return
+    try {
+      setInquirySubmitting(true)
+      await api.createInquiry({
+        advertisementId: id,
+        subject: inquirySubject.trim(),
+        content: inquiryContent.trim(),
+      })
+      setInquirySuccess(true)
+      setTimeout(() => {
+        setShowContactModal(false)
+        setInquirySuccess(false)
+        setContactMode('choice')
+      }, 2000)
+    } catch (error: any) {
+      alert(error?.message || 'Chyba pri odoslaní správy')
+    } finally {
+      setInquirySubmitting(false)
     }
   }
 
@@ -462,7 +510,10 @@ export default function AdvertisementDetailPage({
                       </span>
                     </div>
                   </div>
-                  <button className="w-full mt-4 border border-gray-300 text-gray-900 py-2 rounded-md font-medium hover:border-gray-400 transition-colors">
+                  <button
+                    onClick={handleContactClick}
+                    className="w-full mt-4 border border-gray-300 text-gray-900 py-2 rounded-md font-medium hover:border-gray-400 transition-colors"
+                  >
                     Kontaktovať predajcu
                   </button>
                 </div>
@@ -471,6 +522,179 @@ export default function AdvertisementDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Contact Modal */}
+      {showContactModal && advertisement?.user && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full shadow-xl">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">
+                  Kontaktovať predajcu
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowContactModal(false)
+                    setContactMode('choice')
+                    setInquirySuccess(false)
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {contactMode === 'choice' && (
+                <div className="space-y-4">
+                  <p className="text-gray-600 text-sm">
+                    Vyberte spôsob kontaktu s predajcom {sellerName}:
+                  </p>
+                  <button
+                    onClick={handleContactChat}
+                    className="w-full flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-[#1dbf73] hover:bg-[#1dbf73]/5 transition-colors text-left"
+                  >
+                    <MessageSquare className="w-6 h-6 text-[#1dbf73]" />
+                    <div>
+                      <span className="font-semibold text-gray-900 block">
+                        Napísať cez chat
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {isAuthenticated()
+                          ? 'Obe strany musia byť zaregistrované. Odosielate správu predajcovi.'
+                          : 'Pre chat sa musíte prihlásiť. Obe strany musia byť zaregistrované.'}
+                      </span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={handleContactPhone}
+                    className="w-full flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-[#1dbf73] hover:bg-[#1dbf73]/5 transition-colors text-left"
+                  >
+                    <Phone className="w-6 h-6 text-[#1dbf73]" />
+                    <div>
+                      <span className="font-semibold text-gray-900 block">
+                        Zobraziť telefón
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {advertisement.user && advertisement.user.phone
+                          ? 'Zobrazí telefónne číslo predajcu'
+                          : 'Predajca nemá zverejnený telefón'}
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              )}
+
+              {contactMode === 'chat' && inquirySuccess ? (
+                <div className="text-center py-6">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Check className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Správa bola odoslaná
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    Predajca dostane vašu správu a môže vám odpovedať v sekcii Správy vo svojom profile.
+                  </p>
+                </div>
+              ) : contactMode === 'chat' && (
+                <div className="space-y-4">
+                  <p className="text-gray-600 text-sm">
+                    Napíšte správu predajcovi. Budete si môcť písať cez sekciu Správy vo vašom profile.
+                  </p>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Predmet
+                    </label>
+                    <input
+                      type="text"
+                      value={inquirySubject}
+                      onChange={(e) => setInquirySubject(e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                      placeholder="Predmet správy"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Správa
+                    </label>
+                    <textarea
+                      value={inquiryContent}
+                      onChange={(e) => setInquiryContent(e.target.value)}
+                      rows={4}
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent resize-none"
+                      placeholder="Napíšte svoju správu..."
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                    <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                    <p>
+                      Pre písanie cez chat musia byť obaja používatelia zaregistrovaní. Správa sa odošle predajcovi a môžete pokračovať v komunikácii v sekcii Správy.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 pt-2">
+                    <button
+                      onClick={() => setContactMode('choice')}
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      Späť
+                    </button>
+                    <button
+                      onClick={handleInquirySubmit}
+                      disabled={
+                        !inquirySubject.trim() ||
+                        !inquiryContent.trim() ||
+                        inquirySubmitting
+                      }
+                      className="flex-1 px-4 py-2 bg-[#1dbf73] text-white rounded-lg font-medium hover:bg-[#19a463] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                    >
+                      {inquirySubmitting ? 'Odosielam...' : 'Odoslať správu'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {contactMode === 'phone' && !inquirySuccess && (
+                <div className="space-y-4">
+                  {advertisement.user.phone ? (
+                    <>
+                      <p className="text-gray-600 text-sm">
+                        Telefónne číslo predajcu {sellerName}:
+                      </p>
+                      <a
+                        href={`tel:${advertisement.user.phone}`}
+                        className="block text-xl font-semibold text-[#1dbf73] hover:underline"
+                      >
+                        {advertisement.user.phone}
+                      </a>
+                      <p className="text-sm text-gray-500">
+                        Kliknutím na číslo môžete zavolať.
+                      </p>
+                    </>
+                  ) : (
+                    <div className="text-center py-4">
+                      <Phone className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-gray-600 text-sm">
+                        Predajca nemá zverejnený telefón.
+                      </p>
+                      <p className="text-gray-500 text-sm mt-1">
+                        Skúste napísať cez chat.
+                      </p>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => setContactMode('choice')}
+                    className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                  >
+                    Späť
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Report Modal */}
       {showReportModal && (

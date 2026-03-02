@@ -266,6 +266,10 @@ model Message {
   sender          User?          @relation("MessageSender", fields: [senderId], references: [id], onDelete: SetNull)
   advertisementId String?
   advertisement   Advertisement? @relation(fields: [advertisementId], references: [id], onDelete: SetNull)
+  parentId        String?       // Pre odpovede v konverzácii – odkaz na koreňovú správu
+  parent          Message?      @relation("MessageReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies         Message[]     @relation("MessageReplies")
+  attachments     String[]      @default([]) // Prílohy – base64 alebo URL (obrázky, súbory)
   metadata        Json?         // Ďalšie informácie (napr. dôvod banu, dátum banu, atď.)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
@@ -274,6 +278,7 @@ model Message {
   @@index([recipientId])
   @@index([senderId])
   @@index([advertisementId])
+  @@index([parentId])
   @@index([status])
   @@index([type])
   @@index([createdAt])
