@@ -40,6 +40,34 @@ export class AdvertisementsService {
 
   async findAll() {
     return prisma.advertisement.findMany({
+      where: { status: 'ACTIVE' as any },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+        category: true,
+      } as any,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  async search(query: string) {
+    return prisma.advertisement.findMany({
+      where: {
+        status: 'ACTIVE' as any,
+        OR: [
+          { title: { contains: query, mode: 'insensitive' } },
+          { description: { contains: query, mode: 'insensitive' } },
+        ],
+      },
       include: {
         user: {
           select: {

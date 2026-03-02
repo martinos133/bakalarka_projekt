@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
 
 interface PopularCategory {
@@ -12,6 +13,7 @@ interface PopularCategory {
 }
 
 export default function Hero() {
+  const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [popularCategories, setPopularCategories] = useState<PopularCategory[]>(
     []
@@ -33,8 +35,10 @@ export default function Hero() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle search logic here
-    console.log('Searching for:', searchQuery)
+    const query = searchQuery.trim()
+    if (query) {
+      router.push(`/vyhladavanie?q=${encodeURIComponent(query)}`)
+    }
   }
 
   return (

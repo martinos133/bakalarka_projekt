@@ -31,8 +31,11 @@ export class AdvertisementsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Získanie všetkých inzerátov' })
-  findAll() {
+  @ApiOperation({ summary: 'Získanie všetkých inzerátov alebo vyhľadávanie' })
+  findAll(@Query('q') q?: string) {
+    if (q && q.trim()) {
+      return this.advertisementsService.search(q.trim());
+    }
     return this.advertisementsService.findAll();
   }
 

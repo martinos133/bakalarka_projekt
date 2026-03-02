@@ -76,6 +76,8 @@ export const api = {
   getCategories: () => fetchAPI('/categories/active'),
   getCategoryBySlug: (slug: string) => fetchAPI(`/categories/slug/${slug}`),
   getAdvertisementsByCategory: (slug: string) => fetchAPI(`/advertisements/category/${slug}`),
+  searchAdvertisements: (q: string) => fetchAPI(`/advertisements?q=${encodeURIComponent(q)}`),
+  getSearchSuggestions: (q: string) => fetchAPI(`/search/suggestions?q=${encodeURIComponent(q)}`),
 
   // Auth endpoints
   register: (data: any) => fetchAPI('/auth/register', {
