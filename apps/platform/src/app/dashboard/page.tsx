@@ -23,6 +23,7 @@ export default function DashboardPage() {
   const [replyContent, setReplyContent] = useState('')
   const [replyAttachments, setReplyAttachments] = useState<string[]>([])
   const [replySubmitting, setReplySubmitting] = useState(false)
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null)
   const [messageFilter, setMessageFilter] = useState<'all' | 'unread' | 'inquiry' | 'system'>('all')
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -68,6 +69,7 @@ export default function DashboardPage() {
     answer: '',
   })
   const [categories, setCategories] = useState<any[]>([])
+  const [editingAdId, setEditingAdId] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -338,8 +340,17 @@ export default function DashboardPage() {
         if (adFormData.faq.length > 0) payload.faq = adFormData.faq
       }
 
-      const newAd = await api.createAdvertisement(payload)
-      setAdvertisements([newAd, ...advertisements])
+      if (editingAdId) {
+        const updated = await api.updateAdvertisement(editingAdId, payload)
+        setAdvertisements(advertisements.map((a) => (a.id === editingAdId ? updated : a)))
+        setEditingAdId(null)
+        setSuccess('Inzerát bol úspešne aktualizovaný')
+      } else {
+        const newAd = await api.createAdvertisement(payload)
+        setAdvertisements([newAd, ...advertisements])
+        setSuccess('Inzerát bol úspešne vytvorený a čaká na schválenie')
+      }
+
       setAdFormData({
         title: '',
         description: '',
@@ -363,12 +374,39 @@ export default function DashboardPage() {
       setNewPackageFeature('')
       setNewFAQ({ question: '', answer: '' })
       setActiveTab('advertisements')
-      setSuccess('Inzerát bol úspešne vytvorený a čaká na schválenie')
       setTimeout(() => setSuccess(''), 3000)
     } catch (err: any) {
-      setError(err.message || 'Chyba pri vytváraní inzerátu')
+      setError(err.message || (editingAdId ? 'Chyba pri úprave inzerátu' : 'Chyba pri vytváraní inzerátu'))
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleEditAdvertisement = async (ad: any) => {
+    try {
+      const fullAd = await api.getAdvertisement(ad.id)
+      setAdFormData({
+        title: fullAd.title || '',
+        description: fullAd.description || '',
+        price: fullAd.price != null ? String(fullAd.price) : '',
+        categoryId: fullAd.categoryId || fullAd.category?.id || '',
+        location: fullAd.location || '',
+        postalCode: fullAd.postalCode || '',
+        type: fullAd.type || 'SERVICE',
+        images: fullAd.images || [],
+        pricingType: fullAd.pricingType || 'FIXED',
+        hourlyRate: fullAd.hourlyRate != null ? String(fullAd.hourlyRate) : '',
+        dailyRate: fullAd.dailyRate != null ? String(fullAd.dailyRate) : '',
+        packages: fullAd.packages || [],
+        deliveryTime: fullAd.deliveryTime || '',
+        revisions: fullAd.revisions || '',
+        features: fullAd.features || [],
+        faq: fullAd.faq || [],
+      })
+      setEditingAdId(fullAd.id)
+      setActiveTab('create')
+    } catch (err: any) {
+      setError(err.message || 'Chyba pri načítaní inzerátu')
     }
   }
 
@@ -378,6 +416,7 @@ export default function DashboardPage() {
     try {
       await api.deleteAdvertisement(id)
       setAdvertisements(advertisements.filter(ad => ad.id !== id))
+      setEditingAdId((prev) => (prev === id ? null : prev))
       setSuccess('Inzerát bol úspešne odstránený')
       setTimeout(() => setSuccess(''), 3000)
     } catch (err: any) {
@@ -442,7 +481,29 @@ export default function DashboardPage() {
               Moje inzeráty ({advertisements.length})
             </button>
             <button
-              onClick={() => setActiveTab('create')}
+              onClick={() => {
+                setActiveTab('create')
+                if (!editingAdId) {
+                  setAdFormData({
+                    title: '',
+                    description: '',
+                    price: '',
+                    categoryId: '',
+                    location: '',
+                    postalCode: '',
+                    type: 'SERVICE',
+                    images: [],
+                    pricingType: 'FIXED',
+                    hourlyRate: '',
+                    dailyRate: '',
+                    packages: [],
+                    deliveryTime: '',
+                    revisions: '',
+                    features: [],
+                    faq: [],
+                  })
+                }
+              }}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'create'
                   ? 'border-[#1dbf73] text-[#1dbf73]'
@@ -856,6 +917,13 @@ export default function DashboardPage() {
                           <Eye className="w-4 h-4" />
                         </Link>
                         <button
+                          onClick={() => handleEditAdvertisement(ad)}
+                          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                          title="Upraviť"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
                           onClick={() => handleDeleteAdvertisement(ad.id)}
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="Odstrániť"
@@ -874,7 +942,39 @@ export default function DashboardPage() {
         {/* Create Advertisement Tab */}
         {activeTab === 'create' && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Vytvoriť nový inzerát</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">
+                {editingAdId ? 'Upraviť inzerát' : 'Vytvoriť nový inzerát'}
+              </h2>
+              {editingAdId && (
+                <button
+                  onClick={() => {
+                    setEditingAdId(null)
+                    setAdFormData({
+                      title: '',
+                      description: '',
+                      price: '',
+                      categoryId: '',
+                      location: '',
+                      postalCode: '',
+                      type: 'SERVICE',
+                      images: [],
+                      pricingType: 'FIXED',
+                      hourlyRate: '',
+                      dailyRate: '',
+                      packages: [],
+                      deliveryTime: '',
+                      revisions: '',
+                      features: [],
+                      faq: [],
+                    })
+                  }}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                >
+                  Zrušiť úpravu
+                </button>
+              )}
+            </div>
 
             <div className="space-y-6">
               <div>
@@ -1366,8 +1466,17 @@ export default function DashboardPage() {
                   disabled={saving}
                   className="flex items-center gap-2 px-6 py-3 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463] disabled:opacity-50"
                 >
-                  <Plus className="w-5 h-5" />
-                  {saving ? 'Vytváram...' : 'Vytvoriť inzerát'}
+                  {editingAdId ? (
+                    <>
+                      <Save className="w-5 h-5" />
+                      {saving ? 'Ukladám...' : 'Uložiť zmeny'}
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-5 h-5" />
+                      {saving ? 'Vytváram...' : 'Vytvoriť inzerát'}
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -1540,19 +1649,18 @@ export default function DashboardPage() {
                                     const isPdf = mime.includes('pdf')
                                     const isWord = mime.includes('word') || mime.includes('msword') || mime.includes('document')
                                     return isImage ? (
-                                      <a
+                                      <button
                                         key={i}
-                                        href={att}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="block rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-200 ring-1 ring-black/5 hover:ring-black/10"
+                                        type="button"
+                                        onClick={() => setLightboxImage(att)}
+                                        className="block rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-200 ring-1 ring-black/5 hover:ring-black/10 cursor-zoom-in text-left"
                                       >
                                         <img
                                           src={att}
                                           alt={`Fotka ${i + 1}`}
                                           className="max-w-[220px] max-h-[200px] w-auto h-auto object-cover block"
                                         />
-                                      </a>
+                                      </button>
                                     ) : (
                                       <a
                                         key={i}
@@ -1771,6 +1879,30 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Lightbox pre obrázky v chate */}
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setLightboxImage(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setLightboxImage(null)}
+            className="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+            aria-label="Zavrieť"
+          >
+            <X className="w-8 h-8" />
+          </button>
+          <img
+            src={lightboxImage}
+            alt="Zväčšený obrázok"
+            className="max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+
       <Footer />
     </div>
   )

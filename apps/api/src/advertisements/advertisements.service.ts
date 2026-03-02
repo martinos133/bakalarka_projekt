@@ -182,6 +182,9 @@ export class AdvertisementsService {
         packages: updateDto.packages !== undefined ? (updateDto.packages ? JSON.parse(JSON.stringify(updateDto.packages)) : null) : (advertisement as any).packages,
         faq: updateDto.faq !== undefined ? (updateDto.faq ? JSON.parse(JSON.stringify(updateDto.faq)) : null) : (advertisement as any).faq,
       } as any,
+      include: {
+        category: true,
+      } as any,
     });
   }
 
