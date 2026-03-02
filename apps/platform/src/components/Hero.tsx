@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
+import { FolderOpen, FileText } from 'lucide-react'
 
 interface PopularCategory {
   id: string
@@ -14,10 +15,14 @@ interface PopularCategory {
 
 export default function Hero() {
   const router = useRouter()
+  const searchRef = useRef<HTMLDivElement>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [popularCategories, setPopularCategories] = useState<PopularCategory[]>(
     []
   )
+  const [suggestions, setSuggestions] = useState<{ categories: any[]; advertisements: any[] }>({ categories: [], advertisements: [] })
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false)
 
   useEffect(() => {
     api
@@ -37,9 +42,44 @@ export default function Hero() {
     e.preventDefault()
     const query = searchQuery.trim()
     if (query) {
+      setShowSuggestions(false)
       router.push(`/vyhladavanie?q=${encodeURIComponent(query)}`)
     }
   }
+
+  // Návrhy pri 3+ písmenách (ako v navbare)
+  useEffect(() => {
+    if (searchQuery.trim().length < 3) {
+      setSuggestions({ categories: [], advertisements: [] })
+      setShowSuggestions(false)
+      return
+    }
+    const timer = setTimeout(async () => {
+      try {
+        setSuggestionsLoading(true)
+        const data = await api.getSearchSuggestions(searchQuery.trim())
+        setSuggestions(data)
+        setShowSuggestions(true)
+      } catch {
+        setSuggestions({ categories: [], advertisements: [] })
+      } finally {
+        setSuggestionsLoading(false)
+      }
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const hasSuggestions = suggestions.categories.length > 0 || suggestions.advertisements.length > 0
 
   return (
     <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
@@ -66,34 +106,97 @@ export default function Hero() {
           </h1>
 
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="flex gap-0 mb-6">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Hľadať akúkoľvek službu..."
-              className="flex-1 px-6 py-4 text-lg rounded-l-md rounded-r-none border-0 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] text-gray-900 placeholder-gray-500 shadow-lg"
-            />
-            <button
-              type="submit"
-              className="px-8 py-4 bg-black text-white rounded-r-md hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-[#1dbf73] shadow-lg"
-              aria-label="Search"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          <div ref={searchRef} className="relative mb-6">
+            <form onSubmit={handleSearch} className="flex gap-0">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchQuery.trim().length >= 3 && hasSuggestions && setShowSuggestions(true)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') setShowSuggestions(false)
+                }}
+                placeholder="Hľadať akúkoľvek službu..."
+                className="flex-1 px-6 py-4 text-lg rounded-l-md rounded-r-none border-0 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] text-gray-900 placeholder-gray-500 shadow-lg"
+              />
+              <button
+                type="submit"
+                className="px-8 py-4 bg-black text-white rounded-r-md hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-[#1dbf73] shadow-lg"
+                aria-label="Search"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </button>
-          </form>
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </button>
+            </form>
+
+            {/* Dropdown s návrhmi (ako v navbare) */}
+            {showSuggestions && searchQuery.trim().length >= 3 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-xl z-50 overflow-hidden">
+                {suggestionsLoading ? (
+                  <div className="px-4 py-6 text-center text-gray-500 text-sm">Načítavam...</div>
+                ) : hasSuggestions ? (
+                  <div className="py-2 max-h-80 overflow-y-auto">
+                    {suggestions.categories.length > 0 && (
+                      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Kategórie
+                      </div>
+                    )}
+                    {suggestions.categories.map((cat) => (
+                      <Link
+                        key={cat.id}
+                        href={`/kategoria/${cat.slug}`}
+                        onClick={() => setShowSuggestions(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
+                      >
+                        <FolderOpen className="w-4 h-4 text-[#1dbf73] flex-shrink-0" />
+                        <span className="text-sm font-medium text-gray-900">{cat.name}</span>
+                        <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">Kategória</span>
+                      </Link>
+                    ))}
+                    {suggestions.advertisements.length > 0 && (
+                      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1 border-t border-gray-100">
+                        Inzeráty
+                      </div>
+                    )}
+                    {suggestions.advertisements.map((ad) => (
+                      <Link
+                        key={ad.id}
+                        href={`/inzerat/${ad.id}`}
+                        onClick={() => setShowSuggestions(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
+                      >
+                        {ad.images?.[0] ? (
+                          <img src={ad.images[0]} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
+                        ) : (
+                          <FileText className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm font-medium text-gray-900 block truncate">{ad.title}</span>
+                          {ad.price != null && (
+                            <span className="text-xs text-[#1dbf73] font-semibold">{ad.price} €</span>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded flex-shrink-0">Inzerát</span>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="px-4 py-4 text-sm text-gray-500">Žiadne návrhy</div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Popular Categories */}
           {popularCategories.length > 0 && (
