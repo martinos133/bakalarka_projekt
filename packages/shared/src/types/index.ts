@@ -86,6 +86,8 @@ export interface Advertisement {
   type: AdvertisementType;
   category?: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
   postalCode?: string;
   images: string[];
   // Service-specific fields
@@ -109,6 +111,8 @@ export interface CreateAdvertisementDto {
   type?: AdvertisementType;
   categoryId?: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
   postalCode?: string;
   images?: string[];
   // Service-specific fields

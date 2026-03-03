@@ -6,9 +6,11 @@ import Header from '@/components/Header'
 import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
 import ImageCarousel from '@/components/ImageCarousel'
+import DatePicker from '@/components/DatePicker'
 import { api } from '@/lib/api'
 import { isAuthenticated } from '@/lib/auth'
 import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone, Heart } from 'lucide-react'
+import type { DateRange } from 'react-day-picker'
 
 interface ServicePackage {
   name: string
@@ -74,6 +76,13 @@ export default function AdvertisementDetailPage({
   const [inquirySuccess, setInquirySuccess] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
   const [favoriteLoading, setFavoriteLoading] = useState(false)
+  const [showContinueModal, setShowContinueModal] = useState(false)
+  const [continueSubject, setContinueSubject] = useState('')
+  const [continueContent, setContinueContent] = useState('')
+  const [continueServiceDate, setContinueServiceDate] = useState<Date | undefined>(undefined)
+  const [continueRentalRange, setContinueRentalRange] = useState<DateRange | undefined>(undefined)
+  const [continueSubmitting, setContinueSubmitting] = useState(false)
+  const [continueSuccess, setContinueSuccess] = useState(false)
 
   useEffect(() => {
     loadAdvertisement()
@@ -198,6 +207,78 @@ export default function AdvertisementDetailPage({
     setContactMode('choice')
     setInquirySubject(`Dotaz k inzerátu: ${advertisement?.title || ''}`)
     setInquiryContent('')
+  }
+
+  const handleContinueClick = () => {
+    if (!isAuthenticated()) {
+      window.location.href = `/signin?redirect=${encodeURIComponent(window.location.pathname)}`
+      return
+    }
+    const isService = advertisement?.type === 'SERVICE'
+    setContinueSubject(
+      isService
+        ? `Žiadosť o konzultáciu: ${advertisement?.title || ''}`
+        : `Žiadosť o rezerváciu: ${advertisement?.title || ''}`
+    )
+    setContinueContent('')
+    setContinueServiceDate(undefined)
+    setContinueRentalRange(undefined)
+    setContinueSuccess(false)
+    setShowContinueModal(true)
+  }
+
+  const formatDateForDisplay = (d?: Date) => {
+    if (!d) return ''
+    return d.toLocaleDateString('sk-SK', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  }
+
+  const handleContinueSubmit = async () => {
+    const isService = advertisement?.type === 'SERVICE'
+    if (!continueSubject.trim()) return
+    if (isService) {
+      if (!continueServiceDate) {
+        alert('Vyberte dátum, od kedy chcete využívať službu.')
+        return
+      }
+    } else {
+      const from = continueRentalRange?.from
+      const to = continueRentalRange?.to
+      if (!from || !to) {
+        alert('Vyberte dátumy rezervácie (od – do).')
+        return
+      }
+      if (from > to) {
+        alert('Dátum „do“ musí byť neskôr ako dátum „od“.')
+        return
+      }
+    }
+    if (!continueContent.trim()) {
+      alert('Napíšte doplňujúcu správu pre predajcu.')
+      return
+    }
+
+    const dateBlock = isService
+      ? `--- DÁTUM ---\nOd kedy chcete využívať službu: ${formatDateForDisplay(continueServiceDate)}\n---------------\n\n`
+      : `--- REZERVÁCIA ---\nOd: ${formatDateForDisplay(continueRentalRange?.from)}\nDo: ${formatDateForDisplay(continueRentalRange?.to)}\n---------------\n\n`
+    const fullContent = dateBlock + continueContent.trim()
+
+    try {
+      setContinueSubmitting(true)
+      await api.createInquiry({
+        advertisementId: id,
+        subject: continueSubject.trim(),
+        content: fullContent,
+      })
+      setContinueSuccess(true)
+      setTimeout(() => {
+        setShowContinueModal(false)
+        setContinueSuccess(false)
+      }, 2000)
+    } catch (error: any) {
+      alert(error?.message || 'Chyba pri odoslaní')
+    } finally {
+      setContinueSubmitting(false)
+    }
   }
 
   const handleContactChat = () => {
@@ -488,7 +569,10 @@ export default function AdvertisementDetailPage({
                     </div>
                   )}
                 </div>
-                <button className="w-full bg-[#1dbf73] text-white py-3 rounded-md font-semibold hover:bg-[#19a463] transition-colors mb-4">
+                <button
+                  onClick={handleContinueClick}
+                  className="w-full bg-[#1dbf73] text-white py-3 rounded-md font-semibold hover:bg-[#19a463] transition-colors mb-4"
+                >
                   Pokračovať
                 </button>
                   <button
@@ -729,6 +813,117 @@ export default function AdvertisementDetailPage({
                   >
                     Späť
                   </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Continue Modal - Konzultácia (služby) alebo Rezervácia (inzeráty) */}
+      {showContinueModal && advertisement && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-lg w-full shadow-xl">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">
+                  {advertisement.type === 'SERVICE'
+                    ? 'Dohodnúť konzultáciu'
+                    : 'Rezervovať inzerát'}
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowContinueModal(false)
+                    setContinueSuccess(false)
+                    setContinueServiceDate(undefined)
+                    setContinueRentalRange(undefined)
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {continueSuccess ? (
+                <div className="text-center py-6">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Check className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Žiadosť odoslaná
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    {advertisement.type === 'SERVICE'
+                      ? 'Predajca vám čoskoro odpíše s návrhom termínu konzultácie. Sledujte sekciu Správy.'
+                      : 'Predajca vám čoskoro odpíše k rezervácii. Sledujte sekciu Správy.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-gray-600 text-sm">
+                    {advertisement.type === 'SERVICE'
+                      ? 'Vyberte dátum a popíšte, čo potrebujete. Predajca vám odpíše cez Správy.'
+                      : 'Vyberte termín rezervácie a doplňte správu. Predajca dostane všetky potrebné informácie.'}
+                  </p>
+
+                  {advertisement.type === 'SERVICE' ? (
+                    <DatePicker
+                      mode="single"
+                      label="Od kedy chcete využívať službu *"
+                      value={continueServiceDate}
+                      onChange={setContinueServiceDate}
+                      minDate={new Date()}
+                    />
+                  ) : (
+                    <DatePicker
+                      mode="range"
+                      label="Termín rezervácie (od – do) *"
+                      value={continueRentalRange}
+                      onChange={setContinueRentalRange}
+                      minDate={new Date()}
+                    />
+                  )}
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Doplňujúca správa pre predajcu <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      value={continueContent}
+                      onChange={(e) => setContinueContent(e.target.value)}
+                      rows={3}
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent resize-none"
+                      placeholder={
+                        advertisement.type === 'SERVICE'
+                          ? 'Čo potrebujete vyriešiť, preferovaný čas, kontakt...'
+                          : 'Doplňujúce informácie, spôsob prevzatia, otázky...'
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-3 pt-2">
+                    <button
+                      onClick={() => setShowContinueModal(false)}
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      Zrušiť
+                    </button>
+                    <button
+                      onClick={handleContinueSubmit}
+                      disabled={
+                        !continueContent.trim() ||
+                        (advertisement.type === 'SERVICE'
+                          ? !continueServiceDate
+                          : !continueRentalRange?.from || !continueRentalRange?.to) ||
+                        continueSubmitting
+                      }
+                      className="flex-1 px-4 py-2 bg-[#1dbf73] text-white rounded-lg font-medium hover:bg-[#19a463] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                    >
+                      {continueSubmitting ? 'Odosielam...' : 'Odoslať žiadosť'}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

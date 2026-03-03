@@ -244,6 +244,12 @@ export default function Header() {
 
           {/* Right side - Navigation */}
           <nav className="hidden lg:flex items-center gap-6 flex-shrink-0">
+            <Link
+              href="/mapa"
+              className="text-gray-900 hover:text-[#1dbf73] transition-colors text-sm font-medium"
+            >
+              Mapa
+            </Link>
             {navbarItems.map((item) => (
               <Link
                 key={item.id}
@@ -377,6 +383,13 @@ export default function Header() {
       {isMenuOpen && (
         <div className="lg:hidden border-t border-gray-200 bg-white">
           <div className="px-4 py-4 space-y-3">
+            <Link
+              href="/mapa"
+              className="block text-gray-900"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Mapa
+            </Link>
             {navbarItems.map((item) => (
               <Link
                 key={item.id}

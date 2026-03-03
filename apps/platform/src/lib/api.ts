@@ -45,12 +45,15 @@ export async function fetchAPI(url: string, options: RequestInit = {}) {
     let errorMessage = `API error: ${response.statusText}`
     try {
       const errorData = await response.json()
-      errorMessage = errorData.message || errorData.error || errorMessage
+      const msg = errorData.message || errorData.error
+      errorMessage = Array.isArray(msg) ? msg.join(', ') : (msg || errorMessage)
     } catch {
-      // Ak sa nepodarí parsovať JSON, použijeme statusText
+      // Ak sa nepodarí parsovať JSON
     }
+    errorMessage += ` (${response.status} ${url})`
     const error = new Error(errorMessage)
     ;(error as any).status = response.status
+    ;(error as any).url = url
     throw error
   }
 
@@ -76,6 +79,14 @@ export const api = {
   getCategories: () => fetchAPI('/categories/active'),
   getCategoryBySlug: (slug: string) => fetchAPI(`/categories/slug/${slug}`),
   getAdvertisementsByCategory: (slug: string) => fetchAPI(`/advertisements/category/${slug}`),
+  getAdvertisementsForMap: (params?: { categoryId?: string; type?: string; region?: string }) => {
+    const search = new URLSearchParams()
+    if (params?.categoryId) search.set('categoryId', params.categoryId)
+    if (params?.type) search.set('type', params.type)
+    if (params?.region) search.set('region', params.region)
+    const q = search.toString()
+    return fetchAPI(q ? `/advertisements/map?${q}` : '/advertisements/map', { cache: 'no-store' })
+  },
   searchAdvertisements: (q: string) => fetchAPI(`/advertisements?q=${encodeURIComponent(q)}`),
   getSearchSuggestions: (q: string) => fetchAPI(`/search/suggestions?q=${encodeURIComponent(q)}`),
   getStaticPage: (slug: string) => fetchAPI(`/static-pages/slug/${slug}`),

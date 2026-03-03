@@ -38,6 +38,44 @@ export class AdvertisementsService {
     });
   }
 
+  async findForMap(filters: { categoryId?: string; type?: 'SERVICE' | 'RENTAL'; region?: string }) {
+    const where: any = { status: 'ACTIVE' };
+    if (filters.categoryId) where.categoryId = filters.categoryId;
+    if (filters.type) where.type = filters.type;
+    if (filters.region && filters.region.trim()) {
+      where.location = { contains: filters.region.trim(), mode: 'insensitive' };
+    }
+    const list = await prisma.advertisement.findMany({
+      where,
+      select: {
+        id: true,
+        title: true,
+        location: true,
+        latitude: true,
+        longitude: true,
+        type: true,
+        price: true,
+        images: true,
+        categoryId: true,
+        category: {
+          select: { id: true, name: true, slug: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    return list.map((ad) => ({
+      id: ad.id,
+      title: ad.title,
+      location: ad.location,
+      latitude: ad.latitude,
+      longitude: ad.longitude,
+      type: ad.type,
+      price: ad.price,
+      image: Array.isArray(ad.images) && ad.images.length > 0 ? ad.images[0] : null,
+      category: ad.category ? { id: ad.category.id, name: ad.category.name, slug: ad.category.slug } : null,
+    }));
+  }
+
   async findAll() {
     return prisma.advertisement.findMany({
       where: { status: 'ACTIVE' as any },
@@ -244,8 +282,7 @@ export class AdvertisementsService {
   }
 
   async findByCategorySlug(slug: string) {
-    // Najprv nájdi kategóriu podľa slug
-    const category = await (prisma as any).category.findUnique({
+    const category = await prisma.category.findUnique({
       where: { slug },
     });
 
@@ -253,27 +290,21 @@ export class AdvertisementsService {
       throw new NotFoundException('Kategória nebola nájdená');
     }
 
-    // Nájdi všetky aktívne inzeráty v tejto kategórii a jej podkategóriách
     const categoryIds = [category.id];
-    
-    // Pridaj ID všetkých podkategórií
-    const subcategories = await (prisma as any).category.findMany({
+    const subcategories = await prisma.category.findMany({
       where: {
         parentId: category.id,
         status: 'ACTIVE',
       },
-      select: {
-        id: true,
-      },
+      select: { id: true },
     });
-    
-    categoryIds.push(...subcategories.map(sub => sub.id));
+    categoryIds.push(...subcategories.map((sub) => sub.id));
 
     return prisma.advertisement.findMany({
       where: {
         categoryId: { in: categoryIds },
         status: 'ACTIVE',
-      } as any,
+      },
       include: {
         user: {
           select: {
@@ -290,7 +321,7 @@ export class AdvertisementsService {
             slug: true,
           },
         },
-      } as any,
+      },
       orderBy: {
         createdAt: 'desc',
       },

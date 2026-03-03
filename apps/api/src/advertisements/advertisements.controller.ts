@@ -39,6 +39,20 @@ export class AdvertisementsController {
     return this.advertisementsService.findAll();
   }
 
+  @Get('map')
+  @ApiOperation({ summary: 'Inzeráty pre mapu (ľahký výstup s súradnicami)' })
+  findForMap(
+    @Query('categoryId') categoryId?: string,
+    @Query('type') type?: string,
+    @Query('region') region?: string,
+  ) {
+    return this.advertisementsService.findForMap({
+      categoryId: categoryId || undefined,
+      type: type as 'SERVICE' | 'RENTAL' | undefined,
+      region: region || undefined,
+    });
+  }
+
   @Get('popular/services')
   @ApiOperation({ summary: 'Získanie populárnych služieb' })
   findPopularServices() {

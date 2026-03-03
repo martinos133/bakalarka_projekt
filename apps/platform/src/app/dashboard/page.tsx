@@ -6,6 +6,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { api } from '@/lib/api'
 import { isAuthenticated, getAuthUser, setAuthUser } from '@/lib/auth'
+import { getCoordsFromLocation } from '@/lib/mapRegions'
 import { User, Building2, Eye, EyeOff, Plus, Edit, Trash2, Save, X, Lock, Mail, Phone, MapPin, Calendar, Briefcase, Image as ImageIcon, MessageSquare, Archive, CheckCircle, Paperclip, FileText, Download, Heart } from 'lucide-react'
 import Link from 'next/link'
 
@@ -321,6 +322,7 @@ export default function DashboardPage() {
     try {
       setSaving(true)
       setError('')
+      const coords = getCoordsFromLocation(adFormData.location || null)
       const payload: any = {
         title: adFormData.title,
         description: adFormData.description,
@@ -330,6 +332,10 @@ export default function DashboardPage() {
         location: adFormData.location || undefined,
         postalCode: adFormData.postalCode || undefined,
         images: adFormData.images || [],
+      }
+      if (coords) {
+        payload.latitude = coords[0]
+        payload.longitude = coords[1]
       }
 
       if (adFormData.type === 'SERVICE') {
@@ -1149,8 +1155,11 @@ export default function DashboardPage() {
                     value={adFormData.location}
                     onChange={(e) => setAdFormData({ ...adFormData, location: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900"
-                    placeholder="Napríklad: Bratislava"
+                    placeholder="Napríklad: Bratislava, Košice, Nitra"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Zadajte kraj alebo mesto – inzerát sa podľa lokality zobrazí na mape.
+                  </p>
                 </div>
 
                 <div>
