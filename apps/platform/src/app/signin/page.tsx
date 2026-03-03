@@ -1,15 +1,25 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
+/** Povolené presmerovanie po prihlásení – len interné cesty */
+function safeRedirect(path: string | null): string {
+  if (!path || typeof path !== 'string') return '/'
+  const p = path.trim()
+  if (p.startsWith('/') && !p.startsWith('//')) return p
+  return '/'
+}
+
 export default function SignInPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = safeRedirect(searchParams.get('redirect'))
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -41,8 +51,8 @@ export default function SignInPage() {
         localStorage.setItem('user_user', JSON.stringify(data.user))
       }
 
-      // Presmerovanie na hlavnú stránku
-      router.push('/')
+      // Presmerovanie na pôvodnú stránku alebo domov
+      router.push(redirectTo)
     } catch (err: any) {
       if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
         setError('Nepodarilo sa pripojiť k API serveru. Skontrolujte, či API server beží.')
