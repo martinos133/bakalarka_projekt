@@ -23,6 +23,7 @@ export default function DevStaticPagesPage() {
   const router = useRouter()
   const [pages, setPages] = useState<StaticPage[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
@@ -46,10 +47,17 @@ export default function DevStaticPagesPage() {
   const loadPages = async () => {
     try {
       setLoading(true)
+      setLoadError(null)
       const data = await api.getStaticPages()
-      setPages(data)
-    } catch (error) {
+      // API môže vrátiť pole priamo alebo objekt s pages/items
+      const list = Array.isArray(data)
+        ? data
+        : (data?.pages ?? data?.items ?? [])
+      setPages(Array.isArray(list) ? list : [])
+    } catch (error: any) {
       console.error('Chyba pri načítaní stránok:', error)
+      setLoadError(error?.message || 'Nepodarilo sa načítať zoznam. Skontrolujte prihlásenie a obnovte stránku.')
+      setPages([])
     } finally {
       setLoading(false)
     }
@@ -261,19 +269,42 @@ export default function DevStaticPagesPage() {
             </div>
           )}
 
+          {loadError && (
+            <div className="mb-4 p-4 bg-red-900/20 border border-red-800 rounded-lg flex items-center justify-between gap-4">
+              <p className="text-red-300 text-sm">{loadError}</p>
+              <button
+                onClick={() => loadPages()}
+                className="shrink-0 px-3 py-1.5 bg-red-900/50 hover:bg-red-800/50 text-red-200 rounded-lg text-sm transition-colors"
+              >
+                Skúsiť znova
+              </button>
+            </div>
+          )}
           <div className="bg-card rounded-lg border border-dark overflow-hidden">
             {loading ? (
               <div className="p-6 text-center text-gray-400">Načítavam...</div>
             ) : pages.length === 0 ? (
               <div className="p-12 text-center">
                 <FileCode className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-400 mb-4">Zatiaľ nemáte žiadne statické stránky</p>
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="text-primary hover:underline"
-                >
-                  Vytvoriť prvú stránku
-                </button>
+                <p className="text-gray-400 mb-4">
+                  {loadError ? 'Zoznam sa nenačítal.' : 'Zatiaľ nemáte žiadne statické stránky'}
+                </p>
+                {!loadError && (
+                  <button
+                    onClick={() => setShowForm(true)}
+                    className="text-primary hover:underline"
+                  >
+                    Vytvoriť prvú stránku
+                  </button>
+                )}
+                {loadError && (
+                  <button
+                    onClick={() => loadPages()}
+                    className="text-primary hover:underline"
+                  >
+                    Obnoviť zoznam
+                  </button>
+                )}
               </div>
             ) : (
               <div className="overflow-x-auto">

@@ -186,7 +186,7 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
-  getStaticPages: () => fetchWithAuth('/static-pages'),
+  getStaticPages: () => fetchWithAuth('/static-pages/list'),
   getStaticPage: (id: string) => fetchWithAuth(`/static-pages/${id}`),
   createStaticPage: (data: any) =>
     fetchWithAuth('/static-pages', {

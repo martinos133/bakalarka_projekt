@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { prisma } from '@inzertna-platforma/database';
-import { CreateFilterDto, UpdateFilterDto, FilterType } from '@inzertna-platforma/shared';
+import { CreateFilterDto, UpdateFilterDto } from '@inzertna-platforma/shared';
 
 @Injectable()
 export class FiltersService {
@@ -38,7 +38,7 @@ export class FiltersService {
 
     // Validácia: SELECT a MULTISELECT musia mať options
     if (
-      (createDto.type === FilterType.SELECT || createDto.type === FilterType.MULTISELECT) &&
+      (createDto.type === 'SELECT' || createDto.type === 'MULTISELECT') &&
       (!createDto.options || createDto.options.length === 0)
     ) {
       throw new BadRequestException('SELECT a MULTISELECT filtre musia mať definované možnosti');
@@ -139,7 +139,7 @@ export class FiltersService {
     const newOptions = updateDto.options !== undefined ? updateDto.options : filter.options;
     
     if (
-      (newType === FilterType.SELECT || newType === FilterType.MULTISELECT) &&
+      (newType === 'SELECT' || newType === 'MULTISELECT') &&
       (!newOptions || newOptions.length === 0)
     ) {
       throw new BadRequestException('SELECT a MULTISELECT filtre musia mať definované možnosti');

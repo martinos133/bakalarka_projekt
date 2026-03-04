@@ -6,8 +6,10 @@ import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
-import { Advertisement, AdvertisementStatus, AdvertisementType, CreateAdvertisementDto, Category } from '@inzertna-platforma/shared'
+import { Advertisement, AdvertisementStatus, CreateAdvertisementDto, Category } from '@inzertna-platforma/shared'
 import { Plus, Edit, Trash2, X, Save, Search, Filter as FilterIcon } from 'lucide-react'
+
+type AdvertisementType = 'SERVICE' | 'RENTAL'
 
 export default function DevAdvertisementsPage() {
   const router = useRouter()
@@ -28,11 +30,11 @@ export default function DevAdvertisementsPage() {
     dateFrom: '',
     dateTo: '',
   })
-  const [formData, setFormData] = useState<CreateAdvertisementDto & { status?: AdvertisementStatus }>({
+  const [formData, setFormData] = useState<CreateAdvertisementDto & { status?: AdvertisementStatus; type?: AdvertisementType }>({
     title: '',
     description: '',
     price: undefined,
-    type: AdvertisementType.SERVICE,
+    type: 'SERVICE',
     categoryId: '',
     location: '',
     postalCode: '',
@@ -111,7 +113,7 @@ export default function DevAdvertisementsPage() {
       title: ad.title,
       description: ad.description,
       price: ad.price,
-      type: (ad as any).type ?? AdvertisementType.SERVICE,
+      type: ((ad as any).type as AdvertisementType) ?? 'SERVICE',
       categoryId: (ad as any).categoryId || '',
       location: ad.location || '',
       postalCode: ad.postalCode || '',
@@ -146,7 +148,7 @@ export default function DevAdvertisementsPage() {
       title: '',
       description: '',
       price: undefined,
-      type: AdvertisementType.SERVICE,
+      type: 'SERVICE',
       categoryId: '',
       location: '',
       postalCode: '',
@@ -286,8 +288,8 @@ export default function DevAdvertisementsPage() {
                     className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
                   >
                     <option value="">Všetky</option>
-                    <option value={AdvertisementType.SERVICE}>Služby</option>
-                    <option value={AdvertisementType.RENTAL}>Prenájom</option>
+                    <option value="SERVICE">Služby</option>
+                    <option value="RENTAL">Prenájom</option>
                   </select>
                 </div>
                 <div>
@@ -394,12 +396,12 @@ export default function DevAdvertisementsPage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Typ</label>
                     <select
-                      value={formData.type}
+                      value={formData.type || 'SERVICE'}
                       onChange={(e) => setFormData({ ...formData, type: e.target.value as AdvertisementType })}
                       className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600"
                     >
-                      <option value={AdvertisementType.SERVICE}>Služba</option>
-                      <option value={AdvertisementType.RENTAL}>Prenájom</option>
+                      <option value="SERVICE">Služba</option>
+                      <option value="RENTAL">Prenájom</option>
                     </select>
                   </div>
                   <div>
@@ -481,7 +483,7 @@ export default function DevAdvertisementsPage() {
                           <div className="text-sm text-gray-400 line-clamp-1">{ad.description}</div>
                         </td>
                         <td className="px-6 py-4 text-gray-300">
-                          {(ad as any).type === AdvertisementType.RENTAL ? 'Prenájom' : 'Služba'}
+                          {(ad as any).type === 'RENTAL' ? 'Prenájom' : 'Služba'}
                         </td>
                         <td className="px-6 py-4 text-green-400">
                           {ad.price != null ? `${ad.price.toFixed(2)} €` : '-'}

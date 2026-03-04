@@ -26,7 +26,8 @@ export class StaticPagesController {
     return this.staticPagesService.findBySlug(slug);
   }
 
-  @Get()
+  /** Zoznam všetkých stránok (admin) – vlastná cesta aby GET :id neprebral request */
+  @Get('list')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()

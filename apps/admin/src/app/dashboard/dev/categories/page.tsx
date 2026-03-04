@@ -6,8 +6,10 @@ import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
-import { Category, CategoryStatus } from '@inzertna-platforma/shared'
+import { Category } from '@inzertna-platforma/shared'
 import { Plus, Edit, Trash2, X, Save, FolderTree, Image as ImageIcon, FolderPlus, ChevronDown, ChevronRight, GripVertical, Filter, Search } from 'lucide-react'
+
+type CategoryStatus = 'ACTIVE' | 'DRAFT' | 'INACTIVE'
 
 export default function DevCategoriesPage() {
   const router = useRouter()
@@ -44,7 +46,7 @@ export default function DevCategoriesPage() {
     metaDescription: '',
     metaKeywords: '',
     ogImage: '',
-    status: CategoryStatus.ACTIVE,
+    status: 'ACTIVE' as CategoryStatus,
     parentId: '',
   })
 
@@ -125,7 +127,7 @@ export default function DevCategoriesPage() {
       metaDescription: category.metaDescription || '',
       metaKeywords: category.metaKeywords || '',
       ogImage: category.ogImage || '',
-      status: category.status || CategoryStatus.ACTIVE,
+      status: (category.status as CategoryStatus) || 'ACTIVE',
       parentId: (category as any).parentId || '',
     })
     setEditingId(category.id)
@@ -147,7 +149,7 @@ export default function DevCategoriesPage() {
       metaDescription: '',
       metaKeywords: '',
       ogImage: '',
-      status: CategoryStatus.ACTIVE,
+      status: 'ACTIVE' as CategoryStatus,
       parentId: parentCategory.id,
     })
     setEditingId(null)
@@ -194,7 +196,7 @@ export default function DevCategoriesPage() {
         metaDescription: '',
         metaKeywords: '',
         ogImage: '',
-        status: CategoryStatus.ACTIVE,
+        status: 'ACTIVE' as CategoryStatus,
         parentId: '',
       })
       setShowSubcategoryForm(null)
@@ -339,8 +341,8 @@ export default function DevCategoriesPage() {
       metaTitle: '',
       metaDescription: '',
       metaKeywords: '',
-      ogImage: '',
-      status: CategoryStatus.ACTIVE,
+        ogImage: '',
+        status: 'ACTIVE' as CategoryStatus,
       parentId: '',
     })
     setEditingId(null)
@@ -525,8 +527,8 @@ export default function DevCategoriesPage() {
       }
 
       // Status
-      if (filterData.status === 'active' && cat.status !== CategoryStatus.ACTIVE) return false
-      if (filterData.status === 'inactive' && cat.status === CategoryStatus.ACTIVE) return false
+      if (filterData.status === 'active' && cat.status !== 'ACTIVE') return false
+      if (filterData.status === 'inactive' && cat.status === 'ACTIVE') return false
 
       // Typ (hlavná/podkategória)
       if (filterData.type === 'main' && cat.parentId) return false
@@ -1068,9 +1070,9 @@ export default function DevCategoriesPage() {
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as CategoryStatus })}
                     className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                   >
-                    <option value={CategoryStatus.ACTIVE}>Aktívna</option>
-                    <option value={CategoryStatus.DRAFT}>Koncept</option>
-                    <option value={CategoryStatus.INACTIVE}>Neaktívna</option>
+                    <option value="ACTIVE">Aktívna</option>
+                    <option value="DRAFT">Koncept</option>
+                    <option value="INACTIVE">Neaktívna</option>
                   </select>
                   <p className="mt-1 text-xs text-gray-400">
                     Aktívne kategórie sú viditeľné na platforme. Koncept a neaktívne kategórie nie sú viditeľné.
@@ -1170,14 +1172,14 @@ export default function DevCategoriesPage() {
                             {/* Status badge */}
                             <div className="flex-shrink-0">
                               <span className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
-                                category.status === CategoryStatus.ACTIVE
+                                category.status === 'ACTIVE'
                                   ? 'bg-green-500/20 text-green-400' 
-                                  : category.status === CategoryStatus.DRAFT
+                                  : category.status === 'DRAFT'
                                   ? 'bg-yellow-500/20 text-yellow-400'
                                   : 'bg-gray-500/20 text-gray-400'
                               }`}>
-                                {category.status === CategoryStatus.ACTIVE ? 'Aktívna' : 
-                                 category.status === CategoryStatus.DRAFT ? 'Koncept' : 'Neaktívna'}
+                                {category.status === 'ACTIVE' ? 'Aktívna' : 
+                                 category.status === 'DRAFT' ? 'Koncept' : 'Neaktívna'}
                               </span>
                             </div>
                             
@@ -1265,14 +1267,23 @@ export default function DevCategoriesPage() {
                         {isExpanded && (
                           <div className="border-t border-dark bg-dark/30 rounded-b-lg">
                             {/* Filtre */}
-                            {category.filters && category.filters.length > 0 && (
-                              <div className="p-4 border-b border-dark/50">
-                                <div className="flex items-center justify-between mb-3">
-                                  <h4 className="text-sm font-semibold text-white flex items-center gap-2">
-                                    <span className="w-1 h-4 bg-purple-400 rounded"></span>
-                                    Filtre ({category.filters.length})
-                                  </h4>
-                                </div>
+                            <div className="p-4 border-b border-dark/50">
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+                                  <span className="w-1 h-4 bg-purple-400 rounded"></span>
+                                  Filtre ({category._count?.filters || category.filters?.length || 0})
+                                </h4>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    window.open(`/dashboard/dev/filters?categoryId=${category.id}`, '_blank')
+                                  }
+                                  className="text-xs px-3 py-1.5 rounded-lg border border-purple-500/50 text-purple-300 hover:bg-purple-500/10 transition-colors"
+                                >
+                                  Spravovať filtre
+                                </button>
+                              </div>
+                              {category.filters && category.filters.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">
                                   {category.filters.map((filter: any) => (
                                     <div
@@ -1289,8 +1300,14 @@ export default function DevCategoriesPage() {
                                     </div>
                                   ))}
                                 </div>
-                              </div>
-                            )}
+                              ) : (
+                                <p className="text-xs text-gray-400">
+                                  Táto kategória zatiaľ nemá žiadne filtre. Kliknite na{" "}
+                                  <span className="text-purple-300 font-medium">Spravovať filtre</span> a vytvorte
+                                  prvý filter/preferenciu pre túto kategóriu.
+                                </p>
+                              )}
+                            </div>
                             
                             {/* Formulár pre pridanie podkategórie */}
                             {showForm && (
@@ -1348,7 +1365,7 @@ export default function DevCategoriesPage() {
                                           metaDescription: '',
                                           metaKeywords: '',
                                           ogImage: '',
-                                          status: CategoryStatus.ACTIVE,
+                                          status: 'ACTIVE' as CategoryStatus,
                                           parentId: '',
                                         })
                                       }}
@@ -1405,14 +1422,14 @@ export default function DevCategoriesPage() {
                                     {/* Status badge */}
                                     <div className="flex-shrink-0">
                                       <span className={`px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap ${
-                                        child.status === CategoryStatus.ACTIVE
+                                        child.status === 'ACTIVE'
                                           ? 'bg-green-500/20 text-green-400' 
-                                          : child.status === CategoryStatus.DRAFT
+                                          : child.status === 'DRAFT'
                                           ? 'bg-yellow-500/20 text-yellow-400'
                                           : 'bg-gray-500/20 text-gray-400'
                                       }`}>
-                                        {child.status === CategoryStatus.ACTIVE ? 'Aktívna' : 
-                                         child.status === CategoryStatus.DRAFT ? 'Koncept' : 'Neaktívna'}
+                                        {child.status === 'ACTIVE' ? 'Aktívna' : 
+                                         child.status === 'DRAFT' ? 'Koncept' : 'Neaktívna'}
                                       </span>
                                     </div>
                                     
