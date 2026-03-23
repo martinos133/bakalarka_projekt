@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated, getAuthUser, setAuthUser, logout } from '@/lib/auth'
 import { api } from '@/lib/api'
-import { User, LogOut, ChevronDown, FolderOpen, FileText } from 'lucide-react'
+import { User, LogOut, ChevronDown, FolderOpen, FileText, PlusCircle } from 'lucide-react'
 
 interface NavbarItem {
   id: string
@@ -284,6 +284,14 @@ export default function Header() {
                       <p className="text-xs text-gray-500 truncate">{user.email}</p>
                     </div>
                     <Link
+                      href="/podat-inzerat"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <PlusCircle className="w-4 h-4 text-[#1dbf73]" />
+                      Podať inzerát
+                    </Link>
+                    <Link
                       href="/dashboard"
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                       onClick={() => setShowUserMenu(false)}
@@ -341,6 +349,14 @@ export default function Header() {
                       </p>
                       <p className="text-xs text-gray-500 truncate">{user.email}</p>
                     </div>
+                    <Link
+                      href="/podat-inzerat"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <PlusCircle className="w-4 h-4 text-[#1dbf73]" />
+                      Podať inzerát
+                    </Link>
                     <Link
                       href="/dashboard"
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"

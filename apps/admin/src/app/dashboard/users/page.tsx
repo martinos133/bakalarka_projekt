@@ -6,7 +6,7 @@ import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
-import { User, Gender } from '@inzertna-platforma/shared'
+import { User } from '@inzertna-platforma/shared'
 import { Ban, Unlock, Eye, Calendar, Shield, Mail, Phone, User as UserIcon, MapPin, Building2, CreditCard, X, FileText, Euro, TrendingUp, TrendingDown, Search, Filter as FilterIcon, Users, UserCheck, UserX, Building, UserCog } from 'lucide-react'
 import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts'
 import ConfirmDialog from '@/components/ConfirmDialog'
@@ -28,7 +28,7 @@ export default function UsersPage() {
     role: '' as '' | 'ADMIN' | 'USER',
     status: '' as '' | 'active' | 'banned',
     accountType: '' as '' | 'company' | 'private',
-    gender: '' as '' | Gender,
+    gender: '' as '' | 'MALE' | 'FEMALE' | 'OTHER',
     minAge: '',
     maxAge: '',
   })
@@ -137,11 +137,11 @@ export default function UsersPage() {
     return age >= 0 ? age : null
   }
 
-  const getGenderLabel = (gender?: Gender | string | null) => {
+  const getGenderLabel = (gender?: string | null) => {
     if (!gender) return '-'
-    if (gender === Gender.MALE) return 'Muž'
-    if (gender === Gender.FEMALE) return 'Žena'
-    if (gender === Gender.OTHER) return 'Iné'
+    if (gender === 'MALE') return 'Muž'
+    if (gender === 'FEMALE') return 'Žena'
+    if (gender === 'OTHER') return 'Iné'
     return '-'
   }
 
@@ -243,9 +243,9 @@ export default function UsersPage() {
   ].map((d) => ({ ...d, percent: users.length > 0 ? ((d.count / users.length) * 100).toFixed(1) : '0' })), [byRole, users.length])
 
   const byGender = useMemo(() => ({
-    male: users.filter((u) => u.gender === Gender.MALE).length,
-    female: users.filter((u) => u.gender === Gender.FEMALE).length,
-    other: users.filter((u) => u.gender === Gender.OTHER).length,
+    male: users.filter((u) => u.gender === 'MALE').length,
+    female: users.filter((u) => u.gender === 'FEMALE').length,
+    other: users.filter((u) => u.gender === 'OTHER').length,
     unspecified: users.filter((u) => !u.gender).length,
   }), [users])
 
@@ -272,9 +272,9 @@ export default function UsersPage() {
   }, [usersWithAge])
 
   const avgAgeByGender = useMemo(() => {
-    const male = users.filter((u) => u.gender === Gender.MALE)
-    const female = users.filter((u) => u.gender === Gender.FEMALE)
-    const other = users.filter((u) => u.gender === Gender.OTHER)
+    const male = users.filter((u) => u.gender === 'MALE')
+    const female = users.filter((u) => u.gender === 'FEMALE')
+    const other = users.filter((u) => u.gender === 'OTHER')
     const unspecified = users.filter((u) => !u.gender)
     const calcAvg = (list: User[]) => {
       const withAge = list.filter((u) => getAge(u.dateOfBirth) != null)
@@ -686,13 +686,13 @@ export default function UsersPage() {
                 <label className="block text-xs text-gray-400 mb-2">Pohlavie</label>
                 <select
                   value={filters.gender}
-                  onChange={(e) => setFilters({ ...filters, gender: e.target.value as '' | Gender })}
+                  onChange={(e) => setFilters({ ...filters, gender: e.target.value as '' | 'MALE' | 'FEMALE' | 'OTHER' })}
                   className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                 >
                   <option value="">Všetky</option>
-                  <option value={Gender.MALE}>Muž</option>
-                  <option value={Gender.FEMALE}>Žena</option>
-                  <option value={Gender.OTHER}>Iné</option>
+                  <option value="MALE">Muž</option>
+                  <option value="FEMALE">Žena</option>
+                  <option value="OTHER">Iné</option>
                 </select>
               </div>
               <div>

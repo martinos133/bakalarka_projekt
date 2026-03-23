@@ -170,6 +170,8 @@ model Advertisement {
   revisions   String?            // e.g., "Neobmedzené", "3 revízie"
   features    String[]           // Array of features/included items
   faq         Json?              // Array of FAQ objects with question and answer
+  /// Hodnoty špecifikácií podľa slugov filtrov danej kategórie (TEXT, NUMBER, SELECT, …)
+  specifications Json?
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
   userId      String

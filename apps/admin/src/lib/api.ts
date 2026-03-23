@@ -1,5 +1,37 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
+/** Chyba z API so statusom – v catch môžete čítať `error.status` */
+export class ApiRequestError extends Error {
+  readonly status: number
+  readonly url: string
+  constructor(message: string, status: number, url: string) {
+    super(message)
+    this.name = 'ApiRequestError'
+    this.status = status
+    this.url = url
+  }
+}
+
+/** NestJS / class-validator často vracajú `message` ako string alebo pole stringov */
+function messageFromApiErrorBody(data: unknown): string | undefined {
+  if (!data || typeof data !== 'object') return undefined
+  const d = data as Record<string, unknown>
+  const raw = d.message
+  if (typeof raw === 'string' && raw.trim()) return raw.trim()
+  if (Array.isArray(raw)) {
+    const parts = raw
+      .map((x) => (typeof x === 'string' ? x : x != null ? String(x) : ''))
+      .filter(Boolean)
+    if (parts.length) return parts.join(', ')
+  }
+  const err = d.error
+  if (typeof err === 'string' && err.trim()) {
+    const generic = ['Conflict', 'Bad Request', 'Unauthorized', 'Forbidden', 'Not Found']
+    if (!generic.includes(err)) return err.trim()
+  }
+  return undefined
+}
+
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
   
@@ -28,22 +60,18 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
         }
       }
 
-      let errorMessage = `API error: ${response.statusText}`
+      let errorMessage = `Chyba API (${response.status} ${response.statusText})`
       try {
         const errorData = await response.json()
-        const msg = errorData.message || errorData.error
-        errorMessage = Array.isArray(msg) ? msg.join(', ') : (msg || errorMessage)
+        const parsed = messageFromApiErrorBody(errorData)
+        errorMessage = parsed || errorMessage
         if (response.status >= 500) {
-          errorMessage += ` (${response.status} ${url})`
+          errorMessage += ` — ${url}`
         }
       } catch {
-        // Ak sa nepodarí parsovať JSON, použijeme statusText
         errorMessage = `${response.status} ${response.statusText}: ${url}`
       }
-      const error = new Error(errorMessage)
-      ;(error as any).status = response.status
-      ;(error as any).url = url
-      throw error
+      throw new ApiRequestError(errorMessage, response.status, url)
     }
 
     return response.json()

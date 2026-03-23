@@ -4,27 +4,37 @@ import { CreateCategoryDto, UpdateCategoryDto } from '@inzertna-platforma/shared
 
 @Injectable()
 export class CategoriesService {
-  async create(createDto: CreateCategoryDto) {
-    // Vytvor slug z názvu
-    const slug = createDto.name
+  private static slugify(text: string): string {
+    return text
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
+  }
 
-    // Skontroluj, či už existuje kategória s týmto názvom alebo slugom
+  async create(createDto: CreateCategoryDto) {
+    const slugFromName = CategoriesService.slugify(createDto.name);
+    const finalSlug =
+      createDto.slug && createDto.slug.trim() !== ''
+        ? CategoriesService.slugify(createDto.slug.trim())
+        : slugFromName;
+
     const existing = await prisma.category.findFirst({
       where: {
-        OR: [
-          { name: createDto.name },
-          { slug },
-        ],
+        OR: [{ name: createDto.name }, { slug: finalSlug }],
       },
     });
 
     if (existing) {
-      throw new ConflictException('Kategória s týmto názvom už existuje');
+      if (existing.name === createDto.name) {
+        throw new ConflictException(
+          'Kategória s týmto názvom už existuje. Názvy kategórií musia byť v systéme jedinečné.',
+        );
+      }
+      throw new ConflictException(
+        `URL identifikátor (slug) „${finalSlug}“ už používa iná kategória. Zmeňte slug alebo názov.`,
+      );
     }
 
     // Ak je parentId prázdny string, nastav ho na null
@@ -45,7 +55,7 @@ export class CategoriesService {
     return prisma.category.create({
       data: {
         ...createDto,
-        slug: createDto.slug || slug,
+        slug: finalSlug,
         parentId,
         status: createDto.status || 'ACTIVE',
       },
@@ -223,7 +233,9 @@ export class CategoriesService {
       });
 
       if (existing) {
-        throw new ConflictException('Kategória s týmto názvom už existuje');
+        throw new ConflictException(
+          'Rovnaký URL identifikátor (slug) by už používala iná kategória. Zvoľte iný názov alebo upravte slug.',
+        );
       }
     }
 

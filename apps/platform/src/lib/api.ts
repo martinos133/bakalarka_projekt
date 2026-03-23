@@ -1,5 +1,24 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
+function messageFromApiErrorBody(data: unknown): string | undefined {
+  if (!data || typeof data !== 'object') return undefined
+  const d = data as Record<string, unknown>
+  const raw = d.message
+  if (typeof raw === 'string' && raw.trim()) return raw.trim()
+  if (Array.isArray(raw)) {
+    const parts = raw
+      .map((x) => (typeof x === 'string' ? x : x != null ? String(x) : ''))
+      .filter(Boolean)
+    if (parts.length) return parts.join(', ')
+  }
+  const err = d.error
+  if (typeof err === 'string' && err.trim()) {
+    const generic = ['Conflict', 'Bad Request', 'Unauthorized', 'Forbidden', 'Not Found']
+    if (!generic.includes(err)) return err.trim()
+  }
+  return undefined
+}
+
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('user_token') : null
   
@@ -15,15 +34,16 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
   })
 
   if (!response.ok) {
-    let errorMessage = `API error: ${response.statusText}`
+    let errorMessage = `Chyba API (${response.status} ${response.statusText})`
     try {
       const errorData = await response.json()
-      errorMessage = errorData.message || errorData.error || errorMessage
+      errorMessage = messageFromApiErrorBody(errorData) || errorMessage
     } catch {
-      // Ak sa nepodarí parsovať JSON, použijeme statusText
+      // ponecháme errorMessage
     }
     const error = new Error(errorMessage)
     ;(error as any).status = response.status
+    ;(error as any).url = url
     throw error
   }
 
@@ -42,13 +62,12 @@ export async function fetchAPI(url: string, options: RequestInit = {}) {
   })
 
   if (!response.ok) {
-    let errorMessage = `API error: ${response.statusText}`
+    let errorMessage = `Chyba API (${response.status} ${response.statusText})`
     try {
       const errorData = await response.json()
-      const msg = errorData.message || errorData.error
-      errorMessage = Array.isArray(msg) ? msg.join(', ') : (msg || errorMessage)
+      errorMessage = messageFromApiErrorBody(errorData) || errorMessage
     } catch {
-      // Ak sa nepodarí parsovať JSON
+      // JSON neprístupný
     }
     errorMessage += ` (${response.status} ${url})`
     const error = new Error(errorMessage)
@@ -77,6 +96,9 @@ export const api = {
   getPopularServices: () => fetchAPI('/advertisements/popular/services'),
   getAdvertisement: (id: string) => fetchAPI(`/advertisements/${id}`),
   getCategories: () => fetchAPI('/categories/active'),
+  /** Aktívne špecifikácie / filtre pre kategóriu (verejný endpoint) */
+  getActiveFilters: (categoryId: string) =>
+    fetchAPI(`/filters/active?categoryId=${encodeURIComponent(categoryId)}`, { cache: 'no-store' }),
   getCategoryBySlug: (slug: string) => fetchAPI(`/categories/slug/${slug}`),
   getAdvertisementsByCategory: (slug: string) => fetchAPI(`/advertisements/category/${slug}`),
   getAdvertisementsForMap: (params?: { categoryId?: string; type?: string; region?: string }) => {

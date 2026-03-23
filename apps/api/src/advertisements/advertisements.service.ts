@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { prisma } from '@inzertna-platforma/database';
 import { CreateAdvertisementDto, UpdateAdvertisementDto, MessageType } from '@inzertna-platforma/shared';
 import { MessagesService } from '../messages/messages.service';
+import { validateCategorySpecifications } from './specifications.validation';
 
 @Injectable()
 export class AdvertisementsService {
@@ -25,15 +26,27 @@ export class AdvertisementsService {
       }
     }
 
+    const { specifications: specsRaw, ...createRest } = createDto as CreateAdvertisementDto & {
+      specifications?: Record<string, unknown> | null;
+    };
+
+    const specifications = await validateCategorySpecifications(
+      createRest.categoryId,
+      specsRaw === undefined || specsRaw === null
+        ? {}
+        : (specsRaw as Record<string, unknown>),
+    );
+
     return prisma.advertisement.create({
       data: {
-        ...createDto,
+        ...createRest,
         userId,
-        images: createDto.images || [],
-        type: (createDto.type as any) || 'SERVICE',
-        features: createDto.features || [],
-        packages: createDto.packages ? JSON.parse(JSON.stringify(createDto.packages)) : null,
-        faq: createDto.faq ? JSON.parse(JSON.stringify(createDto.faq)) : null,
+        images: createRest.images || [],
+        type: (createRest.type as any) || 'SERVICE',
+        features: createRest.features || [],
+        packages: createRest.packages ? JSON.parse(JSON.stringify(createRest.packages)) : null,
+        faq: createRest.faq ? JSON.parse(JSON.stringify(createRest.faq)) : null,
+        specifications,
       } as any,
     });
   }
@@ -239,15 +252,54 @@ export class AdvertisementsService {
       throw new ForbiddenException('Nemáte oprávnenie upravovať tento inzerát');
     }
 
+    const { specifications: specsRaw, ...updateRest } = updateDto as UpdateAdvertisementDto & {
+      specifications?: Record<string, unknown> | null;
+    };
+
+    const categoryChanged =
+      updateDto.categoryId !== undefined && updateDto.categoryId !== advertisement.categoryId;
+
+    let specifications: Record<string, unknown> | null | undefined = undefined;
+    if (categoryChanged) {
+      if (specsRaw !== undefined) {
+        specifications = await validateCategorySpecifications(
+          updateDto.categoryId ?? null,
+          specsRaw === null ? {} : (specsRaw as Record<string, unknown>),
+        );
+      } else {
+        specifications = null;
+      }
+    } else if (specsRaw !== undefined) {
+      specifications = await validateCategorySpecifications(
+        advertisement.categoryId,
+        specsRaw === null ? {} : (specsRaw as Record<string, unknown>),
+      );
+    }
+
+    const data: Record<string, unknown> = {
+      ...updateRest,
+      images: updateDto.images !== undefined ? updateDto.images : advertisement.images,
+      features: updateDto.features !== undefined ? updateDto.features : (advertisement as any).features,
+      packages:
+        updateDto.packages !== undefined
+          ? updateDto.packages
+            ? JSON.parse(JSON.stringify(updateDto.packages))
+            : null
+          : (advertisement as any).packages,
+      faq:
+        updateDto.faq !== undefined
+          ? updateDto.faq
+            ? JSON.parse(JSON.stringify(updateDto.faq))
+            : null
+          : (advertisement as any).faq,
+    };
+    if (specifications !== undefined) {
+      data.specifications = specifications;
+    }
+
     return prisma.advertisement.update({
       where: { id },
-      data: {
-        ...updateDto,
-        images: updateDto.images !== undefined ? updateDto.images : advertisement.images,
-        features: updateDto.features !== undefined ? updateDto.features : (advertisement as any).features,
-        packages: updateDto.packages !== undefined ? (updateDto.packages ? JSON.parse(JSON.stringify(updateDto.packages)) : null) : (advertisement as any).packages,
-        faq: updateDto.faq !== undefined ? (updateDto.faq ? JSON.parse(JSON.stringify(updateDto.faq)) : null) : (advertisement as any).faq,
-      } as any,
+      data: data as any,
       include: {
         category: true,
       } as any,

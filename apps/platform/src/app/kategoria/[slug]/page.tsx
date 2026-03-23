@@ -209,7 +209,7 @@ export default function CategoryPage() {
             <div className="bg-white rounded-lg shadow-sm p-12 text-center">
               <p className="text-gray-600 mb-4">V tejto kategórii zatiaľ nie sú žiadne inzeráty.</p>
               <Link
-                href="/dashboard"
+                href={`/podat-inzerat?kategoria=${encodeURIComponent(slug)}`}
                 className="inline-block bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors"
               >
                 Vytvoriť inzerát

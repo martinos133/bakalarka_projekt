@@ -11,13 +11,13 @@ import {
   Flag,
   Settings,
   Code,
-  Filter,
   Navigation,
   Boxes,
   Sliders,
   MousePointerClick,
   FileCode,
   BookOpen,
+  ListChecks,
 } from 'lucide-react'
 
 interface NavItem {
@@ -39,6 +39,7 @@ const navigation: NavSection[] = [
       { label: 'Inzeráty', path: '/dashboard/advertisements', icon: FileText },
       { label: 'Používatelia', path: '/dashboard/users', icon: Users },
       { label: 'Kategórie', path: '/dashboard/categories', icon: FolderTree },
+      { label: 'Špecifikácie', path: '/dashboard/specifications', icon: ListChecks },
       { label: 'Monitoring kliknutí', path: '/dashboard/monitoring', icon: MousePointerClick },
     ],
   },
@@ -67,7 +68,6 @@ const navigation: NavSection[] = [
     items: [
       { label: 'Kategórie', path: '/dashboard/dev/categories', icon: FolderTree },
       { label: 'Inzeráty', path: '/dashboard/dev/advertisements', icon: FileText },
-      { label: 'Filtre', path: '/dashboard/dev/filters', icon: Filter },
       { label: 'Menu', path: '/dashboard/dev/menu', icon: Navigation },
       { label: 'Komponenty', path: '/dashboard/dev/components', icon: Boxes },
       { label: 'Konfigurácia', path: '/dashboard/dev/config', icon: Sliders },

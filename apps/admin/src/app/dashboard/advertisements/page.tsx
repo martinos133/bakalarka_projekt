@@ -6,11 +6,11 @@ import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
-import { Advertisement, AdvertisementStatus, AdvertisementType, Category } from '@inzertna-platforma/shared'
+import { Advertisement, AdvertisementStatus, Category } from '@inzertna-platforma/shared'
 import { Search, Filter as FilterIcon, TrendingUp, Euro, Tag, BarChart3, Calendar, MapPin, PieChart, FileText, Briefcase, Home } from 'lucide-react'
 import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts'
 
-type TypeView = 'all' | AdvertisementType.SERVICE | AdvertisementType.RENTAL
+type TypeView = 'all' | 'SERVICE' | 'RENTAL'
 
 export default function AdvertisementsPage() {
   const router = useRouter()
@@ -22,7 +22,7 @@ export default function AdvertisementsPage() {
   const [filters, setFilters] = useState({
     search: '',
     status: '' as '' | AdvertisementStatus,
-    type: '' as '' | AdvertisementType,
+    type: '' as '' | 'SERVICE' | 'RENTAL',
     categoryId: '',
     minPrice: '',
     maxPrice: '',
@@ -107,8 +107,8 @@ export default function AdvertisementsPage() {
   }), [displayAds])
 
   const byType = useMemo(() => ({
-    services: displayAds.filter((ad) => (ad as any).type === AdvertisementType.SERVICE || !(ad as any).type).length,
-    rentals: displayAds.filter((ad) => (ad as any).type === AdvertisementType.RENTAL).length,
+    services: displayAds.filter((ad) => (ad as any).type === 'SERVICE' || !(ad as any).type).length,
+    rentals: displayAds.filter((ad) => (ad as any).type === 'RENTAL').length,
   }), [displayAds])
 
   const byCategory = useMemo(() => {
@@ -208,18 +208,18 @@ export default function AdvertisementsPage() {
                 Všetky inzeráty
               </button>
               <button
-                onClick={() => setTypeView(AdvertisementType.SERVICE)}
+                onClick={() => setTypeView('SERVICE')}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                  typeView === AdvertisementType.SERVICE ? 'bg-blue-600 text-gray-200' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                  typeView === 'SERVICE' ? 'bg-blue-600 text-gray-200' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <Briefcase className="w-4 h-4" />
                 Len služby
               </button>
               <button
-                onClick={() => setTypeView(AdvertisementType.RENTAL)}
+                onClick={() => setTypeView('RENTAL')}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                  typeView === AdvertisementType.RENTAL ? 'bg-purple-600 text-gray-200' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                  typeView === 'RENTAL' ? 'bg-purple-600 text-gray-200' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <Home className="w-4 h-4" />
@@ -583,12 +583,12 @@ export default function AdvertisementsPage() {
                   <label className="block text-xs text-gray-400 mb-2">Typ</label>
                   <select
                     value={filters.type}
-                    onChange={(e) => setFilters({ ...filters, type: e.target.value as '' | AdvertisementType })}
+                    onChange={(e) => setFilters({ ...filters, type: e.target.value as '' | 'SERVICE' | 'RENTAL' })}
                     className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
                   >
                     <option value="">Všetky</option>
-                    <option value={AdvertisementType.SERVICE}>Služby</option>
-                    <option value={AdvertisementType.RENTAL}>Prenájom</option>
+                    <option value="SERVICE">Služby</option>
+                    <option value="RENTAL">Prenájom</option>
                   </select>
                 </div>
                 <div>
@@ -692,7 +692,7 @@ export default function AdvertisementsPage() {
                           <div className="text-sm text-gray-400 line-clamp-1 max-w-[200px]">{ad.description}</div>
                         </td>
                         <td className="px-6 py-4 text-gray-300">
-                          {(ad as any).type === AdvertisementType.RENTAL ? 'Prenájom' : 'Služba'}
+                          {(ad as any).type === 'RENTAL' ? 'Prenájom' : 'Služba'}
                         </td>
                         <td className="px-6 py-4 text-gray-300">{(ad as any).category?.name || '-'}</td>
                         <td className="px-6 py-4 text-green-400">

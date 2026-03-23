@@ -9,6 +9,7 @@ import ImageCarousel from '@/components/ImageCarousel'
 import DatePicker from '@/components/DatePicker'
 import { api } from '@/lib/api'
 import { isAuthenticated } from '@/lib/auth'
+import type { Filter } from '@inzertna-platforma/shared'
 import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone, Heart } from 'lucide-react'
 import type { DateRange } from 'react-day-picker'
 
@@ -25,13 +26,40 @@ interface FAQ {
   answer: string
 }
 
+function formatSpecificationValue(f: Filter, value: unknown): string {
+  if (value === undefined || value === null || value === '') return ''
+  if (f.type === 'BOOLEAN') return value ? 'Áno' : 'Nie'
+  if (f.type === 'MULTISELECT' && Array.isArray(value)) return value.join(', ')
+  if (f.type === 'RANGE' && value && typeof value === 'object' && !Array.isArray(value)) {
+    const o = value as Record<string, unknown>
+    const a = o.min != null ? String(o.min) : ''
+    const b = o.max != null ? String(o.max) : ''
+    if (a && b) return `${a} – ${b}`
+    if (a) return `od ${a}`
+    if (b) return `do ${b}`
+    return ''
+  }
+  if (f.type === 'DATE' && typeof value === 'string') {
+    const d = new Date(value)
+    return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleDateString('sk-SK')
+  }
+  if (f.type === 'NUMBER' && (typeof value === 'number' || typeof value === 'string')) {
+    const n = typeof value === 'number' ? value : parseFloat(value)
+    return Number.isNaN(n) ? String(value) : n.toLocaleString('sk-SK')
+  }
+  return String(value)
+}
+
 interface Advertisement {
   id: string
   title: string
   description: string
   price?: number
   images: string[]
+  categoryId?: string
+  specifications?: Record<string, unknown> | null
   category?: {
+    id?: string
     name: string
   }
   location?: string
@@ -83,10 +111,31 @@ export default function AdvertisementDetailPage({
   const [continueRentalRange, setContinueRentalRange] = useState<DateRange | undefined>(undefined)
   const [continueSubmitting, setContinueSubmitting] = useState(false)
   const [continueSuccess, setContinueSuccess] = useState(false)
+  const [categorySpecFilters, setCategorySpecFilters] = useState<Filter[]>([])
 
   useEffect(() => {
     loadAdvertisement()
   }, [id])
+
+  useEffect(() => {
+    const cid = advertisement?.categoryId || advertisement?.category?.id
+    if (!cid) {
+      setCategorySpecFilters([])
+      return
+    }
+    let cancelled = false
+    api
+      .getActiveFilters(cid)
+      .then((rows) => {
+        if (!cancelled) setCategorySpecFilters(Array.isArray(rows) ? rows : [])
+      })
+      .catch(() => {
+        if (!cancelled) setCategorySpecFilters([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [advertisement?.categoryId, advertisement?.category?.id])
 
   const loadAdvertisement = async () => {
     try {
@@ -409,6 +458,33 @@ export default function AdvertisementDetailPage({
                 </p>
               </div>
             </div>
+
+            {advertisement.specifications &&
+              categorySpecFilters.length > 0 &&
+              (() => {
+                const rows = categorySpecFilters
+                  .map((f) => {
+                    const raw = (advertisement.specifications as Record<string, unknown>)[f.slug]
+                    const text = formatSpecificationValue(f, raw)
+                    if (!text) return null
+                    return { f, text }
+                  })
+                  .filter(Boolean) as { f: Filter; text: string }[]
+                if (rows.length === 0) return null
+                return (
+                  <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Špecifikácie</h2>
+                    <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 rounded-xl border border-gray-200 bg-gray-50/50 p-4 sm:p-6">
+                      {rows.map(({ f, text }) => (
+                        <div key={f.id} className="border-b border-gray-100 pb-3 last:border-0 sm:border-0 sm:pb-0">
+                          <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">{f.name}</dt>
+                          <dd className="mt-1 text-base font-medium text-gray-900">{text}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                )
+              })()}
 
             {/* Service Details */}
             {advertisement.type === 'SERVICE' && (

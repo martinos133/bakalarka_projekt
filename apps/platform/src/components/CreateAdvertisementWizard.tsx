@@ -1,0 +1,669 @@
+'use client'
+
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
+import { ChevronLeft, Search } from 'lucide-react'
+import { api } from '@/lib/api'
+import { getCoordsFromLocation } from '@/lib/mapRegions'
+import CategorySpecificationsForm from '@/components/dashboard/CategorySpecificationsForm'
+import AdvertisementAdForm, { type AdFormDataState } from '@/components/AdvertisementAdForm'
+import type { Filter } from '@inzertna-platforma/shared'
+
+type Phase = 'root' | 'sub' | 'form'
+
+function sortByOrder(a: { order?: number }, b: { order?: number }) {
+  return (a.order || 0) - (b.order || 0)
+}
+
+function activeChildrenOf(root: any): any[] {
+  return (root?.children?.filter((c: any) => c.status === 'ACTIVE') || []).slice().sort(sortByOrder)
+}
+
+function rootsFrom(categories: any[]) {
+  return categories.filter((c) => !c.parentId && c.status === 'ACTIVE').sort(sortByOrder)
+}
+
+function findCategoryNode(categories: any[], id: string): any | null {
+  for (const c of categories) {
+    if (c.id === id) return c
+    for (const ch of c.children || []) {
+      if (ch.id === id) return ch
+    }
+  }
+  return null
+}
+
+function CategoryVisualTile({
+  cat,
+  selected,
+  onSelect,
+}: {
+  cat: any
+  selected: boolean
+  onSelect: () => void
+}) {
+  const accent = cat.color?.trim() || '#1dbf73'
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`group flex flex-col items-center rounded-2xl border-2 bg-white px-2 py-5 text-center shadow-sm transition-all hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1dbf73] ${
+        selected ? 'border-[#1dbf73] ring-2 ring-[#1dbf73]/25' : 'border-white/80 hover:border-[#1dbf73]/40'
+      }`}
+    >
+      <div
+        className="mb-3 flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-2xl sm:h-20 sm:w-20"
+        style={{ backgroundColor: `${accent}22` }}
+      >
+        {cat.image ? (
+          <img src={cat.image} alt="" className="h-full w-full object-cover" />
+        ) : cat.icon ? (
+          <span className="text-4xl leading-none sm:text-[2.75rem]" aria-hidden>
+            {cat.icon}
+          </span>
+        ) : (
+          <span className="text-xl font-bold sm:text-2xl" style={{ color: accent }}>
+            {(cat.name || '?').charAt(0).toUpperCase()}
+          </span>
+        )}
+      </div>
+      <span className="line-clamp-2 text-sm font-semibold leading-tight text-gray-900 sm:text-base">{cat.name}</span>
+    </button>
+  )
+}
+
+const emptyAdForm = (): AdFormDataState => ({
+  title: '',
+  description: '',
+  price: '',
+  categoryId: '',
+  location: '',
+  postalCode: '',
+  type: 'SERVICE',
+  images: [],
+  pricingType: 'FIXED',
+  hourlyRate: '',
+  dailyRate: '',
+  packages: [],
+  deliveryTime: '',
+  revisions: '',
+  features: [],
+  faq: [],
+})
+
+export type CreateAdvertisementWizardProps = {
+  categories: any[]
+  variant?: 'embed' | 'page'
+  initialEditId?: string | null
+  /** Predvýber podľa slug (z URL napr. z kategórnej stránky) */
+  initialCategorySlug?: string | null
+  onCancelEdit?: () => void
+  onComplete?: (payload: { mode: 'create' | 'update'; advertisement: any }) => void
+}
+
+export default function CreateAdvertisementWizard({
+  categories,
+  variant = 'embed',
+  initialEditId = null,
+  initialCategorySlug = null,
+  onCancelEdit,
+  onComplete,
+}: CreateAdvertisementWizardProps) {
+  const appliedInitialSlug = useRef(false)
+  const [phase, setPhase] = useState<Phase>('root')
+  const [rootId, setRootId] = useState<string | null>(null)
+  const [subId, setSubId] = useState<string | null>(null)
+  const [categoryQuery, setCategoryQuery] = useState('')
+
+  const [adFormData, setAdFormData] = useState<AdFormDataState>(emptyAdForm)
+  const [specificationValues, setSpecificationValues] = useState<Record<string, unknown>>({})
+  const [categoryFilters, setCategoryFilters] = useState<Filter[]>([])
+  const [newFeature, setNewFeature] = useState('')
+  const [newPackage, setNewPackage] = useState<any>({
+    name: '',
+    description: '',
+    price: '',
+    deliveryTime: '',
+    features: [],
+  })
+  const [newPackageFeature, setNewPackageFeature] = useState('')
+  const [newFAQ, setNewFAQ] = useState<any>({ question: '', answer: '' })
+
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+
+  const roots = useMemo(() => rootsFrom(categories), [categories])
+  const filteredRoots = useMemo(() => {
+    const q = categoryQuery.trim().toLowerCase()
+    if (!q) return roots
+    return roots.filter((r) => r.name?.toLowerCase().includes(q))
+  }, [roots, categoryQuery])
+
+  const selectedRoot = useMemo(
+    () => (rootId ? roots.find((r) => r.id === rootId) || null : null),
+    [roots, rootId],
+  )
+  const subcategories = useMemo(() => (selectedRoot ? activeChildrenOf(selectedRoot) : []), [selectedRoot])
+
+  const effectiveCategoryId = useMemo(() => {
+    if (phase !== 'form') return null
+    return subId || rootId || adFormData.categoryId || null
+  }, [phase, subId, rootId, adFormData.categoryId])
+
+  useEffect(() => {
+    if (phase !== 'form' || !effectiveCategoryId) {
+      if (phase !== 'form') setCategoryFilters([])
+      return
+    }
+    setAdFormData((prev) =>
+      prev.categoryId === effectiveCategoryId ? prev : { ...prev, categoryId: effectiveCategoryId },
+    )
+    let cancelled = false
+    api
+      .getActiveFilters(effectiveCategoryId)
+      .then((rows) => {
+        if (!cancelled) setCategoryFilters(Array.isArray(rows) ? rows : [])
+      })
+      .catch(() => {
+        if (!cancelled) setCategoryFilters([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [phase, effectiveCategoryId])
+
+  const resetNewAdFlow = useCallback(() => {
+    setPhase('root')
+    setRootId(null)
+    setSubId(null)
+    setCategoryQuery('')
+    setAdFormData(emptyAdForm())
+    setSpecificationValues({})
+    setCategoryFilters([])
+    setNewFeature('')
+    setNewPackage({ name: '', description: '', price: '', deliveryTime: '', features: [] })
+    setNewPackageFeature('')
+    setNewFAQ({ question: '', answer: '' })
+    setEditingId(null)
+    setError('')
+  }, [])
+
+  useEffect(() => {
+    if (!initialEditId) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        setError('')
+        const fullAd = await api.getAdvertisement(initialEditId)
+        if (cancelled) return
+        const catId = fullAd.categoryId || fullAd.category?.id || ''
+        const node = catId ? findCategoryNode(categories, catId) : null
+        if (node?.parentId) {
+          setRootId(node.parentId)
+          setSubId(node.id)
+        } else if (catId) {
+          setRootId(catId)
+          setSubId(null)
+        } else {
+          setRootId(null)
+          setSubId(null)
+        }
+        setAdFormData({
+          title: fullAd.title || '',
+          description: fullAd.description || '',
+          price: fullAd.price != null ? String(fullAd.price) : '',
+          categoryId: catId,
+          location: fullAd.location || '',
+          postalCode: fullAd.postalCode || '',
+          type: fullAd.type || 'SERVICE',
+          images: fullAd.images || [],
+          pricingType: fullAd.pricingType || 'FIXED',
+          hourlyRate: fullAd.hourlyRate != null ? String(fullAd.hourlyRate) : '',
+          dailyRate: fullAd.dailyRate != null ? String(fullAd.dailyRate) : '',
+          packages: fullAd.packages || [],
+          deliveryTime: fullAd.deliveryTime || '',
+          revisions: fullAd.revisions || '',
+          features: fullAd.features || [],
+          faq: fullAd.faq || [],
+        })
+        const specs = fullAd.specifications
+        setSpecificationValues(
+          specs && typeof specs === 'object' && !Array.isArray(specs)
+            ? { ...(specs as Record<string, unknown>) }
+            : {},
+        )
+        setEditingId(fullAd.id)
+        setPhase('form')
+      } catch (e: any) {
+        if (!cancelled) setError(e?.message || 'Chyba pri načítaní inzerátu')
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [initialEditId, categories])
+
+  useEffect(() => {
+    if (appliedInitialSlug.current || initialEditId || !initialCategorySlug?.trim() || categories.length === 0) {
+      return
+    }
+    const slug = initialCategorySlug.trim().toLowerCase()
+    const roots = rootsFrom(categories)
+    for (const r of roots) {
+      if (r.slug?.toLowerCase() === slug) {
+        setRootId(r.id)
+        setSubId(null)
+        const kids = activeChildrenOf(r)
+        if (kids.length > 0) {
+          setPhase('sub')
+        } else {
+          setPhase('form')
+          setAdFormData((prev) => ({ ...prev, categoryId: r.id }))
+        }
+        appliedInitialSlug.current = true
+        return
+      }
+      for (const ch of activeChildrenOf(r)) {
+        if (ch.slug?.toLowerCase() === slug) {
+          setRootId(r.id)
+          setSubId(ch.id)
+          setPhase('form')
+          setAdFormData((prev) => ({ ...prev, categoryId: ch.id }))
+          appliedInitialSlug.current = true
+          return
+        }
+      }
+    }
+  }, [initialCategorySlug, categories, initialEditId])
+
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setAdFormData((prev) => ({
+          ...prev,
+          images: [...prev.images, reader.result as string],
+        }))
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const removeImage = (index: number) => {
+    setAdFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }))
+  }
+
+  const handleSubmit = async () => {
+    if (!editingId && phase !== 'form') {
+      setError('Dokončite výber kategórie')
+      return
+    }
+    if (!adFormData.categoryId) {
+      setError('Vyberte kategóriu')
+      return
+    }
+    if (!adFormData.title?.trim() || !adFormData.description?.trim()) {
+      setError('Vyplňte názov a popis')
+      return
+    }
+
+    try {
+      setSaving(true)
+      setError('')
+      const coords = getCoordsFromLocation(adFormData.location || null)
+      const payload: any = {
+        title: adFormData.title,
+        description: adFormData.description,
+        type: adFormData.type,
+        price: adFormData.price ? parseFloat(adFormData.price) : undefined,
+        categoryId: adFormData.categoryId || undefined,
+        location: adFormData.location || undefined,
+        postalCode: adFormData.postalCode || undefined,
+        images: adFormData.images || [],
+        specifications: specificationValues,
+      }
+      if (coords) {
+        payload.latitude = coords[0]
+        payload.longitude = coords[1]
+      }
+      if (adFormData.type === 'SERVICE') {
+        payload.pricingType = adFormData.pricingType
+        if (adFormData.pricingType === 'FIXED' && adFormData.price) {
+          payload.price = parseFloat(adFormData.price)
+        }
+        if (adFormData.pricingType === 'HOURLY' && adFormData.hourlyRate) {
+          payload.hourlyRate = parseFloat(adFormData.hourlyRate)
+        }
+        if (adFormData.pricingType === 'DAILY' && adFormData.dailyRate) {
+          payload.dailyRate = parseFloat(adFormData.dailyRate)
+        }
+        if (adFormData.pricingType === 'PACKAGE' && adFormData.packages.length > 0) {
+          payload.packages = adFormData.packages.map((pkg) => ({
+            ...pkg,
+            price: parseFloat(pkg.price),
+          }))
+        }
+        if (adFormData.deliveryTime) payload.deliveryTime = adFormData.deliveryTime
+        if (adFormData.revisions) payload.revisions = adFormData.revisions
+        if (adFormData.features.length > 0) payload.features = adFormData.features
+        if (adFormData.faq.length > 0) payload.faq = adFormData.faq
+      }
+
+      if (editingId) {
+        const updated = await api.updateAdvertisement(editingId, payload)
+        resetNewAdFlow()
+        onCancelEdit?.()
+        if (onComplete) {
+          onComplete({ mode: 'update', advertisement: updated })
+        } else {
+          setSuccess('Inzerát bol úspešne aktualizovaný')
+          setTimeout(() => setSuccess(''), 4000)
+        }
+      } else {
+        const newAd = await api.createAdvertisement(payload)
+        resetNewAdFlow()
+        if (onComplete) {
+          onComplete({ mode: 'create', advertisement: newAd })
+        } else {
+          setSuccess('Inzerát bol vytvorený a čaká na schválenie')
+          setTimeout(() => setSuccess(''), 4000)
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || 'Chyba pri ukladaní inzerátu')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const goRoot = () => {
+    setPhase('root')
+    setSubId(null)
+    setError('')
+  }
+
+  const goSub = () => {
+    setPhase('sub')
+    setSubId(null)
+    setError('')
+  }
+
+  const continueFromRoot = () => {
+    if (!rootId) {
+      setError('Vyberte kategóriu')
+      return
+    }
+    setError('')
+    const root = roots.find((r) => r.id === rootId)
+    const kids = root ? activeChildrenOf(root) : []
+    if (kids.length > 0) {
+      setPhase('sub')
+      return
+    }
+    setSubId(null)
+    setAdFormData((prev) => ({ ...prev, categoryId: rootId! }))
+    setPhase('form')
+  }
+
+  const continueFromSub = () => {
+    if (!subId) {
+      setError('Vyberte podkategóriu')
+      return
+    }
+    setError('')
+    setAdFormData((prev) => ({ ...prev, categoryId: subId }))
+    setPhase('form')
+  }
+
+  const shellClass =
+    variant === 'page'
+      ? 'rounded-3xl border border-orange-100/80 bg-white/90 p-6 shadow-lg backdrop-blur-sm sm:p-8'
+      : 'rounded-lg border border-gray-200 bg-white p-6 shadow-sm'
+
+  const categoryPanelClass =
+    variant === 'page'
+      ? 'rounded-3xl border border-orange-100/60 bg-[#fff5ed] p-6 sm:p-8'
+      : 'rounded-2xl border border-gray-100 bg-[#fff8f3] p-6'
+
+  return (
+    <div className={shellClass}>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl">
+            {editingId ? 'Upraviť inzerát' : 'Podať inzerát'}
+          </h2>
+          <p className="mt-1 text-sm text-gray-600">
+            Vyberte kategóriu podľa toho, čo ponúkate – špecifikácie sa načítajú z nastavení administrátora.
+          </p>
+        </div>
+        {editingId && onCancelEdit && (
+          <button
+            type="button"
+            onClick={() => {
+              resetNewAdFlow()
+              onCancelEdit()
+            }}
+            className="shrink-0 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+          >
+            Zrušiť úpravu
+          </button>
+        )}
+      </div>
+
+      {!editingId && (
+        <div className="mb-8 flex flex-wrap items-center gap-2 sm:gap-3">
+          {(['root', 'sub', 'form'] as const).map((step, i) => {
+            const labels = { root: 'Kategória', sub: 'Podkategória', form: 'Údaje inzerátu' }
+            const active =
+              (step === 'root' && phase === 'root') ||
+              (step === 'sub' && phase === 'sub') ||
+              (step === 'form' && phase === 'form')
+            const passed =
+              (step === 'root' && (phase === 'sub' || phase === 'form')) ||
+              (step === 'sub' && phase === 'form')
+            const skipSub = step === 'sub' && selectedRoot && activeChildrenOf(selectedRoot).length === 0
+            if (skipSub) return null
+            return (
+              <div key={step} className="flex items-center gap-2">
+                {i > 0 && <div className="hidden h-px w-6 bg-gray-200 sm:block" />}
+                <div
+                  className={`rounded-full px-3 py-1.5 text-xs font-semibold sm:text-sm ${
+                    active
+                      ? 'bg-[#1dbf73] text-white'
+                      : passed
+                        ? 'bg-[#1dbf73]/15 text-[#148a55]'
+                        : 'bg-gray-100 text-gray-500'
+                  }`}
+                >
+                  {labels[step]}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {error ? (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</div>
+      ) : null}
+      {success ? (
+        <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+          {success}
+        </div>
+      ) : null}
+
+      {phase === 'root' && !editingId && (
+        <div className={categoryPanelClass}>
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Vyberte hlavnú kategóriu</h3>
+              <p className="text-sm text-gray-600">Zobrazujú sa len aktívne kategórie z administrácie.</p>
+            </div>
+            <div className="relative max-w-md flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type="search"
+                value={categoryQuery}
+                onChange={(e) => setCategoryQuery(e.target.value)}
+                placeholder="Hľadať kategóriu..."
+                className="w-full rounded-xl border border-orange-100 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#1dbf73] focus:outline-none focus:ring-2 focus:ring-[#1dbf73]/25"
+              />
+            </div>
+          </div>
+
+          {filteredRoots.length === 0 ? (
+            <p className="text-center text-sm text-amber-800">
+              {roots.length === 0
+                ? 'Žiadne aktívne kategórie. Pridajte ich v administrácii.'
+                : 'Žiadna kategória nezodpovedá hľadaniu.'}
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {filteredRoots.map((cat) => (
+                <CategoryVisualTile
+                  key={cat.id}
+                  cat={cat}
+                  selected={rootId === cat.id}
+                  onSelect={() => {
+                    if (cat.id !== rootId) {
+                      setSubId(null)
+                      setSpecificationValues({})
+                    }
+                    setRootId(cat.id)
+                    setError('')
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
+          <div className="mt-8 flex justify-end">
+            <button
+              type="button"
+              onClick={continueFromRoot}
+              className="rounded-xl bg-[#1dbf73] px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#19a463]"
+            >
+              Pokračovať
+            </button>
+          </div>
+        </div>
+      )}
+
+      {phase === 'sub' && !editingId && (
+        <div className={categoryPanelClass}>
+          <button
+            type="button"
+            onClick={goRoot}
+            className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Späť na kategórie
+          </button>
+          <h3 className="mb-1 text-lg font-semibold text-gray-900">Vyberte podkategóriu</h3>
+          <p className="mb-6 text-sm text-gray-600">
+            Kategória: <span className="font-semibold text-gray-800">{selectedRoot?.name}</span>
+          </p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            {subcategories.map((cat: any) => (
+              <CategoryVisualTile
+                key={cat.id}
+                cat={cat}
+                selected={subId === cat.id}
+                onSelect={() => {
+                  setSubId(cat.id)
+                  setError('')
+                }}
+              />
+            ))}
+          </div>
+          <div className="mt-8 flex justify-end">
+            <button
+              type="button"
+              onClick={continueFromSub}
+              className="rounded-xl bg-[#1dbf73] px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#19a463]"
+            >
+              Pokračovať k inzerátu
+            </button>
+          </div>
+        </div>
+      )}
+
+      {phase === 'form' && (
+        <div className="space-y-6">
+          {!editingId && (
+            <div className="flex flex-wrap items-center gap-3 border-b border-gray-100 pb-5">
+              <button
+                type="button"
+                onClick={() => {
+                  setError('')
+                  if (subcategories.length > 0) goSub()
+                  else goRoot()
+                }}
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Zmeniť kategóriu
+              </button>
+              <div className="flex flex-wrap gap-2">
+                {selectedRoot && (
+                  <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800">
+                    {selectedRoot.name}
+                  </span>
+                )}
+                {subId && (
+                  <span className="rounded-full bg-[#1dbf73]/10 px-3 py-1 text-sm font-medium text-[#148a55]">
+                    {findCategoryNode(categories, subId)?.name || 'Podkategória'}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="rounded-2xl border border-gray-200 bg-gradient-to-b from-white to-gray-50/50 p-6">
+            <h3 className="text-lg font-semibold text-gray-900">Špecifikácie</h3>
+            <p className="mt-1 text-sm text-gray-600">
+              Polia podľa vašej kategórie. Povinné polia sú označené hviezdičkou.
+            </p>
+            <div className="mt-5">
+              <CategorySpecificationsForm
+                filters={categoryFilters}
+                values={specificationValues}
+                onChange={(slug, v) =>
+                  setSpecificationValues((prev) => {
+                    const next = { ...prev, [slug]: v }
+                    if (v === undefined || v === '') delete next[slug]
+                    return next
+                  })
+                }
+              />
+            </div>
+          </div>
+
+          <AdvertisementAdForm
+            adFormData={adFormData}
+            setAdFormData={setAdFormData}
+            newFeature={newFeature}
+            setNewFeature={setNewFeature}
+            newPackage={newPackage}
+            setNewPackage={setNewPackage}
+            newPackageFeature={newPackageFeature}
+            setNewPackageFeature={setNewPackageFeature}
+            newFAQ={newFAQ}
+            setNewFAQ={setNewFAQ}
+            handleImageUpload={handleImageUpload}
+            removeImage={removeImage}
+            onSubmit={handleSubmit}
+            saving={saving}
+            editingId={editingId}
+          />
+        </div>
+      )}
+    </div>
+  )
+}

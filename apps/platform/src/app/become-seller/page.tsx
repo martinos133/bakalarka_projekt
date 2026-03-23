@@ -36,11 +36,11 @@ const STEPS = [
     num: 2,
     title: 'Vytvorte svoj prvý inzerát',
     description:
-      'Inzerát môžete vytvoriť až po prihlásení. V dashboarde potom pridáte názov, kategóriu, popis, cenu a fotky. Vyplňte lokalitu, aby vás zákazníci našli na mape. Inzerát môže byť služba alebo prenájom.',
+      'Inzerát môžete vytvoriť až po prihlásení. Najprv vyberiete kategóriu z ponuky, vyplníte špecifikácie a potom názov, popis, cenu a fotky. Lokalita pomôže zákazníkom nájsť vás na mape.',
     icon: FileEdit,
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
     cta: 'Vytvoriť inzerát',
-    href: '/dashboard',
+    href: '/podat-inzerat',
     authRequired: true,
   },
   {

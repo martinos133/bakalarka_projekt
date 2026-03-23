@@ -2,13 +2,22 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
-import { Category, CategoryStatus } from '@inzertna-platforma/shared'
-import { FolderTree, FolderOpen, Folder, Search, Filter as FilterIcon, BarChart3 } from 'lucide-react'
+import type { Category } from '@inzertna-platforma/shared'
+import { FolderTree, FolderOpen, Folder, Search, Filter as FilterIcon, BarChart3, ListChecks } from 'lucide-react'
 import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts'
+
+const CATEGORY_STATUS = {
+  ACTIVE: 'ACTIVE',
+  DRAFT: 'DRAFT',
+  INACTIVE: 'INACTIVE',
+} as const
+
+type CategoryStatus = (typeof CATEGORY_STATUS)[keyof typeof CATEGORY_STATUS]
 
 export default function CategoriesPage() {
   const router = useRouter()
@@ -59,9 +68,9 @@ export default function CategoriesPage() {
 
   const byStatus = useMemo(
     () => ({
-      active: categories.filter((c) => c.status === CategoryStatus.ACTIVE).length,
-      draft: categories.filter((c) => c.status === CategoryStatus.DRAFT).length,
-      inactive: categories.filter((c) => c.status === CategoryStatus.INACTIVE).length,
+      active: categories.filter((c) => c.status === CATEGORY_STATUS.ACTIVE).length,
+      draft: categories.filter((c) => c.status === CATEGORY_STATUS.DRAFT).length,
+      inactive: categories.filter((c) => c.status === CATEGORY_STATUS.INACTIVE).length,
     }),
     [categories]
   )
@@ -109,9 +118,9 @@ export default function CategoriesPage() {
 
   const getStatusLabel = (status: CategoryStatus) => {
     const labels: Record<CategoryStatus, string> = {
-      [CategoryStatus.ACTIVE]: 'Aktívna',
-      [CategoryStatus.DRAFT]: 'Koncept',
-      [CategoryStatus.INACTIVE]: 'Neaktívna',
+      [CATEGORY_STATUS.ACTIVE]: 'Aktívna',
+      [CATEGORY_STATUS.DRAFT]: 'Koncept',
+      [CATEGORY_STATUS.INACTIVE]: 'Neaktívna',
     }
     return labels[status] ?? status
   }
@@ -396,9 +405,9 @@ export default function CategoriesPage() {
                   className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                 >
                   <option value="">Všetky</option>
-                  <option value={CategoryStatus.ACTIVE}>Aktívna</option>
-                  <option value={CategoryStatus.DRAFT}>Koncept</option>
-                  <option value={CategoryStatus.INACTIVE}>Neaktívna</option>
+                  <option value={CATEGORY_STATUS.ACTIVE}>Aktívna</option>
+                  <option value={CATEGORY_STATUS.DRAFT}>Koncept</option>
+                  <option value={CATEGORY_STATUS.INACTIVE}>Neaktívna</option>
                 </select>
               </div>
               <div>
@@ -448,6 +457,7 @@ export default function CategoriesPage() {
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Podkategórie</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Inzeráty</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Poradie</th>
+                      <th className="text-right px-6 py-3 text-sm font-semibold text-gray-300">Špecifikácie</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -477,9 +487,9 @@ export default function CategoriesPage() {
                           <td className="px-6 py-4">
                             <span
                               className={`px-2 py-1 rounded text-xs font-medium ${
-                                cat.status === CategoryStatus.ACTIVE
+                                cat.status === CATEGORY_STATUS.ACTIVE
                                   ? 'bg-green-500/20 text-green-400'
-                                  : cat.status === CategoryStatus.DRAFT
+                                  : cat.status === CATEGORY_STATUS.DRAFT
                                     ? 'bg-gray-500/20 text-gray-400'
                                     : 'bg-red-500/20 text-red-400'
                               }`}
@@ -490,6 +500,15 @@ export default function CategoriesPage() {
                           <td className="px-6 py-4 text-gray-300 text-sm tabular-nums">{childrenCount}</td>
                           <td className="px-6 py-4 text-gray-300 text-sm tabular-nums">{adsCount}</td>
                           <td className="px-6 py-4 text-gray-400 text-sm tabular-nums">{cat.order}</td>
+                          <td className="px-6 py-4 text-right">
+                            <Link
+                              href={`/dashboard/specifications?categoryId=${encodeURIComponent(cat.id)}`}
+                              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+                            >
+                              <ListChecks className="w-4 h-4 shrink-0" />
+                              Upraviť
+                            </Link>
+                          </td>
                         </tr>
                       )
                     })}

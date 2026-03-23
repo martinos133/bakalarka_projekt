@@ -7,7 +7,17 @@ import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { Category, Filter } from '@inzertna-platforma/shared'
-import { Filter as FilterIcon, Plus, Edit, Trash2, Save, X, Check } from 'lucide-react'
+import {
+  Filter as FilterIcon,
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  Check,
+  ChevronUp,
+  ChevronDown,
+} from 'lucide-react'
 
 type FilterType =
   | 'TEXT'
@@ -61,6 +71,7 @@ export default function DevFiltersPage() {
   })
   const [batchRows, setBatchRows] = useState<BatchRow[]>([])
   const [batchSaving, setBatchSaving] = useState(false)
+  const [orderSavingId, setOrderSavingId] = useState<string | null>(null)
 
   const categoryIdFromQuery = searchParams?.get('categoryId') || ''
 
@@ -186,7 +197,7 @@ export default function DevFiltersPage() {
 
   const addBatchRow = () => {
     if (!selectedCategoryId) {
-      alert('Najprv vyberte hlavnú kategóriu.')
+      alert('Najprv vyberte kategóriu.')
       return
     }
     setBatchRows((prev) => [
@@ -247,13 +258,82 @@ export default function DevFiltersPage() {
     return filters.filter((f) => !selectedCategoryId || f.categoryId === selectedCategoryId)
   }, [filters, selectedCategoryId])
 
-  const mainCategories = useMemo(
-    () =>
-      categories
-        .filter((c) => !c.parentId)
-        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || a.name.localeCompare(b.name)),
-    [categories]
-  )
+  const sortedFilteredFilters = useMemo(() => {
+    return [...filteredFilters].sort(
+      (a, b) =>
+        (a.order ?? 0) - (b.order ?? 0) || a.name.localeCompare(b.name, 'sk'),
+    )
+  }, [filteredFilters])
+
+  const commitFilterOrder = async (filter: Filter, raw: string) => {
+    const parsed = parseInt(raw, 10)
+    const newOrder = Number.isFinite(parsed) ? Math.max(0, parsed) : 0
+    if (newOrder === (filter.order ?? 0)) return
+    try {
+      setOrderSavingId(filter.id)
+      await api.updateFilter(filter.id, { order: newOrder })
+      await loadData()
+    } catch (error: any) {
+      console.error('Chyba pri ukladaní poradia:', error)
+      alert(error?.message || 'Chyba pri ukladaní poradia')
+    } finally {
+      setOrderSavingId(null)
+    }
+  }
+
+  const moveFilterOrder = async (filterId: string, direction: 'up' | 'down') => {
+    const list = sortedFilteredFilters
+    const i = list.findIndex((f) => f.id === filterId)
+    if (i < 0) return
+    const j = direction === 'up' ? i - 1 : i + 1
+    if (j < 0 || j >= list.length) return
+    const cur = list[i]
+    const neigh = list[j]
+    const curOrder = cur.order ?? 0
+    const neighOrder = neigh.order ?? 0
+    const base = Math.min(curOrder, neighOrder)
+    try {
+      setOrderSavingId(filterId)
+      if (curOrder === neighOrder) {
+        if (direction === 'up') {
+          await api.updateFilter(neigh.id, { order: base + 1 })
+          await api.updateFilter(cur.id, { order: base })
+        } else {
+          await api.updateFilter(neigh.id, { order: base })
+          await api.updateFilter(cur.id, { order: base + 1 })
+        }
+      } else {
+        await Promise.all([
+          api.updateFilter(cur.id, { order: neighOrder }),
+          api.updateFilter(neigh.id, { order: curOrder }),
+        ])
+      }
+      await loadData()
+    } catch (error: any) {
+      console.error('Chyba pri zmene poradia:', error)
+      alert(error?.message || 'Chyba pri zmene poradia')
+    } finally {
+      setOrderSavingId(null)
+    }
+  }
+
+  /** Hlavné + podkategórie – špecifikácie sa viažu na presné categoryId (aj listová podkategória). */
+  const categoriesForFilterSelect = useMemo(() => {
+    const list: { id: string; label: string }[] = []
+    const roots = categories
+      .filter((c) => !c.parentId)
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || a.name.localeCompare(b.name))
+    for (const r of roots) {
+      list.push({ id: r.id, label: r.name })
+      const subs = categories
+        .filter((c) => c.parentId === r.id)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || a.name.localeCompare(b.name))
+      for (const s of subs) {
+        list.push({ id: s.id, label: `${r.name} → ${s.name}` })
+      }
+    }
+    return list
+  }, [categories])
 
   const filterTypeLabel = (type: FilterType) => {
     switch (type) {
@@ -284,15 +364,16 @@ export default function DevFiltersPage() {
         <main className="p-6">
           <div className="flex items-start justify-between mb-6 gap-4">
             <div>
-              <h1 className="text-2xl font-bold">Filtre kategórií</h1>
-              <p className="text-sm text-gray-400 mt-1">
-                Nastavte polia, ktoré bude tvorca inzerátu vypĺňať pre vybranú hlavnú kategóriu (napr. výkon v kW, výmera v m²).
+              <h1 className="text-2xl font-bold">Špecifikácie inzerátov</h1>
+              <p className="mt-1 text-sm text-gray-400 max-w-2xl">
+                Vyberte kategóriu a pridajte polia (text, číslo, výber, dátum, rozsah…). Tieto údaje potom vyplnia predajcovia pri
+                podaní inzerátu v tejto kategórii.
               </p>
             </div>
             <button
               onClick={() => {
                 if (!selectedCategoryId) {
-                  alert('Najprv vyberte hlavnú kategóriu.')
+                  alert('Najprv vyberte kategóriu.')
                   return
                 }
                 addBatchRow()
@@ -309,7 +390,7 @@ export default function DevFiltersPage() {
             <div className="flex items-center gap-3 flex-wrap">
               <div className="flex items-center gap-2">
                 <FilterIcon className="w-5 h-5 text-gray-400" />
-                <span className="text-sm text-gray-300">Hlavná kategória</span>
+                <span className="text-sm text-gray-300">Kategória</span>
               </div>
               <select
                 value={selectedCategoryId}
@@ -319,10 +400,10 @@ export default function DevFiltersPage() {
                 }}
                 className="bg-dark border border-card rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary min-w-[260px] transition-shadow"
               >
-                <option value="">-- Vyberte hlavnú kategóriu --</option>
-                {mainCategories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
+                <option value="">-- Vyberte kategóriu --</option>
+                {categoriesForFilterSelect.map((row) => (
+                  <option key={row.id} value={row.id}>
+                    {row.label}
                   </option>
                 ))}
               </select>
@@ -330,7 +411,7 @@ export default function DevFiltersPage() {
                 <span className="text-xs text-gray-500">
                   Spravujete polia pre:{' '}
                   <span className="text-gray-200 font-medium">
-                    {mainCategories.find((c) => c.id === selectedCategoryId)?.name}
+                    {categoriesForFilterSelect.find((c) => c.id === selectedCategoryId)?.label}
                   </span>
                 </span>
               )}
@@ -495,7 +576,7 @@ export default function DevFiltersPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Hlavná kategória *
+                      Kategória *
                     </label>
                     <select
                       value={formState.categoryId}
@@ -504,15 +585,15 @@ export default function DevFiltersPage() {
                       }
                       className="w-full bg-dark border border-card rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow placeholder-gray-500"
                     >
-                      <option value="">Vyberte hlavnú kategóriu</option>
-                      {mainCategories.map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                          {cat.name}
+                      <option value="">Vyberte kategóriu</option>
+                      {categoriesForFilterSelect.map((row) => (
+                        <option key={row.id} value={row.id}>
+                          {row.label}
                         </option>
                       ))}
                     </select>
                     <p className="mt-1.5 text-xs text-gray-500">
-                      Polia sa viažu na hlavnú kategóriu.
+                      Polia sa zobrazia pri výbere tejto kategórie pri podaní inzerátu.
                     </p>
                   </div>
 
@@ -678,7 +759,7 @@ export default function DevFiltersPage() {
             ) : filteredFilters.length === 0 ? (
               <div className="p-6 text-center text-gray-400">
                 {!selectedCategoryId
-                  ? 'Najprv vyberte hlavnú kategóriu.'
+                  ? 'Najprv vyberte kategóriu.'
                   : 'Pre túto kategóriu zatiaľ nemáte žiadne polia.'}
                 {!!selectedCategoryId && (
                   <div className="mt-4">
@@ -707,7 +788,8 @@ export default function DevFiltersPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredFilters.map((filter) => {
+                    {sortedFilteredFilters.map((filter, rowIndex) => {
+                      const savingOrder = orderSavingId === filter.id
                       return (
                         <tr
                           key={filter.id}
@@ -755,8 +837,47 @@ export default function DevFiltersPage() {
                               <span className="text-xs text-gray-500">—</span>
                             )}
                           </td>
-                          <td className="px-6 py-3 text-gray-300 tabular-nums">
-                            {filter.order ?? '—'}
+                          <td className="px-6 py-3">
+                            <div className="flex items-center gap-1">
+                              <div className="flex flex-col">
+                                <button
+                                  type="button"
+                                  disabled={savingOrder || rowIndex === 0}
+                                  onClick={() => moveFilterOrder(filter.id, 'up')}
+                                  className="p-0.5 rounded text-gray-400 hover:text-white hover:bg-cardHover disabled:opacity-30 disabled:pointer-events-none"
+                                  title="Posunúť vyššie"
+                                >
+                                  <ChevronUp className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={savingOrder || rowIndex >= sortedFilteredFilters.length - 1}
+                                  onClick={() => moveFilterOrder(filter.id, 'down')}
+                                  className="p-0.5 rounded text-gray-400 hover:text-white hover:bg-cardHover disabled:opacity-30 disabled:pointer-events-none"
+                                  title="Posunúť nižšie"
+                                >
+                                  <ChevronDown className="w-4 h-4" />
+                                </button>
+                              </div>
+                              <input
+                                type="number"
+                                min={0}
+                                step={1}
+                                disabled={savingOrder}
+                                defaultValue={filter.order ?? 0}
+                                key={`${filter.id}-${filter.order ?? 0}`}
+                                onBlur={(e) => commitFilterOrder(filter, e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    ;(e.target as HTMLInputElement).blur()
+                                  }
+                                }}
+                                className="w-16 bg-dark border border-card rounded-lg px-2 py-1.5 text-white text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary disabled:opacity-50"
+                              />
+                              {savingOrder && (
+                                <span className="inline-block w-3.5 h-3.5 border-2 border-gray-500 border-t-primary rounded-full animate-spin shrink-0" />
+                              )}
+                            </div>
                           </td>
                           <td className="px-6 py-3 text-right">
                             <div className="flex items-center justify-end gap-2">

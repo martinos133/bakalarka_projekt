@@ -99,6 +99,9 @@ export interface Advertisement {
   revisions?: string;
   features?: string[];
   faq?: FAQ[];
+  /** Kľúče = slug filtra kategórie, hodnoty podľa typu filtra */
+  specifications?: Record<string, unknown> | null;
+  categoryId?: string;
   userId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -124,6 +127,7 @@ export interface CreateAdvertisementDto {
   revisions?: string;
   features?: string[];
   faq?: FAQ[];
+  specifications?: Record<string, unknown> | null;
 }
 
 export interface UpdateAdvertisementDto extends Partial<CreateAdvertisementDto> {
