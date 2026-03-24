@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
+import AlertDialog from '@/components/AlertDialog'
 import { api } from '@/lib/api'
 import { Category, Filter } from '@inzertna-platforma/shared'
 import {
@@ -72,8 +73,24 @@ export default function DevFiltersPage() {
   const [batchRows, setBatchRows] = useState<BatchRow[]>([])
   const [batchSaving, setBatchSaving] = useState(false)
   const [orderSavingId, setOrderSavingId] = useState<string | null>(null)
+  const [alertModal, setAlertModal] = useState<{
+    open: boolean
+    title: string
+    message: string
+  }>({
+    open: false,
+    title: '',
+    message: '',
+  })
 
   const categoryIdFromQuery = searchParams?.get('categoryId') || ''
+  const showAlert = (message: string, title = 'Upozornenie') => {
+    setAlertModal({
+      open: true,
+      title,
+      message,
+    })
+  }
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -136,15 +153,15 @@ export default function DevFiltersPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formState.categoryId) {
-      alert('Vyberte kategóriu.')
+      showAlert('Vyberte kategóriu.')
       return
     }
     if (!formState.name.trim()) {
-      alert('Názov filtra je povinný.')
+      showAlert('Názov filtra je povinný.')
       return
     }
     if (!formState.type) {
-      alert('Vyberte typ filtra.')
+      showAlert('Vyberte typ filtra.')
       return
     }
 
@@ -178,7 +195,7 @@ export default function DevFiltersPage() {
       resetForm()
     } catch (error: any) {
       console.error('Chyba pri ukladaní filtra:', error)
-      alert(error?.message || 'Chyba pri ukladaní filtra')
+      showAlert(error?.message || 'Chyba pri ukladaní filtra', 'Chyba')
     } finally {
       setSaving(false)
     }
@@ -191,13 +208,13 @@ export default function DevFiltersPage() {
       await loadData()
     } catch (error: any) {
       console.error('Chyba pri odstraňovaní filtra:', error)
-      alert(error?.message || 'Chyba pri odstraňovaní filtra')
+      showAlert(error?.message || 'Chyba pri odstraňovaní filtra', 'Chyba')
     }
   }
 
   const addBatchRow = () => {
     if (!selectedCategoryId) {
-      alert('Najprv vyberte kategóriu.')
+      showAlert('Najprv vyberte kategóriu.')
       return
     }
     setBatchRows((prev) => [
@@ -220,7 +237,7 @@ export default function DevFiltersPage() {
     if (!selectedCategoryId) return
     const toSave = batchRows.filter((r) => r.name.trim() && r.type)
     if (toSave.length === 0) {
-      alert('Pridajte aspoň jeden riadok s názvom a typom.')
+      showAlert('Pridajte aspoň jeden riadok s názvom a typom.')
       return
     }
     try {
@@ -248,7 +265,7 @@ export default function DevFiltersPage() {
       await loadData()
     } catch (error: any) {
       console.error('Chyba pri ukladaní polí:', error)
-      alert(error?.message || 'Chyba pri ukladaní polí')
+      showAlert(error?.message || 'Chyba pri ukladaní polí', 'Chyba')
     } finally {
       setBatchSaving(false)
     }
@@ -275,7 +292,7 @@ export default function DevFiltersPage() {
       await loadData()
     } catch (error: any) {
       console.error('Chyba pri ukladaní poradia:', error)
-      alert(error?.message || 'Chyba pri ukladaní poradia')
+      showAlert(error?.message || 'Chyba pri ukladaní poradia', 'Chyba')
     } finally {
       setOrderSavingId(null)
     }
@@ -311,7 +328,7 @@ export default function DevFiltersPage() {
       await loadData()
     } catch (error: any) {
       console.error('Chyba pri zmene poradia:', error)
-      alert(error?.message || 'Chyba pri zmene poradia')
+      showAlert(error?.message || 'Chyba pri zmene poradia', 'Chyba')
     } finally {
       setOrderSavingId(null)
     }
@@ -358,6 +375,12 @@ export default function DevFiltersPage() {
 
   return (
     <div className="min-h-screen bg-dark text-white flex">
+      <AlertDialog
+        open={alertModal.open}
+        title={alertModal.title}
+        message={alertModal.message}
+        onClose={() => setAlertModal((prev) => ({ ...prev, open: false }))}
+      />
       <Sidebar />
       <div className="flex-1 ml-64">
         <Header />
@@ -373,7 +396,7 @@ export default function DevFiltersPage() {
             <button
               onClick={() => {
                 if (!selectedCategoryId) {
-                  alert('Najprv vyberte kategóriu.')
+                  showAlert('Najprv vyberte kategóriu.')
                   return
                 }
                 addBatchRow()

@@ -38,6 +38,8 @@ export type AdvertisementAdFormProps = {
   onSubmit: () => void
   saving: boolean
   editingId: string | null
+  /** `admin` = tmavé polia zladené s admin panelom */
+  variant?: 'platform' | 'admin'
 }
 
 export default function AdvertisementAdForm({
@@ -56,43 +58,114 @@ export default function AdvertisementAdForm({
   onSubmit,
   saving,
   editingId,
+  variant = 'platform',
 }: AdvertisementAdFormProps) {
+  const a = variant === 'admin'
+  const c = {
+    label: a ? 'block text-sm font-medium text-gray-300 mb-2' : 'block text-sm font-medium text-gray-700 mb-2',
+    labelXs: a ? 'block text-xs text-gray-400 mb-1' : 'block text-xs text-gray-600 mb-1',
+    input:
+      a
+        ? 'w-full px-4 py-2.5 rounded-lg border border-card bg-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
+        : 'w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900',
+    textarea:
+      a
+        ? 'w-full px-4 py-2.5 rounded-lg border border-card bg-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
+        : 'w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900',
+    inpFocus:
+      a
+        ? 'w-full px-4 py-2 rounded-lg border border-card bg-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
+        : 'w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent',
+    inpSm:
+      a
+        ? 'w-full px-3 py-2 rounded-lg border border-card bg-dark text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
+        : 'w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent',
+    flexInp:
+      a
+        ? 'flex-1 px-4 py-2 rounded-lg border border-card bg-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
+        : 'flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent',
+    flexInpSm:
+      a
+        ? 'flex-1 px-3 py-2 rounded-lg border border-card bg-dark text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
+        : 'flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent',
+    secBorder: a ? 'border-t border-card pt-6 mt-6' : 'border-t border-gray-200 pt-6 mt-6',
+    secTitle: a ? 'text-lg font-semibold text-white mb-4' : 'text-lg font-semibold text-gray-900 mb-4',
+    hint: 'text-xs text-gray-500 mt-1',
+    panel: a ? 'space-y-2 p-4 bg-dark rounded-xl border border-card' : 'space-y-2 p-4 bg-gray-50 rounded-lg border border-gray-200',
+    panelLg: a ? 'space-y-4 p-4 bg-dark rounded-xl border border-card' : 'space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200',
+    featureChip: a
+      ? 'px-3 py-1 bg-card rounded-lg text-sm text-gray-200 border border-card flex items-center gap-2'
+      : 'px-3 py-1 bg-gray-100 rounded-lg text-sm text-gray-900 flex items-center gap-2',
+    chipSm: a
+      ? 'px-2 py-1 bg-card rounded text-xs text-gray-300 border border-card flex items-center gap-1'
+      : 'px-2 py-1 bg-gray-200 rounded text-xs text-gray-900 flex items-center gap-1',
+    pkgList: a
+      ? 'p-3 bg-card rounded-xl border border-card flex items-start justify-between'
+      : 'p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-start justify-between',
+    pkgTitle: a ? 'font-medium text-white' : 'font-medium text-gray-900',
+    pkgDesc: a ? 'text-sm text-gray-400' : 'text-sm text-gray-600',
+    pkgMeta: a ? 'text-sm text-gray-300 mt-1' : 'text-sm text-gray-700 mt-1',
+    innerTag: a ? 'px-2 py-1 bg-dark rounded text-xs text-gray-300 border border-card' : 'px-2 py-1 bg-white rounded text-xs text-gray-700',
+    btnPri: a
+      ? 'px-4 py-2 bg-primary hover:opacity-90 text-white rounded-lg transition-opacity'
+      : 'px-4 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg',
+    btnPriSm: a
+      ? 'px-3 py-2 bg-primary hover:opacity-90 text-white rounded-lg text-sm transition-opacity'
+      : 'px-3 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg text-sm',
+    btnPriWide: a
+      ? 'w-full px-4 py-2 bg-primary hover:opacity-90 text-white rounded-lg text-sm flex items-center justify-center gap-2 transition-opacity'
+      : 'w-full px-4 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg text-sm flex items-center justify-center gap-2',
+    danger: a ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-700',
+    imgBox: a
+      ? 'flex items-center justify-center w-full h-32 border-2 border-dashed border-card rounded-lg cursor-pointer hover:bg-card/50 transition-colors'
+      : 'flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors',
+    imgIcon: a ? 'w-8 h-8 text-gray-500 mb-2' : 'w-8 h-8 text-gray-400 mb-2',
+    imgText: a ? 'text-sm text-gray-400' : 'text-sm text-gray-600',
+    imgSub: a ? 'text-xs text-gray-500 mt-1' : 'text-xs text-gray-500 mt-1',
+    imgThumb: a ? 'w-full h-32 object-cover rounded-lg border border-card' : 'w-full h-32 object-cover rounded-lg border border-gray-200',
+    submit: a
+      ? 'flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity'
+      : 'flex items-center gap-2 px-6 py-3 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463] disabled:opacity-50',
+    faqQ: a ? 'font-medium text-white mb-1' : 'font-medium text-gray-900 mb-1',
+    faqA: a ? 'text-sm text-gray-400' : 'text-sm text-gray-600',
+  }
+
   return (
     <>
   <div>
-    <label className="block text-sm font-medium text-gray-700 mb-2">
+    <label className={c.label}>
       Názov inzerátu *
     </label>
     <input
       type="text"
       value={adFormData.title}
       onChange={(e) => setAdFormData({ ...adFormData, title: e.target.value })}
-      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900"
+      className={c.input}
       placeholder="Napríklad: Profesionálny web dizajn"
     />
   </div>
 
   <div>
-    <label className="block text-sm font-medium text-gray-700 mb-2">
+    <label className={c.label}>
       Popis *
     </label>
     <textarea
       value={adFormData.description}
       onChange={(e) => setAdFormData({ ...adFormData, description: e.target.value })}
       rows={6}
-      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900"
+      className={c.textarea}
       placeholder="Podrobný popis služby alebo produktu..."
     />
   </div>
 
   <div className="max-w-md">
-    <label className="block text-sm font-medium text-gray-700 mb-2">
+    <label className={c.label}>
       Typ *
     </label>
     <select
       value={adFormData.type}
       onChange={(e) => setAdFormData({ ...adFormData, type: e.target.value })}
-      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900"
+      className={c.input}
     >
       <option value="SERVICE">Služba</option>
       <option value="RENTAL">Prenájom</option>
@@ -101,30 +174,30 @@ export default function AdvertisementAdForm({
 
   <div className="grid grid-cols-2 gap-4">
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className={c.label}>
         Lokalita
       </label>
       <input
         type="text"
         value={adFormData.location}
         onChange={(e) => setAdFormData({ ...adFormData, location: e.target.value })}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900"
+        className={c.input}
         placeholder="Napríklad: Bratislava, Košice, Nitra"
       />
-      <p className="text-xs text-gray-500 mt-1">
+      <p className={c.hint}>
         Zadajte kraj alebo mesto – inzerát sa podľa lokality zobrazí na mape.
       </p>
     </div>
 
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className={c.label}>
         PSČ
       </label>
       <input
         type="text"
         value={adFormData.postalCode}
         onChange={(e) => setAdFormData({ ...adFormData, postalCode: e.target.value })}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900"
+        className={c.input}
         placeholder="Napríklad: 811 01"
       />
     </div>
@@ -133,17 +206,17 @@ export default function AdvertisementAdForm({
   {/* Service-specific fields */}
   {adFormData.type === 'SERVICE' && (
     <>
-      <div className="border-t border-gray-200 pt-6 mt-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Detaily služby</h3>
+      <div className={c.secBorder}>
+        <h3 className={c.secTitle}>Detaily služby</h3>
         
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Typ sadzby *</label>
+            <label className={c.label}>Typ sadzby *</label>
             <select
               required
               value={adFormData.pricingType}
               onChange={(e) => setAdFormData({ ...adFormData, pricingType: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+              className={c.inpFocus}
             >
               <option value="FIXED">Fixná cena</option>
               <option value="HOURLY">Hodinová sadzba</option>
@@ -154,14 +227,14 @@ export default function AdvertisementAdForm({
 
           {adFormData.pricingType === 'FIXED' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Fixná cena (€) *</label>
+              <label className={c.label}>Fixná cena (€) *</label>
               <input
                 type="number"
                 step="0.01"
                 required
                 value={adFormData.price}
                 onChange={(e) => setAdFormData({ ...adFormData, price: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                className={c.inpFocus}
                 placeholder="0.00"
               />
             </div>
@@ -169,28 +242,28 @@ export default function AdvertisementAdForm({
 
           {adFormData.pricingType === 'HOURLY' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Hodinová sadzba (€/h) *</label>
+              <label className={c.label}>Hodinová sadzba (€/h) *</label>
               <input
                 type="number"
                 step="0.01"
                 required
                 value={adFormData.hourlyRate}
                 onChange={(e) => setAdFormData({ ...adFormData, hourlyRate: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                className={c.inpFocus}
               />
             </div>
           )}
 
           {adFormData.pricingType === 'DAILY' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Denná sadzba (€/deň) *</label>
+              <label className={c.label}>Denná sadzba (€/deň) *</label>
               <input
                 type="number"
                 step="0.01"
                 required
                 value={adFormData.dailyRate}
                 onChange={(e) => setAdFormData({ ...adFormData, dailyRate: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                className={c.inpFocus}
               />
             </div>
           )}
@@ -198,31 +271,31 @@ export default function AdvertisementAdForm({
 
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Čas dodania</label>
+            <label className={c.label}>Čas dodania</label>
             <input
               type="text"
               value={adFormData.deliveryTime || ''}
               onChange={(e) => setAdFormData({ ...adFormData, deliveryTime: e.target.value })}
               placeholder="Napríklad: 3-5 dní, 1 týždeň..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+              className={c.inpFocus}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Revízie</label>
+            <label className={c.label}>Revízie</label>
             <input
               type="text"
               value={adFormData.revisions || ''}
               onChange={(e) => setAdFormData({ ...adFormData, revisions: e.target.value })}
               placeholder="Napríklad: Neobmedzené, 3 revízie..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+              className={c.inpFocus}
             />
           </div>
         </div>
 
         {/* Features */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Čo je zahrnuté</label>
+          <label className={c.label}>Čo je zahrnuté</label>
           <div className="flex gap-2 mb-2">
             <input
               type="text"
@@ -238,7 +311,7 @@ export default function AdvertisementAdForm({
                 }
               }}
               placeholder="Pridajte funkciu a stlačte Enter"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+              className={c.flexInp}
             />
             <button
               type="button"
@@ -248,21 +321,21 @@ export default function AdvertisementAdForm({
                   setNewFeature('')
                 }
               }}
-              className="px-4 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg"
+              className={c.btnPri}
             >
               <Plus className="w-4 h-4" />
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
             {adFormData.features.map((feature, idx) => (
-              <span key={idx} className="px-3 py-1 bg-gray-100 rounded-lg text-sm text-gray-900 flex items-center gap-2">
+              <span key={idx} className={c.featureChip}>
                 {feature}
                 <button
                   type="button"
                   onClick={() => {
                     setAdFormData({ ...adFormData, features: adFormData.features.filter((_, i) => i !== idx) })
                   }}
-                  className="text-red-600 hover:text-red-700"
+                  className={c.danger}
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -274,53 +347,53 @@ export default function AdvertisementAdForm({
         {/* Packages */}
         {adFormData.pricingType === 'PACKAGE' && (
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Balíčky služieb</label>
-            <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <label className={c.label}>Balíčky služieb</label>
+            <div className={c.panelLg}>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-gray-600 mb-1">Názov balíčka</label>
+                  <label className={c.labelXs}>Názov balíčka</label>
                   <input
                     type="text"
                     value={newPackage.name || ''}
                     onChange={(e) => setNewPackage({ ...newPackage, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                    className={c.inpSm}
                     placeholder="Napríklad: Základný"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 mb-1">Cena (€)</label>
+                  <label className={c.labelXs}>Cena (€)</label>
                   <input
                     type="number"
                     step="0.01"
                     value={newPackage.price || ''}
                     onChange={(e) => setNewPackage({ ...newPackage, price: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                    className={c.inpSm}
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-gray-600 mb-1">Popis balíčka</label>
+                <label className={c.labelXs}>Popis balíčka</label>
                 <textarea
                   value={newPackage.description || ''}
                   onChange={(e) => setNewPackage({ ...newPackage, description: e.target.value })}
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                  className={c.inpSm}
                   placeholder="Popis toho, čo obsahuje tento balíček"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-gray-600 mb-1">Čas dodania</label>
+                  <label className={c.labelXs}>Čas dodania</label>
                   <input
                     type="text"
                     value={newPackage.deliveryTime || ''}
                     onChange={(e) => setNewPackage({ ...newPackage, deliveryTime: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                    className={c.inpSm}
                     placeholder="Napríklad: 3-5 dní"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 mb-1">Funkcie balíčka</label>
+                  <label className={c.labelXs}>Funkcie balíčka</label>
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -335,7 +408,7 @@ export default function AdvertisementAdForm({
                           }
                         }
                       }}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                      className={c.flexInpSm}
                       placeholder="Pridajte funkciu"
                     />
                     <button
@@ -346,21 +419,21 @@ export default function AdvertisementAdForm({
                           setNewPackageFeature('')
                         }
                       }}
-                      className="px-3 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg text-sm"
+                      className={c.btnPriSm}
                     >
                       <Plus className="w-3 h-3" />
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {newPackage.features?.map((feature: string, idx: number) => (
-                      <span key={idx} className="px-2 py-1 bg-gray-200 rounded text-xs text-gray-900 flex items-center gap-1">
+                      <span key={idx} className={c.chipSm}>
                         {feature}
                         <button
                           type="button"
                           onClick={() => {
                             setNewPackage({ ...newPackage, features: newPackage.features?.filter((_: any, i: number) => i !== idx) })
                           }}
-                          className="text-red-600 hover:text-red-700"
+                          className={c.danger}
                         >
                           <X className="w-2 h-2" />
                         </button>
@@ -378,7 +451,7 @@ export default function AdvertisementAdForm({
                     setNewPackageFeature('')
                   }
                 }}
-                className="w-full px-4 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg text-sm flex items-center justify-center gap-2"
+                className={c.btnPriWide}
               >
                 <Plus className="w-4 h-4" />
                 Pridať balíček
@@ -386,17 +459,17 @@ export default function AdvertisementAdForm({
             </div>
             <div className="mt-4 space-y-2">
               {adFormData.packages.map((pkg, idx) => (
-                <div key={idx} className="p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-start justify-between">
+                <div key={idx} className={c.pkgList}>
                   <div className="flex-1">
-                    <div className="font-medium text-gray-900">{pkg.name}</div>
-                    <div className="text-sm text-gray-600">{pkg.description}</div>
-                    <div className="text-sm text-gray-700 mt-1">
+                    <div className={c.pkgTitle}>{pkg.name}</div>
+                    <div className={c.pkgDesc}>{pkg.description}</div>
+                    <div className={c.pkgMeta}>
                       <span className="font-semibold">{pkg.price}€</span> • {pkg.deliveryTime}
                     </div>
                     {pkg.features && pkg.features.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {pkg.features.map((feature: string, fIdx: number) => (
-                          <span key={fIdx} className="px-2 py-1 bg-white rounded text-xs text-gray-700">
+                          <span key={fIdx} className={c.innerTag}>
                             {feature}
                           </span>
                         ))}
@@ -408,7 +481,7 @@ export default function AdvertisementAdForm({
                     onClick={() => {
                       setAdFormData({ ...adFormData, packages: adFormData.packages.filter((_, i) => i !== idx) })
                     }}
-                    className="ml-4 text-red-600 hover:text-red-700"
+                    className={`ml-4 ${c.danger}`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -420,25 +493,25 @@ export default function AdvertisementAdForm({
 
         {/* FAQ */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Často kladené otázky (FAQ)</label>
-          <div className="space-y-2 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <label className={c.label}>Často kladené otázky (FAQ)</label>
+          <div className={c.panel}>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Otázka</label>
+              <label className={c.labelXs}>Otázka</label>
               <input
                 type="text"
                 value={newFAQ.question || ''}
                 onChange={(e) => setNewFAQ({ ...newFAQ, question: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent mb-2"
+                className={`${c.inpSm} mb-2`}
                 placeholder="Napríklad: Ako dlho trvá dodanie?"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Odpoveď</label>
+              <label className={c.labelXs}>Odpoveď</label>
               <textarea
                 value={newFAQ.answer || ''}
                 onChange={(e) => setNewFAQ({ ...newFAQ, answer: e.target.value })}
                 rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                className={c.inpSm}
                 placeholder="Odpoveď na otázku"
               />
             </div>
@@ -450,7 +523,7 @@ export default function AdvertisementAdForm({
                   setNewFAQ({ question: '', answer: '' })
                 }
               }}
-              className="w-full px-4 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg text-sm flex items-center justify-center gap-2"
+              className={c.btnPriWide}
             >
               <Plus className="w-4 h-4" />
               Pridať FAQ
@@ -458,17 +531,17 @@ export default function AdvertisementAdForm({
           </div>
           <div className="mt-4 space-y-2">
             {adFormData.faq.map((faq, idx) => (
-              <div key={idx} className="p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-start justify-between">
+              <div key={idx} className={c.pkgList}>
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900 mb-1">{faq.question}</div>
-                  <div className="text-sm text-gray-600">{faq.answer}</div>
+                  <div className={c.faqQ}>{faq.question}</div>
+                  <div className={c.faqA}>{faq.answer}</div>
                 </div>
                 <button
                   type="button"
                   onClick={() => {
                     setAdFormData({ ...adFormData, faq: adFormData.faq.filter((_, i) => i !== idx) })
                   }}
-                  className="ml-4 text-red-600 hover:text-red-700"
+                  className={`ml-4 ${c.danger}`}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -481,18 +554,14 @@ export default function AdvertisementAdForm({
   )}
 
   <div>
-    <label className="block text-sm font-medium text-gray-700 mb-2">Fotky</label>
+    <label className={c.label}>Fotky</label>
     <div className="space-y-4">
       <div>
-        <label className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+        <label className={c.imgBox}>
           <div className="flex flex-col items-center justify-center">
-            <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
-            <p className="text-sm text-gray-600">
-              Kliknite alebo presuňte obrázky sem
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              PNG, JPG, GIF do 10MB
-            </p>
+            <ImageIcon className={c.imgIcon} />
+            <p className={c.imgText}>Kliknite alebo presuňte obrázky sem</p>
+            <p className={c.imgSub}>PNG, JPG, GIF do 10MB</p>
           </div>
           <input
             type="file"
@@ -511,7 +580,7 @@ export default function AdvertisementAdForm({
               <img
                 src={image}
                 alt={`Upload ${index + 1}`}
-                className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                className={c.imgThumb}
               />
               <button
                 type="button"
@@ -532,7 +601,7 @@ export default function AdvertisementAdForm({
       type="button"
       onClick={onSubmit}
       disabled={saving}
-      className="flex items-center gap-2 px-6 py-3 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463] disabled:opacity-50"
+      className={c.submit}
     >
       {editingId ? (
         <>

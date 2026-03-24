@@ -6,8 +6,9 @@ import { isAuthenticated } from '@/lib/auth'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { api } from '@/lib/api'
-import { Advertisement, AdvertisementStatus, CreateAdvertisementDto, Category } from '@inzertna-platforma/shared'
-import { Plus, Edit, Trash2, X, Save, Search, Filter as FilterIcon } from 'lucide-react'
+import CreateAdvertisementWizard from '@/components/CreateAdvertisementWizard'
+import { Advertisement, AdvertisementStatus, Category } from '@inzertna-platforma/shared'
+import { Plus, Edit, Trash2, X, Search, Filter as FilterIcon } from 'lucide-react'
 
 type AdvertisementType = 'SERVICE' | 'RENTAL'
 
@@ -17,6 +18,7 @@ export default function DevAdvertisementsPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [wizardNonce, setWizardNonce] = useState(0)
   const [categories, setCategories] = useState<Category[]>([])
   const [showFilters, setShowFilters] = useState(true)
   const [filters, setFilters] = useState({
@@ -29,25 +31,6 @@ export default function DevAdvertisementsPage() {
     location: '',
     dateFrom: '',
     dateTo: '',
-  })
-  const [formData, setFormData] = useState<CreateAdvertisementDto & { status?: AdvertisementStatus; type?: AdvertisementType }>({
-    title: '',
-    description: '',
-    price: undefined,
-    type: 'SERVICE',
-    categoryId: '',
-    location: '',
-    postalCode: '',
-    images: [],
-    status: AdvertisementStatus.DRAFT,
-    pricingType: 'FIXED',
-    hourlyRate: undefined,
-    dailyRate: undefined,
-    packages: [],
-    deliveryTime: '',
-    revisions: '',
-    features: [],
-    faq: [],
   })
 
   useEffect(() => {
@@ -84,50 +67,19 @@ export default function DevAdvertisementsPage() {
     if (showForm) loadCategories()
   }, [showForm])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      const submitData = {
-        ...formData,
-        price: formData.price ? parseFloat(formData.price.toString()) : undefined,
-        images: formData.images || [],
-        categoryId: formData.categoryId || undefined,
-      }
-      if (editingId) {
-        await api.updateAdvertisement(editingId, submitData)
-      } else {
-        const { status, ...createData } = submitData
-        await api.createAdvertisement(createData)
-      }
-      await loadAdvertisements()
-      resetForm()
-    } catch (error: any) {
-      console.error('Chyba pri ukladaní inzerátu:', error)
-      alert(error?.message || 'Chyba pri ukladaní inzerátu')
-    }
+  const resetWizardPanel = () => {
+    setEditingId(null)
+    setShowForm(false)
+  }
+
+  const openNewAdvertisement = () => {
+    setEditingId(null)
+    setWizardNonce((n) => n + 1)
+    setShowForm(true)
   }
 
   const handleEdit = (ad: Advertisement) => {
     loadCategories()
-    setFormData({
-      title: ad.title,
-      description: ad.description,
-      price: ad.price,
-      type: ((ad as any).type as AdvertisementType) ?? 'SERVICE',
-      categoryId: (ad as any).categoryId || '',
-      location: ad.location || '',
-      postalCode: ad.postalCode || '',
-      images: ad.images || [],
-      status: ad.status,
-      pricingType: 'FIXED',
-      hourlyRate: undefined,
-      dailyRate: undefined,
-      packages: [],
-      deliveryTime: '',
-      revisions: '',
-      features: [],
-      faq: [],
-    })
     setEditingId(ad.id)
     setShowForm(true)
   }
@@ -141,30 +93,6 @@ export default function DevAdvertisementsPage() {
       console.error('Chyba pri odstraňovaní inzerátu:', error)
       alert('Chyba pri odstraňovaní inzerátu')
     }
-  }
-
-  const resetForm = () => {
-    setFormData({
-      title: '',
-      description: '',
-      price: undefined,
-      type: 'SERVICE',
-      categoryId: '',
-      location: '',
-      postalCode: '',
-      images: [],
-      status: AdvertisementStatus.DRAFT,
-      pricingType: 'FIXED',
-      hourlyRate: undefined,
-      dailyRate: undefined,
-      packages: [],
-      deliveryTime: '',
-      revisions: '',
-      features: [],
-      faq: [],
-    })
-    setEditingId(null)
-    setShowForm(false)
   }
 
   const getFilteredAdvertisements = () => {
@@ -197,8 +125,12 @@ export default function DevAdvertisementsPage() {
         <Header />
         <main className="p-6">
           <div className="mb-6 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-white">Development – Inzeráty</h1>
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight text-white">Inzeráty</h1>
+                <p className="text-sm text-gray-500">Prehľad a editor — rovnaké polia ako na platforme pre konzistentné dáta.</p>
+              </div>
+              <div className="flex items-center gap-3 sm:ml-2">
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
@@ -214,12 +146,15 @@ export default function DevAdvertisementsPage() {
                 )}
               </button>
               <span className="text-sm text-gray-400">
-                Zobrazených: <span className="text-white font-semibold">{filteredAdvertisements.length}</span> z {advertisements.length}
+                Zobrazených: <span className="text-white font-semibold tabular-nums">{filteredAdvertisements.length}</span>{' '}
+                <span className="text-gray-500">/</span> <span className="tabular-nums text-gray-300">{advertisements.length}</span>
               </span>
+              </div>
             </div>
             {!showForm && (
               <button
-                onClick={() => setShowForm(true)}
+                type="button"
+                onClick={openNewAdvertisement}
                 className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
               >
                 <Plus className="w-5 h-5" />
@@ -362,97 +297,34 @@ export default function DevAdvertisementsPage() {
           )}
 
           {showForm && (
-            <div className="bg-card rounded-lg p-6 border border-dark mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-white">
-                  {editingId ? 'Upraviť inzerát' : 'Nový inzerát'}
-                </h2>
-                <button onClick={resetForm} className="text-gray-400 hover:text-white transition-colors">
+            <div className="mb-8 overflow-hidden rounded-xl border border-card bg-gradient-to-b from-card via-card to-dark shadow-2xl shadow-black/40">
+              <div className="flex items-center justify-between border-b border-card bg-dark/40 px-6 py-3">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-500">Editor</p>
+                  <p className="text-sm text-gray-400">Zhodné s používateľským podaním inzerátu</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={resetWizardPanel}
+                  className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-card hover:text-white"
+                  aria-label="Zavrieť editor"
+                >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Názov *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Popis *</label>
-                  <textarea
-                    required
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={3}
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Typ</label>
-                    <select
-                      value={formData.type || 'SERVICE'}
-                      onChange={(e) => setFormData({ ...formData, type: e.target.value as AdvertisementType })}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600"
-                    >
-                      <option value="SERVICE">Služba</option>
-                      <option value="RENTAL">Prenájom</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Cena (€)</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={formData.price ?? ''}
-                      onChange={(e) => setFormData({ ...formData, price: e.target.value ? parseFloat(e.target.value) : undefined })}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Kategória</label>
-                    <select
-                      value={formData.categoryId}
-                      onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600"
-                    >
-                      <option value="">-- Vybrať --</option>
-                      {categories.map((cat) => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
-                    <select
-                      value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value as AdvertisementStatus })}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600"
-                    >
-                      <option value={AdvertisementStatus.DRAFT}>Koncept</option>
-                      <option value={AdvertisementStatus.ACTIVE}>Aktívny</option>
-                      <option value={AdvertisementStatus.INACTIVE}>Neaktívny</option>
-                      <option value={AdvertisementStatus.ARCHIVED}>Archivovaný</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="flex justify-end gap-3 pt-4">
-                  <button type="button" onClick={resetForm} className="px-4 py-2 border border-card rounded-lg text-gray-300 hover:bg-cardHover">
-                    Zrušiť
-                  </button>
-                  <button type="submit" className="px-4 py-2 bg-primary hover:opacity-90 text-white rounded-lg flex items-center gap-2">
-                    <Save className="w-4 h-4" />
-                    Uložiť
-                  </button>
-                </div>
-              </form>
+              <div className="p-6 sm:p-8">
+                <CreateAdvertisementWizard
+                  key={`admin-ad-${wizardNonce}-${editingId ?? 'new'}`}
+                  categories={categories as any[]}
+                  variant="admin"
+                  initialEditId={editingId}
+                  onCancelEdit={resetWizardPanel}
+                  onComplete={() => {
+                    void loadAdvertisements()
+                    resetWizardPanel()
+                  }}
+                />
+              </div>
             </div>
           )}
 

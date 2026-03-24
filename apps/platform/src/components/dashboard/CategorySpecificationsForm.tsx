@@ -4,6 +4,8 @@ import type { Filter } from '@inzertna-platforma/shared'
 
 type SpecValues = Record<string, unknown>
 
+type SpecVariant = 'platform' | 'admin'
+
 function rangeValue(v: unknown): { min: string; max: string } {
   if (v && typeof v === 'object' && !Array.isArray(v)) {
     const o = v as Record<string, unknown>
@@ -19,18 +21,60 @@ export default function CategorySpecificationsForm({
   filters,
   values,
   onChange,
+  variant = 'platform',
 }: {
   filters: Filter[]
   values: SpecValues
   onChange: (slug: string, value: unknown) => void
+  variant?: SpecVariant
 }) {
+  const a = variant === 'admin'
+  const u = {
+    empty:
+      'rounded-xl border border-dashed px-4 py-6 text-center text-sm ' +
+      (a ? 'border-card bg-dark/60 text-gray-400' : 'border-gray-200 bg-gray-50/80 text-gray-600'),
+    emptyHint: 'mt-2 text-xs ' + (a ? 'text-gray-500' : 'text-gray-500'),
+    label: 'mb-1.5 block text-sm font-medium ' + (a ? 'text-gray-200' : 'text-gray-800'),
+    desc: 'mb-1.5 text-xs ' + (a ? 'text-gray-500' : 'text-gray-500'),
+    field:
+      'w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ' +
+      (a
+        ? 'border-card bg-dark text-white placeholder:text-gray-500 focus:border-primary focus:ring-primary/30'
+        : 'border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-[#1dbf73] focus:ring-[#1dbf73]/30'),
+    fieldNum:
+      'min-w-0 flex-1 rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ' +
+      (a
+        ? 'border-card bg-dark text-white focus:border-primary focus:ring-primary/30'
+        : 'border-gray-300 text-gray-900 focus:border-[#1dbf73] focus:ring-[#1dbf73]/30'),
+    spanOdDo: 'text-xs ' + (a ? 'text-gray-500' : 'text-gray-500'),
+    multiOn:
+      'inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ' +
+      (a
+        ? 'border-primary bg-primary/15 text-white'
+        : 'border-[#1dbf73] bg-[#1dbf73]/10 text-gray-900'),
+    multiOff:
+      'inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ' +
+      (a
+        ? 'border-card bg-card text-gray-300 hover:border-primary/40'
+        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'),
+  }
+
   if (filters.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50/80 px-4 py-6 text-center text-sm text-gray-600">
+      <div className={u.empty}>
         Pre túto kategóriu zatiaľ nie sú definované špecifikácie. Môžete pokračovať k základným údajom inzerátu.
-        <p className="mt-2 text-xs text-gray-500">
-          V <strong>admin paneli</strong> otvorte vľavo <strong>Špecifikácie</strong> (alebo pri kategórii v zozname kliknite
-          „Upraviť“ v stĺpci špecifikácií).
+        <p className={u.emptyHint}>
+          {a ? (
+            <>
+              Doplňte ich v sekcii <strong className="text-gray-300">Špecifikácie</strong> alebo pri kategórii cez stĺpec
+              špecifikácií.
+            </>
+          ) : (
+            <>
+              V <strong>admin paneli</strong> otvorte vľavo <strong>Špecifikácie</strong> (alebo pri kategórii v zozname
+              kliknite „Upraviť“ v stĺpci špecifikácií).
+            </>
+          )}
         </p>
       </div>
     )
@@ -41,7 +85,7 @@ export default function CategorySpecificationsForm({
       {filters.map((f) => {
         const id = `spec-${f.slug}`
         const commonLabel = (
-          <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-gray-800">
+          <label htmlFor={id} className={u.label}>
             {f.name}
             {f.isRequired ? <span className="text-red-500"> *</span> : null}
           </label>
@@ -51,15 +95,13 @@ export default function CategorySpecificationsForm({
           return (
             <div key={f.id} className={f.description ? 'sm:col-span-2' : ''}>
               {commonLabel}
-              {f.description ? (
-                <p className="mb-1.5 text-xs text-gray-500">{f.description}</p>
-              ) : null}
+              {f.description ? <p className={u.desc}>{f.description}</p> : null}
               <input
                 id={id}
                 type="text"
                 value={values[f.slug] != null ? String(values[f.slug]) : ''}
                 onChange={(e) => onChange(f.slug, e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-[#1dbf73] focus:outline-none focus:ring-2 focus:ring-[#1dbf73]/30"
+                className={u.field}
                 placeholder={f.description || ''}
               />
             </div>
@@ -70,14 +112,14 @@ export default function CategorySpecificationsForm({
           return (
             <div key={f.id}>
               {commonLabel}
-              {f.description ? <p className="mb-1.5 text-xs text-gray-500">{f.description}</p> : null}
+              {f.description ? <p className={u.desc}>{f.description}</p> : null}
               <input
                 id={id}
                 type="number"
                 step="any"
                 value={values[f.slug] != null && values[f.slug] !== '' ? String(values[f.slug]) : ''}
                 onChange={(e) => onChange(f.slug, e.target.value === '' ? '' : e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#1dbf73] focus:outline-none focus:ring-2 focus:ring-[#1dbf73]/30"
+                className={u.field}
               />
             </div>
           )
@@ -90,7 +132,7 @@ export default function CategorySpecificationsForm({
           return (
             <div key={f.id}>
               {commonLabel}
-              {f.description ? <p className="mb-1.5 text-xs text-gray-500">{f.description}</p> : null}
+              {f.description ? <p className={u.desc}>{f.description}</p> : null}
               <select
                 id={id}
                 value={sel}
@@ -99,7 +141,7 @@ export default function CategorySpecificationsForm({
                   if (x === '') onChange(f.slug, undefined)
                   else onChange(f.slug, x === 'true')
                 }}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#1dbf73] focus:outline-none focus:ring-2 focus:ring-[#1dbf73]/30"
+                className={u.field}
               >
                 {!f.isRequired ? <option value="">— zvoliť —</option> : null}
                 <option value="true">Áno</option>
@@ -113,13 +155,13 @@ export default function CategorySpecificationsForm({
           return (
             <div key={f.id}>
               {commonLabel}
-              {f.description ? <p className="mb-1.5 text-xs text-gray-500">{f.description}</p> : null}
+              {f.description ? <p className={u.desc}>{f.description}</p> : null}
               <input
                 id={id}
                 type="date"
                 value={values[f.slug] != null ? String(values[f.slug]).slice(0, 10) : ''}
                 onChange={(e) => onChange(f.slug, e.target.value || undefined)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#1dbf73] focus:outline-none focus:ring-2 focus:ring-[#1dbf73]/30"
+                className={u.field}
               />
             </div>
           )
@@ -129,12 +171,12 @@ export default function CategorySpecificationsForm({
           return (
             <div key={f.id}>
               {commonLabel}
-              {f.description ? <p className="mb-1.5 text-xs text-gray-500">{f.description}</p> : null}
+              {f.description ? <p className={u.desc}>{f.description}</p> : null}
               <select
                 id={id}
                 value={values[f.slug] != null ? String(values[f.slug]) : ''}
                 onChange={(e) => onChange(f.slug, e.target.value || undefined)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#1dbf73] focus:outline-none focus:ring-2 focus:ring-[#1dbf73]/30"
+                className={u.field}
               >
                 <option value="">{f.isRequired ? '— vyberte —' : '— voliteľné —'}</option>
                 {f.options.map((opt) => (
@@ -160,16 +202,12 @@ export default function CategorySpecificationsForm({
           return (
             <div key={f.id} className="sm:col-span-2">
               {commonLabel}
-              {f.description ? <p className="mb-1.5 text-xs text-gray-500">{f.description}</p> : null}
+              {f.description ? <p className={u.desc}>{f.description}</p> : null}
               <div className="flex flex-wrap gap-2">
                 {f.options.map((opt) => (
                   <label
                     key={opt}
-                    className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ${
-                      selected.includes(opt)
-                        ? 'border-[#1dbf73] bg-[#1dbf73]/10 text-gray-900'
-                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-                    }`}
+                    className={selected.includes(opt) ? u.multiOn : u.multiOff}
                   >
                     <input
                       type="checkbox"
@@ -198,26 +236,26 @@ export default function CategorySpecificationsForm({
           return (
             <div key={f.id} className="sm:col-span-2">
               {commonLabel}
-              {f.description ? <p className="mb-1.5 text-xs text-gray-500">{f.description}</p> : null}
+              {f.description ? <p className={u.desc}>{f.description}</p> : null}
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex min-w-[140px] flex-1 items-center gap-2">
-                  <span className="text-xs text-gray-500">Od</span>
+                  <span className={u.spanOdDo}>Od</span>
                   <input
                     type="number"
                     step="any"
                     value={min}
                     onChange={(e) => setRange(e.target.value, max)}
-                    className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#1dbf73] focus:outline-none focus:ring-2 focus:ring-[#1dbf73]/30"
+                    className={u.fieldNum}
                   />
                 </div>
                 <div className="flex min-w-[140px] flex-1 items-center gap-2">
-                  <span className="text-xs text-gray-500">Do</span>
+                  <span className={u.spanOdDo}>Do</span>
                   <input
                     type="number"
                     step="any"
                     value={max}
                     onChange={(e) => setRange(min, e.target.value)}
-                    className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#1dbf73] focus:outline-none focus:ring-2 focus:ring-[#1dbf73]/30"
+                    className={u.fieldNum}
                   />
                 </div>
               </div>

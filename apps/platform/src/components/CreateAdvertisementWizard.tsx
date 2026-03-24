@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } f
 import { ChevronLeft, Search } from 'lucide-react'
 import { api } from '@/lib/api'
 import { getCoordsFromLocation } from '@/lib/mapRegions'
-import CategorySpecificationsForm from '@/components/dashboard/CategorySpecificationsForm'
-import AdvertisementAdForm, { type AdFormDataState } from '@/components/AdvertisementAdForm'
+import CategorySpecificationsForm from './dashboard/CategorySpecificationsForm'
+import AdvertisementAdForm, { type AdFormDataState } from './AdvertisementAdForm'
 import type { Filter } from '@inzertna-platforma/shared'
 
 type Phase = 'root' | 'sub' | 'form'
@@ -36,19 +36,30 @@ function CategoryVisualTile({
   cat,
   selected,
   onSelect,
+  tileVariant = 'platform',
 }: {
   cat: any
   selected: boolean
   onSelect: () => void
+  tileVariant?: 'platform' | 'admin'
 }) {
-  const accent = cat.color?.trim() || '#1dbf73'
+  const accent = cat.color?.trim() || (tileVariant === 'admin' ? 'rgb(59,130,246)' : '#1dbf73')
+  const isAdmin = tileVariant === 'admin'
   return (
     <button
       type="button"
       onClick={onSelect}
-      className={`group flex flex-col items-center rounded-2xl border-2 bg-white px-2 py-5 text-center shadow-sm transition-all hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1dbf73] ${
-        selected ? 'border-[#1dbf73] ring-2 ring-[#1dbf73]/25' : 'border-white/80 hover:border-[#1dbf73]/40'
-      }`}
+      className={
+        isAdmin
+          ? `group flex flex-col items-center rounded-xl border-2 bg-card px-2 py-5 text-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+              selected
+                ? 'border-primary shadow-lg shadow-primary/10 ring-2 ring-primary/25'
+                : 'border-card hover:border-primary/40 hover:bg-cardHover'
+            }`
+          : `group flex flex-col items-center rounded-2xl border-2 bg-white px-2 py-5 text-center shadow-sm transition-all hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1dbf73] ${
+              selected ? 'border-[#1dbf73] ring-2 ring-[#1dbf73]/25' : 'border-white/80 hover:border-[#1dbf73]/40'
+            }`
+      }
     >
       <div
         className="mb-3 flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-2xl sm:h-20 sm:w-20"
@@ -66,7 +77,11 @@ function CategoryVisualTile({
           </span>
         )}
       </div>
-      <span className="line-clamp-2 text-sm font-semibold leading-tight text-gray-900 sm:text-base">{cat.name}</span>
+      <span
+        className={`line-clamp-2 text-sm font-semibold leading-tight sm:text-base ${isAdmin ? 'text-white' : 'text-gray-900'}`}
+      >
+        {cat.name}
+      </span>
     </button>
   )
 }
@@ -92,7 +107,8 @@ const emptyAdForm = (): AdFormDataState => ({
 
 export type CreateAdvertisementWizardProps = {
   categories: any[]
-  variant?: 'embed' | 'page'
+  /** `admin` = tmavý vizuál zladený s admin panelom (CEO / interná správa) */
+  variant?: 'embed' | 'page' | 'admin'
   initialEditId?: string | null
   /** Predvýber podľa slug (z URL napr. z kategórnej stránky) */
   initialCategorySlug?: string | null
@@ -108,6 +124,7 @@ export default function CreateAdvertisementWizard({
   onCancelEdit,
   onComplete,
 }: CreateAdvertisementWizardProps) {
+  const isAdmin = variant === 'admin'
   const appliedInitialSlug = useRef(false)
   const [phase, setPhase] = useState<Phase>('root')
   const [rootId, setRootId] = useState<string | null>(null)
@@ -421,13 +438,15 @@ export default function CreateAdvertisementWizard({
     setPhase('form')
   }
 
-  const shellClass =
-    variant === 'page'
+  const shellClass = isAdmin
+    ? 'rounded-xl border border-card bg-card p-6 shadow-xl shadow-black/20 sm:p-8'
+    : variant === 'page'
       ? 'rounded-3xl border border-orange-100/80 bg-white/90 p-6 shadow-lg backdrop-blur-sm sm:p-8'
       : 'rounded-lg border border-gray-200 bg-white p-6 shadow-sm'
 
-  const categoryPanelClass =
-    variant === 'page'
+  const categoryPanelClass = isAdmin
+    ? 'rounded-xl border border-dark bg-dark p-6 sm:p-8'
+    : variant === 'page'
       ? 'rounded-3xl border border-orange-100/60 bg-[#fff5ed] p-6 sm:p-8'
       : 'rounded-2xl border border-gray-100 bg-[#fff8f3] p-6'
 
@@ -435,11 +454,21 @@ export default function CreateAdvertisementWizard({
     <div className={shellClass}>
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl">
-            {editingId ? 'Upraviť inzerát' : 'Podať inzerát'}
+          <h2
+            className={`text-xl font-semibold sm:text-2xl ${isAdmin ? 'tracking-tight text-white' : 'text-gray-900'}`}
+          >
+            {isAdmin
+              ? editingId
+                ? 'Úprava inzerátu'
+                : 'Nový inzerát'
+              : editingId
+                ? 'Upraviť inzerát'
+                : 'Podať inzerát'}
           </h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Vyberte kategóriu podľa toho, čo ponúkate – špecifikácie sa načítajú z nastavení administrátora.
+          <p className={`mt-1 text-sm leading-relaxed ${isAdmin ? 'text-gray-400' : 'text-gray-600'}`}>
+            {isAdmin
+              ? 'Rovnaký postup ako na webe: kategória → špecifikácie → údaje. Špecifikácie vychádzajú z vášho nastavenia v sekcii Špecifikácie.'
+              : 'Vyberte kategóriu podľa toho, čo ponúkate – špecifikácie sa načítajú z nastavení administrátora.'}
           </p>
         </div>
         {editingId && onCancelEdit && (
@@ -449,7 +478,11 @@ export default function CreateAdvertisementWizard({
               resetNewAdFlow()
               onCancelEdit()
             }}
-            className="shrink-0 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            className={
+              isAdmin
+                ? 'shrink-0 rounded-lg border border-card bg-dark px-4 py-2 text-sm text-gray-200 transition-colors hover:border-primary/40 hover:text-white'
+                : 'shrink-0 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50'
+            }
           >
             Zrušiť úpravu
           </button>
@@ -471,15 +504,29 @@ export default function CreateAdvertisementWizard({
             if (skipSub) return null
             return (
               <div key={step} className="flex items-center gap-2">
-                {i > 0 && <div className="hidden h-px w-6 bg-gray-200 sm:block" />}
+                {i > 0 && (
+                  <div
+                    className={`hidden h-px w-6 sm:block ${isAdmin ? 'bg-card' : 'bg-gray-200'}`}
+                  />
+                )}
                 <div
-                  className={`rounded-full px-3 py-1.5 text-xs font-semibold sm:text-sm ${
-                    active
-                      ? 'bg-[#1dbf73] text-white'
-                      : passed
-                        ? 'bg-[#1dbf73]/15 text-[#148a55]'
-                        : 'bg-gray-100 text-gray-500'
-                  }`}
+                  className={
+                    isAdmin
+                      ? `rounded-full px-3 py-1.5 text-xs font-semibold sm:text-sm ${
+                          active
+                            ? 'bg-primary text-white shadow-sm'
+                            : passed
+                              ? 'bg-primary/20 text-blue-200'
+                              : 'bg-dark text-gray-500 ring-1 ring-card'
+                        }`
+                      : `rounded-full px-3 py-1.5 text-xs font-semibold sm:text-sm ${
+                          active
+                            ? 'bg-[#1dbf73] text-white'
+                            : passed
+                              ? 'bg-[#1dbf73]/15 text-[#148a55]'
+                              : 'bg-gray-100 text-gray-500'
+                        }`
+                  }
                 >
                   {labels[step]}
                 </div>
@@ -490,10 +537,24 @@ export default function CreateAdvertisementWizard({
       )}
 
       {error ? (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</div>
+        <div
+          className={
+            isAdmin
+              ? 'mb-4 rounded-lg border border-red-500/40 bg-red-950/40 px-4 py-3 text-sm text-red-200'
+              : 'mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800'
+          }
+        >
+          {error}
+        </div>
       ) : null}
       {success ? (
-        <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+        <div
+          className={
+            isAdmin
+              ? 'mb-4 rounded-lg border border-emerald-500/30 bg-emerald-950/30 px-4 py-3 text-sm text-emerald-200'
+              : 'mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900'
+          }
+        >
           {success}
         </div>
       ) : null}
@@ -502,23 +563,33 @@ export default function CreateAdvertisementWizard({
         <div className={categoryPanelClass}>
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Vyberte hlavnú kategóriu</h3>
-              <p className="text-sm text-gray-600">Zobrazujú sa len aktívne kategórie z administrácie.</p>
+              <h3 className={`text-lg font-semibold ${isAdmin ? 'text-white' : 'text-gray-900'}`}>
+                Vyberte hlavnú kategóriu
+              </h3>
+              <p className={`text-sm ${isAdmin ? 'text-gray-400' : 'text-gray-600'}`}>
+                Zobrazujú sa len aktívne kategórie z administrácie.
+              </p>
             </div>
             <div className="relative max-w-md flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Search
+                className={`absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 ${isAdmin ? 'text-gray-500' : 'text-gray-400'}`}
+              />
               <input
                 type="search"
                 value={categoryQuery}
                 onChange={(e) => setCategoryQuery(e.target.value)}
                 placeholder="Hľadať kategóriu..."
-                className="w-full rounded-xl border border-orange-100 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#1dbf73] focus:outline-none focus:ring-2 focus:ring-[#1dbf73]/25"
+                className={
+                  isAdmin
+                    ? 'w-full rounded-xl border border-card bg-card py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25'
+                    : 'w-full rounded-xl border border-orange-100 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#1dbf73] focus:outline-none focus:ring-2 focus:ring-[#1dbf73]/25'
+                }
               />
             </div>
           </div>
 
           {filteredRoots.length === 0 ? (
-            <p className="text-center text-sm text-amber-800">
+            <p className={`text-center text-sm ${isAdmin ? 'text-amber-200/90' : 'text-amber-800'}`}>
               {roots.length === 0
                 ? 'Žiadne aktívne kategórie. Pridajte ich v administrácii.'
                 : 'Žiadna kategória nezodpovedá hľadaniu.'}
@@ -529,6 +600,7 @@ export default function CreateAdvertisementWizard({
                 <CategoryVisualTile
                   key={cat.id}
                   cat={cat}
+                  tileVariant={isAdmin ? 'admin' : 'platform'}
                   selected={rootId === cat.id}
                   onSelect={() => {
                     if (cat.id !== rootId) {
@@ -547,7 +619,11 @@ export default function CreateAdvertisementWizard({
             <button
               type="button"
               onClick={continueFromRoot}
-              className="rounded-xl bg-[#1dbf73] px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#19a463]"
+              className={
+                isAdmin
+                  ? 'rounded-xl bg-primary px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition hover:opacity-90'
+                  : 'rounded-xl bg-[#1dbf73] px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#19a463]'
+              }
             >
               Pokračovať
             </button>
@@ -560,20 +636,24 @@ export default function CreateAdvertisementWizard({
           <button
             type="button"
             onClick={goRoot}
-            className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+            className={`mb-6 inline-flex items-center gap-2 text-sm font-medium ${isAdmin ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`}
           >
             <ChevronLeft className="h-4 w-4" />
             Späť na kategórie
           </button>
-          <h3 className="mb-1 text-lg font-semibold text-gray-900">Vyberte podkategóriu</h3>
-          <p className="mb-6 text-sm text-gray-600">
-            Kategória: <span className="font-semibold text-gray-800">{selectedRoot?.name}</span>
+          <h3 className={`mb-1 text-lg font-semibold ${isAdmin ? 'text-white' : 'text-gray-900'}`}>
+            Vyberte podkategóriu
+          </h3>
+          <p className={`mb-6 text-sm ${isAdmin ? 'text-gray-400' : 'text-gray-600'}`}>
+            Kategória:{' '}
+            <span className={`font-semibold ${isAdmin ? 'text-white' : 'text-gray-800'}`}>{selectedRoot?.name}</span>
           </p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {subcategories.map((cat: any) => (
               <CategoryVisualTile
                 key={cat.id}
                 cat={cat}
+                tileVariant={isAdmin ? 'admin' : 'platform'}
                 selected={subId === cat.id}
                 onSelect={() => {
                   setSubId(cat.id)
@@ -586,7 +666,11 @@ export default function CreateAdvertisementWizard({
             <button
               type="button"
               onClick={continueFromSub}
-              className="rounded-xl bg-[#1dbf73] px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#19a463]"
+              className={
+                isAdmin
+                  ? 'rounded-xl bg-primary px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition hover:opacity-90'
+                  : 'rounded-xl bg-[#1dbf73] px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#19a463]'
+              }
             >
               Pokračovať k inzerátu
             </button>
@@ -597,7 +681,9 @@ export default function CreateAdvertisementWizard({
       {phase === 'form' && (
         <div className="space-y-6">
           {!editingId && (
-            <div className="flex flex-wrap items-center gap-3 border-b border-gray-100 pb-5">
+            <div
+              className={`flex flex-wrap items-center gap-3 border-b pb-5 ${isAdmin ? 'border-card' : 'border-gray-100'}`}
+            >
               <button
                 type="button"
                 onClick={() => {
@@ -605,19 +691,31 @@ export default function CreateAdvertisementWizard({
                   if (subcategories.length > 0) goSub()
                   else goRoot()
                 }}
-                className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                className={
+                  isAdmin
+                    ? 'inline-flex items-center gap-2 rounded-xl border border-card bg-dark px-4 py-2 text-sm font-medium text-gray-200 transition hover:border-primary/40 hover:text-white'
+                    : 'inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50'
+                }
               >
                 <ChevronLeft className="h-4 w-4" />
                 Zmeniť kategóriu
               </button>
               <div className="flex flex-wrap gap-2">
                 {selectedRoot && (
-                  <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800">
+                  <span
+                    className={`rounded-full px-3 py-1 text-sm font-medium ${
+                      isAdmin ? 'bg-card text-gray-100 ring-1 ring-card' : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
                     {selectedRoot.name}
                   </span>
                 )}
                 {subId && (
-                  <span className="rounded-full bg-[#1dbf73]/10 px-3 py-1 text-sm font-medium text-[#148a55]">
+                  <span
+                    className={`rounded-full px-3 py-1 text-sm font-medium ${
+                      isAdmin ? 'bg-primary/15 text-blue-200 ring-1 ring-primary/30' : 'bg-[#1dbf73]/10 text-[#148a55]'
+                    }`}
+                  >
                     {findCategoryNode(categories, subId)?.name || 'Podkategória'}
                   </span>
                 )}
@@ -625,13 +723,20 @@ export default function CreateAdvertisementWizard({
             </div>
           )}
 
-          <div className="rounded-2xl border border-gray-200 bg-gradient-to-b from-white to-gray-50/50 p-6">
-            <h3 className="text-lg font-semibold text-gray-900">Špecifikácie</h3>
-            <p className="mt-1 text-sm text-gray-600">
-              Polia podľa vašej kategórie. Povinné polia sú označené hviezdičkou.
+          <div
+            className={
+              isAdmin
+                ? 'rounded-xl border border-card bg-dark p-6'
+                : 'rounded-2xl border border-gray-200 bg-gradient-to-b from-white to-gray-50/50 p-6'
+            }
+          >
+            <h3 className={`text-lg font-semibold ${isAdmin ? 'text-white' : 'text-gray-900'}`}>Špecifikácie</h3>
+            <p className={`mt-1 text-sm ${isAdmin ? 'text-gray-400' : 'text-gray-600'}`}>
+              Polia podľa zvolenej kategórie. Povinné polia sú označené hviezdičkou.
             </p>
             <div className="mt-5">
               <CategorySpecificationsForm
+                variant={isAdmin ? 'admin' : 'platform'}
                 filters={categoryFilters}
                 values={specificationValues}
                 onChange={(slug, v) =>
@@ -646,6 +751,7 @@ export default function CreateAdvertisementWizard({
           </div>
 
           <AdvertisementAdForm
+            variant={isAdmin ? 'admin' : 'platform'}
             adFormData={adFormData}
             setAdFormData={setAdFormData}
             newFeature={newFeature}
