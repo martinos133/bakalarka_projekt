@@ -250,6 +250,12 @@ export default function Header() {
             >
               Mapa
             </Link>
+            <Link
+              href="/premium"
+              className="px-3 py-1.5 rounded-md bg-[#1dbf73]/10 text-[#138a54] hover:bg-[#1dbf73]/15 transition-colors text-sm font-semibold"
+            >
+              RentMe Pro
+            </Link>
             {navbarItems.map((item) => (
               <Link
                 key={item.id}
@@ -405,6 +411,13 @@ export default function Header() {
               onClick={() => setIsMenuOpen(false)}
             >
               Mapa
+            </Link>
+            <Link
+              href="/premium"
+              className="block text-[#138a54] font-semibold"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              RentMe Pro
             </Link>
             {navbarItems.map((item) => (
               <Link
