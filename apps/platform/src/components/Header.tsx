@@ -115,6 +115,7 @@ export default function Header() {
   }, [])
 
   const hasSuggestions = suggestions.categories.length > 0 || suggestions.advertisements.length > 0
+  const navbarItemsWithoutMap = navbarItems.filter((item) => item.href !== '/mapa')
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
@@ -250,7 +251,7 @@ export default function Header() {
             >
               Mapa
             </Link>
-            {navbarItems.map((item) => (
+            {navbarItemsWithoutMap.map((item) => (
               <Link
                 key={item.id}
                 href={item.href}
@@ -406,7 +407,7 @@ export default function Header() {
             >
               Mapa
             </Link>
-            {navbarItems.map((item) => (
+            {navbarItemsWithoutMap.map((item) => (
               <Link
                 key={item.id}
                 href={item.href}
