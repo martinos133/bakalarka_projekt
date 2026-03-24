@@ -5,17 +5,35 @@ import L from 'leaflet'
 import { SK_CENTER, SK_DEFAULT_ZOOM, SK_BOUNDS } from '@/lib/mapRegions'
 import 'leaflet/dist/leaflet.css'
 
-/** Pekný marker – zelený bod s tieňom a bielym obrysom */
-function createDotIcon() {
+function formatPriceSk(price: number): string {
+  return `${price.toLocaleString('sk-SK', {
+    minimumFractionDigits: Number.isInteger(price) ? 0 : 2,
+    maximumFractionDigits: 2,
+  })} €`
+}
+
+/** Špendlík s voliteľnou cenou – vybraný stav je výraznejší */
+function createPinIcon(isSelected: boolean, price: number | null) {
+  const fill = isSelected ? '#0f9d5c' : '#1dbf73'
+  const priceBlock =
+    price != null
+      ? `<span class="ad-map-pin-label">${escapeHtml(formatPriceSk(price))}</span>`
+      : ''
   return L.divIcon({
-    className: 'ad-map-dot',
+    className: 'ad-map-pin-root',
     html: `
-      <span class="ad-map-marker-inner">
-        <span class="ad-map-marker-pulse"></span>
-      </span>
+      <div class="ad-map-pin ${isSelected ? 'ad-map-pin--selected' : ''}">
+        ${priceBlock}
+        <svg class="ad-map-pin-svg" viewBox="0 0 32 42" width="34" height="44" aria-hidden="true">
+          <path fill="${fill}" stroke="#ffffff" stroke-width="2"
+            d="M16 2C9.4 2 4 7.2 4 13.5c0 8.2 12 24.5 12 24.5s12-16.3 12-24.5C28 7.2 22.6 2 16 2z"/>
+          <circle cx="16" cy="14" r="4" fill="#ffffff"/>
+        </svg>
+      </div>
     `,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
+    iconSize: [40, 52],
+    iconAnchor: [20, 48],
+    popupAnchor: [0, -46],
   })
 }
 
@@ -32,17 +50,22 @@ export interface MapPoint {
 
 function popupContent(ad: MapPoint): string {
   const img = ad.image
-    ? `<img src="${ad.image}" alt="" class="ad-map-popup-img" />`
-    : '<div class="ad-map-popup-placeholder"></div>'
+    ? `<img src="${escapeHtml(ad.image)}" alt="" class="ad-map-popup-img" />`
+    : `<div class="ad-map-popup-placeholder" role="img" aria-label="Bez fotografie">
+         <span class="ad-map-popup-placeholder-text">Bez fotografie</span>
+       </div>`
   const cat = ad.category ? `<span class="ad-map-popup-cat">${escapeHtml(ad.category.name)}</span>` : ''
-  const loc = ad.location ? `<p class="ad-map-popup-loc">📍 ${escapeHtml(ad.location)}</p>` : ''
+  const loc = ad.location
+    ? `<p class="ad-map-popup-loc"><span class="ad-map-popup-loc-icon" aria-hidden="true">📍</span> ${escapeHtml(ad.location)}</p>`
+    : ''
   const price =
     ad.price != null
-      ? `<p class="ad-map-popup-price">${ad.price.toFixed(2)} €</p>`
-      : ''
-  const link = `<a href="/inzerat/${ad.id}" class="ad-map-popup-link">Zobraziť inzerát →</a>`
+      ? `<p class="ad-map-popup-price">${escapeHtml(formatPriceSk(ad.price))}</p>`
+      : '<p class="ad-map-popup-price ad-map-popup-price--muted">Cena na vyžiadanie</p>'
+  const link = `<a href="/inzerat/${ad.id}" class="ad-map-popup-link">Otvoriť detail inzerátu<span class="ad-map-popup-link-arrow" aria-hidden="true"> →</span></a>`
   return `
     <div class="ad-map-popup-card">
+      <p class="ad-map-popup-kicker">Rýchly náhľad</p>
       <div class="ad-map-popup-img-wrap">${img}</div>
       <div class="ad-map-popup-body">
         ${cat}
@@ -104,15 +127,19 @@ export default function AdMap({ points, selectedPointId, onMarkerClick }: AdMapP
     if (!map) return
     markersRef.current.forEach((m) => m.remove())
     markersRef.current = []
-    const icon = createDotIcon()
     points.forEach((ad) => {
+      const icon = createPinIcon(ad.id === selectedPointId, ad.price)
       const marker = L.marker([ad.lat, ad.lng], { icon })
-      marker.bindPopup(popupContent(ad), { className: 'ad-map-popup' })
+      marker.bindPopup(popupContent(ad), {
+        className: 'ad-map-popup',
+        maxWidth: 340,
+        autoPanPadding: [16, 16],
+      })
       marker.on('click', () => onMarkerClick?.(ad.id))
       marker.addTo(map)
       markersRef.current.push(marker)
     })
-  }, [points, onMarkerClick])
+  }, [points, onMarkerClick, selectedPointId])
 
   // Pri zmene selectedPointId posun mapu na marker a otvor popup
   useEffect(() => {
