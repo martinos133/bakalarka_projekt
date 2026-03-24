@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -20,6 +20,30 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('me/profile')
+  @ApiOperation({ summary: 'Získanie vlastného profilu' })
+  getMyProfile(@Request() req) {
+    return this.usersService.findOne(req.user.userId);
+  }
+
+  @Patch('me/profile')
+  @ApiOperation({ summary: 'Aktualizácia vlastného profilu' })
+  updateMyProfile(@Request() req, @Body() updateData: any) {
+    return this.usersService.updateProfile(req.user.userId, updateData);
+  }
+
+  @Patch('me/password')
+  @ApiOperation({ summary: 'Zmena hesla' })
+  changePassword(@Request() req, @Body() body: { oldPassword: string; newPassword: string }) {
+    return this.usersService.changePassword(req.user.userId, body.oldPassword, body.newPassword);
+  }
+
+  @Post('me/subscription/demo-checkout')
+  @ApiOperation({ summary: 'Demo aktivácia prémiového balíka po checkoute (bez reálnej platby)' })
+  demoCheckout(@Request() req, @Body() body: { plan: string }) {
+    return this.usersService.activateDemoCheckout(req.user.userId, body?.plan);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Získanie používateľa podľa ID' })
   findOne(@Param('id') id: string) {
@@ -38,23 +62,5 @@ export class UsersController {
   @ApiOperation({ summary: 'Získanie štatistík používateľa' })
   getUserStats(@Param('id') id: string) {
     return this.usersService.getUserStats(id);
-  }
-
-  @Get('me/profile')
-  @ApiOperation({ summary: 'Získanie vlastného profilu' })
-  getMyProfile(@Request() req) {
-    return this.usersService.findOne(req.user.userId);
-  }
-
-  @Patch('me/profile')
-  @ApiOperation({ summary: 'Aktualizácia vlastného profilu' })
-  updateMyProfile(@Request() req, @Body() updateData: any) {
-    return this.usersService.updateProfile(req.user.userId, updateData);
-  }
-
-  @Patch('me/password')
-  @ApiOperation({ summary: 'Zmena hesla' })
-  changePassword(@Request() req, @Body() body: { oldPassword: string; newPassword: string }) {
-    return this.usersService.changePassword(req.user.userId, body.oldPassword, body.newPassword);
   }
 }

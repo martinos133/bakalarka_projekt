@@ -6,6 +6,7 @@ import { api } from '@/lib/api'
 import Link from 'next/link'
 import TrackedLink from '@/components/TrackedLink'
 import Image from 'next/image'
+import { isProSellerBadge } from '@/lib/sellerPlan'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
@@ -232,9 +233,34 @@ export default function CategoryPage() {
                         alt={ad.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
+                      <div className="absolute top-2 left-2 flex flex-wrap gap-1.5">
+                        {ad.priorityBoosted && (
+                          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-[#1dbf73] text-white shadow">
+                            Priorita
+                          </span>
+                        )}
+                        {isProSellerBadge(ad.user?.sellerPlan, ad.user?.sellerPlanValidUntil) && (
+                          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-[#0c1a2e] text-white shadow">
+                            Pro predajca
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )}
                   <div className="p-4">
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {(!ad.images || ad.images.length === 0) && ad.priorityBoosted && (
+                        <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-[#1dbf73] text-white">
+                          Priorita
+                        </span>
+                      )}
+                      {(!ad.images || ad.images.length === 0) &&
+                        isProSellerBadge(ad.user?.sellerPlan, ad.user?.sellerPlanValidUntil) && (
+                          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-[#0c1a2e] text-white">
+                            Pro predajca
+                          </span>
+                        )}
+                    </div>
                     <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
                       {ad.title}
                     </h3>

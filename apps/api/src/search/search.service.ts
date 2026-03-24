@@ -41,6 +41,7 @@ export class SearchService {
           price: true,
           images: true,
         },
+        orderBy: [{ priorityBoosted: 'desc' }, { createdAt: 'desc' }],
         take: SUGGESTIONS_LIMIT,
       }),
     ]);

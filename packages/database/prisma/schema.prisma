@@ -41,6 +41,13 @@ enum Gender {
   OTHER
 }
 
+enum SellerPlan {
+  STANDARD
+  PLUS
+  PRO
+  FIRMA
+}
+
 model User {
   id            String    @id @default(uuid())
   email         String    @unique
@@ -59,6 +66,8 @@ model User {
   postalCode    String?
   country       String?
   role          UserRole  @default(USER)
+  sellerPlan          SellerPlan @default(STANDARD)
+  sellerPlanValidUntil DateTime?
   banned        Boolean   @default(false)
   bannedUntil   DateTime?
   banReason     String?
@@ -172,6 +181,8 @@ model Advertisement {
   faq         Json?              // Array of FAQ objects with question and answer
   /// Hodnoty špecifikácií podľa slugov filtrov danej kategórie (TEXT, NUMBER, SELECT, …)
   specifications Json?
+  /// Zvýraznenie vo výsledkoch (balík Plus/Pro/Firma) – zoradenie navrch
+  priorityBoosted Boolean         @default(false)
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
   userId      String
@@ -185,6 +196,7 @@ model Advertisement {
   @@index([status])
   @@index([categoryId])
   @@index([type])
+  @@index([priorityBoosted])
 }
 
 model Payment {

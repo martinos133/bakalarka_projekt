@@ -2,11 +2,15 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { prisma } from '@inzertna-platforma/database';
 import { CreateAdvertisementDto, UpdateAdvertisementDto, MessageType } from '@inzertna-platforma/shared';
 import { MessagesService } from '../messages/messages.service';
+import { UsersService } from '../users/users.service';
 import { validateCategorySpecifications } from './specifications.validation';
 
 @Injectable()
 export class AdvertisementsService {
-  constructor(private readonly messagesService: MessagesService) {}
+  constructor(
+    private readonly messagesService: MessagesService,
+    private readonly usersService: UsersService,
+  ) {}
   async create(userId: string, createDto: CreateAdvertisementDto) {
     // Skontroluj, či používateľ nie je zabanovaný
     const user = await prisma.user.findUnique({
@@ -37,7 +41,7 @@ export class AdvertisementsService {
         : (specsRaw as Record<string, unknown>),
     );
 
-    return prisma.advertisement.create({
+    const created = await prisma.advertisement.create({
       data: {
         ...createRest,
         userId,
@@ -49,6 +53,8 @@ export class AdvertisementsService {
         specifications,
       } as any,
     });
+    await this.usersService.syncPriorityBoostsForUser(userId).catch(() => undefined);
+    return created;
   }
 
   async findForMap(filters: { categoryId?: string; type?: 'SERVICE' | 'RENTAL'; region?: string }) {
@@ -69,12 +75,13 @@ export class AdvertisementsService {
         type: true,
         price: true,
         images: true,
+        priorityBoosted: true,
         categoryId: true,
         category: {
           select: { id: true, name: true, slug: true },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ priorityBoosted: 'desc' }, { createdAt: 'desc' }],
     });
     return list.map((ad) => ({
       id: ad.id,
@@ -100,13 +107,13 @@ export class AdvertisementsService {
             firstName: true,
             lastName: true,
             phone: true,
+            sellerPlan: true,
+            sellerPlanValidUntil: true,
           },
         },
         category: true,
       } as any,
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: [{ priorityBoosted: 'desc' }, { createdAt: 'desc' }],
     });
   }
 
@@ -127,13 +134,13 @@ export class AdvertisementsService {
             firstName: true,
             lastName: true,
             phone: true,
+            sellerPlan: true,
+            sellerPlanValidUntil: true,
           },
         },
         category: true,
       } as any,
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: [{ priorityBoosted: 'desc' }, { createdAt: 'desc' }],
     });
   }
 
@@ -151,13 +158,13 @@ export class AdvertisementsService {
             firstName: true,
             lastName: true,
             phone: true,
+            sellerPlan: true,
+            sellerPlanValidUntil: true,
           },
         },
         category: true,
       } as any,
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: [{ priorityBoosted: 'desc' }, { createdAt: 'desc' }],
       take: limit,
     });
   }
@@ -226,6 +233,8 @@ export class AdvertisementsService {
             firstName: true,
             lastName: true,
             phone: true,
+            sellerPlan: true,
+            sellerPlanValidUntil: true,
           },
         },
         category: true,
@@ -297,13 +306,15 @@ export class AdvertisementsService {
       data.specifications = specifications;
     }
 
-    return prisma.advertisement.update({
+    const updated = await prisma.advertisement.update({
       where: { id },
       data: data as any,
       include: {
         category: true,
       } as any,
     });
+    await this.usersService.syncPriorityBoostsForUser(userId).catch(() => undefined);
+    return updated;
   }
 
   async remove(id: string, userId: string) {
@@ -319,9 +330,11 @@ export class AdvertisementsService {
       throw new ForbiddenException('Nemáte oprávnenie odstrániť tento inzerát');
     }
 
-    return prisma.advertisement.delete({
+    const deleted = await prisma.advertisement.delete({
       where: { id },
     });
+    await this.usersService.syncPriorityBoostsForUser(userId).catch(() => undefined);
+    return deleted;
   }
 
   async findByUser(userId: string) {
@@ -364,6 +377,8 @@ export class AdvertisementsService {
             firstName: true,
             lastName: true,
             phone: true,
+            sellerPlan: true,
+            sellerPlanValidUntil: true,
           },
         },
         category: {
@@ -374,9 +389,7 @@ export class AdvertisementsService {
           },
         },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: [{ priorityBoosted: 'desc' }, { createdAt: 'desc' }],
     });
   }
 
@@ -446,6 +459,8 @@ export class AdvertisementsService {
       },
     );
 
+    await this.usersService.syncPriorityBoostsForUser(advertisement.userId).catch(() => undefined);
+
     return updated;
   }
 
@@ -492,6 +507,8 @@ export class AdvertisementsService {
         reason,
       },
     );
+
+    await this.usersService.syncPriorityBoostsForUser(advertisement.userId).catch(() => undefined);
 
     return updated;
   }

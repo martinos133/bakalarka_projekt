@@ -22,6 +22,13 @@ export enum AdvertisementType {
   RENTAL = 'RENTAL',
 }
 
+export enum SellerPlan {
+  STANDARD = 'STANDARD',
+  PLUS = 'PLUS',
+  PRO = 'PRO',
+  FIRMA = 'FIRMA',
+}
+
 export interface JwtPayload {
   userId: string;
   email: string;
@@ -47,6 +54,9 @@ export interface User {
   postalCode?: string;
   country?: string;
   role: UserRole;
+  /** Prémiový balík predajcu (platný do sellerPlanValidUntil) */
+  sellerPlan?: SellerPlan | string;
+  sellerPlanValidUntil?: Date | string | null;
   banned: boolean;
   bannedUntil?: Date;
   banReason?: string;

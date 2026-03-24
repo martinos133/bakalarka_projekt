@@ -6,6 +6,8 @@ export interface User {
   role: string
   gender?: string
   isCompany?: boolean
+  sellerPlan?: string
+  sellerPlanValidUntil?: string | null
 }
 
 export function getAuthToken(): string | null {

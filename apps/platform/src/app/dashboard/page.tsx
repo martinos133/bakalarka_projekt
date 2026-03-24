@@ -9,6 +9,7 @@ import { isAuthenticated, getAuthUser, setAuthUser } from '@/lib/auth'
 import { User, Building2, Eye, EyeOff, Edit, Trash2, X, Lock, Mail, Phone, MapPin, Calendar, Briefcase, MessageSquare, Archive, CheckCircle, Paperclip, FileText, Download, Heart } from 'lucide-react'
 import CreateAdvertisementWizard from '@/components/CreateAdvertisementWizard'
 import Link from 'next/link'
+import { sellerPlanLabel } from '@/lib/sellerPlan'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -381,6 +382,33 @@ export default function DashboardPage() {
 
         {/* Profile Tab */}
         {activeTab === 'profile' && (
+          <>
+          <div className="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Predajcovský balík</p>
+              <p className="text-lg font-bold text-gray-900 mt-1">
+                {sellerPlanLabel(profileData?.sellerPlan)}
+              </p>
+              {profileData?.sellerPlanValidUntil ? (
+                <p className="text-sm text-gray-600 mt-1">
+                  Platné do:{' '}
+                  {new Date(profileData.sellerPlanValidUntil).toLocaleDateString('sk-SK', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </p>
+              ) : (
+                <p className="text-sm text-gray-600 mt-1">Žiadny aktívny prémiový balík.</p>
+              )}
+            </div>
+            <Link
+              href="/premium"
+              className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#1dbf73] hover:bg-[#19a463] transition-colors shrink-0"
+            >
+              Prémiové balíky
+            </Link>
+          </div>
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900">Kontaktné údaje</h2>
@@ -712,6 +740,7 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
+          </>
         )}
 
         {/* Advertisements Tab */}
@@ -753,6 +782,11 @@ export default function DashboardPage() {
                              ad.status === 'DRAFT' ? 'Koncept' :
                              'Neaktívny'}
                           </span>
+                          {ad.priorityBoosted && ad.status === 'ACTIVE' && (
+                            <span className="px-2 py-1 text-xs rounded-full bg-emerald-100 text-emerald-800 font-medium">
+                              Priorita
+                            </span>
+                          )}
                         </div>
                         <p className="text-gray-600 mb-2 line-clamp-2">{ad.description}</p>
                         <div className="flex items-center gap-4 text-sm text-gray-500">

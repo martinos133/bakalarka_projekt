@@ -136,6 +136,11 @@ export const api = {
     method: 'PATCH',
     body: JSON.stringify({ oldPassword, newPassword }),
   }),
+  activateDemoSubscription: (plan: 'PLUS' | 'PRO' | 'FIRMA') =>
+    fetchWithAuth('/users/me/subscription/demo-checkout', {
+      method: 'POST',
+      body: JSON.stringify({ plan }),
+    }),
 
   // Advertisement endpoints
   getMyAdvertisements: () => fetchWithAuth('/advertisements/me/my-advertisements'),

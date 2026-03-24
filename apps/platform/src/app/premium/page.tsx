@@ -1,16 +1,23 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { api } from '@/lib/api'
+import { isAuthenticated, setAuthUser } from '@/lib/auth'
 import {
   ArrowRight,
   BadgeCheck,
   BarChart3,
   Building2,
   Check,
+  CircleCheckBig,
+  CreditCard,
   Crown,
   HelpCircle,
+  Lock,
   MapPin,
   Sparkles,
+  X,
   Zap,
 } from 'lucide-react'
 import Header from '@/components/Header'
@@ -148,6 +155,86 @@ function formatPriceEUR(n: number | null): string {
 }
 
 export default function PremiumPage() {
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [checkoutDone, setCheckoutDone] = useState(false)
+  const [checkoutSubmitting, setCheckoutSubmitting] = useState(false)
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
+  const [checkoutPlanId, setCheckoutPlanId] = useState<PlanId>('pro')
+  const [paymentForm, setPaymentForm] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    cardName: '',
+    cardNumber: '',
+    exp: '',
+    cvc: '',
+  })
+
+  const selectedPlan = PLANS.find((p) => p.id === checkoutPlanId) || PLANS[2]
+
+  useEffect(() => {
+    if (!checkoutOpen) return
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = originalOverflow
+    }
+  }, [checkoutOpen])
+
+  const openCheckout = (planId: PlanId) => {
+    setCheckoutPlanId(planId)
+    setCheckoutDone(false)
+    setCheckoutError(null)
+    setCheckoutOpen(true)
+  }
+
+  const closeCheckout = () => {
+    setCheckoutOpen(false)
+    setCheckoutDone(false)
+    setCheckoutError(null)
+    setCheckoutSubmitting(false)
+  }
+
+  const handleCheckoutSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setCheckoutError(null)
+    if (!isAuthenticated()) {
+      setCheckoutError('Pre aktiváciu balíka sa musíte prihlásiť.')
+      return
+    }
+    const planApi: Record<string, 'PLUS' | 'PRO' | 'FIRMA'> = {
+      plus: 'PLUS',
+      pro: 'PRO',
+      firma: 'FIRMA',
+    }
+    const apiPlan = planApi[checkoutPlanId]
+    if (!apiPlan) {
+      setCheckoutError('Neplatný balík.')
+      return
+    }
+    setCheckoutSubmitting(true)
+    try {
+      const profile = await api.activateDemoSubscription(apiPlan)
+      setAuthUser({
+        id: profile.id,
+        email: profile.email,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        role: profile.role,
+        gender: profile.gender,
+        isCompany: profile.isCompany,
+        sellerPlan: profile.sellerPlan,
+        sellerPlanValidUntil: profile.sellerPlanValidUntil,
+      })
+      setCheckoutDone(true)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Aktivácia zlyhala.'
+      setCheckoutError(msg)
+    } finally {
+      setCheckoutSubmitting(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#f4f6f9]">
       <Header />
@@ -316,27 +403,44 @@ export default function PremiumPage() {
                   ))}
                 </ul>
 
-                <Link
-                  href={plan.ctaHref}
-                  className={`mt-auto inline-flex w-full items-center justify-center gap-2 rounded-xl py-3.5 px-4 text-sm font-semibold transition ${
-                    plan.ctaVariant === 'primary'
-                      ? 'text-white bg-[#1dbf73] hover:bg-[#19a463] shadow-lg shadow-[#1dbf73]/25'
-                      : plan.ctaVariant === 'navy'
-                        ? 'text-white bg-[#0c1a2e] hover:bg-[#152a45] border border-transparent'
-                        : 'text-[#0c1a2e] bg-white border-2 border-gray-200 hover:border-[#1dbf73] hover:text-[#1dbf73]'
-                  }`}
-                >
-                  {plan.cta}
-                  <ArrowRight className="w-4 h-4" aria-hidden />
-                </Link>
+                {plan.id === 'standard' ? (
+                  <Link
+                    href={plan.ctaHref}
+                    className={`mt-auto inline-flex w-full items-center justify-center gap-2 rounded-xl py-3.5 px-4 text-sm font-semibold transition ${
+                      plan.ctaVariant === 'primary'
+                        ? 'text-white bg-[#1dbf73] hover:bg-[#19a463] shadow-lg shadow-[#1dbf73]/25'
+                        : plan.ctaVariant === 'navy'
+                          ? 'text-white bg-[#0c1a2e] hover:bg-[#152a45] border border-transparent'
+                          : 'text-[#0c1a2e] bg-white border-2 border-gray-200 hover:border-[#1dbf73] hover:text-[#1dbf73]'
+                    }`}
+                  >
+                    {plan.cta}
+                    <ArrowRight className="w-4 h-4" aria-hidden />
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => openCheckout(plan.id)}
+                    className={`mt-auto inline-flex w-full items-center justify-center gap-2 rounded-xl py-3.5 px-4 text-sm font-semibold transition ${
+                      plan.ctaVariant === 'primary'
+                        ? 'text-white bg-[#1dbf73] hover:bg-[#19a463] shadow-lg shadow-[#1dbf73]/25'
+                        : plan.ctaVariant === 'navy'
+                          ? 'text-white bg-[#0c1a2e] hover:bg-[#152a45] border border-transparent'
+                          : 'text-[#0c1a2e] bg-white border-2 border-gray-200 hover:border-[#1dbf73] hover:text-[#1dbf73]'
+                    }`}
+                  >
+                    {plan.cta}
+                    <ArrowRight className="w-4 h-4" aria-hidden />
+                  </button>
+                )}
               </article>
             )
           })}
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-10 max-w-xl mx-auto leading-relaxed">
-          Aktiváciu balíka a platobné podmienky vám potvrdíme pred spustením. Pripravujeme platby priamo v účte; do
-          tej doby vás kontaktujeme s potvrdením objednávky.
+          Aktivácia prebieha priamo cez checkout popup po kliknutí na tlačidlo balíka. Aktuálne je to demo platobného
+          procesu na otestovanie UX.
         </p>
       </section>
 
@@ -443,6 +547,179 @@ export default function PremiumPage() {
           </div>
         </div>
       </section>
+
+      {checkoutOpen && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Zatvoriť checkout"
+            className="absolute inset-0 bg-[#0c1a2e]/65 backdrop-blur-[2px]"
+            onClick={closeCheckout}
+          />
+          <div className="relative w-full max-w-2xl rounded-2xl bg-white border border-gray-200 shadow-2xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Checkout</p>
+                <h3 className="text-lg font-bold text-[#0c1a2e]">Aktivácia balíka {selectedPlan.name}</h3>
+              </div>
+              <button
+                type="button"
+                onClick={closeCheckout}
+                className="w-9 h-9 rounded-lg border border-gray-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50 flex items-center justify-center"
+              >
+                <X className="w-4 h-4" aria-hidden />
+              </button>
+            </div>
+
+            {!checkoutDone ? (
+              <form onSubmit={handleCheckoutSubmit} className="p-5 md:p-6">
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4 mb-5">
+                  <p className="text-sm text-emerald-800">
+                    Vybraný balík: <strong>{selectedPlan.name}</strong> —{' '}
+                    <strong>
+                      {formatPriceEUR(selectedPlan.price)}
+                      {selectedPlan.price && selectedPlan.price > 0 ? ' / mesiac' : ''}
+                    </strong>
+                  </p>
+                </div>
+
+                {checkoutError && (
+                  <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                    <p>{checkoutError}</p>
+                    {checkoutError.includes('prihlásiť') && (
+                      <Link
+                        href="/signin?redirect=/premium"
+                        className="mt-2 inline-block font-semibold text-red-900 underline hover:no-underline"
+                      >
+                        Prihlásiť sa
+                      </Link>
+                    )}
+                  </div>
+                )}
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1.5">Meno a priezvisko</label>
+                    <input
+                      required
+                      value={paymentForm.fullName}
+                      onChange={(e) => setPaymentForm((p) => ({ ...p, fullName: e.target.value }))}
+                      placeholder="Ján Novák"
+                      className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1.5">E-mail</label>
+                    <input
+                      type="email"
+                      required
+                      value={paymentForm.email}
+                      onChange={(e) => setPaymentForm((p) => ({ ...p, email: e.target.value }))}
+                      placeholder="jan@firma.sk"
+                      className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-medium text-gray-500 mb-1.5">Telefón</label>
+                    <input
+                      required
+                      value={paymentForm.phone}
+                      onChange={(e) => setPaymentForm((p) => ({ ...p, phone: e.target.value }))}
+                      placeholder="+421 900 123 456"
+                      className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-5 rounded-xl border border-gray-200 p-4">
+                  <p className="text-sm font-semibold text-[#0c1a2e] mb-3 flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-[#1dbf73]" aria-hidden />
+                    Platobné údaje
+                  </p>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-medium text-gray-500 mb-1.5">Meno na karte</label>
+                      <input
+                        required
+                        value={paymentForm.cardName}
+                        onChange={(e) => setPaymentForm((p) => ({ ...p, cardName: e.target.value }))}
+                        placeholder="JAN NOVAK"
+                        className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-medium text-gray-500 mb-1.5">Číslo karty</label>
+                      <input
+                        required
+                        value={paymentForm.cardNumber}
+                        onChange={(e) => setPaymentForm((p) => ({ ...p, cardNumber: e.target.value }))}
+                        placeholder="4242 4242 4242 4242"
+                        className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1.5">Expirácia</label>
+                      <input
+                        required
+                        value={paymentForm.exp}
+                        onChange={(e) => setPaymentForm((p) => ({ ...p, exp: e.target.value }))}
+                        placeholder="MM/RR"
+                        className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1.5">CVC</label>
+                      <input
+                        required
+                        value={paymentForm.cvc}
+                        onChange={(e) => setPaymentForm((p) => ({ ...p, cvc: e.target.value }))}
+                        placeholder="123"
+                        className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-5 flex items-center justify-between gap-3 flex-wrap">
+                  <p className="text-xs text-gray-500 flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5" aria-hidden />
+                    Demo checkout – údaje karty sa neodosielajú; balík sa uloží na účet.
+                  </p>
+                  <button
+                    type="submit"
+                    disabled={checkoutSubmitting}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-[#1dbf73] hover:bg-[#19a463] transition shadow-lg shadow-[#1dbf73]/20 disabled:opacity-60"
+                  >
+                    {checkoutSubmitting ? 'Aktivujem…' : 'Zaplatiť a aktivovať'}
+                    <ArrowRight className="w-4 h-4" aria-hidden />
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="p-6 md:p-8">
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-center">
+                  <CircleCheckBig className="w-12 h-12 text-emerald-600 mx-auto mb-3" aria-hidden />
+                  <h4 className="text-lg font-bold text-emerald-900 mb-1">Balík je aktivovaný</h4>
+                  <p className="text-sm text-emerald-800">
+                    <strong>{selectedPlan.name}</strong> je priradený k vášmu účtu (platnosť 30 dní v demo režime).
+                    Vaše najnovšie aktívne inzeráty sú automaticky označené ako prioritné podľa limitu balíka a zobrazia sa
+                    vyššie v kategóriách a vo vyhľadávaní.
+                  </p>
+                </div>
+                <div className="mt-5 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={closeCheckout}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-[#0c1a2e] hover:bg-[#152a45] transition"
+                  >
+                    Zavrieť
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

@@ -9,6 +9,7 @@ import ImageCarousel from '@/components/ImageCarousel'
 import DatePicker from '@/components/DatePicker'
 import { api } from '@/lib/api'
 import { isAuthenticated } from '@/lib/auth'
+import { isProSellerBadge } from '@/lib/sellerPlan'
 import type { Filter } from '@inzertna-platforma/shared'
 import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone, Heart } from 'lucide-react'
 import type { DateRange } from 'react-day-picker'
@@ -63,12 +64,15 @@ interface Advertisement {
     name: string
   }
   location?: string
+  priorityBoosted?: boolean
   user?: {
     id: string
     firstName?: string
     lastName?: string
     email?: string
     phone?: string
+    sellerPlan?: string
+    sellerPlanValidUntil?: string | null
   }
   createdAt: string
   type?: 'SERVICE' | 'RENTAL'
@@ -403,9 +407,16 @@ export default function AdvertisementDetailPage({
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Title */}
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              {advertisement.title}
-            </h1>
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+                {advertisement.title}
+              </h1>
+              {advertisement.priorityBoosted && (
+                <span className="text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded-lg bg-[#1dbf73]/15 text-[#138a54] border border-[#1dbf73]/30">
+                  Prioritný inzerát
+                </span>
+              )}
+            </div>
 
             {/* Seller Info */}
             {advertisement.user && (
@@ -414,9 +425,17 @@ export default function AdvertisementDetailPage({
                   {sellerName.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">
-                    {sellerName}
-                  </h3>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="font-semibold text-gray-900">{sellerName}</h3>
+                    {isProSellerBadge(
+                      advertisement.user?.sellerPlan,
+                      advertisement.user?.sellerPlanValidUntil,
+                    ) && (
+                      <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-[#0c1a2e] text-white">
+                        Pro predajca
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 mt-1">
                     <div className="flex items-center gap-1">
                       <svg
