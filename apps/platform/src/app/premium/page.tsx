@@ -24,9 +24,8 @@ import Header from '@/components/Header'
 import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
 
-/** Značková námorná modrá + zelené akcenty platformy */
 const NAVY = 'text-[#0c1a2e]'
-const NAVY_BG = 'bg-[#0c1a2e]'
+const NAVY_BG = 'bg-[#0f172a]'
 
 type PlanId = 'standard' | 'plus' | 'pro' | 'firma'
 
@@ -49,7 +48,7 @@ const PLANS: Plan[] = [
   {
     id: 'standard',
     name: 'Štandard',
-    tagline: 'Vhodné na prvé skúsenosti a občasné ponuky.',
+    tagline: 'Pre občasné inzerovanie bez mesačného poplatku.',
     price: 0,
     priceNote: 'Zverejnenie inzerátu podľa platného cenníka kategórie.',
     badge: null,
@@ -59,16 +58,16 @@ const PLANS: Plan[] = [
     ctaHref: '/podat-inzerat',
     ctaVariant: 'outline',
     features: [
-      'Základné zaradenie do kategórie a vyhľadávania',
+      'Základné zaradenie vo vyhľadávaní a kategóriách',
       'Zobrazenie na mape pri vyplnenej lokalite',
-      'Štandardná rotácia medzi ostatnými inzerátmi',
-      'Notifikácie o správach v rámci účtu',
+      'Štandardná rotácia medzi inzerátmi',
+      'Notifikácie o nových správach',
     ],
   },
   {
     id: 'plus',
     name: 'Plus',
-    tagline: 'Jeden inzerát výraznejšie v popredí.',
+    tagline: 'Jeden prioritný inzerát pre lepšiu viditeľnosť.',
     price: 8.99,
     priceNote: 'mesačne, jedna aktívna propagácia v rámci balíka.',
     badge: null,
@@ -78,17 +77,17 @@ const PLANS: Plan[] = [
     ctaHref: '/podat-inzerat?plan=plus',
     ctaVariant: 'outline',
     features: [
-      'Všetko zo balíka Štandard',
-      '1× mesačne zvýraznenie inzerátu vo výsledkoch (vyššia pozícia)',
-      'Jemný vizuálny odlišovač v zozname výsledkov',
-      'Prednostné zobrazenie v rámci vášho mesta / regiónu',
-      'E-mailové pripomienky pred koncom obdobia propagácie',
+      'Všetko zo Štandardu',
+      '1 prioritný inzerát vo výsledkoch',
+      'Jemné vizuálne zvýraznenie inzerátu',
+      'Lepšia pozícia v rámci mesta a regiónu',
+      'Pripomienka pred koncom obdobia',
     ],
   },
   {
     id: 'pro',
     name: 'RentMe Pro',
-    tagline: 'Najlepší pomer viditeľnosti a ceny pre aktívnych predajcov.',
+    tagline: 'Pre aktívnych predajcov, ktorí chcú stabilnú viditeľnosť.',
     price: 16.99,
     priceNote: 'mesačne, až 3 prioritné inzeráty naraz.',
     badge: 'Odporúčané',
@@ -99,17 +98,17 @@ const PLANS: Plan[] = [
     ctaVariant: 'primary',
     features: [
       'Všetko z balíka Plus',
-      'Až 3 inzeráty s prioritným zaradením súčasne',
-      'Výraznejšie miesto v hornej časti výsledkov v kategórii',
-      'Priorita na mape (väčší vizuál, lepšia čitateľnosť)',
-      'Základné štatistiky: zobrazenia a kliky na detail',
-      'Odznak dôvery „Pro predajca“ pri profile',
+      'Až 3 prioritné inzeráty súčasne',
+      'Lepšie umiestnenie v kategóriách',
+      'Zvýraznenie na mape',
+      'Základné štatistiky výkonu',
+      'Odznak Pro pri profile',
     ],
   },
   {
     id: 'firma',
     name: 'Firma',
-    tagline: 'Pre tímy a firmy s väčším objemom ponúk.',
+    tagline: 'Pre tímy a firmy s väčším počtom ponúk.',
     price: 39,
     priceNote: 'mesačne, viac inzerátov a firemné funkcie.',
     badge: 'Pre firmy',
@@ -120,31 +119,31 @@ const PLANS: Plan[] = [
     ctaVariant: 'navy',
     features: [
       'Všetko z balíka RentMe Pro',
-      'Až 10 aktívnych inzerátov s prioritným režimom',
-      'Rozšírený firemný profil (logo, IČO, kontakty)',
-      'Export prehľadov a mesačný report výkonu',
-      'Prioritná e-mailová podpora do 24 hodín',
-      'Možnosť individuálnej fakturácie (po dohode)',
+      'Až 10 prioritných inzerátov',
+      'Rozšírený firemný profil',
+      'Mesačný report výkonu',
+      'Prioritná podpora',
+      'Individuálna fakturácia',
     ],
   },
 ]
 
 const FAQ = [
   {
-    q: 'Prečo platiť za balík, keď môžem inzerovať zadarmo?',
-    a: 'Základné zverejnenie zostáva dostupné pre každého. Prémiové balíky riešia konkurenciu vo výsledkoch – viac zobrazení, lepšia pozícia a dôvera zákazníkov pri rozhodovaní.',
+    q: 'Prečo si zvoliť platený balík?',
+    a: 'Štandard je vhodný na základné použitie. Platené balíky zvyšujú viditeľnosť, prinášajú lepšie pozície vo výsledkoch a pomáhajú odlíšiť ponuku od konkurencie.',
   },
   {
-    q: 'Ako fungujú platby a viazanosť?',
-    a: 'Balíky sú koncipované ako mesačný predplatný model s jasným rozsahom. Presné podmienky fakturácie a spôsob úhrady vám potvrdíme pred aktiváciou; pripravujeme platobné rozhranie priamo v účte.',
+    q: 'Ako funguje fakturácia?',
+    a: 'Balíky sú mesačné. V tejto verzii ide o demo checkout na otestovanie používateľského toku bez reálneho spracovania platby.',
   },
   {
     q: 'Môžem medzi balíkmi prepínať?',
-    a: 'Áno. Upgrade je možný kedykoľvek; pri zmene na nižší balík sa rozdiely prejavia od nasledujúceho fakturačného obdobia, aby ste nestratili už zaplatené výhody.',
+    a: 'Áno, balík môžete zmeniť podľa aktuálnych potrieb. Vyšší plán sa aktivuje okamžite, nižší plán od ďalšieho obdobia.',
   },
   {
-    q: 'Čo ak predávam len občas?',
-    a: 'Pre občasné ponuky stačí balík Štandard alebo krátkodobý Plus. Pre pravidelnú aktivitu sa oplatí RentMe Pro – lepšia viditeľnosť viacerých ponúk naraz.',
+    q: 'Ktorý balík je vhodný pre občasný predaj?',
+    a: 'Pre občasný predaj stačí Štandard alebo Plus. RentMe Pro a Firma sú vhodné pre pravidelné inzerovanie vo väčšom objeme.',
   },
 ]
 
@@ -241,52 +240,52 @@ export default function PremiumPage() {
       <CategoryNav />
 
       {/* Hero */}
-      <section className={`relative ${NAVY_BG} text-white overflow-hidden`}>
+      <section className="border-b border-slate-200 bg-white">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          className="pointer-events-none absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v2H24v-2h12zm0-4v2H24v-2h12z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }}
           aria-hidden
         />
-        <div className="absolute top-0 right-0 w-[min(100%,480px)] h-80 bg-gradient-to-bl from-emerald-500/20 to-transparent rounded-bl-[100%] blur-3xl" aria-hidden />
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+        <div className="absolute top-0 right-0 w-[min(100%,420px)] h-72 bg-gradient-to-bl from-slate-200/70 to-transparent rounded-bl-[100%] blur-3xl" aria-hidden />
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-16">
           <nav className="mb-8" aria-label="Drobečková navigácia">
-            <ol className="flex flex-wrap items-center gap-2 text-sm text-white/60">
+            <ol className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
               <li>
-                <Link href="/" className="hover:text-white transition-colors">
+                <Link href="/" className="hover:text-slate-700 transition-colors">
                   Domov
                 </Link>
               </li>
-              <li aria-hidden className="text-white/30">
+              <li aria-hidden className="text-slate-300">
                 /
               </li>
-              <li className="text-white font-medium">Prémiové balíky</li>
+              <li className="text-slate-900 font-medium">Prémiové balíky</li>
             </ol>
           </nav>
           <div className="max-w-3xl">
-            <p className="inline-flex items-center gap-2 text-emerald-400 font-semibold text-sm uppercase tracking-widest mb-4">
+            <p className="inline-flex items-center gap-2 text-emerald-700 font-semibold text-sm uppercase tracking-widest mb-4">
               <BadgeCheck className="w-4 h-4" aria-hidden />
-              Pre predajcov a poskytovateľov služieb
+              Profesionálne balíky pre predajcov
             </p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-balance leading-tight">
-              Prémiové balíky, ktoré dávajú zmysel
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-balance leading-tight text-slate-900">
+              Jednoduché a férové ceny
             </h1>
-            <p className="mt-5 text-lg text-white/80 leading-relaxed max-w-2xl">
-              Získajte vyššiu viditeľnosť, profesionálny dojem a lepšie výsledky pri predaji služieb alebo prenájmu.
-              Ceny sú nastavené tak, aby sa oplatili jednotlivcovi aj firme – od prvého inzerátu po desiatky ponúk.
+            <p className="mt-5 text-lg text-slate-600 leading-relaxed max-w-2xl">
+              Vyberte si plán podľa objemu inzerátov. Každý balík jasne definuje rozsah služieb a zvýšenie viditeľnosti
+              vo vyhľadávaní.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="#baliky"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-[#0c1a2e] bg-white hover:bg-gray-100 transition shadow-lg shadow-black/20"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-white bg-[#0f172a] hover:bg-[#1e293b] transition"
               >
                 Porovnať balíky
                 <ArrowRight className="w-4 h-4" aria-hidden />
               </Link>
               <Link
                 href="/podat-inzerat"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-white border border-white/30 hover:bg-white/10 transition"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-slate-700 border border-slate-300 hover:bg-slate-50 transition"
               >
                 Pridať inzerát
               </Link>
@@ -296,22 +295,22 @@ export default function PremiumPage() {
       </section>
 
       {/* Value props */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
         <div className="grid sm:grid-cols-3 gap-4">
           {[
             {
-              title: 'Lepšia pozícia',
-              text: 'Prioritné zaradenie tam, kde zákazníci hľadajú – vo výsledkoch aj na mape.',
+              title: 'Lepšie umiestnenie',
+              text: 'Prioritné pozície vo vyhľadávaní a v kategóriách.',
               icon: MapPin,
             },
             {
-              title: 'Menej hluku',
-              text: 'Vizuálne zvýraznenie a odznaky pomáhajú odlíšiť vašu ponuku od konkurencie.',
+              title: 'Čistejší profil',
+              text: 'Vizuálne odlíšenie, ktoré pôsobí dôveryhodne a profesionálne.',
               icon: Sparkles,
             },
             {
-              title: 'Merať výkon',
-              text: 'Od balíka Pro máte prehľad o záujme – zobrazenia a kliky na váš inzerát.',
+              title: 'Prehľad výkonu',
+              text: 'Od balíka Pro získate základné štatistiky inzerátov.',
               icon: BarChart3,
             },
           ].map((item) => {
@@ -319,7 +318,7 @@ export default function PremiumPage() {
             return (
               <div
                 key={item.title}
-                className="rounded-2xl bg-white border border-gray-200/90 p-5 shadow-sm hover:shadow-md transition-shadow"
+                className="rounded-2xl bg-white border border-slate-200 p-5 shadow-sm"
               >
                 <div className="w-10 h-10 rounded-xl bg-[#0c1a2e]/5 flex items-center justify-center mb-3">
                   <Icon className="w-5 h-5 text-[#0c1a2e]" aria-hidden />
@@ -333,12 +332,11 @@ export default function PremiumPage() {
       </section>
 
       {/* Pricing */}
-      <section id="baliky" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 scroll-mt-24">
+      <section id="baliky" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-20 scroll-mt-24">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <h2 className={`text-2xl sm:text-3xl font-bold ${NAVY} mb-3`}>Vyberte si balík</h2>
           <p className="text-gray-600 leading-relaxed">
-            Štyri úrovne – od nezáväzného štartu až po firemné riešenie. Všetky ceny sú s DPH a za kalendárny mesiac
-            používania služieb v rozsahu uvedenom pri balíku.
+            Vyberte si balík podľa počtu inzerátov a požadovanej viditeľnosti. Ceny sú uvedené za mesiac.
           </p>
         </div>
 
@@ -350,15 +348,13 @@ export default function PremiumPage() {
               <article
                 key={plan.id}
                 className={`relative flex flex-col rounded-2xl border bg-white p-6 shadow-sm transition-all ${
-                  isPro
-                    ? 'border-emerald-500/60 shadow-xl shadow-emerald-500/10 ring-2 ring-emerald-500/30 scale-[1.02] xl:scale-105 z-[1]'
-                    : 'border-gray-200/90 hover:border-gray-300 hover:shadow-md'
+                  isPro ? 'border-emerald-500/60 shadow-md' : 'border-slate-200'
                 }`}
               >
                 {plan.badge && (
                   <span
                     className={`absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full whitespace-nowrap ${
-                      isPro ? 'bg-emerald-500 text-white shadow-md' : 'bg-[#0c1a2e] text-white'
+                      isPro ? 'bg-emerald-600 text-white' : 'bg-[#0f172a] text-white'
                     }`}
                   >
                     {plan.badge}
@@ -439,8 +435,8 @@ export default function PremiumPage() {
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-10 max-w-xl mx-auto leading-relaxed">
-          Aktivácia prebieha priamo cez checkout popup po kliknutí na tlačidlo balíka. Aktuálne je to demo platobného
-          procesu na otestovanie UX.
+          Aktivácia prebieha cez checkout okno po výbere balíka. Aktuálne ide o demo režim bez reálneho spracovania
+          platobných údajov.
         </p>
       </section>
 
@@ -450,25 +446,24 @@ export default function PremiumPage() {
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-balance">
-                Logika cien: platíte za viditeľnosť, nie za „tajné“ funkcie
+                Čo získate navyše
               </h2>
               <p className="text-white/75 leading-relaxed mb-6">
-                Štandard pokrýva férové zaradenie pre každého. Plus pridáva cielené zvýraznenie jednej ponuky. RentMe
-                Pro je optimalizovaný pre tých, ktorí súťažia o zákazníka aktívne – viac inzerátov, dáta a dôveryhodný
-                profil. Firma spája objem, reporting a podporu pre tímy.
+                Každý vyšší balík rozširuje možnosti predchádzajúceho. Prirodzene tak rastie viditeľnosť inzerátov,
+                dostupné limity a podpora pre profesionálny predaj.
               </p>
               <ul className="space-y-2 text-sm text-white/85">
                 <li className="flex gap-2">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden />
-                  Žiadne skryté poplatky za založenie účtu alebo základný inzerát.
+                  Jasné mesačné ceny bez skrytých doplatkov.
                 </li>
                 <li className="flex gap-2">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden />
-                  Vyšší balík vždy obsahuje výhody nižších – nič neduplikujete zbytočne.
+                  Vyšší balík vždy zahŕňa výhody nižšieho.
                 </li>
                 <li className="flex gap-2">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden />
-                  Firemný balík možno prispôsobiť – viac inzerátov alebo faktúra na IČO.
+                  Firemný balík je vhodný pre tímy a väčší objem inzerátov.
                 </li>
               </ul>
             </div>
@@ -524,11 +519,11 @@ export default function PremiumPage() {
       {/* Bottom CTA */}
       <section className="pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl bg-gradient-to-br from-emerald-500 to-emerald-600 p-8 md:p-12 text-center text-white shadow-xl shadow-emerald-500/20">
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">Pripravení zarobiť na svojej ponuke?</h2>
-            <p className="text-white/90 max-w-lg mx-auto mb-8 leading-relaxed">
-              Začnite inzerátom alebo sa zaregistrujte – prémiový balík si môžete zvoliť, keď budete chcieť viac
-              pozornosti.
+          <div className="rounded-3xl bg-slate-900 p-8 md:p-12 text-center text-white shadow-lg">
+            <h2 className="text-2xl md:text-3xl font-bold mb-3">Začnite jednoducho</h2>
+            <p className="text-slate-200 max-w-lg mx-auto mb-8 leading-relaxed">
+              Najprv môžete inzerovať v balíku Štandard. Keď budete potrebovať vyššiu viditeľnosť, prejdete na Plus,
+              RentMe Pro alebo Firma.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
