@@ -32,31 +32,31 @@ export default function CategorySpecificationsForm({
   const u = {
     empty:
       'rounded-xl border border-dashed px-4 py-6 text-center text-sm ' +
-      (a ? 'border-card bg-dark/60 text-gray-400' : 'border-gray-200 bg-gray-50/80 text-gray-600'),
+      (a ? 'border-card bg-dark/60 text-gray-500' : 'border-white/[0.08] bg-dark-50/80 text-gray-500'),
     emptyHint: 'mt-2 text-xs ' + (a ? 'text-gray-500' : 'text-gray-500'),
-    label: 'mb-1.5 block text-sm font-medium ' + (a ? 'text-gray-200' : 'text-gray-800'),
+    label: 'mb-1.5 block text-sm font-medium ' + (a ? 'text-gray-200' : 'text-white/90'),
     desc: 'mb-1.5 text-xs ' + (a ? 'text-gray-500' : 'text-gray-500'),
     field:
       'w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ' +
       (a
         ? 'border-card bg-dark text-white placeholder:text-gray-500 focus:border-primary focus:ring-primary/30'
-        : 'border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-[#1dbf73] focus:ring-[#1dbf73]/30'),
+        : 'border-white/10 text-white placeholder:text-gray-400 focus:border-accent focus:ring-accent/30'),
     fieldNum:
       'min-w-0 flex-1 rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ' +
       (a
         ? 'border-card bg-dark text-white focus:border-primary focus:ring-primary/30'
-        : 'border-gray-300 text-gray-900 focus:border-[#1dbf73] focus:ring-[#1dbf73]/30'),
+        : 'border-white/10 text-white focus:border-accent focus:ring-accent/30'),
     spanOdDo: 'text-xs ' + (a ? 'text-gray-500' : 'text-gray-500'),
     multiOn:
       'inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ' +
       (a
         ? 'border-primary bg-primary/15 text-white'
-        : 'border-[#1dbf73] bg-[#1dbf73]/10 text-gray-900'),
+        : 'border-accent bg-accent/10 text-white'),
     multiOff:
       'inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ' +
       (a
         ? 'border-card bg-card text-gray-300 hover:border-primary/40'
-        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'),
+        : 'border-white/[0.08] bg-dark text-gray-300 hover:border-white/15'),
   }
 
   if (filters.length === 0) {

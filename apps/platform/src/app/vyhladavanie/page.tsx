@@ -39,24 +39,24 @@ function SearchPageInner() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-dark-50">
       <Header />
       <CategoryNav />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-gray-600">
+          <ol className="flex items-center space-x-2 text-sm text-gray-500">
             <li>
-              <Link href="/" className="hover:text-gray-900">
+              <Link href="/" className="hover:text-white">
                 Domov
               </Link>
             </li>
             <li>/</li>
-            <li className="text-gray-900 font-medium">Vyhľadávanie</li>
+            <li className="text-white font-medium">Vyhľadávanie</li>
           </ol>
         </nav>
 
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-6">
           {q.trim() ? (
             <>Výsledky pre „{q}"</>
           ) : (
@@ -67,29 +67,29 @@ function SearchPageInner() {
         {loading ? (
           <div className="text-center py-16 text-gray-500">Načítavam...</div>
         ) : !q.trim() ? (
-          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <p className="text-gray-600 mb-4">Zadajte hľadaný výraz do vyhľadávacieho poľa v hlavičke.</p>
+          <div className="bg-dark rounded-lg shadow-sm p-12 text-center">
+            <p className="text-gray-500 mb-4">Zadajte hľadaný výraz do vyhľadávacieho poľa v hlavičke.</p>
             <Link
               href="/"
-              className="inline-block bg-[#1dbf73] hover:bg-[#19a463] text-white px-6 py-2 rounded-lg transition-colors"
+              className="inline-block bg-accent hover:bg-accent-light text-white px-6 py-2 rounded-lg transition-colors"
             >
               Späť na domov
             </Link>
           </div>
         ) : advertisements.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <p className="text-gray-600 mb-4">Nenašli sme žiadne inzeráty pre „{q}"</p>
+          <div className="bg-dark rounded-lg shadow-sm p-12 text-center">
+            <p className="text-gray-500 mb-4">Nenašli sme žiadne inzeráty pre „{q}"</p>
             <p className="text-sm text-gray-500 mb-6">Skúste zmeniť hľadaný výraz alebo prehľadávať podľa kategórie.</p>
             <Link
               href="/"
-              className="inline-block bg-[#1dbf73] hover:bg-[#19a463] text-white px-6 py-2 rounded-lg transition-colors"
+              className="inline-block bg-accent hover:bg-accent-light text-white px-6 py-2 rounded-lg transition-colors"
             >
               Prehľadať všetky inzeráty
             </Link>
           </div>
         ) : (
           <div>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-500 mb-6">
               Nájdených {advertisements.length} {advertisements.length === 1 ? 'inzerát' : 'inzerátov'}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -99,7 +99,7 @@ function SearchPageInner() {
                   href={`/inzerat/${ad.id}`}
                   targetType="AD"
                   targetId={ad.id}
-                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden group block"
+                  className="bg-dark rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden group block"
                 >
                   {ad.images && ad.images.length > 0 ? (
                     <div className="relative w-full h-48 overflow-hidden">
@@ -110,22 +110,22 @@ function SearchPageInner() {
                       />
                     </div>
                   ) : (
-                    <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400 text-sm">Bez obrázka</span>
+                    <div className="w-full h-48 bg-dark-200 flex items-center justify-center">
+                      <span className="text-gray-500 text-sm">Bez obrázka</span>
                     </div>
                   )}
                   <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                    <h3 className="font-semibold text-white mb-2 line-clamp-2">
                       {ad.title}
                     </h3>
                     {ad.description && (
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                      <p className="text-sm text-gray-500 mb-3 line-clamp-2">
                         {ad.description}
                       </p>
                     )}
                     <div className="flex items-center justify-between">
                       {ad.price && (
-                        <span className="text-lg font-bold text-[#1dbf73]">
+                        <span className="text-lg font-bold text-accent">
                           {ad.price.toLocaleString('sk-SK')} €
                         </span>
                       )}

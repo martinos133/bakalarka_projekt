@@ -212,14 +212,14 @@ export default function DashboardPage() {
 
   const getMessageTypeColor = (type: string) => {
     const colors: { [key: string]: string } = {
-      INQUIRY: 'bg-blue-100 text-blue-800',
-      SYSTEM: 'bg-gray-100 text-gray-800',
-      BAN_NOTIFICATION: 'bg-red-100 text-red-800',
-      VIOLATION: 'bg-orange-100 text-orange-800',
-      AD_APPROVED: 'bg-green-100 text-green-800',
-      AD_REJECTED: 'bg-red-100 text-red-800',
+      INQUIRY: 'bg-blue-900/25 text-blue-400',
+      SYSTEM: 'bg-dark-100 text-white/90',
+      BAN_NOTIFICATION: 'bg-red-100 text-red-400',
+      VIOLATION: 'bg-orange-900/25 text-orange-400',
+      AD_APPROVED: 'bg-accent/15 text-accent',
+      AD_REJECTED: 'bg-red-100 text-red-400',
     }
-    return colors[type] || 'bg-gray-100 text-gray-800'
+    return colors[type] || 'bg-dark-100 text-white/90'
   }
 
   const handleSaveProfile = async () => {
@@ -300,7 +300,7 @@ export default function DashboardPage() {
 
   if (!mounted || loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-dark">
         <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-gray-500">Načítavam...</div>
@@ -311,35 +311,35 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-dark-50">
       <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Môj profil</h1>
-          <p className="text-gray-600 mt-2">Spravujte svoj profil a inzeráty</p>
+          <h1 className="text-3xl font-bold text-white">Môj profil</h1>
+          <p className="text-gray-500 mt-2">Spravujte svoj profil a inzeráty</p>
         </div>
 
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="mb-6 bg-red-900/20 border border-red-800/30 text-red-400 px-4 py-3 rounded-lg">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+          <div className="mb-6 bg-accent/10 border border-accent/20 text-accent px-4 py-3 rounded-lg">
             {success}
           </div>
         )}
 
         {/* Tabs */}
-        <div className="border-b border-gray-200 mb-6">
+        <div className="border-b border-white/[0.08] mb-6">
           <nav className="flex space-x-8">
             <button
               onClick={() => setActiveTab('profile')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'profile'
-                  ? 'border-[#1dbf73] text-[#1dbf73]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-gray-500 hover:text-white hover:border-white/15'
               }`}
             >
               Profil
@@ -348,8 +348,8 @@ export default function DashboardPage() {
               onClick={() => setActiveTab('advertisements')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'advertisements'
-                  ? 'border-[#1dbf73] text-[#1dbf73]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-gray-500 hover:text-white hover:border-white/15'
               }`}
             >
               Moje inzeráty ({advertisements.length})
@@ -358,8 +358,8 @@ export default function DashboardPage() {
               onClick={() => setActiveTab('favorites')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'favorites'
-                  ? 'border-[#1dbf73] text-[#1dbf73]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-gray-500 hover:text-white hover:border-white/15'
               }`}
             >
               Obľúbené inzeráty ({favorites.length})
@@ -373,8 +373,8 @@ export default function DashboardPage() {
               }}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'create'
-                  ? 'border-[#1dbf73] text-[#1dbf73]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-gray-500 hover:text-white hover:border-white/15'
               }`}
             >
               Vytvoriť inzerát
@@ -383,8 +383,8 @@ export default function DashboardPage() {
               onClick={() => setActiveTab('messages')}
               className={`py-4 px-1 border-b-2 font-medium text-sm relative ${
                 activeTab === 'messages'
-                  ? 'border-[#1dbf73] text-[#1dbf73]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-gray-500 hover:text-white hover:border-white/15'
               }`}
             >
               Správy
@@ -400,14 +400,14 @@ export default function DashboardPage() {
         {/* Profile Tab */}
         {activeTab === 'profile' && (
           <>
-          <div className="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="mb-6 rounded-xl border border-white/[0.08] bg-dark shadow-sm p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Predajcovský balík</p>
-              <p className="text-lg font-bold text-gray-900 mt-1">
+              <p className="text-lg font-bold text-white mt-1">
                 {sellerPlanLabel(profileData?.sellerPlan)}
               </p>
               {profileData?.sellerPlanValidUntil ? (
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-500 mt-1">
                   Platné do:{' '}
                   {new Date(profileData.sellerPlanValidUntil).toLocaleDateString('sk-SK', {
                     day: 'numeric',
@@ -416,23 +416,23 @@ export default function DashboardPage() {
                   })}
                 </p>
               ) : (
-                <p className="text-sm text-gray-600 mt-1">Žiadny aktívny prémiový balík.</p>
+                <p className="text-sm text-gray-500 mt-1">Žiadny aktívny prémiový balík.</p>
               )}
             </div>
             <Link
               href="/premium"
-              className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#1dbf73] hover:bg-[#19a463] transition-colors shrink-0"
+              className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-accent hover:bg-accent-light transition-colors shrink-0"
             >
               Prémiové balíky
             </Link>
           </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-dark rounded-lg shadow-sm border border-white/[0.08] p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Kontaktné údaje</h2>
+              <h2 className="text-xl font-semibold text-white">Kontaktné údaje</h2>
               {!editing ? (
                 <button
                   onClick={() => setEditing(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463] transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-light transition-colors"
                 >
                   <Edit className="w-4 h-4" />
                   Upraviť
@@ -444,14 +444,14 @@ export default function DashboardPage() {
                       setEditing(false)
                       setProfileData(user)
                     }}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 border border-white/10 text-gray-300 rounded-lg hover:bg-dark-200/[0.04] transition-colors"
                   >
                     Zrušiť
                   </button>
                   <button
                     onClick={handleSaveProfile}
                     disabled={saving}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463] transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-light transition-colors disabled:opacity-50"
                   >
                     <Save className="w-4 h-4" />
                     {saving ? 'Ukladám...' : 'Uložiť'}
@@ -462,7 +462,7 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   <Mail className="w-4 h-4 inline mr-2" />
                   Email
                 </label>
@@ -470,12 +470,12 @@ export default function DashboardPage() {
                   type="email"
                   value={profileData.email || ''}
                   disabled
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
+                  className="w-full px-4 py-2 border border-white/10 rounded-lg bg-dark-50 text-gray-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   <Phone className="w-4 h-4 inline mr-2" />
                   Telefónne číslo *
                 </label>
@@ -484,12 +484,12 @@ export default function DashboardPage() {
                   value={profileData.phone || ''}
                   onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Meno *
                 </label>
                 <input
@@ -497,12 +497,12 @@ export default function DashboardPage() {
                   value={profileData.firstName || ''}
                   onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Priezvisko *
                 </label>
                 <input
@@ -510,19 +510,19 @@ export default function DashboardPage() {
                   value={profileData.lastName || ''}
                   onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Pohlavie
                 </label>
                 <select
                   value={profileData.gender || ''}
                   onChange={(e) => setProfileData({ ...profileData, gender: e.target.value || undefined })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 >
                   <option value="">-- Vybrať --</option>
                   <option value="MALE">Muž</option>
@@ -532,7 +532,7 @@ export default function DashboardPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Typ účtu
                 </label>
                 <div className="flex gap-4">
@@ -543,9 +543,9 @@ export default function DashboardPage() {
                       checked={profileData.isCompany === false}
                       onChange={() => setProfileData({ ...profileData, isCompany: false })}
                       disabled={!editing}
-                      className="rounded border-gray-300"
+                      className="rounded border-white/10"
                     />
-                    <span className="text-gray-700">Fyzická osoba</span>
+                    <span className="text-gray-300">Fyzická osoba</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -554,9 +554,9 @@ export default function DashboardPage() {
                       checked={profileData.isCompany === true}
                       onChange={() => setProfileData({ ...profileData, isCompany: true })}
                       disabled={!editing}
-                      className="rounded border-gray-300"
+                      className="rounded border-white/10"
                     />
-                    <span className="text-gray-700">Firma</span>
+                    <span className="text-gray-300">Firma</span>
                   </label>
                 </div>
               </div>
@@ -564,7 +564,7 @@ export default function DashboardPage() {
               {profileData.isCompany && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       <Building2 className="w-4 h-4 inline mr-2" />
                       Názov firmy *
                     </label>
@@ -573,12 +573,12 @@ export default function DashboardPage() {
                       value={profileData.companyName || ''}
                       onChange={(e) => setProfileData({ ...profileData, companyName: e.target.value })}
                       disabled={!editing}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                      className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       <Briefcase className="w-4 h-4 inline mr-2" />
                       IČO *
                     </label>
@@ -587,14 +587,14 @@ export default function DashboardPage() {
                       value={profileData.companyId || ''}
                       onChange={(e) => setProfileData({ ...profileData, companyId: e.target.value })}
                       disabled={!editing}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                      className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                     />
                   </div>
                 </>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   <MapPin className="w-4 h-4 inline mr-2" />
                   Adresa
                 </label>
@@ -603,12 +603,12 @@ export default function DashboardPage() {
                   value={profileData.address || ''}
                   onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Mesto
                 </label>
                 <input
@@ -616,12 +616,12 @@ export default function DashboardPage() {
                   value={profileData.city || ''}
                   onChange={(e) => setProfileData({ ...profileData, city: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   PSČ
                 </label>
                 <input
@@ -629,19 +629,19 @@ export default function DashboardPage() {
                   value={profileData.postalCode || ''}
                   onChange={(e) => setProfileData({ ...profileData, postalCode: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Krajina
                 </label>
                 <select
                   value={profileData.country || 'Slovensko'}
                   onChange={(e) => setProfileData({ ...profileData, country: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 >
                   <option value="Slovensko">Slovensko</option>
                   <option value="Česko">Česko</option>
@@ -654,16 +654,16 @@ export default function DashboardPage() {
             </div>
 
             {/* Change Password Section */}
-            <div className="mt-8 pt-8 border-t border-gray-200">
+            <div className="mt-8 pt-8 border-t border-white/[0.08]">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                   <Lock className="w-5 h-5" />
                   Zmena hesla
                 </h3>
                 {!changingPassword && (
                   <button
                     onClick={() => setChangingPassword(true)}
-                    className="text-[#1dbf73] hover:text-[#19a463] font-medium"
+                    className="text-accent hover:text-accent font-medium"
                   >
                     Zmeniť heslo
                   </button>
@@ -673,7 +673,7 @@ export default function DashboardPage() {
               {changingPassword && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Pôvodné heslo
                     </label>
                     <div className="relative">
@@ -681,7 +681,7 @@ export default function DashboardPage() {
                         type={showPassword.old ? 'text' : 'password'}
                         value={passwordData.oldPassword}
                         onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
-                        className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg text-gray-900"
+                        className="w-full px-4 py-2 pr-10 border border-white/10 rounded-lg text-white"
                       />
                       <button
                         type="button"
@@ -694,7 +694,7 @@ export default function DashboardPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Nové heslo
                     </label>
                     <div className="relative">
@@ -702,7 +702,7 @@ export default function DashboardPage() {
                         type={showPassword.new ? 'text' : 'password'}
                         value={passwordData.newPassword}
                         onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                        className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg text-gray-900"
+                        className="w-full px-4 py-2 pr-10 border border-white/10 rounded-lg text-white"
                       />
                       <button
                         type="button"
@@ -715,7 +715,7 @@ export default function DashboardPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Potvrďte nové heslo
                     </label>
                     <div className="relative">
@@ -723,7 +723,7 @@ export default function DashboardPage() {
                         type={showPassword.confirm ? 'text' : 'password'}
                         value={passwordData.confirmPassword}
                         onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                        className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg text-gray-900"
+                        className="w-full px-4 py-2 pr-10 border border-white/10 rounded-lg text-white"
                       />
                       <button
                         type="button"
@@ -741,14 +741,14 @@ export default function DashboardPage() {
                         setChangingPassword(false)
                         setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' })
                       }}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                      className="px-4 py-2 border border-white/10 text-gray-300 rounded-lg hover:bg-dark-200/[0.04]"
                     >
                       Zrušiť
                     </button>
                     <button
                       onClick={handleChangePassword}
                       disabled={saving}
-                      className="px-4 py-2 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463] disabled:opacity-50"
+                      className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-light disabled:opacity-50"
                     >
                       {saving ? 'Ukladám...' : 'Zmeniť heslo'}
                     </button>
@@ -762,11 +762,11 @@ export default function DashboardPage() {
 
         {/* Advertisements Tab */}
         {activeTab === 'advertisements' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">Moje inzeráty</h2>
+          <div className="bg-dark rounded-lg shadow-sm border border-white/[0.08]">
+            <div className="p-6 border-b border-white/[0.08]">
+              <h2 className="text-xl font-semibold text-white">Moje inzeráty</h2>
             </div>
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-white/[0.06]">
               {advertisements.length === 0 ? (
                 <div className="p-12 text-center">
                   <p className="text-gray-500 mb-4">Zatiaľ ste nevytvorili žiadne inzeráty</p>
@@ -776,23 +776,23 @@ export default function DashboardPage() {
                       setActiveTab('create')
                       if (!editingAdId) setCreateWizardNonce((n) => n + 1)
                     }}
-                    className="px-4 py-2 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463]"
+                    className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-light"
                   >
                     Vytvoriť prvý inzerát
                   </button>
                 </div>
               ) : (
                 advertisements.map((ad) => (
-                  <div key={ad.id} className="p-6 hover:bg-gray-50 transition-colors">
+                  <div key={ad.id} className="p-6 hover:bg-dark-200/[0.04] transition-colors">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold text-gray-900">{ad.title}</h3>
+                          <h3 className="text-lg font-semibold text-white">{ad.title}</h3>
                           <span className={`px-2 py-1 text-xs rounded-full ${
-                            ad.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                            ad.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                            ad.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
-                            'bg-red-100 text-red-800'
+                            ad.status === 'ACTIVE' ? 'bg-accent/15 text-accent' :
+                            ad.status === 'PENDING' ? 'bg-yellow-900/25 text-yellow-400' :
+                            ad.status === 'DRAFT' ? 'bg-dark-100 text-white/90' :
+                            'bg-red-100 text-red-400'
                           }`}>
                             {ad.status === 'ACTIVE' ? 'Aktívny' :
                              ad.status === 'PENDING' ? 'Čaká na schválenie' :
@@ -800,12 +800,12 @@ export default function DashboardPage() {
                              'Neaktívny'}
                           </span>
                           {ad.priorityBoosted && ad.status === 'ACTIVE' && (
-                            <span className="px-2 py-1 text-xs rounded-full bg-emerald-100 text-emerald-800 font-medium">
+                            <span className="px-2 py-1 text-xs rounded-full bg-accent/15 text-accent font-medium">
                               Priorita
                             </span>
                           )}
                         </div>
-                        <p className="text-gray-600 mb-2 line-clamp-2">{ad.description}</p>
+                        <p className="text-gray-500 mb-2 line-clamp-2">{ad.description}</p>
                         <div className="flex items-center gap-4 text-sm text-gray-500">
                           {ad.price && <span>Cena: {ad.price}€</span>}
                           {ad.location && <span>Lokalita: {ad.location}</span>}
@@ -815,21 +815,21 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-2 ml-4">
                         <Link
                           href={`/inzerat/${ad.id}`}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors"
                           title="Zobraziť"
                         >
                           <Eye className="w-4 h-4" />
                         </Link>
                         <button
                           onClick={() => handleEditAdvertisement(ad)}
-                          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-2 text-gray-500 hover:bg-dark-200/[0.06] rounded-lg transition-colors"
                           title="Upraviť"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteAdvertisement(ad.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
                           title="Odstrániť"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -845,19 +845,19 @@ export default function DashboardPage() {
 
         {/* Favorites Tab */}
         {activeTab === 'favorites' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">Obľúbené inzeráty</h2>
+          <div className="bg-dark rounded-lg shadow-sm border border-white/[0.08]">
+            <div className="p-6 border-b border-white/[0.08]">
+              <h2 className="text-xl font-semibold text-white">Obľúbené inzeráty</h2>
             </div>
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-white/[0.06]">
               {favorites.length === 0 ? (
                 <div className="p-12 text-center">
                   <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-500 mb-4">Zatiaľ nemáte žiadne obľúbené inzeráty</p>
-                  <p className="text-sm text-gray-400 mb-4">Kliknite na „Uložiť do obľúbených“ pri inzeráte, ktorý sa vám páči</p>
+                  <p className="text-sm text-gray-500 mb-4">Kliknite na „Uložiť do obľúbených“ pri inzeráte, ktorý sa vám páči</p>
                   <Link
                     href="/"
-                    className="inline-block px-4 py-2 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463]"
+                    className="inline-block px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-light"
                   >
                     Prehľadať inzeráty
                   </Link>
@@ -867,23 +867,23 @@ export default function DashboardPage() {
                   const ad = fav.advertisement
                   if (!ad) return null
                   return (
-                    <div key={fav.id} className="p-6 hover:bg-gray-50 transition-colors">
+                    <div key={fav.id} className="p-6 hover:bg-dark-200/[0.04] transition-colors">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900">{ad.title}</h3>
+                            <h3 className="text-lg font-semibold text-white">{ad.title}</h3>
                             {ad.status && (
                               <span className={`px-2 py-1 text-xs rounded-full ${
-                                ad.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                                ad.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-gray-100 text-gray-800'
+                                ad.status === 'ACTIVE' ? 'bg-accent/15 text-accent' :
+                                ad.status === 'PENDING' ? 'bg-yellow-900/25 text-yellow-400' :
+                                'bg-dark-100 text-white/90'
                               }`}>
                                 {ad.status === 'ACTIVE' ? 'Aktívny' :
                                  ad.status === 'PENDING' ? 'Čaká na schválenie' : 'Neaktívny'}
                               </span>
                             )}
                           </div>
-                          <p className="text-gray-600 mb-2 line-clamp-2">{ad.description}</p>
+                          <p className="text-gray-500 mb-2 line-clamp-2">{ad.description}</p>
                           <div className="flex items-center gap-4 text-sm text-gray-500">
                             {ad.price && <span>Cena: {ad.price}€</span>}
                             {ad.location && <span>Lokalita: {ad.location}</span>}
@@ -893,7 +893,7 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-2 ml-4">
                           <Link
                             href={`/inzerat/${ad.id}`}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors"
                             title="Zobraziť"
                           >
                             <Eye className="w-4 h-4" />
@@ -907,7 +907,7 @@ export default function DashboardPage() {
                                 setError(err.message || 'Chyba pri odstránení')
                               }
                             }}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
                             title="Odstrániť z obľúbených"
                           >
                             <Heart className="w-4 h-4 fill-current" />
@@ -954,14 +954,14 @@ export default function DashboardPage() {
         {activeTab === 'messages' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Messages List */}
-            <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Správy</h2>
+            <div className="lg:col-span-2 bg-dark rounded-lg shadow-sm border border-white/[0.08]">
+              <div className="p-4 border-b border-white/[0.08] flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-white">Správy</h2>
                 <div className="flex gap-2">
                   <select
                     value={messageFilter}
                     onChange={(e) => setMessageFilter(e.target.value as any)}
-                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1dbf73]"
+                    className="px-3 py-1.5 border border-white/10 rounded-lg text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-accent"
                   >
                     <option value="all">Všetky</option>
                     <option value="unread">Neprečítané</option>
@@ -970,7 +970,7 @@ export default function DashboardPage() {
                   </select>
                 </div>
               </div>
-              <div className="divide-y divide-gray-200 max-h-[600px] overflow-y-auto">
+              <div className="divide-y divide-white/[0.06] max-h-[600px] overflow-y-auto">
                 {messages.length === 0 ? (
                   <div className="p-8 text-center text-gray-500">
                     <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
@@ -981,9 +981,9 @@ export default function DashboardPage() {
                     <div
                       key={message.id}
                       onClick={() => handleMessageClick(message)}
-                      className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
-                        message.status === 'UNREAD' ? 'bg-blue-50' : ''
-                      } ${selectedMessage?.id === message.id ? 'bg-[#1dbf73]/10' : ''}`}
+                      className={`p-4 cursor-pointer hover:bg-dark-200/[0.04] transition-colors ${
+                        message.status === 'UNREAD' ? 'bg-blue-900/20' : ''
+                      } ${selectedMessage?.id === message.id ? 'bg-accent/10' : ''}`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -995,14 +995,14 @@ export default function DashboardPage() {
                               <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                             )}
                           </div>
-                          <h3 className="font-medium text-gray-900 mb-1">{message.subject}</h3>
-                          <p className="text-sm text-gray-600 line-clamp-2">{message.content}</p>
+                          <h3 className="font-medium text-white mb-1">{message.subject}</h3>
+                          <p className="text-sm text-gray-500 line-clamp-2">{message.content}</p>
                           {message.advertisement && (
                             <p className="text-xs text-gray-500 mt-1">
                               Inzerát: {message.advertisement.title}
                             </p>
                           )}
-                          <p className="text-xs text-gray-400 mt-2">
+                          <p className="text-xs text-gray-500 mt-2">
                             {new Date(message.createdAt).toLocaleDateString('sk-SK', {
                               year: 'numeric',
                               month: 'long',
@@ -1019,7 +1019,7 @@ export default function DashboardPage() {
                                 e.stopPropagation()
                                 api.markAsRead(message.id).then(() => loadMessages())
                               }}
-                              className="p-1 text-gray-400 hover:text-blue-600"
+                              className="p-1 text-gray-500 hover:text-blue-600"
                               title="Označiť ako prečítané"
                             >
                               <CheckCircle className="w-4 h-4" />
@@ -1030,7 +1030,7 @@ export default function DashboardPage() {
                               e.stopPropagation()
                               handleMarkAsArchived(message.id)
                             }}
-                            className="p-1 text-gray-400 hover:text-gray-600"
+                            className="p-1 text-gray-500 hover:text-gray-300"
                             title="Archivovať"
                           >
                             <Archive className="w-4 h-4" />
@@ -1044,13 +1044,13 @@ export default function DashboardPage() {
             </div>
 
             {/* Message Detail */}
-            <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col">
+            <div className="lg:col-span-1 bg-dark rounded-lg shadow-sm border border-white/[0.08] p-6 flex flex-col">
               {selectedMessage ? (
                 selectedMessage.type === 'INQUIRY' && conversationMessages.length > 0 ? (
                   /* Chat view pre Dotaz na inzerát */
                   <div className="flex flex-col flex-1 min-h-0">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-gray-900">Konverzácia</h3>
+                      <h3 className="text-lg font-semibold text-white">Konverzácia</h3>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={async () => {
@@ -1061,7 +1061,7 @@ export default function DashboardPage() {
                               setConversationMessages([])
                             }
                           }}
-                          className="p-2 text-gray-400 hover:text-gray-600"
+                          className="p-2 text-gray-500 hover:text-gray-300"
                           title="Archivovať"
                         >
                           <Archive className="w-5 h-5" />
@@ -1071,16 +1071,16 @@ export default function DashboardPage() {
                             setSelectedMessage(null)
                             setConversationMessages([])
                           }}
-                          className="p-2 text-gray-400 hover:text-gray-600"
+                          className="p-2 text-gray-500 hover:text-gray-300"
                         >
                           <X className="w-5 h-5" />
                         </button>
                       </div>
                     </div>
                     {conversationMessages[0]?.advertisement && (
-                      <div className="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="mb-3 p-3 bg-dark-50 rounded-lg border border-white/[0.08]">
                         <p className="text-xs font-medium text-gray-500 mb-1">Inzerát:</p>
-                        <Link href={`/inzerat/${conversationMessages[0].advertisement.id}`} className="text-sm text-[#1dbf73] hover:underline">
+                        <Link href={`/inzerat/${conversationMessages[0].advertisement.id}`} className="text-sm text-accent hover:underline">
                           {conversationMessages[0].advertisement.title}
                         </Link>
                       </div>
@@ -1096,8 +1096,8 @@ export default function DashboardPage() {
                             <div
                               className={`max-w-[85%] rounded-lg px-4 py-2 ${
                                 isMe
-                                  ? 'bg-[#1dbf73] text-white'
-                                  : 'bg-gray-100 text-gray-900'
+                                  ? 'bg-accent text-white'
+                                  : 'bg-dark-100 text-white'
                               }`}
                             >
                               {!isMe && msg.sender && (
@@ -1137,17 +1137,17 @@ export default function DashboardPage() {
                                         download
                                         className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                                           isMe
-                                            ? 'bg-white/95 text-gray-800 hover:bg-white shadow-sm hover:shadow'
-                                            : 'bg-white text-gray-800 border border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                                            ? 'bg-dark-200/95 text-white/90 hover:bg-dark-200 shadow-sm hover:shadow'
+                                            : 'bg-dark text-white/90 border border-white/[0.08] hover:border-white/15 hover:shadow-sm'
                                         } min-w-[180px]`}
                                       >
                                         <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-                                          isMe ? 'bg-[#1dbf73]/15 text-[#1dbf73]' : 'bg-gray-100 text-gray-600'
+                                          isMe ? 'bg-[#c9a96e]/15 text-accent' : 'bg-dark-100 text-gray-500'
                                         }`}>
                                           <FileText className="w-5 h-5" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                          <p className="text-sm font-semibold text-gray-900 truncate">
+                                          <p className="text-sm font-semibold text-white truncate">
                                             {isPdf ? 'PDF dokument' : isWord ? 'Word dokument' : 'Príloha'}
                                           </p>
                                           <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
@@ -1160,7 +1160,7 @@ export default function DashboardPage() {
                                   })}
                                 </div>
                               )}
-                              <p className={`text-xs mt-2 ${msg.attachments?.length ? 'pt-2 border-t ' + (isMe ? 'border-white/25' : 'border-gray-200') : ''} ${isMe ? 'text-white/85' : 'text-gray-500'}`}>
+                              <p className={`text-xs mt-2 ${msg.attachments?.length ? 'pt-2 border-t ' + (isMe ? 'border-white/25' : 'border-white/[0.08]') : ''} ${isMe ? 'text-white/85' : 'text-gray-500'}`}>
                                 {new Date(msg.createdAt).toLocaleString('sk-SK', {
                                   day: 'numeric',
                                   month: 'short',
@@ -1173,7 +1173,7 @@ export default function DashboardPage() {
                         )
                       })}
                     </div>
-                    <div className="border-t border-gray-200 pt-3">
+                    <div className="border-t border-white/[0.08] pt-3">
                       {replyAttachments.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-2">
                           {replyAttachments.map((att, i) => {
@@ -1187,12 +1187,12 @@ export default function DashboardPage() {
                                   <img
                                     src={att}
                                     alt=""
-                                    className="w-20 h-20 object-cover rounded-xl border border-gray-200 shadow-sm"
+                                    className="w-20 h-20 object-cover rounded-xl border border-white/[0.08] shadow-sm"
                                   />
                                 ) : (
-                                  <div className="w-20 h-20 rounded-xl border border-gray-200 flex flex-col items-center justify-center bg-white">
-                                    <FileText className="w-8 h-8 text-gray-400" />
-                                    <span className="text-xs font-medium text-gray-600 mt-1">{isPdf ? 'PDF' : isWord ? 'Word' : 'Súbor'}</span>
+                                  <div className="w-20 h-20 rounded-xl border border-white/[0.08] flex flex-col items-center justify-center bg-dark">
+                                    <FileText className="w-8 h-8 text-gray-500" />
+                                    <span className="text-xs font-medium text-gray-500 mt-1">{isPdf ? 'PDF' : isWord ? 'Word' : 'Súbor'}</span>
                                   </div>
                                 )}
                                 <button
@@ -1210,7 +1210,7 @@ export default function DashboardPage() {
                         </div>
                       )}
                       <div className="flex gap-2 mb-2">
-                        <label className="flex items-center justify-center w-10 h-10 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex-shrink-0">
+                        <label className="flex items-center justify-center w-10 h-10 border border-white/10 rounded-lg cursor-pointer hover:bg-dark-200/[0.04] transition-colors flex-shrink-0">
                           <Paperclip className="w-5 h-5 text-gray-500" />
                           <input
                             type="file"
@@ -1225,7 +1225,7 @@ export default function DashboardPage() {
                           onChange={(e) => setReplyContent(e.target.value)}
                           placeholder="Napíšte odpoveď... (môžete pridať fotky alebo súbory)"
                           rows={2}
-                          className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent resize-none text-sm"
+                          className="flex-1 border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-sm"
                         />
                       </div>
                       <button
@@ -1233,7 +1233,7 @@ export default function DashboardPage() {
                         disabled={
                           (!replyContent.trim() && replyAttachments.length === 0) || replySubmitting
                         }
-                        className="w-full px-4 py-2 bg-[#1dbf73] hover:bg-[#19a463] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium"
+                        className="w-full px-4 py-2 bg-accent hover:bg-accent-light disabled:bg-dark-300 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium"
                       >
                         {replySubmitting ? 'Odosielam...' : 'Odoslať odpoveď'}
                       </button>
@@ -1243,13 +1243,13 @@ export default function DashboardPage() {
                   /* Statický detail pre ostatné typy správ */
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-gray-900">Detail správy</h3>
+                      <h3 className="text-lg font-semibold text-white">Detail správy</h3>
                       <button
                         onClick={() => {
                           setSelectedMessage(null)
                           setConversationMessages([])
                         }}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-gray-500 hover:text-gray-300"
                       >
                         <X className="w-5 h-5" />
                       </button>
@@ -1259,26 +1259,26 @@ export default function DashboardPage() {
                         {getMessageTypeLabel(selectedMessage.type)}
                       </span>
                     </div>
-                    <h4 className="font-medium text-gray-900 mb-2">{selectedMessage.subject}</h4>
+                    <h4 className="font-medium text-white mb-2">{selectedMessage.subject}</h4>
                     {selectedMessage.sender && (
-                      <p className="text-sm text-gray-600 mb-2">
+                      <p className="text-sm text-gray-500 mb-2">
                         Od: {selectedMessage.sender.firstName} {selectedMessage.sender.lastName} ({selectedMessage.sender.email})
                       </p>
                     )}
                     {selectedMessage.advertisement && (
-                      <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <p className="text-sm font-medium text-gray-900 mb-1">Súvisiaci inzerát:</p>
-                        <Link href={`/inzerat/${selectedMessage.advertisement.id}`} className="text-sm text-[#1dbf73] hover:underline">
+                      <div className="mb-4 p-3 bg-dark-50 rounded-lg border border-white/[0.08]">
+                        <p className="text-sm font-medium text-white mb-1">Súvisiaci inzerát:</p>
+                        <Link href={`/inzerat/${selectedMessage.advertisement.id}`} className="text-sm text-accent hover:underline">
                           {selectedMessage.advertisement.title}
                         </Link>
                       </div>
                     )}
-                    <div className="text-sm text-gray-700 whitespace-pre-wrap mb-4">
+                    <div className="text-sm text-gray-300 whitespace-pre-wrap mb-4">
                       {selectedMessage.content}
                     </div>
                     {selectedMessage.metadata && (
-                      <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <p className="text-xs text-gray-600">
+                      <div className="mb-4 p-3 bg-dark-50 rounded-lg border border-white/[0.08]">
+                        <p className="text-xs text-gray-500">
                           {selectedMessage.metadata.banDuration && (
                             <>
                               Trvanie banu: {selectedMessage.metadata.banDuration === 'permanent' 
@@ -1304,7 +1304,7 @@ export default function DashboardPage() {
                         </p>
                       </div>
                     )}
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-500">
                       {new Date(selectedMessage.createdAt).toLocaleDateString('sk-SK', {
                         year: 'numeric',
                         month: 'long',
@@ -1322,14 +1322,14 @@ export default function DashboardPage() {
                               setSelectedMessage({ ...selectedMessage, status: 'READ' })
                             })
                           }}
-                          className="flex-1 px-4 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg text-sm"
+                          className="flex-1 px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg text-sm"
                         >
                           Označiť ako prečítané
                         </button>
                       )}
                       <button
                         onClick={() => handleMarkAsArchived(selectedMessage.id)}
-                        className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50"
+                        className="flex-1 px-4 py-2 border border-white/10 text-gray-300 rounded-lg text-sm hover:bg-dark-200/[0.04]"
                       >
                         Archivovať
                       </button>
@@ -1356,7 +1356,7 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={() => setLightboxImage(null)}
-            className="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+            className="absolute top-4 right-4 p-2 text-white hover:bg-dark-200/10 rounded-lg transition-colors"
             aria-label="Zavrieť"
           >
             <X className="w-8 h-8" />

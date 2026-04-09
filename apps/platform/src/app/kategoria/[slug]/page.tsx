@@ -69,7 +69,7 @@ export default function CategoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-dark-50">
         <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center text-gray-500">Načítavam...</div>
@@ -81,12 +81,12 @@ export default function CategoryPage() {
 
   if (!category) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-dark-50">
         <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Kategória nebola nájdená</h1>
-            <Link href="/" className="text-blue-600 hover:text-blue-800">
+            <h1 className="text-2xl font-bold text-white mb-4">Kategória nebola nájdená</h1>
+            <Link href="/" className="text-blue-400 hover:text-blue-800">
               Späť na domov
             </Link>
           </div>
@@ -97,7 +97,7 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-dark-50">
       <Header />
       
       {/* Banner */}
@@ -105,7 +105,7 @@ export default function CategoryPage() {
         <div className="w-full flex justify-center px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           {/* Banner kontajner s presnými rozmermi 1200×400px (pomer 3:1) */}
           <div 
-            className="relative w-full max-w-[1200px] rounded-xl overflow-hidden shadow-2xl"
+            className="relative w-full max-w-[1200px] rounded-xl overflow-hidden shadow-2xl shadow-black/40"
             style={{ 
               aspectRatio: '3 / 1',
               height: '400px'
@@ -158,9 +158,9 @@ export default function CategoryPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumbs */}
         <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-gray-600">
+          <ol className="flex items-center space-x-2 text-sm text-gray-500">
             <li>
-              <Link href="/" className="hover:text-gray-900">
+              <Link href="/" className="hover:text-white">
                 Domov
               </Link>
             </li>
@@ -168,21 +168,21 @@ export default function CategoryPage() {
             {category.parent && (
               <>
                 <li>
-                  <Link href={`/kategoria/${category.parent.slug}`} className="hover:text-gray-900">
+                  <Link href={`/kategoria/${category.parent.slug}`} className="hover:text-white">
                     {category.parent.name}
                   </Link>
                 </li>
                 <li>/</li>
               </>
             )}
-            <li className="text-gray-900 font-medium">{category.name}</li>
+            <li className="text-white font-medium">{category.name}</li>
           </ol>
         </nav>
 
         {/* Podkategórie */}
         {subcategories.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Podkategórie</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">Podkategórie</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {subcategories.map((subcategory) => (
                 <TrackedLink
@@ -190,7 +190,7 @@ export default function CategoryPage() {
                   href={`/kategoria/${subcategory.slug}`}
                   targetType="CATEGORY"
                   targetId={subcategory.id}
-                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 border border-gray-200 block"
+                  className="bg-dark rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 border border-white/[0.08] block"
                 >
                   {subcategory.image && (
                     <img
@@ -199,9 +199,9 @@ export default function CategoryPage() {
                       className="w-full h-32 object-cover rounded-lg mb-3"
                     />
                   )}
-                  <h3 className="font-semibold text-gray-900">{subcategory.name}</h3>
+                  <h3 className="font-semibold text-white">{subcategory.name}</h3>
                   {subcategory.description && (
-                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">
                       {subcategory.description}
                     </p>
                   )}
@@ -219,17 +219,17 @@ export default function CategoryPage() {
         {/* Inzeráty */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-white">
               Inzeráty ({advertisements.length})
             </h2>
           </div>
 
           {advertisements.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-              <p className="text-gray-600 mb-4">V tejto kategórii zatiaľ nie sú žiadne inzeráty.</p>
+            <div className="bg-dark rounded-lg shadow-sm p-12 text-center">
+              <p className="text-gray-500 mb-4">V tejto kategórii zatiaľ nie sú žiadne inzeráty.</p>
               <Link
                 href={`/podat-inzerat?kategoria=${encodeURIComponent(slug)}`}
-                className="inline-block bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors"
+                className="inline-block bg-accent hover:bg-accent-dark text-white px-6 py-2 rounded-lg transition-colors"
               >
                 Vytvoriť inzerát
               </Link>
@@ -242,7 +242,7 @@ export default function CategoryPage() {
                   href={`/inzerat/${ad.id}`}
                   targetType="AD"
                   targetId={ad.id}
-                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden group block"
+                  className="bg-dark rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden group block"
                 >
                   {ad.images && ad.images.length > 0 && (
                     <div className="relative w-full h-48 overflow-hidden">
@@ -253,12 +253,12 @@ export default function CategoryPage() {
                       />
                       <div className="absolute top-2 left-2 flex flex-wrap gap-1.5">
                         {ad.priorityBoosted && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-[#1dbf73] text-white shadow">
+                          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-accent text-white shadow">
                             Priorita
                           </span>
                         )}
                         {isProSellerBadge(ad.user?.sellerPlan, ad.user?.sellerPlanValidUntil) && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-[#0c1a2e] text-white shadow">
+                          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-dark-100 text-white shadow">
                             Pro predajca
                           </span>
                         )}
@@ -268,28 +268,28 @@ export default function CategoryPage() {
                   <div className="p-4">
                     <div className="flex flex-wrap gap-1.5 mb-2">
                       {(!ad.images || ad.images.length === 0) && ad.priorityBoosted && (
-                        <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-[#1dbf73] text-white">
+                        <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-accent text-white">
                           Priorita
                         </span>
                       )}
                       {(!ad.images || ad.images.length === 0) &&
                         isProSellerBadge(ad.user?.sellerPlan, ad.user?.sellerPlanValidUntil) && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-[#0c1a2e] text-white">
+                          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-dark-100 text-white">
                             Pro predajca
                           </span>
                         )}
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                    <h3 className="font-semibold text-white mb-2 line-clamp-2">
                       {ad.title}
                     </h3>
                     {ad.description && (
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                      <p className="text-sm text-gray-500 mb-3 line-clamp-2">
                         {ad.description}
                       </p>
                     )}
                     <div className="flex items-center justify-between">
                       {ad.price && (
-                        <span className="text-lg font-bold text-green-600">
+                        <span className="text-lg font-bold text-accent">
                           {ad.price.toLocaleString('sk-SK')} €
                         </span>
                       )}

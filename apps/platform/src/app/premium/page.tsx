@@ -25,8 +25,8 @@ import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
 import { CmsGate } from '@/components/CmsGate'
 
-const NAVY = 'text-[#0c1a2e]'
-const NAVY_BG = 'bg-[#0f172a]'
+const NAVY = 'text-white'
+const NAVY_BG = 'bg-dark-100'
 
 type PlanId = 'standard' | 'plus' | 'pro' | 'firma'
 
@@ -236,12 +236,12 @@ function PremiumPageInner() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f6f9]">
+    <div className="min-h-screen bg-dark">
       <Header />
       <CategoryNav />
 
       {/* Hero */}
-      <section className="border-b border-slate-200 bg-white">
+      <section className="border-b border-white/[0.08] bg-dark">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.03]"
           style={{
@@ -249,44 +249,44 @@ function PremiumPageInner() {
           }}
           aria-hidden
         />
-        <div className="absolute top-0 right-0 w-[min(100%,420px)] h-72 bg-gradient-to-bl from-slate-200/70 to-transparent rounded-bl-[100%] blur-3xl" aria-hidden />
+        <div className="absolute top-0 right-0 w-[min(100%,420px)] h-72 bg-gradient-to-bl from-white/5 to-transparent rounded-bl-[100%] blur-3xl" aria-hidden />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-16">
           <nav className="mb-8" aria-label="Drobečková navigácia">
-            <ol className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+            <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
               <li>
-                <Link href="/" className="hover:text-slate-700 transition-colors">
+                <Link href="/" className="hover:text-white transition-colors">
                   Domov
                 </Link>
               </li>
-              <li aria-hidden className="text-slate-300">
+              <li aria-hidden className="text-gray-600">
                 /
               </li>
-              <li className="text-slate-900 font-medium">Prémiové balíky</li>
+              <li className="text-white font-medium">Prémiové balíky</li>
             </ol>
           </nav>
           <div className="max-w-3xl">
-            <p className="inline-flex items-center gap-2 text-emerald-700 font-semibold text-sm uppercase tracking-widest mb-4">
+            <p className="inline-flex items-center gap-2 text-accent font-semibold text-sm uppercase tracking-widest mb-4">
               <BadgeCheck className="w-4 h-4" aria-hidden />
               Profesionálne balíky pre predajcov
             </p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-balance leading-tight text-slate-900">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-balance leading-tight text-white">
               Jednoduché a férové ceny
             </h1>
-            <p className="mt-5 text-lg text-slate-600 leading-relaxed max-w-2xl">
+            <p className="mt-5 text-lg text-gray-400 leading-relaxed max-w-2xl">
               Vyberte si plán podľa objemu inzerátov. Každý balík jasne definuje rozsah služieb a zvýšenie viditeľnosti
               vo vyhľadávaní.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="#baliky"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-white bg-[#0f172a] hover:bg-[#1e293b] transition"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-white bg-dark-100 hover:bg-dark-200 transition"
               >
                 Porovnať balíky
                 <ArrowRight className="w-4 h-4" aria-hidden />
               </Link>
               <Link
                 href="/podat-inzerat"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-slate-700 border border-slate-300 hover:bg-slate-50 transition"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-gray-300 border border-white/10 hover:bg-dark-200/[0.04] transition"
               >
                 Pridať inzerát
               </Link>
@@ -319,13 +319,13 @@ function PremiumPageInner() {
             return (
               <div
                 key={item.title}
-                className="rounded-2xl bg-white border border-slate-200 p-5 shadow-sm"
+                className="rounded-2xl bg-dark border border-white/[0.08] p-5 shadow-sm"
               >
-                <div className="w-10 h-10 rounded-xl bg-[#0c1a2e]/5 flex items-center justify-center mb-3">
-                  <Icon className="w-5 h-5 text-[#0c1a2e]" aria-hidden />
+                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-3">
+                  <Icon className="w-5 h-5 text-white" aria-hidden />
                 </div>
                 <h2 className={`font-semibold ${NAVY} mb-1`}>{item.title}</h2>
-                <p className="text-sm text-gray-600 leading-relaxed">{item.text}</p>
+                <p className="text-sm text-gray-500 leading-relaxed">{item.text}</p>
               </div>
             )
           })}
@@ -336,7 +336,7 @@ function PremiumPageInner() {
       <section id="baliky" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-20 scroll-mt-24">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <h2 className={`text-2xl sm:text-3xl font-bold ${NAVY} mb-3`}>Vyberte si balík</h2>
-          <p className="text-gray-600 leading-relaxed">
+          <p className="text-gray-500 leading-relaxed">
             Vyberte si balík podľa počtu inzerátov a požadovanej viditeľnosti. Ceny sú uvedené za mesiac.
           </p>
         </div>
@@ -348,14 +348,14 @@ function PremiumPageInner() {
             return (
               <article
                 key={plan.id}
-                className={`relative flex flex-col rounded-2xl border bg-white p-6 shadow-sm transition-all ${
-                  isPro ? 'border-emerald-500/60 shadow-md' : 'border-slate-200'
+                className={`relative flex flex-col rounded-2xl border bg-dark p-6 shadow-sm transition-all ${
+                  isPro ? 'border-accent/60 shadow-md' : 'border-white/[0.08]'
                 }`}
               >
                 {plan.badge && (
                   <span
                     className={`absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full whitespace-nowrap ${
-                      isPro ? 'bg-emerald-600 text-white' : 'bg-[#0f172a] text-white'
+                      isPro ? 'bg-accent text-white' : 'bg-dark-100 text-white'
                     }`}
                   >
                     {plan.badge}
@@ -364,16 +364,16 @@ function PremiumPageInner() {
                 <div className="flex items-start justify-between gap-2 mb-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                        <Icon className={`w-4 h-4 ${isPro ? 'text-emerald-600' : 'text-[#0c1a2e]'}`} aria-hidden />
+                      <span className="w-9 h-9 rounded-lg bg-dark-100 flex items-center justify-center">
+                        <Icon className={`w-4 h-4 ${isPro ? 'text-accent' : 'text-white'}`} aria-hidden />
                       </span>
                       <h3 className={`text-lg font-bold ${NAVY}`}>{plan.name}</h3>
                     </div>
-                    <p className="text-sm text-gray-600 leading-snug">{plan.tagline}</p>
+                    <p className="text-sm text-gray-500 leading-snug">{plan.tagline}</p>
                   </div>
                 </div>
 
-                <div className="mb-5 pb-5 border-b border-gray-100">
+                <div className="mb-5 pb-5 border-b border-white/[0.06]">
                   <div className="flex items-baseline gap-1 flex-wrap">
                     <span className={`text-3xl font-bold tabular-nums ${NAVY}`}>
                       {formatPriceEUR(plan.price)}
@@ -387,10 +387,10 @@ function PremiumPageInner() {
 
                 <ul className="space-y-3 flex-1 mb-6">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex gap-2.5 text-sm text-gray-700">
+                    <li key={f} className="flex gap-2.5 text-sm text-gray-300">
                       <span
                         className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                          isPro ? 'bg-emerald-500 text-white' : 'bg-[#0c1a2e] text-white'
+                          isPro ? 'bg-accent text-white' : 'bg-dark-100 text-white'
                         }`}
                       >
                         <Check className="w-3 h-3" strokeWidth={3} aria-hidden />
@@ -405,10 +405,10 @@ function PremiumPageInner() {
                     href={plan.ctaHref}
                     className={`mt-auto inline-flex w-full items-center justify-center gap-2 rounded-xl py-3.5 px-4 text-sm font-semibold transition ${
                       plan.ctaVariant === 'primary'
-                        ? 'text-white bg-[#1dbf73] hover:bg-[#19a463] shadow-lg shadow-[#1dbf73]/25'
+                        ? 'text-white bg-accent hover:bg-accent-light shadow-lg shadow-black/20 shadow-accent/25'
                         : plan.ctaVariant === 'navy'
-                          ? 'text-white bg-[#0c1a2e] hover:bg-[#152a45] border border-transparent'
-                          : 'text-[#0c1a2e] bg-white border-2 border-gray-200 hover:border-[#1dbf73] hover:text-[#1dbf73]'
+                          ? 'text-white bg-dark-100 hover:bg-dark-300 border border-transparent'
+                          : 'text-white bg-dark border-2 border-white/[0.08] hover:border-accent hover:text-accent-light'
                     }`}
                   >
                     {plan.cta}
@@ -420,10 +420,10 @@ function PremiumPageInner() {
                     onClick={() => openCheckout(plan.id)}
                     className={`mt-auto inline-flex w-full items-center justify-center gap-2 rounded-xl py-3.5 px-4 text-sm font-semibold transition ${
                       plan.ctaVariant === 'primary'
-                        ? 'text-white bg-[#1dbf73] hover:bg-[#19a463] shadow-lg shadow-[#1dbf73]/25'
+                        ? 'text-white bg-accent hover:bg-accent-light shadow-lg shadow-black/20 shadow-accent/25'
                         : plan.ctaVariant === 'navy'
-                          ? 'text-white bg-[#0c1a2e] hover:bg-[#152a45] border border-transparent'
-                          : 'text-[#0c1a2e] bg-white border-2 border-gray-200 hover:border-[#1dbf73] hover:text-[#1dbf73]'
+                          ? 'text-white bg-dark-100 hover:bg-dark-300 border border-transparent'
+                          : 'text-white bg-dark border-2 border-white/[0.08] hover:border-accent hover:text-accent-light'
                     }`}
                   >
                     {plan.cta}
@@ -455,22 +455,22 @@ function PremiumPageInner() {
               </p>
               <ul className="space-y-2 text-sm text-white/85">
                 <li className="flex gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden />
+                  <Check className="w-4 h-4 text-accent-light shrink-0 mt-0.5" aria-hidden />
                   Jasné mesačné ceny bez skrytých doplatkov.
                 </li>
                 <li className="flex gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden />
+                  <Check className="w-4 h-4 text-accent-light shrink-0 mt-0.5" aria-hidden />
                   Vyšší balík vždy zahŕňa výhody nižšieho.
                 </li>
                 <li className="flex gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden />
+                  <Check className="w-4 h-4 text-accent-light shrink-0 mt-0.5" aria-hidden />
                   Firemný balík je vhodný pre tímy a väčší objem inzerátov.
                 </li>
               </ul>
             </div>
             <div className="rounded-2xl bg-white/5 border border-white/10 p-6 md:p-8 backdrop-blur-sm">
               <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                <HelpCircle className="w-5 h-5 text-emerald-400" aria-hidden />
+                <HelpCircle className="w-5 h-5 text-accent-light" aria-hidden />
                 Stručný prehľad
               </h3>
               <dl className="space-y-4 text-sm">
@@ -484,7 +484,7 @@ function PremiumPageInner() {
                 </div>
                 <div className="flex justify-between gap-4 border-b border-white/10 pb-3">
                   <dt className="text-white/70">RentMe Pro</dt>
-                  <dd className="font-semibold text-right text-emerald-400 tabular-nums">16,99 € / mes.</dd>
+                  <dd className="font-semibold text-right text-accent-light tabular-nums">16,99 € / mes.</dd>
                 </div>
                 <div className="flex justify-between gap-4">
                   <dt className="text-white/70">Firma</dt>
@@ -503,15 +503,15 @@ function PremiumPageInner() {
           {FAQ.map((item) => (
             <details
               key={item.q}
-              className="group rounded-2xl border border-gray-200 bg-white p-5 shadow-sm open:shadow-md transition-shadow"
+              className="group rounded-2xl border border-white/[0.08] bg-dark p-5 shadow-sm open:shadow-md transition-shadow"
             >
-              <summary className="font-semibold text-gray-900 cursor-pointer list-none flex items-center justify-between gap-3">
+              <summary className="font-semibold text-white cursor-pointer list-none flex items-center justify-between gap-3">
                 <span>{item.q}</span>
-                <span className="text-gray-400 group-open:rotate-180 transition-transform text-xl leading-none">
+                <span className="text-gray-500 group-open:rotate-180 transition-transform text-xl leading-none">
                   ▾
                 </span>
               </summary>
-              <p className="mt-3 text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3">{item.a}</p>
+              <p className="mt-3 text-sm text-gray-500 leading-relaxed border-t border-white/[0.06] pt-3">{item.a}</p>
             </details>
           ))}
         </div>
@@ -520,22 +520,22 @@ function PremiumPageInner() {
       {/* Bottom CTA */}
       <section className="pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl bg-slate-900 p-8 md:p-12 text-center text-white shadow-lg">
+          <div className="rounded-3xl bg-dark-50 p-8 md:p-12 text-center text-white shadow-lg shadow-black/20">
             <h2 className="text-2xl md:text-3xl font-bold mb-3">Začnite jednoducho</h2>
-            <p className="text-slate-200 max-w-lg mx-auto mb-8 leading-relaxed">
+            <p className="text-gray-400 max-w-lg mx-auto mb-8 leading-relaxed">
               Najprv môžete inzerovať v balíku Štandard. Keď budete potrebovať vyššiu viditeľnosť, prejdete na Plus,
               RentMe Pro alebo Firma.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
                 href="/join"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-semibold text-emerald-600 bg-white hover:bg-gray-50 transition shadow-lg"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-semibold text-accent bg-dark hover:bg-dark-200/[0.04] transition shadow-lg shadow-black/20"
               >
                 Vytvoriť účet
               </Link>
               <Link
                 href="/podat-inzerat"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-semibold text-white border-2 border-white/80 hover:bg-white/10 transition"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-semibold text-white border-2 border-white/80 hover:bg-dark-200/10 transition"
               >
                 Podať inzerát
               </Link>
@@ -549,19 +549,19 @@ function PremiumPageInner() {
           <button
             type="button"
             aria-label="Zatvoriť checkout"
-            className="absolute inset-0 bg-[#0c1a2e]/65 backdrop-blur-[2px]"
+            className="absolute inset-0 bg-black/65 backdrop-blur-[2px]"
             onClick={closeCheckout}
           />
-          <div className="relative w-full max-w-2xl rounded-2xl bg-white border border-gray-200 shadow-2xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="relative w-full max-w-2xl rounded-2xl bg-dark border border-white/[0.08] shadow-2xl shadow-black/40 overflow-hidden">
+            <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Checkout</p>
-                <h3 className="text-lg font-bold text-[#0c1a2e]">Aktivácia balíka {selectedPlan.name}</h3>
+                <h3 className="text-lg font-bold text-white">Aktivácia balíka {selectedPlan.name}</h3>
               </div>
               <button
                 type="button"
                 onClick={closeCheckout}
-                className="w-9 h-9 rounded-lg border border-gray-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50 flex items-center justify-center"
+                className="w-9 h-9 rounded-lg border border-white/[0.08] text-gray-500 hover:text-white hover:bg-dark-200/[0.04] flex items-center justify-center"
               >
                 <X className="w-4 h-4" aria-hidden />
               </button>
@@ -569,8 +569,8 @@ function PremiumPageInner() {
 
             {!checkoutDone ? (
               <form onSubmit={handleCheckoutSubmit} className="p-5 md:p-6">
-                <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4 mb-5">
-                  <p className="text-sm text-emerald-800">
+                <div className="rounded-xl border border-accent/20 bg-accent/10 p-4 mb-5">
+                  <p className="text-sm text-accent">
                     Vybraný balík: <strong>{selectedPlan.name}</strong> —{' '}
                     <strong>
                       {formatPriceEUR(selectedPlan.price)}
@@ -580,7 +580,7 @@ function PremiumPageInner() {
                 </div>
 
                 {checkoutError && (
-                  <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                  <div className="mb-4 rounded-xl border border-red-800/30 bg-red-900/20 px-4 py-3 text-sm text-red-400">
                     <p>{checkoutError}</p>
                     {checkoutError.includes('prihlásiť') && (
                       <Link
@@ -601,7 +601,7 @@ function PremiumPageInner() {
                       value={paymentForm.fullName}
                       onChange={(e) => setPaymentForm((p) => ({ ...p, fullName: e.target.value }))}
                       placeholder="Ján Novák"
-                      className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                      className="w-full border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white focus:ring-2 focus:ring-accent/30 focus:border-accent outline-none"
                     />
                   </div>
                   <div>
@@ -612,7 +612,7 @@ function PremiumPageInner() {
                       value={paymentForm.email}
                       onChange={(e) => setPaymentForm((p) => ({ ...p, email: e.target.value }))}
                       placeholder="jan@firma.sk"
-                      className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                      className="w-full border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white focus:ring-2 focus:ring-accent/30 focus:border-accent outline-none"
                     />
                   </div>
                   <div className="sm:col-span-2">
@@ -622,14 +622,14 @@ function PremiumPageInner() {
                       value={paymentForm.phone}
                       onChange={(e) => setPaymentForm((p) => ({ ...p, phone: e.target.value }))}
                       placeholder="+421 900 123 456"
-                      className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                      className="w-full border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white focus:ring-2 focus:ring-accent/30 focus:border-accent outline-none"
                     />
                   </div>
                 </div>
 
-                <div className="mt-5 rounded-xl border border-gray-200 p-4">
-                  <p className="text-sm font-semibold text-[#0c1a2e] mb-3 flex items-center gap-2">
-                    <CreditCard className="w-4 h-4 text-[#1dbf73]" aria-hidden />
+                <div className="mt-5 rounded-xl border border-white/[0.08] p-4">
+                  <p className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-accent" aria-hidden />
                     Platobné údaje
                   </p>
                   <div className="grid sm:grid-cols-2 gap-4">
@@ -640,7 +640,7 @@ function PremiumPageInner() {
                         value={paymentForm.cardName}
                         onChange={(e) => setPaymentForm((p) => ({ ...p, cardName: e.target.value }))}
                         placeholder="JAN NOVAK"
-                        className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                        className="w-full border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white focus:ring-2 focus:ring-accent/30 focus:border-accent outline-none"
                       />
                     </div>
                     <div className="sm:col-span-2">
@@ -650,7 +650,7 @@ function PremiumPageInner() {
                         value={paymentForm.cardNumber}
                         onChange={(e) => setPaymentForm((p) => ({ ...p, cardNumber: e.target.value }))}
                         placeholder="4242 4242 4242 4242"
-                        className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                        className="w-full border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white focus:ring-2 focus:ring-accent/30 focus:border-accent outline-none"
                       />
                     </div>
                     <div>
@@ -660,7 +660,7 @@ function PremiumPageInner() {
                         value={paymentForm.exp}
                         onChange={(e) => setPaymentForm((p) => ({ ...p, exp: e.target.value }))}
                         placeholder="MM/RR"
-                        className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                        className="w-full border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white focus:ring-2 focus:ring-accent/30 focus:border-accent outline-none"
                       />
                     </div>
                     <div>
@@ -670,7 +670,7 @@ function PremiumPageInner() {
                         value={paymentForm.cvc}
                         onChange={(e) => setPaymentForm((p) => ({ ...p, cvc: e.target.value }))}
                         placeholder="123"
-                        className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-[#1dbf73]/30 focus:border-[#1dbf73] outline-none"
+                        className="w-full border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white focus:ring-2 focus:ring-accent/30 focus:border-accent outline-none"
                       />
                     </div>
                   </div>
@@ -684,7 +684,7 @@ function PremiumPageInner() {
                   <button
                     type="submit"
                     disabled={checkoutSubmitting}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-[#1dbf73] hover:bg-[#19a463] transition shadow-lg shadow-[#1dbf73]/20 disabled:opacity-60"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-accent hover:bg-accent-light transition shadow-lg shadow-black/20 shadow-accent/20 disabled:opacity-60"
                   >
                     {checkoutSubmitting ? 'Aktivujem…' : 'Zaplatiť a aktivovať'}
                     <ArrowRight className="w-4 h-4" aria-hidden />
@@ -693,10 +693,10 @@ function PremiumPageInner() {
               </form>
             ) : (
               <div className="p-6 md:p-8">
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-center">
-                  <CircleCheckBig className="w-12 h-12 text-emerald-600 mx-auto mb-3" aria-hidden />
-                  <h4 className="text-lg font-bold text-emerald-900 mb-1">Balík je aktivovaný</h4>
-                  <p className="text-sm text-emerald-800">
+                <div className="rounded-xl border border-accent/20 bg-accent/10 p-5 text-center">
+                  <CircleCheckBig className="w-12 h-12 text-accent mx-auto mb-3" aria-hidden />
+                  <h4 className="text-lg font-bold text-accent mb-1">Balík je aktivovaný</h4>
+                  <p className="text-sm text-accent">
                     <strong>{selectedPlan.name}</strong> je priradený k vášmu účtu (platnosť 30 dní v demo režime).
                     Vaše najnovšie aktívne inzeráty sú automaticky označené ako prioritné podľa limitu balíka a zobrazia sa
                     vyššie v kategóriách a vo vyhľadávaní.
@@ -706,7 +706,7 @@ function PremiumPageInner() {
                   <button
                     type="button"
                     onClick={closeCheckout}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-[#0c1a2e] hover:bg-[#152a45] transition"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-dark-100 hover:bg-dark-300 transition"
                   >
                     Zavrieť
                   </button>

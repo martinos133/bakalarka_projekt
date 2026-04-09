@@ -45,19 +45,19 @@ function PodatInzeratContent() {
   if (loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-gray-600">Načítavam kategórie…</p>
+        <p className="text-gray-500">Načítavam kategórie…</p>
       </div>
     )
   }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
-      <nav className="mb-6 text-sm text-gray-600">
-        <Link href="/" className="hover:text-[#1dbf73]">
+      <nav className="mb-6 text-sm text-gray-500">
+        <Link href="/" className="hover:text-accent-light">
           Domov
         </Link>
         <span className="mx-2">/</span>
-        <span className="text-gray-900">Podať inzerát</span>
+        <span className="text-white">Podať inzerát</span>
       </nav>
       <CreateAdvertisementWizard
         categories={categories}
@@ -78,7 +78,7 @@ export default function PodatInzeratPage() {
       <Header />
       <Suspense
         fallback={
-          <div className="flex min-h-[50vh] items-center justify-center text-gray-600">Načítavam…</div>
+          <div className="flex min-h-[50vh] items-center justify-center text-gray-500">Načítavam…</div>
         }
       >
         <PodatInzeratContent />

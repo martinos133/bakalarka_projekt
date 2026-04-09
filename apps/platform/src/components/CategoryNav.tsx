@@ -45,12 +45,12 @@ export default function CategoryNav() {
   if (items.length === 0) return null
 
   return (
-    <nav className="bg-white border-b border-gray-200">
+    <nav className="bg-dark border-b border-white/[0.08]">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-6 overflow-x-auto scrollbar-hide">
-          <div className="flex items-center gap-2 text-gray-900 font-medium py-3 flex-shrink-0">
+          <div className="flex items-center gap-2 text-white font-medium py-3 flex-shrink-0">
             <svg
-              className="w-5 h-5 text-orange-500"
+              className="w-5 h-5 text-accent"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -62,7 +62,7 @@ export default function CategoryNav() {
             <Link
               key={item.id}
               href={item.href}
-              className="text-sm text-gray-700 hover:text-[#1dbf73] transition-colors whitespace-nowrap py-3 border-b-2 border-transparent hover:border-[#1dbf73] flex-shrink-0"
+              className="text-sm text-gray-300 hover:text-accent-light transition-colors whitespace-nowrap py-3 border-b-2 border-transparent hover:border-accent flex-shrink-0"
             >
               {item.label}
             </Link>
@@ -71,7 +71,7 @@ export default function CategoryNav() {
             <button
               type="button"
               onClick={() => setShowMore(true)}
-              className="flex items-center gap-1 text-sm text-gray-700 hover:text-[#1dbf73] transition-colors whitespace-nowrap py-3 flex-shrink-0"
+              className="flex items-center gap-1 text-sm text-gray-300 hover:text-accent-light transition-colors whitespace-nowrap py-3 flex-shrink-0"
             >
               <span>Viac</span>
               <svg

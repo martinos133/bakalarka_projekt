@@ -67,27 +67,27 @@ export default function SignInPage() {
 
   return (
     <CmsGate cmsSlug="signin" shell="headerFooterOnly">
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-dark">
       <Header />
       <div className="flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">
+          <div className="bg-dark rounded-lg shadow-lg shadow-black/20 p-8 border border-white/[0.08]">
+            <h1 className="text-3xl font-bold text-white mb-2 text-center">
               Prihlásenie
             </h1>
-            <p className="text-gray-600 text-center mb-8">
+            <p className="text-gray-500 text-center mb-8">
               Prihláste sa do svojho účtu
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                <div className="bg-red-900/20 border border-red-800/30 text-red-400 px-4 py-3 rounded">
                   {error}
                 </div>
               )}
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                   Email
                 </label>
                 <input
@@ -96,13 +96,13 @@ export default function SignInPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="vas@email.com"
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                   Heslo
                 </label>
                 <input
@@ -111,7 +111,7 @@ export default function SignInPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="••••••••"
                 />
               </div>
@@ -119,16 +119,16 @@ export default function SignInPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#1dbf73] hover:bg-[#19a463] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
+                className="w-full bg-accent hover:bg-accent-light disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
               >
                 {loading ? 'Prihlasovanie...' : 'Prihlásiť sa'}
               </button>
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-gray-600">
+              <p className="text-gray-500">
                 Nemáte účet?{' '}
-                <Link href="/join" className="text-[#1dbf73] hover:text-[#19a463] font-medium">
+                <Link href="/join" className="text-accent hover:text-accent font-medium">
                   Zaregistrujte sa
                 </Link>
               </p>

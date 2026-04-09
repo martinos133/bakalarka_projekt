@@ -44,7 +44,7 @@ export default function StaticPageRoute({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-dark">
         <Header />
         <CategoryNav />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -57,12 +57,12 @@ export default function StaticPageRoute({
 
   if (error || !page) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-dark">
         <Header />
         <CategoryNav />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Stránka nebola nájdená</h1>
-          <Link href="/" className="text-[#1dbf73] hover:underline">
+          <h1 className="text-2xl font-bold text-white mb-4">Stránka nebola nájdená</h1>
+          <Link href="/" className="text-accent hover:underline">
             Späť na domov
           </Link>
         </div>
@@ -72,7 +72,7 @@ export default function StaticPageRoute({
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-dark">
       <Header />
       <CategoryNav />
       <StaticPageArticle slug={slug} title={page.title} content={page.content || ''} />

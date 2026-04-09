@@ -202,7 +202,7 @@ export default function AdvertisementDetailPage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-dark">
         <Header />
         <CategoryNav />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -215,17 +215,17 @@ export default function AdvertisementDetailPage({
 
   if (!advertisement) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-dark">
         <Header />
         <CategoryNav />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-white mb-4">
               Inzerát nebol nájdený
             </h1>
             <Link
               href="/"
-              className="text-[#1dbf73] hover:underline"
+              className="text-accent hover:underline"
             >
               Späť na hlavnú stránku
             </Link>
@@ -396,28 +396,28 @@ export default function AdvertisementDetailPage({
   ]
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-dark">
       <Header />
       <CategoryNav />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="mb-6">
-          <ol className="flex items-center gap-2 text-sm text-gray-600">
+          <ol className="flex items-center gap-2 text-sm text-gray-500">
             <li>
-              <Link href="/" className="hover:text-[#1dbf73]">
+              <Link href="/" className="hover:text-accent-light">
                 Domov
               </Link>
             </li>
             <li>/</li>
             {advertisement.category && (
               <li>
-                <Link href="/" className="hover:text-[#1dbf73]">
+                <Link href="/" className="hover:text-accent-light">
                   {advertisement.category.name}
                 </Link>
               </li>
             )}
             <li>/</li>
-            <li className="text-gray-900">{advertisement.title}</li>
+            <li className="text-white">{advertisement.title}</li>
           </ol>
         </nav>
 
@@ -426,11 +426,11 @@ export default function AdvertisementDetailPage({
           <div className="lg:col-span-2">
             {/* Title */}
             <div className="flex flex-wrap items-center gap-2 mb-4">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+              <h1 className="text-3xl md:text-4xl font-bold text-white">
                 {advertisement.title}
               </h1>
               {advertisement.priorityBoosted && (
-                <span className="text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded-lg bg-[#1dbf73]/15 text-[#138a54] border border-[#1dbf73]/30">
+                <span className="text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded-lg bg-[#c9a96e]/15 text-[#138a54] border border-[#c9a96e]/30">
                   Prioritný inzerát
                 </span>
               )}
@@ -438,18 +438,18 @@ export default function AdvertisementDetailPage({
 
             {/* Seller Info */}
             {advertisement.user && (
-              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200">
-                <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold text-xl">
+              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-white/[0.08]">
+                <div className="w-16 h-16 rounded-full bg-dark-300 flex items-center justify-center text-gray-500 font-semibold text-xl">
                   {sellerName.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-semibold text-gray-900">{sellerName}</h3>
+                    <h3 className="font-semibold text-white">{sellerName}</h3>
                     {isProSellerBadge(
                       advertisement.user?.sellerPlan,
                       advertisement.user?.sellerPlanValidUntil,
                     ) && (
-                      <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-[#0c1a2e] text-white">
+                      <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-dark-100 text-white">
                         Pro predajca
                       </span>
                     )}
@@ -462,7 +462,7 @@ export default function AdvertisementDetailPage({
                       >
                         <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
                       </svg>
-                      <span className="text-sm font-semibold text-gray-900">
+                      <span className="text-sm font-semibold text-white">
                         5.0
                       </span>
                     </div>
@@ -479,18 +479,18 @@ export default function AdvertisementDetailPage({
                 title={advertisement.title}
               />
             ) : (
-              <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center mb-8">
-                <span className="text-gray-400">Žiadny obrázok</span>
+              <div className="w-full h-96 bg-dark-200 rounded-lg flex items-center justify-center mb-8">
+                <span className="text-gray-500">Žiadny obrázok</span>
               </div>
             )}
 
             {/* Description */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              <h2 className="text-2xl font-bold text-white mb-4">
                 O tejto službe
               </h2>
               <div className="prose max-w-none">
-                <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+                <p className="text-gray-300 whitespace-pre-line leading-relaxed">
                   {advertisement.description}
                 </p>
               </div>
@@ -510,12 +510,12 @@ export default function AdvertisementDetailPage({
                 if (rows.length === 0) return null
                 return (
                   <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Špecifikácie</h2>
-                    <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 rounded-xl border border-gray-200 bg-gray-50/50 p-4 sm:p-6">
+                    <h2 className="text-2xl font-bold text-white mb-4">Špecifikácie</h2>
+                    <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 rounded-xl border border-white/[0.08] bg-dark-50/50 p-4 sm:p-6">
                       {rows.map(({ f, text }) => (
-                        <div key={f.id} className="border-b border-gray-100 pb-3 last:border-0 sm:border-0 sm:pb-0">
+                        <div key={f.id} className="border-b border-white/[0.06] pb-3 last:border-0 sm:border-0 sm:pb-0">
                           <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">{f.name}</dt>
-                          <dd className="mt-1 text-base font-medium text-gray-900">{text}</dd>
+                          <dd className="mt-1 text-base font-medium text-white">{text}</dd>
                         </div>
                       ))}
                     </dl>
@@ -529,16 +529,16 @@ export default function AdvertisementDetailPage({
                 {/* Features */}
                 {advertisement.features && advertisement.features.length > 0 && (
                   <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                    <h2 className="text-2xl font-bold text-white mb-4">
                       Čo je zahrnuté
                     </h2>
                     <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {advertisement.features.map((feature, idx) => (
                         <li key={idx} className="flex items-start gap-2">
-                          <svg className="w-5 h-5 text-[#1dbf73] mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                           </svg>
-                          <span className="text-gray-700">{feature}</span>
+                          <span className="text-gray-300">{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -548,16 +548,16 @@ export default function AdvertisementDetailPage({
                 {/* Packages */}
                 {advertisement.pricingType === 'PACKAGE' && advertisement.packages && advertisement.packages.length > 0 && (
                   <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                    <h2 className="text-2xl font-bold text-white mb-4">
                       Balíčky služieb
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {advertisement.packages.map((pkg, idx) => (
-                        <div key={idx} className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">{pkg.name}</h3>
-                          <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
+                        <div key={idx} className="border border-white/[0.08] rounded-lg p-6 hover:shadow-lg transition-shadow">
+                          <h3 className="text-xl font-bold text-white mb-2">{pkg.name}</h3>
+                          <p className="text-gray-500 text-sm mb-4">{pkg.description}</p>
                           <div className="mb-4">
-                            <div className="text-3xl font-bold text-gray-900 mb-1">{pkg.price}€</div>
+                            <div className="text-3xl font-bold text-white mb-1">{pkg.price}€</div>
                             {pkg.deliveryTime && (
                               <div className="text-sm text-gray-500">Dodanie: {pkg.deliveryTime}</div>
                             )}
@@ -565,8 +565,8 @@ export default function AdvertisementDetailPage({
                           {pkg.features && pkg.features.length > 0 && (
                             <ul className="space-y-2 mb-4">
                               {pkg.features.map((feature, fIdx) => (
-                                <li key={fIdx} className="flex items-start gap-2 text-sm text-gray-700">
-                                  <svg className="w-4 h-4 text-[#1dbf73] mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <li key={fIdx} className="flex items-start gap-2 text-sm text-gray-300">
+                                  <svg className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                   </svg>
                                   <span>{feature}</span>
@@ -574,7 +574,7 @@ export default function AdvertisementDetailPage({
                               ))}
                             </ul>
                           )}
-                          <button className="w-full bg-[#1dbf73] text-white py-2 rounded-md font-semibold hover:bg-[#19a463] transition-colors">
+                          <button className="w-full bg-accent text-white py-2 rounded-md font-semibold hover:bg-accent-light transition-colors">
                             Vybrať balíček
                           </button>
                         </div>
@@ -586,20 +586,20 @@ export default function AdvertisementDetailPage({
                 {/* FAQ */}
                 {advertisement.faq && advertisement.faq.length > 0 && (
                   <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                    <h2 className="text-2xl font-bold text-white mb-6">
                       Často kladené otázky
                     </h2>
                     <div className="space-y-3">
                       {advertisement.faq.map((faq, idx) => (
                         <div 
                           key={idx} 
-                          className="border border-gray-200 rounded-lg overflow-hidden bg-white hover:shadow-md transition-shadow"
+                          className="border border-white/[0.08] rounded-lg overflow-hidden bg-dark hover:shadow-md transition-shadow"
                         >
                           <button
                             onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
-                            className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                            className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-dark-200/[0.04] transition-colors"
                           >
-                            <h3 className="font-semibold text-gray-900 pr-4">{faq.question}</h3>
+                            <h3 className="font-semibold text-white pr-4">{faq.question}</h3>
                             <div className="flex-shrink-0">
                               {expandedFAQ === idx ? (
                                 <ChevronUp className="w-5 h-5 text-gray-500" />
@@ -610,7 +610,7 @@ export default function AdvertisementDetailPage({
                           </button>
                           {expandedFAQ === idx && (
                             <div className="px-6 pb-4 pt-0">
-                              <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
+                              <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
                             </div>
                           )}
                         </div>
@@ -622,8 +622,8 @@ export default function AdvertisementDetailPage({
             )}
 
             {/* Reviews Section */}
-            <div className="border-t border-gray-200 pt-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <div className="border-t border-white/[0.08] pt-8">
+              <h2 className="text-2xl font-bold text-white mb-6">
                 Recenzie (0)
               </h2>
               <div className="text-center text-gray-500 py-8">
@@ -636,18 +636,18 @@ export default function AdvertisementDetailPage({
           <div className="lg:col-span-1">
             <div className="sticky top-24">
               {/* Price Card */}
-              <div className="border border-gray-200 rounded-lg p-6 mb-6">
+              <div className="border border-white/[0.08] rounded-lg p-6 mb-6">
                 <div className="mb-4">
                   {advertisement.type === 'SERVICE' && advertisement.pricingType === 'HOURLY' && advertisement.hourlyRate ? (
                     <div>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-gray-900">
+                        <span className="text-3xl font-bold text-white">
                           {advertisement.hourlyRate.toFixed(2)}€
                         </span>
                         <span className="text-gray-500">/ hodina</span>
                       </div>
                       {advertisement.deliveryTime && (
-                        <div className="text-sm text-gray-600 mt-2">
+                        <div className="text-sm text-gray-500 mt-2">
                           ⏱ Dodanie: {advertisement.deliveryTime}
                         </div>
                       )}
@@ -655,20 +655,20 @@ export default function AdvertisementDetailPage({
                   ) : advertisement.type === 'SERVICE' && advertisement.pricingType === 'DAILY' && advertisement.dailyRate ? (
                     <div>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-gray-900">
+                        <span className="text-3xl font-bold text-white">
                           {advertisement.dailyRate.toFixed(2)}€
                         </span>
                         <span className="text-gray-500">/ deň</span>
                       </div>
                       {advertisement.deliveryTime && (
-                        <div className="text-sm text-gray-600 mt-2">
+                        <div className="text-sm text-gray-500 mt-2">
                           ⏱ Dodanie: {advertisement.deliveryTime}
                         </div>
                       )}
                     </div>
                   ) : (
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold text-gray-900">
+                      <span className="text-3xl font-bold text-white">
                         {advertisement.price ? `${advertisement.price.toFixed(2)}€` : 'Na dohodu'}
                       </span>
                       {advertisement.price && (
@@ -677,14 +677,14 @@ export default function AdvertisementDetailPage({
                     </div>
                   )}
                   {advertisement.type === 'SERVICE' && advertisement.revisions && (
-                    <div className="text-sm text-gray-600 mt-2">
+                    <div className="text-sm text-gray-500 mt-2">
                       🔄 Revízie: {advertisement.revisions}
                     </div>
                   )}
                 </div>
                 <button
                   onClick={handleContinueClick}
-                  className="w-full bg-[#1dbf73] text-white py-3 rounded-md font-semibold hover:bg-[#19a463] transition-colors mb-4"
+                  className="w-full bg-accent text-white py-3 rounded-md font-semibold hover:bg-accent-light transition-colors mb-4"
                 >
                   Pokračovať
                 </button>
@@ -693,8 +693,8 @@ export default function AdvertisementDetailPage({
                     disabled={favoriteLoading}
                     className={`w-full flex items-center justify-center gap-2 py-3 rounded-md font-semibold transition-colors mb-4 ${
                       isFavorite
-                        ? 'border-2 border-[#1dbf73] bg-[#1dbf73]/10 text-[#1dbf73] hover:bg-[#1dbf73]/20'
-                        : 'border-2 border-gray-300 text-gray-900 hover:border-gray-400'
+                        ? 'border-2 border-accent bg-accent/10 text-accent hover:bg-[#c9a96e]/20'
+                        : 'border-2 border-white/10 text-white hover:border-white/20'
                     }`}
                   >
                     <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
@@ -702,7 +702,7 @@ export default function AdvertisementDetailPage({
                   </button>
                   <button
                     onClick={() => setShowReportModal(true)}
-                    className="w-full flex items-center justify-center gap-2 border-2 border-red-300 text-red-600 py-3 rounded-md font-semibold hover:border-red-400 hover:bg-red-50 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 border-2 border-red-300 text-red-400 py-3 rounded-md font-semibold hover:border-red-400 hover:bg-red-900/20 transition-colors"
                   >
                     <Flag className="w-4 h-4" />
                     Nahlásiť inzerát
@@ -711,13 +711,13 @@ export default function AdvertisementDetailPage({
 
               {/* Seller Card */}
               {advertisement.user && (
-                <div className="border border-gray-200 rounded-lg p-6">
+                <div className="border border-white/[0.08] rounded-lg p-6">
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold text-xl">
+                    <div className="w-16 h-16 rounded-full bg-dark-300 flex items-center justify-center text-gray-500 font-semibold text-xl">
                       {sellerName.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-white">
                         {sellerName}
                       </h3>
                       <div className="flex items-center gap-1 mt-1">
@@ -727,13 +727,13 @@ export default function AdvertisementDetailPage({
                         >
                           <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
                         </svg>
-                        <span className="text-sm font-semibold text-gray-900">
+                        <span className="text-sm font-semibold text-white">
                           5.0
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-2 text-sm text-gray-600">
+                  <div className="space-y-2 text-sm text-gray-500">
                     {advertisement.location && (
                       <div className="flex justify-between">
                         <span>Lokalita:</span>
@@ -749,7 +749,7 @@ export default function AdvertisementDetailPage({
                   </div>
                   <button
                     onClick={handleContactClick}
-                    className="w-full mt-4 border border-gray-300 text-gray-900 py-2 rounded-md font-medium hover:border-gray-400 transition-colors"
+                    className="w-full mt-4 border border-white/10 text-white py-2 rounded-md font-medium hover:border-white/20 transition-colors"
                   >
                     Kontaktovať predajcu
                   </button>
@@ -763,10 +763,10 @@ export default function AdvertisementDetailPage({
       {/* Contact Modal */}
       {showContactModal && advertisement?.user && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full shadow-xl">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-dark rounded-lg max-w-md w-full shadow-xl shadow-black/30">
+            <div className="p-6 border-b border-white/[0.08]">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-white">
                   Kontaktovať predajcu
                 </h2>
                 <button
@@ -775,7 +775,7 @@ export default function AdvertisementDetailPage({
                     setContactMode('choice')
                     setInquirySuccess(false)
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-dark-200/[0.06] rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
@@ -785,16 +785,16 @@ export default function AdvertisementDetailPage({
             <div className="p-6">
               {contactMode === 'choice' && (
                 <div className="space-y-4">
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-500 text-sm">
                     Vyberte spôsob kontaktu s predajcom {sellerName}:
                   </p>
                   <button
                     onClick={handleContactChat}
-                    className="w-full flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-[#1dbf73] hover:bg-[#1dbf73]/5 transition-colors text-left"
+                    className="w-full flex items-center gap-3 p-4 border-2 border-white/[0.08] rounded-lg hover:border-accent hover:bg-[#c9a96e]/5 transition-colors text-left"
                   >
-                    <MessageSquare className="w-6 h-6 text-[#1dbf73]" />
+                    <MessageSquare className="w-6 h-6 text-accent" />
                     <div>
-                      <span className="font-semibold text-gray-900 block">
+                      <span className="font-semibold text-white block">
                         Napísať cez chat
                       </span>
                       <span className="text-sm text-gray-500">
@@ -806,11 +806,11 @@ export default function AdvertisementDetailPage({
                   </button>
                   <button
                     onClick={handleContactPhone}
-                    className="w-full flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-[#1dbf73] hover:bg-[#1dbf73]/5 transition-colors text-left"
+                    className="w-full flex items-center gap-3 p-4 border-2 border-white/[0.08] rounded-lg hover:border-accent hover:bg-[#c9a96e]/5 transition-colors text-left"
                   >
-                    <Phone className="w-6 h-6 text-[#1dbf73]" />
+                    <Phone className="w-6 h-6 text-accent" />
                     <div>
-                      <span className="font-semibold text-gray-900 block">
+                      <span className="font-semibold text-white block">
                         Zobraziť telefón
                       </span>
                       <span className="text-sm text-gray-500">
@@ -825,47 +825,47 @@ export default function AdvertisementDetailPage({
 
               {contactMode === 'chat' && inquirySuccess ? (
                 <div className="text-center py-6">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Check className="w-8 h-8 text-green-600" />
+                  <div className="w-16 h-16 bg-accent/15 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Check className="w-8 h-8 text-accent" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="text-lg font-semibold text-white mb-2">
                     Správa bola odoslaná
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-500 text-sm">
                     Predajca dostane vašu správu a môže vám odpovedať v sekcii Správy vo svojom profile.
                   </p>
                 </div>
               ) : contactMode === 'chat' && (
                 <div className="space-y-4">
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-500 text-sm">
                     Napíšte správu predajcovi. Budete si môcť písať cez sekciu Správy vo vašom profile.
                   </p>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Predmet
                     </label>
                     <input
                       type="text"
                       value={inquirySubject}
                       onChange={(e) => setInquirySubject(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                      className="w-full border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                       placeholder="Predmet správy"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Správa
                     </label>
                     <textarea
                       value={inquiryContent}
                       onChange={(e) => setInquiryContent(e.target.value)}
                       rows={4}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent resize-none"
+                      className="w-full border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
                       placeholder="Napíšte svoju správu..."
                     />
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
-                    <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                  <div className="flex items-center gap-2 text-sm text-gray-500 bg-blue-900/20 p-3 rounded-lg">
+                    <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
                     <p>
                       Pre písanie cez chat musia byť obaja používatelia zaregistrovaní. Správa sa odošle predajcovi a môžete pokračovať v komunikácii v sekcii Správy.
                     </p>
@@ -873,7 +873,7 @@ export default function AdvertisementDetailPage({
                   <div className="flex items-center gap-3 pt-2">
                     <button
                       onClick={() => setContactMode('choice')}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                      className="px-4 py-2 border border-white/10 text-gray-300 rounded-lg font-medium hover:bg-dark-200/[0.04] transition-colors"
                     >
                       Späť
                     </button>
@@ -884,7 +884,7 @@ export default function AdvertisementDetailPage({
                         !inquiryContent.trim() ||
                         inquirySubmitting
                       }
-                      className="flex-1 px-4 py-2 bg-[#1dbf73] text-white rounded-lg font-medium hover:bg-[#19a463] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                      className="flex-1 px-4 py-2 bg-accent text-white rounded-lg font-medium hover:bg-accent-light disabled:bg-dark-300 disabled:cursor-not-allowed transition-colors"
                     >
                       {inquirySubmitting ? 'Odosielam...' : 'Odoslať správu'}
                     </button>
@@ -896,12 +896,12 @@ export default function AdvertisementDetailPage({
                 <div className="space-y-4">
                   {advertisement.user.phone ? (
                     <>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-500 text-sm">
                         Telefónne číslo predajcu {sellerName}:
                       </p>
                       <a
                         href={`tel:${advertisement.user.phone}`}
-                        className="block text-xl font-semibold text-[#1dbf73] hover:underline"
+                        className="block text-xl font-semibold text-accent hover:underline"
                       >
                         {advertisement.user.phone}
                       </a>
@@ -912,7 +912,7 @@ export default function AdvertisementDetailPage({
                   ) : (
                     <div className="text-center py-4">
                       <Phone className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-500 text-sm">
                         Predajca nemá zverejnený telefón.
                       </p>
                       <p className="text-gray-500 text-sm mt-1">
@@ -922,7 +922,7 @@ export default function AdvertisementDetailPage({
                   )}
                   <button
                     onClick={() => setContactMode('choice')}
-                    className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                    className="w-full px-4 py-2 border border-white/10 text-gray-300 rounded-lg font-medium hover:bg-dark-200/[0.04] transition-colors"
                   >
                     Späť
                   </button>
@@ -936,10 +936,10 @@ export default function AdvertisementDetailPage({
       {/* Continue Modal - Konzultácia (služby) alebo Rezervácia (inzeráty) */}
       {showContinueModal && advertisement && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-lg w-full shadow-xl">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-dark rounded-lg max-w-lg w-full shadow-xl shadow-black/30">
+            <div className="p-6 border-b border-white/[0.08]">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-white">
                   {advertisement.type === 'SERVICE'
                     ? 'Dohodnúť konzultáciu'
                     : 'Rezervovať inzerát'}
@@ -951,7 +951,7 @@ export default function AdvertisementDetailPage({
                     setContinueServiceDate(undefined)
                     setContinueRentalRange(undefined)
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-dark-200/[0.06] rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
@@ -961,13 +961,13 @@ export default function AdvertisementDetailPage({
             <div className="p-6">
               {continueSuccess ? (
                 <div className="text-center py-6">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Check className="w-8 h-8 text-green-600" />
+                  <div className="w-16 h-16 bg-accent/15 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Check className="w-8 h-8 text-accent" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="text-lg font-semibold text-white mb-2">
                     Žiadosť odoslaná
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-500 text-sm">
                     {advertisement.type === 'SERVICE'
                       ? 'Predajca vám čoskoro odpíše s návrhom termínu konzultácie. Sledujte sekciu Správy.'
                       : 'Predajca vám čoskoro odpíše k rezervácii. Sledujte sekciu Správy.'}
@@ -975,7 +975,7 @@ export default function AdvertisementDetailPage({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-500 text-sm">
                     {advertisement.type === 'SERVICE'
                       ? 'Vyberte dátum a popíšte, čo potrebujete. Predajca vám odpíše cez Správy.'
                       : 'Vyberte termín rezervácie a doplňte správu. Predajca dostane všetky potrebné informácie.'}
@@ -1000,14 +1000,14 @@ export default function AdvertisementDetailPage({
                   )}
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Doplňujúca správa pre predajcu <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       value={continueContent}
                       onChange={(e) => setContinueContent(e.target.value)}
                       rows={3}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent resize-none"
+                      className="w-full border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
                       placeholder={
                         advertisement.type === 'SERVICE'
                           ? 'Čo potrebujete vyriešiť, preferovaný čas, kontakt...'
@@ -1019,7 +1019,7 @@ export default function AdvertisementDetailPage({
                   <div className="flex items-center gap-3 pt-2">
                     <button
                       onClick={() => setShowContinueModal(false)}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                      className="px-4 py-2 border border-white/10 text-gray-300 rounded-lg font-medium hover:bg-dark-200/[0.04] transition-colors"
                     >
                       Zrušiť
                     </button>
@@ -1032,7 +1032,7 @@ export default function AdvertisementDetailPage({
                           : !continueRentalRange?.from || !continueRentalRange?.to) ||
                         continueSubmitting
                       }
-                      className="flex-1 px-4 py-2 bg-[#1dbf73] text-white rounded-lg font-medium hover:bg-[#19a463] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                      className="flex-1 px-4 py-2 bg-accent text-white rounded-lg font-medium hover:bg-accent-light disabled:bg-dark-300 disabled:cursor-not-allowed transition-colors"
                     >
                       {continueSubmitting ? 'Odosielam...' : 'Odoslať žiadosť'}
                     </button>
@@ -1047,11 +1047,11 @@ export default function AdvertisementDetailPage({
       {/* Report Modal */}
       {showReportModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full shadow-xl">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-dark rounded-lg max-w-md w-full shadow-xl shadow-black/30">
+            <div className="p-6 border-b border-white/[0.08]">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <Flag className="w-5 h-5 text-red-600" />
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <Flag className="w-5 h-5 text-red-400" />
                   Nahlásiť inzerát
                 </h2>
                 <button
@@ -1061,7 +1061,7 @@ export default function AdvertisementDetailPage({
                     setReportDescription('')
                     setReportSuccess(false)
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-dark-200/[0.06] rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
@@ -1070,26 +1070,26 @@ export default function AdvertisementDetailPage({
 
             {reportSuccess ? (
               <div className="p-6 text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Check className="w-8 h-8 text-green-600" />
+                <div className="w-16 h-16 bg-accent/15 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Check className="w-8 h-8 text-accent" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-white mb-2">
                   Ďakujeme za nahlásenie
                 </h3>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-500 text-sm">
                   Váš report bol úspešne odoslaný. Náš tím to skontroluje.
                 </p>
               </div>
             ) : (
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Dôvod nahlásenia <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={reportReason}
                     onChange={(e) => setReportReason(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                    className="w-full border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                   >
                     <option value="">Vyberte dôvod...</option>
                     {reportReasons.map((reason) => (
@@ -1101,7 +1101,7 @@ export default function AdvertisementDetailPage({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Popis problému (voliteľné)
                   </label>
                   <textarea
@@ -1109,32 +1109,32 @@ export default function AdvertisementDetailPage({
                     onChange={(e) => setReportDescription(e.target.value)}
                     placeholder="Poskytnite viac informácií o probléme..."
                     rows={4}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent resize-none"
+                    className="w-full border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
                   />
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
-                  <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                <div className="flex items-center gap-2 text-sm text-gray-500 bg-blue-900/20 p-3 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
                   <p>
                     Nahlásené inzeráty sú kontrolované našim tímom. Inzerát zostane aktívny, pokiaľ ho nerozhodneme odstrániť.
                   </p>
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/[0.08]">
                   <button
                     onClick={() => {
                       setShowReportModal(false)
                       setReportReason('')
                       setReportDescription('')
                     }}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 border border-white/10 text-gray-300 rounded-lg font-medium hover:bg-dark-200/[0.04] transition-colors"
                   >
                     Zrušiť
                   </button>
                   <button
                     onClick={handleReport}
                     disabled={!reportReason || reportSubmitting}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:bg-dark-300 disabled:cursor-not-allowed transition-colors"
                   >
                     {reportSubmitting ? 'Odosielam...' : 'Nahlásiť'}
                   </button>

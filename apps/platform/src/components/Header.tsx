@@ -118,7 +118,7 @@ export default function Header() {
   const navbarItemsWithoutMap = navbarItems.filter((item) => item.href !== '/mapa')
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+    <header className="sticky top-0 z-50 bg-dark/80 backdrop-blur-xl border-b border-white/[0.06]">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Left side - Logo and Hamburger */}
@@ -143,15 +143,15 @@ export default function Header() {
               </svg>
             </button>
             <Link href="/" className="flex items-center gap-1.5">
-              <span className="text-2xl font-bold text-gray-900 tracking-tight">RentMe</span>
-              <span className="w-2 h-2 bg-[#1dbf73] rounded-full"></span>
+              <span className="text-2xl font-serif italic text-white tracking-tight">RentMe</span>
+              <span className="w-2 h-2 bg-accent rounded-full"></span>
             </Link>
           </div>
 
           {/* Center - Search Bar */}
           <div ref={searchRef} className="hidden md:flex flex-1 max-w-2xl mx-4 relative">
             <form onSubmit={handleSearch} className="flex w-full">
-              <div className="flex w-full border border-gray-300 rounded-md overflow-hidden focus-within:border-[#1dbf73] focus-within:ring-1 focus-within:ring-[#1dbf73]">
+              <div className="flex w-full border border-white/10 rounded-md overflow-hidden focus-within:border-accent focus-within:ring-1 focus-within:ring-accent">
                 <input
                   type="text"
                   value={searchQuery}
@@ -161,11 +161,11 @@ export default function Header() {
                     if (e.key === 'Escape') setShowSuggestions(false)
                   }}
                   placeholder="Akú službu hľadáte dnes?"
-                  className="flex-1 px-4 py-2 text-sm focus:outline-none text-gray-900 placeholder-gray-500"
+                  className="flex-1 px-4 py-2 text-sm focus:outline-none text-white placeholder-gray-500 bg-transparent"
                 />
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors"
+                  className="px-6 py-2 bg-accent text-dark hover:bg-accent-light transition-colors"
                   aria-label="Search"
                 >
                   <svg
@@ -187,7 +187,7 @@ export default function Header() {
 
             {/* Dropdown s návrhmi */}
             {showSuggestions && searchQuery.trim().length >= 3 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 overflow-hidden">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-dark border border-white/[0.08] rounded-md shadow-lg shadow-black/20 z-50 overflow-hidden">
                 {suggestionsLoading ? (
                   <div className="px-4 py-6 text-center text-gray-500 text-sm">Načítavam...</div>
                 ) : hasSuggestions ? (
@@ -202,15 +202,15 @@ export default function Header() {
                         key={cat.id}
                         href={`/kategoria/${cat.slug}`}
                         onClick={() => setShowSuggestions(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-dark-200/[0.04] transition-colors"
                       >
-                        <FolderOpen className="w-4 h-4 text-[#1dbf73] flex-shrink-0" />
-                        <span className="text-sm font-medium text-gray-900">{cat.name}</span>
-                        <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">Kategória</span>
+                        <FolderOpen className="w-4 h-4 text-accent flex-shrink-0" />
+                        <span className="text-sm font-medium text-white">{cat.name}</span>
+                        <span className="ml-auto text-xs text-gray-500 bg-dark-100 px-2 py-0.5 rounded">Kategória</span>
                       </Link>
                     ))}
                     {suggestions.advertisements.length > 0 && (
-                      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1 border-t border-gray-100">
+                      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1 border-t border-white/[0.06]">
                         Inzeráty
                       </div>
                     )}
@@ -219,20 +219,20 @@ export default function Header() {
                         key={ad.id}
                         href={`/inzerat/${ad.id}`}
                         onClick={() => setShowSuggestions(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-dark-200/[0.04] transition-colors"
                       >
                         {ad.images?.[0] ? (
                           <img src={ad.images[0]} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
                         ) : (
-                          <FileText className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                          <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
                         )}
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm font-medium text-gray-900 block truncate">{ad.title}</span>
+                          <span className="text-sm font-medium text-white block truncate">{ad.title}</span>
                           {ad.price != null && (
-                            <span className="text-xs text-[#1dbf73] font-semibold">{ad.price} €</span>
+                            <span className="text-xs text-accent font-semibold">{ad.price} €</span>
                           )}
                         </div>
-                        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded flex-shrink-0">Inzerát</span>
+                        <span className="text-xs text-gray-500 bg-dark-100 px-2 py-0.5 rounded flex-shrink-0">Inzerát</span>
                       </Link>
                     ))}
                   </div>
@@ -247,7 +247,7 @@ export default function Header() {
           <nav className="hidden lg:flex items-center gap-6 flex-shrink-0">
             <Link
               href="/mapa"
-              className="text-gray-900 hover:text-[#1dbf73] transition-colors text-sm font-medium"
+              className="text-white hover:text-accent-light transition-colors text-sm font-medium"
             >
               Mapa
             </Link>
@@ -255,7 +255,7 @@ export default function Header() {
               <Link
                 key={item.id}
                 href={item.href}
-                className="text-gray-900 hover:text-[#1dbf73] transition-colors text-sm font-medium"
+                className="text-white hover:text-accent-light transition-colors text-sm font-medium"
               >
                 {item.label}
               </Link>
@@ -264,20 +264,20 @@ export default function Header() {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-dark-200/[0.06] transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-full bg-[#1dbf73] flex items-center justify-center text-white font-semibold text-sm">
+                  <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-white font-semibold text-sm">
                     {user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-white">
                     {user.firstName || user.email.split('@')[0]}
                   </span>
-                  <ChevronDown className="w-4 h-4 text-gray-600" />
+                  <ChevronDown className="w-4 h-4 text-gray-500" />
                 </button>
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                    <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm font-semibold text-gray-900">
+                  <div className="absolute right-0 mt-2 w-48 bg-dark rounded-lg shadow-lg shadow-black/20 border border-white/[0.08] py-2 z-50">
+                    <div className="px-4 py-2 border-b border-white/[0.06]">
+                      <p className="text-sm font-semibold text-white">
                         {user.firstName && user.lastName 
                           ? `${user.firstName} ${user.lastName}`
                           : user.firstName || user.email.split('@')[0]}
@@ -286,15 +286,15 @@ export default function Header() {
                     </div>
                     <Link
                       href="/podat-inzerat"
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-dark-200/[0.04] transition-colors"
                       onClick={() => setShowUserMenu(false)}
                     >
-                      <PlusCircle className="w-4 h-4 text-[#1dbf73]" />
+                      <PlusCircle className="w-4 h-4 text-accent" />
                       Podať inzerát
                     </Link>
                     <Link
                       href="/dashboard"
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-dark-200/[0.04] transition-colors"
                       onClick={() => setShowUserMenu(false)}
                     >
                       <User className="w-4 h-4" />
@@ -302,7 +302,7 @@ export default function Header() {
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-900/20 transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
                       Odhlásiť sa
@@ -314,13 +314,13 @@ export default function Header() {
               <>
                 <Link
                   href="/signin"
-                  className="text-gray-900 hover:text-[#1dbf73] transition-colors text-sm font-medium"
+                  className="text-white hover:text-accent-light transition-colors text-sm font-medium"
                 >
                   Prihlásiť sa
                 </Link>
                 <Link
                   href="/join"
-                  className="px-4 py-2 bg-[#1dbf73] text-white rounded-md hover:bg-[#19a463] transition-colors font-medium text-sm"
+                  className="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-light transition-colors font-medium text-sm"
                 >
                   Registrovať sa
                 </Link>
@@ -336,14 +336,14 @@ export default function Header() {
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-2"
                 >
-                  <div className="w-8 h-8 rounded-full bg-[#1dbf73] flex items-center justify-center text-white font-semibold text-sm">
+                  <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-white font-semibold text-sm">
                     {user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
                   </div>
                 </button>
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                    <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm font-semibold text-gray-900">
+                  <div className="absolute right-0 mt-2 w-48 bg-dark rounded-lg shadow-lg shadow-black/20 border border-white/[0.08] py-2 z-50">
+                    <div className="px-4 py-2 border-b border-white/[0.06]">
+                      <p className="text-sm font-semibold text-white">
                         {user.firstName && user.lastName 
                           ? `${user.firstName} ${user.lastName}`
                           : user.firstName || user.email.split('@')[0]}
@@ -352,15 +352,15 @@ export default function Header() {
                     </div>
                     <Link
                       href="/podat-inzerat"
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-dark-200/[0.04] transition-colors"
                       onClick={() => setShowUserMenu(false)}
                     >
-                      <PlusCircle className="w-4 h-4 text-[#1dbf73]" />
+                      <PlusCircle className="w-4 h-4 text-accent" />
                       Podať inzerát
                     </Link>
                     <Link
                       href="/dashboard"
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-dark-200/[0.04] transition-colors"
                       onClick={() => setShowUserMenu(false)}
                     >
                       <User className="w-4 h-4" />
@@ -368,7 +368,7 @@ export default function Header() {
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-900/20 transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
                       Odhlásiť sa
@@ -380,7 +380,7 @@ export default function Header() {
               <>
                 <Link
                   href="/signin"
-                  className="text-gray-900 text-sm"
+                  className="text-white text-sm"
                 >
                   Prihlásiť sa
                 </Link>
@@ -398,11 +398,11 @@ export default function Header() {
 
       {/* Mobile menu */}
       {isMenuOpen && (
-        <div className="lg:hidden border-t border-gray-200 bg-white">
+        <div className="lg:hidden border-t border-white/[0.08] bg-dark">
           <div className="px-4 py-4 space-y-3">
             <Link
               href="/mapa"
-              className="block text-gray-900"
+              className="block text-white"
               onClick={() => setIsMenuOpen(false)}
             >
               Mapa
@@ -411,7 +411,7 @@ export default function Header() {
               <Link
                 key={item.id}
                 href={item.href}
-                className="block text-gray-900"
+                className="block text-white"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.label}

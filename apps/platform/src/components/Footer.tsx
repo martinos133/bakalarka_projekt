@@ -31,7 +31,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-dark-50 text-white border-t border-white/[0.06]">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
           {sections.map((section) => (
@@ -42,7 +42,7 @@ export default function Footer() {
                   <li key={link.id}>
                     <Link
                       href={link.href}
-                      className="text-gray-400 hover:text-white transition-colors text-sm"
+                      className="text-gray-500 hover:text-white transition-colors text-sm"
                     >
                       {link.label}
                     </Link>
@@ -56,7 +56,7 @@ export default function Footer() {
             <div className="flex gap-4 mb-4">
               <a
                 href="#"
-                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-dark-200/15 transition-colors"
                 aria-label="Facebook"
               >
                 <svg
@@ -69,7 +69,7 @@ export default function Footer() {
               </a>
               <a
                 href="#"
-                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-dark-200/15 transition-colors"
                 aria-label="Twitter"
               >
                 <svg
@@ -82,7 +82,7 @@ export default function Footer() {
               </a>
               <a
                 href="#"
-                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-dark-200/15 transition-colors"
                 aria-label="Instagram"
               >
                 <svg
@@ -96,21 +96,21 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="border-t border-gray-800 pt-8">
+        <div className="border-t border-white/[0.06] pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold">RentMe</span>
-              <span className="w-2 h-2 bg-[#1dbf73] rounded-full"></span>
-              <span className="text-gray-400 text-sm ml-2">
+              <span className="text-2xl font-serif italic">RentMe</span>
+              <span className="w-2 h-2 bg-accent rounded-full"></span>
+              <span className="text-gray-500 text-sm ml-2">
                 © RentMe International Ltd. 2024
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <button className="text-gray-400 hover:text-white transition-colors text-sm">
+              <button className="text-gray-500 hover:text-white transition-colors text-sm">
                 Slovenčina
               </button>
-              <span className="text-gray-600">|</span>
-              <button className="text-gray-400 hover:text-white transition-colors text-sm">
+              <span className="text-gray-500">|</span>
+              <button className="text-gray-500 hover:text-white transition-colors text-sm">
                 € EUR
               </button>
             </div>

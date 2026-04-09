@@ -43,7 +43,7 @@ function CategoryVisualTile({
   onSelect: () => void
   tileVariant?: 'platform' | 'admin'
 }) {
-  const accent = cat.color?.trim() || (tileVariant === 'admin' ? 'rgb(59,130,246)' : '#1dbf73')
+  const accent = cat.color?.trim() || (tileVariant === 'admin' ? 'rgb(59,130,246)' : '#c9a96e')
   const isAdmin = tileVariant === 'admin'
   return (
     <button
@@ -53,11 +53,11 @@ function CategoryVisualTile({
         isAdmin
           ? `group flex flex-col items-center rounded-xl border-2 bg-card px-2 py-5 text-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               selected
-                ? 'border-primary shadow-lg shadow-primary/10 ring-2 ring-primary/25'
+                ? 'border-primary shadow-lg shadow-black/20 shadow-primary/10 ring-2 ring-primary/25'
                 : 'border-card hover:border-primary/40 hover:bg-cardHover'
             }`
-          : `group flex flex-col items-center rounded-2xl border-2 bg-white px-2 py-5 text-center shadow-sm transition-all hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1dbf73] ${
-              selected ? 'border-[#1dbf73] ring-2 ring-[#1dbf73]/25' : 'border-white/80 hover:border-[#1dbf73]/40'
+          : `group flex flex-col items-center rounded-2xl border-2 bg-dark px-2 py-5 text-center shadow-sm transition-all hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9a96e] ${
+              selected ? 'border-accent ring-2 ring-[#c9a96e]/25' : 'border-white/80 hover:border-[#c9a96e]/40'
             }`
       }
     >
@@ -78,7 +78,7 @@ function CategoryVisualTile({
         )}
       </div>
       <span
-        className={`line-clamp-2 text-sm font-semibold leading-tight sm:text-base ${isAdmin ? 'text-white' : 'text-gray-900'}`}
+        className={`line-clamp-2 text-sm font-semibold leading-tight sm:text-base ${isAdmin ? 'text-white' : 'text-white'}`}
       >
         {cat.name}
       </span>
@@ -439,23 +439,23 @@ export default function CreateAdvertisementWizard({
   }
 
   const shellClass = isAdmin
-    ? 'rounded-xl border border-card bg-card p-6 shadow-xl shadow-black/20 sm:p-8'
+    ? 'rounded-xl border border-card bg-card p-6 shadow-xl shadow-black/30 shadow-black/20 sm:p-8'
     : variant === 'page'
-      ? 'rounded-3xl border border-orange-100/80 bg-white/90 p-6 shadow-lg backdrop-blur-sm sm:p-8'
-      : 'rounded-lg border border-gray-200 bg-white p-6 shadow-sm'
+      ? 'rounded-3xl border border-accent/20 bg-dark-200/90 p-6 shadow-lg shadow-black/20 backdrop-blur-sm sm:p-8'
+      : 'rounded-lg border border-white/[0.08] bg-dark p-6 shadow-sm'
 
   const categoryPanelClass = isAdmin
     ? 'rounded-xl border border-dark bg-dark p-6 sm:p-8'
     : variant === 'page'
-      ? 'rounded-3xl border border-orange-100/60 bg-[#fff5ed] p-6 sm:p-8'
-      : 'rounded-2xl border border-gray-100 bg-[#fff8f3] p-6'
+      ? 'rounded-3xl border border-accent/20 bg-dark-50 p-6 sm:p-8'
+      : 'rounded-2xl border border-white/[0.06] bg-dark-50 p-6'
 
   return (
     <div className={shellClass}>
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2
-            className={`text-xl font-semibold sm:text-2xl ${isAdmin ? 'tracking-tight text-white' : 'text-gray-900'}`}
+            className={`text-xl font-semibold sm:text-2xl ${isAdmin ? 'tracking-tight text-white' : 'text-white'}`}
           >
             {isAdmin
               ? editingId
@@ -465,7 +465,7 @@ export default function CreateAdvertisementWizard({
                 ? 'Upraviť inzerát'
                 : 'Podať inzerát'}
           </h2>
-          <p className={`mt-1 text-sm leading-relaxed ${isAdmin ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className={`mt-1 text-sm leading-relaxed ${isAdmin ? 'text-gray-500' : 'text-gray-500'}`}>
             {isAdmin
               ? 'Rovnaký postup ako na webe: kategória → špecifikácie → údaje. Špecifikácie vychádzajú z vášho nastavenia v sekcii Špecifikácie.'
               : 'Vyberte kategóriu podľa toho, čo ponúkate – špecifikácie sa načítajú z nastavení administrátora.'}
@@ -481,7 +481,7 @@ export default function CreateAdvertisementWizard({
             className={
               isAdmin
                 ? 'shrink-0 rounded-lg border border-card bg-dark px-4 py-2 text-sm text-gray-200 transition-colors hover:border-primary/40 hover:text-white'
-                : 'shrink-0 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50'
+                : 'shrink-0 rounded-lg border border-white/10 px-4 py-2 text-sm text-gray-300 hover:bg-dark-200/[0.04]'
             }
           >
             Zrušiť úpravu
@@ -506,7 +506,7 @@ export default function CreateAdvertisementWizard({
               <div key={step} className="flex items-center gap-2">
                 {i > 0 && (
                   <div
-                    className={`hidden h-px w-6 sm:block ${isAdmin ? 'bg-card' : 'bg-gray-200'}`}
+                    className={`hidden h-px w-6 sm:block ${isAdmin ? 'bg-card' : 'bg-dark-200'}`}
                   />
                 )}
                 <div
@@ -521,10 +521,10 @@ export default function CreateAdvertisementWizard({
                         }`
                       : `rounded-full px-3 py-1.5 text-xs font-semibold sm:text-sm ${
                           active
-                            ? 'bg-[#1dbf73] text-white'
+                            ? 'bg-accent text-white'
                             : passed
-                              ? 'bg-[#1dbf73]/15 text-[#148a55]'
-                              : 'bg-gray-100 text-gray-500'
+                              ? 'bg-[#c9a96e]/15 text-[#148a55]'
+                              : 'bg-dark-100 text-gray-500'
                         }`
                   }
                 >
@@ -541,7 +541,7 @@ export default function CreateAdvertisementWizard({
           className={
             isAdmin
               ? 'mb-4 rounded-lg border border-red-500/40 bg-red-950/40 px-4 py-3 text-sm text-red-200'
-              : 'mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800'
+              : 'mb-4 rounded-lg border border-red-800/30 bg-red-900/20 px-4 py-3 text-sm text-red-400'
           }
         >
           {error}
@@ -551,8 +551,8 @@ export default function CreateAdvertisementWizard({
         <div
           className={
             isAdmin
-              ? 'mb-4 rounded-lg border border-emerald-500/30 bg-emerald-950/30 px-4 py-3 text-sm text-emerald-200'
-              : 'mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900'
+              ? 'mb-4 rounded-lg border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-accent-light'
+              : 'mb-4 rounded-lg border border-accent/20 bg-accent/10 px-4 py-3 text-sm text-accent'
           }
         >
           {success}
@@ -563,16 +563,16 @@ export default function CreateAdvertisementWizard({
         <div className={categoryPanelClass}>
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h3 className={`text-lg font-semibold ${isAdmin ? 'text-white' : 'text-gray-900'}`}>
+              <h3 className={`text-lg font-semibold ${isAdmin ? 'text-white' : 'text-white'}`}>
                 Vyberte hlavnú kategóriu
               </h3>
-              <p className={`text-sm ${isAdmin ? 'text-gray-400' : 'text-gray-600'}`}>
+              <p className={`text-sm ${isAdmin ? 'text-gray-500' : 'text-gray-500'}`}>
                 Zobrazujú sa len aktívne kategórie z administrácie.
               </p>
             </div>
             <div className="relative max-w-md flex-1">
               <Search
-                className={`absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 ${isAdmin ? 'text-gray-500' : 'text-gray-400'}`}
+                className={`absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 ${isAdmin ? 'text-gray-500' : 'text-gray-500'}`}
               />
               <input
                 type="search"
@@ -582,7 +582,7 @@ export default function CreateAdvertisementWizard({
                 className={
                   isAdmin
                     ? 'w-full rounded-xl border border-card bg-card py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25'
-                    : 'w-full rounded-xl border border-orange-100 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#1dbf73] focus:outline-none focus:ring-2 focus:ring-[#1dbf73]/25'
+                    : 'w-full rounded-xl border border-orange-100 bg-dark py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-gray-400 focus:border-accent focus:outline-none focus:ring-2 focus:ring-[#c9a96e]/25'
                 }
               />
             </div>
@@ -621,8 +621,8 @@ export default function CreateAdvertisementWizard({
               onClick={continueFromRoot}
               className={
                 isAdmin
-                  ? 'rounded-xl bg-primary px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition hover:opacity-90'
-                  : 'rounded-xl bg-[#1dbf73] px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#19a463]'
+                  ? 'rounded-xl bg-primary px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-black/20 shadow-primary/20 transition hover:opacity-90'
+                  : 'rounded-xl bg-accent px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-accent-light'
               }
             >
               Pokračovať
@@ -636,17 +636,17 @@ export default function CreateAdvertisementWizard({
           <button
             type="button"
             onClick={goRoot}
-            className={`mb-6 inline-flex items-center gap-2 text-sm font-medium ${isAdmin ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`}
+            className={`mb-6 inline-flex items-center gap-2 text-sm font-medium ${isAdmin ? 'text-gray-300 hover:text-white' : 'text-gray-300 hover:text-white'}`}
           >
             <ChevronLeft className="h-4 w-4" />
             Späť na kategórie
           </button>
-          <h3 className={`mb-1 text-lg font-semibold ${isAdmin ? 'text-white' : 'text-gray-900'}`}>
+          <h3 className={`mb-1 text-lg font-semibold ${isAdmin ? 'text-white' : 'text-white'}`}>
             Vyberte podkategóriu
           </h3>
-          <p className={`mb-6 text-sm ${isAdmin ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className={`mb-6 text-sm ${isAdmin ? 'text-gray-500' : 'text-gray-500'}`}>
             Kategória:{' '}
-            <span className={`font-semibold ${isAdmin ? 'text-white' : 'text-gray-800'}`}>{selectedRoot?.name}</span>
+            <span className={`font-semibold ${isAdmin ? 'text-white' : 'text-white/90'}`}>{selectedRoot?.name}</span>
           </p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {subcategories.map((cat: any) => (
@@ -668,8 +668,8 @@ export default function CreateAdvertisementWizard({
               onClick={continueFromSub}
               className={
                 isAdmin
-                  ? 'rounded-xl bg-primary px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition hover:opacity-90'
-                  : 'rounded-xl bg-[#1dbf73] px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#19a463]'
+                  ? 'rounded-xl bg-primary px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-black/20 shadow-primary/20 transition hover:opacity-90'
+                  : 'rounded-xl bg-accent px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-accent-light'
               }
             >
               Pokračovať k inzerátu
@@ -682,7 +682,7 @@ export default function CreateAdvertisementWizard({
         <div className="space-y-6">
           {!editingId && (
             <div
-              className={`flex flex-wrap items-center gap-3 border-b pb-5 ${isAdmin ? 'border-card' : 'border-gray-100'}`}
+              className={`flex flex-wrap items-center gap-3 border-b pb-5 ${isAdmin ? 'border-card' : 'border-white/[0.06]'}`}
             >
               <button
                 type="button"
@@ -694,7 +694,7 @@ export default function CreateAdvertisementWizard({
                 className={
                   isAdmin
                     ? 'inline-flex items-center gap-2 rounded-xl border border-card bg-dark px-4 py-2 text-sm font-medium text-gray-200 transition hover:border-primary/40 hover:text-white'
-                    : 'inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50'
+                    : 'inline-flex items-center gap-2 rounded-xl border border-white/[0.08] bg-dark px-4 py-2 text-sm font-medium text-gray-300 shadow-sm hover:bg-dark-200/[0.04]'
                 }
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -704,7 +704,7 @@ export default function CreateAdvertisementWizard({
                 {selectedRoot && (
                   <span
                     className={`rounded-full px-3 py-1 text-sm font-medium ${
-                      isAdmin ? 'bg-card text-gray-100 ring-1 ring-card' : 'bg-gray-100 text-gray-800'
+                      isAdmin ? 'bg-card text-gray-100 ring-1 ring-card' : 'bg-dark-100 text-white/90'
                     }`}
                   >
                     {selectedRoot.name}
@@ -713,7 +713,7 @@ export default function CreateAdvertisementWizard({
                 {subId && (
                   <span
                     className={`rounded-full px-3 py-1 text-sm font-medium ${
-                      isAdmin ? 'bg-primary/15 text-blue-200 ring-1 ring-primary/30' : 'bg-[#1dbf73]/10 text-[#148a55]'
+                      isAdmin ? 'bg-primary/15 text-blue-200 ring-1 ring-primary/30' : 'bg-accent/10 text-[#148a55]'
                     }`}
                   >
                     {findCategoryNode(categories, subId)?.name || 'Podkategória'}
@@ -727,11 +727,11 @@ export default function CreateAdvertisementWizard({
             className={
               isAdmin
                 ? 'rounded-xl border border-card bg-dark p-6'
-                : 'rounded-2xl border border-gray-200 bg-gradient-to-b from-white to-gray-50/50 p-6'
+                : 'rounded-2xl border border-white/[0.08] bg-gradient-to-b from-white to-gray-50/50 p-6'
             }
           >
-            <h3 className={`text-lg font-semibold ${isAdmin ? 'text-white' : 'text-gray-900'}`}>Špecifikácie</h3>
-            <p className={`mt-1 text-sm ${isAdmin ? 'text-gray-400' : 'text-gray-600'}`}>
+            <h3 className={`text-lg font-semibold ${isAdmin ? 'text-white' : 'text-white'}`}>Špecifikácie</h3>
+            <p className={`mt-1 text-sm ${isAdmin ? 'text-gray-500' : 'text-gray-500'}`}>
               Polia podľa zvolenej kategórie. Povinné polia sú označené hviezdičkou.
             </p>
             <div className="mt-5">

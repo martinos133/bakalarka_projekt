@@ -11,7 +11,7 @@ export type CmsGateShell = 'withCategoryNav' | 'headerFooterOnly'
 
 export function CmsLoadingView({ shell }: { shell: CmsGateShell }) {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-dark">
       <Header />
       {shell === 'withCategoryNav' ? <CategoryNav /> : null}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center text-gray-500">
@@ -34,7 +34,7 @@ export function CmsArticleView({
   content: string
 }) {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-dark">
       <Header />
       {shell === 'withCategoryNav' ? <CategoryNav /> : null}
       <StaticPageArticle slug={slug} title={title} content={content} />

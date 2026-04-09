@@ -29,7 +29,7 @@ export default function Categories() {
 
   if (loading) {
     return (
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-dark-50">
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center text-gray-500">Načítavam kategórie...</div>
         </div>
@@ -42,11 +42,12 @@ export default function Categories() {
   }
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-dark-50">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Preskúmajte trh
+          <p className="text-accent text-sm font-semibold uppercase tracking-[0.2em] mb-3">Kategórie</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Preskúmajte <span className="font-serif italic">trh</span>
           </h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -57,7 +58,7 @@ export default function Categories() {
             return (
               <div
                 key={category.id}
-                className="bg-white p-6 rounded-lg hover:shadow-lg transition-shadow cursor-pointer group"
+                className="bg-dark-100 border border-white/[0.06] p-6 rounded-xl hover:border-white/10 transition-all cursor-pointer group"
               >
                 <TrackedLink
                   href={`/kategoria/${category.slug}`}
@@ -76,13 +77,13 @@ export default function Categories() {
                   ) : category.icon ? (
                     <div className="text-4xl mb-4">{category.icon}</div>
                   ) : (
-                    <div className="w-16 h-16 bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
-                      <span className="text-2xl text-gray-400">
+                    <div className="w-16 h-16 bg-dark-200 rounded-lg mb-4 flex items-center justify-center">
+                      <span className="text-2xl text-gray-500">
                         {category.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
                   )}
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 group-hover:text-[#1dbf73] transition-colors">
+                  <h3 className="text-lg font-semibold text-white mb-3 group-hover:text-[#c9a96e] transition-colors">
                     {category.name}
                   </h3>
                 </TrackedLink>
@@ -94,7 +95,7 @@ export default function Categories() {
                           href={`/kategoria/${subcategory.slug}`}
                           targetType="CATEGORY"
                           targetId={subcategory.id}
-                          className="text-sm text-gray-600 hover:text-[#1dbf73] transition-colors block"
+                          className="text-sm text-gray-500 hover:text-accent-light transition-colors block"
                         >
                           {subcategory.name}
                         </TrackedLink>

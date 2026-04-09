@@ -157,31 +157,31 @@ export default function JoinPage() {
 
   return (
     <CmsGate cmsSlug="join" shell="headerFooterOnly">
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-dark-50">
       <Header />
       <div className="flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-3xl">
-          <div className="bg-white rounded-lg shadow-xl p-8 border border-gray-200">
+          <div className="bg-dark rounded-lg shadow-xl shadow-black/30 p-8 border border-white/[0.08]">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">
+              <h1 className="text-3xl font-bold text-white mb-2 text-center">
                 Registrácia
               </h1>
-              <p className="text-gray-600 text-center mb-6">
+              <p className="text-gray-500 text-center mb-6">
                 Vytvorte si profesionálny účet
               </p>
               
               {/* Progress Steps */}
               <div className="flex items-center justify-center mb-8">
                 <div className="flex items-center">
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep >= 1 ? 'bg-[#1dbf73] text-white' : 'bg-gray-200 text-gray-600'}`}>
+                  <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep >= 1 ? 'bg-accent text-white' : 'bg-dark-200 text-gray-500'}`}>
                     1
                   </div>
-                  <div className={`w-24 h-1 mx-2 ${currentStep >= 2 ? 'bg-[#1dbf73]' : 'bg-gray-200'}`}></div>
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep >= 2 ? 'bg-[#1dbf73] text-white' : 'bg-gray-200 text-gray-600'}`}>
+                  <div className={`w-24 h-1 mx-2 ${currentStep >= 2 ? 'bg-accent' : 'bg-dark-200'}`}></div>
+                  <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep >= 2 ? 'bg-accent text-white' : 'bg-dark-200 text-gray-500'}`}>
                     2
                   </div>
-                  <div className={`w-24 h-1 mx-2 ${currentStep >= 3 ? 'bg-[#1dbf73]' : 'bg-gray-200'}`}></div>
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep >= 3 ? 'bg-[#1dbf73] text-white' : 'bg-gray-200 text-gray-600'}`}>
+                  <div className={`w-24 h-1 mx-2 ${currentStep >= 3 ? 'bg-accent' : 'bg-dark-200'}`}></div>
+                  <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep >= 3 ? 'bg-accent text-white' : 'bg-dark-200 text-gray-500'}`}>
                     3
                   </div>
                 </div>
@@ -190,7 +190,7 @@ export default function JoinPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                <div className="bg-red-900/20 border border-red-800/30 text-red-400 px-4 py-3 rounded">
                   {error}
                 </div>
               )}
@@ -199,7 +199,7 @@ export default function JoinPage() {
               {currentStep === 1 && (
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-4">
+                    <label className="block text-sm font-semibold text-white mb-4">
                       Typ účtu *
                     </label>
                     <div className="grid grid-cols-2 gap-4">
@@ -208,22 +208,22 @@ export default function JoinPage() {
                         onClick={() => setIsCompany(false)}
                         className={`p-6 border-2 rounded-lg transition-all ${
                           !isCompany
-                            ? 'border-[#1dbf73] bg-green-50'
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-accent bg-accent/10'
+                            : 'border-white/[0.08] hover:border-white/15'
                         }`}
                       >
                         <div className="text-center">
                           <div className="flex justify-center mb-3">
                             <div className={`p-3 rounded-full ${
-                              !isCompany ? 'bg-[#1dbf73]' : 'bg-gray-200'
+                              !isCompany ? 'bg-accent' : 'bg-dark-200'
                             }`}>
                               <User className={`w-6 h-6 ${
-                                !isCompany ? 'text-white' : 'text-gray-600'
+                                !isCompany ? 'text-white' : 'text-gray-500'
                               }`} />
                             </div>
                           </div>
-                          <div className="font-semibold text-gray-900">Súkromná osoba</div>
-                          <div className="text-sm text-gray-600 mt-1">Pre jednotlivcov</div>
+                          <div className="font-semibold text-white">Súkromná osoba</div>
+                          <div className="text-sm text-gray-500 mt-1">Pre jednotlivcov</div>
                         </div>
                       </button>
                       <button
@@ -231,22 +231,22 @@ export default function JoinPage() {
                         onClick={() => setIsCompany(true)}
                         className={`p-6 border-2 rounded-lg transition-all ${
                           isCompany
-                            ? 'border-[#1dbf73] bg-green-50'
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-accent bg-accent/10'
+                            : 'border-white/[0.08] hover:border-white/15'
                         }`}
                       >
                         <div className="text-center">
                           <div className="flex justify-center mb-3">
                             <div className={`p-3 rounded-full ${
-                              isCompany ? 'bg-[#1dbf73]' : 'bg-gray-200'
+                              isCompany ? 'bg-accent' : 'bg-dark-200'
                             }`}>
                               <Building2 className={`w-6 h-6 ${
-                                isCompany ? 'text-white' : 'text-gray-600'
+                                isCompany ? 'text-white' : 'text-gray-500'
                               }`} />
                             </div>
                           </div>
-                          <div className="font-semibold text-gray-900">Firma</div>
-                          <div className="text-sm text-gray-600 mt-1">Pre spoločnosti</div>
+                          <div className="font-semibold text-white">Firma</div>
+                          <div className="text-sm text-gray-500 mt-1">Pre spoločnosti</div>
                         </div>
                       </button>
                     </div>
@@ -254,7 +254,7 @@ export default function JoinPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-2">
                         {isCompany ? 'Kontaktná osoba - Meno *' : 'Meno *'}
                       </label>
                       <input
@@ -263,13 +263,13 @@ export default function JoinPage() {
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                        className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                         placeholder="Ján"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="lastName" className="block text-sm font-medium text-gray-300 mb-2">
                         {isCompany ? 'Kontaktná osoba - Priezvisko *' : 'Priezvisko *'}
                       </label>
                       <input
@@ -278,7 +278,7 @@ export default function JoinPage() {
                         value={formData.lastName}
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                        className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                         placeholder="Novák"
                       />
                     </div>
@@ -287,7 +287,7 @@ export default function JoinPage() {
                   {isCompany && (
                     <>
                       <div>
-                        <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="companyName" className="block text-sm font-medium text-gray-300 mb-2">
                           Názov firmy *
                         </label>
                         <input
@@ -296,14 +296,14 @@ export default function JoinPage() {
                           value={formData.companyName}
                           onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                           required={isCompany}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                          className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                           placeholder="Názov spoločnosti s.r.o."
                         />
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label htmlFor="companyId" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="companyId" className="block text-sm font-medium text-gray-300 mb-2">
                             IČO *
                           </label>
                           <input
@@ -312,13 +312,13 @@ export default function JoinPage() {
                             value={formData.companyId}
                             onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
                             required={isCompany}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                            className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                             placeholder="12345678"
                           />
                         </div>
 
                         <div>
-                          <label htmlFor="companyTaxId" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="companyTaxId" className="block text-sm font-medium text-gray-300 mb-2">
                             DIČ
                           </label>
                           <input
@@ -326,7 +326,7 @@ export default function JoinPage() {
                             type="text"
                             value={formData.companyTaxId}
                             onChange={(e) => setFormData({ ...formData, companyTaxId: e.target.value })}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                            className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                             placeholder="2020123456"
                           />
                         </div>
@@ -335,7 +335,7 @@ export default function JoinPage() {
                   )}
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                       Email *
                     </label>
                     <input
@@ -344,13 +344,13 @@ export default function JoinPage() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                      className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                       placeholder="vas@email.com"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
                       Telefónne číslo *
                     </label>
                     <input
@@ -359,14 +359,14 @@ export default function JoinPage() {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                      className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                       placeholder="+421 912 345 678"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                         Heslo *
                       </label>
                       <div className="relative">
@@ -376,13 +376,13 @@ export default function JoinPage() {
                           value={formData.password}
                           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                           required
-                          className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                          className="w-full px-4 py-3 pr-12 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                           placeholder="Min. 8 znakov"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white focus:outline-none"
                           aria-label={showPassword ? 'Skryť heslo' : 'Zobraziť heslo'}
                         >
                           {showPassword ? (
@@ -396,7 +396,7 @@ export default function JoinPage() {
                     </div>
 
                     <div>
-                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
                         Potvrďte heslo *
                       </label>
                       <div className="relative">
@@ -406,13 +406,13 @@ export default function JoinPage() {
                           value={formData.confirmPassword}
                           onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                           required
-                          className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                          className="w-full px-4 py-3 pr-12 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                           placeholder="Zopakujte heslo"
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white focus:outline-none"
                           aria-label={showConfirmPassword ? 'Skryť heslo' : 'Zobraziť heslo'}
                         >
                           {showConfirmPassword ? (
@@ -428,7 +428,7 @@ export default function JoinPage() {
                   <button
                     type="button"
                     onClick={nextStep}
-                    className="w-full bg-[#1dbf73] hover:bg-[#19a463] text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
+                    className="w-full bg-accent hover:bg-accent-light text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
                   >
                     Pokračovať
                   </button>
@@ -442,7 +442,7 @@ export default function JoinPage() {
                     <>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-300 mb-2">
                             Dátum narodenia
                           </label>
                           <input
@@ -451,19 +451,19 @@ export default function JoinPage() {
                             value={formData.dateOfBirth}
                             onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
                             max={new Date().toISOString().split('T')[0]}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                            className="w-full px-4 py-3 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                           />
                         </div>
 
                         <div>
-                          <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="gender" className="block text-sm font-medium text-gray-300 mb-2">
                             Pohlavie
                           </label>
                           <select
                             id="gender"
                             value={formData.gender}
                             onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                            className="w-full px-4 py-3 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                           >
                             <option value="">-- Vybrať --</option>
                             <option value="MALE">Muž</option>
@@ -476,7 +476,7 @@ export default function JoinPage() {
                   )}
 
                   <div>
-                    <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="address" className="block text-sm font-medium text-gray-300 mb-2">
                       Adresa
                     </label>
                     <input
@@ -484,14 +484,14 @@ export default function JoinPage() {
                       type="text"
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                      className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                       placeholder="Ulica a číslo"
                     />
                   </div>
 
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="city" className="block text-sm font-medium text-gray-300 mb-2">
                         Mesto
                       </label>
                       <input
@@ -499,13 +499,13 @@ export default function JoinPage() {
                         type="text"
                         value={formData.city}
                         onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                        className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                         placeholder="Bratislava"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="postalCode" className="block text-sm font-medium text-gray-300 mb-2">
                         PSČ
                       </label>
                       <input
@@ -513,20 +513,20 @@ export default function JoinPage() {
                         type="text"
                         value={formData.postalCode}
                         onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                        className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                         placeholder="811 01"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="country" className="block text-sm font-medium text-gray-300 mb-2">
                         Krajina
                       </label>
                       <select
                         id="country"
                         value={formData.country}
                         onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent"
+                        className="w-full px-4 py-3 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                       >
                         <option value="Slovensko">Slovensko</option>
                         <option value="Česko">Česko</option>
@@ -542,14 +542,14 @@ export default function JoinPage() {
                     <button
                       type="button"
                       onClick={prevStep}
-                      className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-3 px-4 rounded-lg transition duration-200"
+                      className="flex-1 bg-dark-200 hover:bg-dark-200/10 text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
                     >
                       Späť
                     </button>
                     <button
                       type="button"
                       onClick={nextStep}
-                      className="flex-1 bg-[#1dbf73] hover:bg-[#19a463] text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
+                      className="flex-1 bg-accent hover:bg-accent-light text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
                     >
                       Pokračovať
                     </button>
@@ -560,42 +560,42 @@ export default function JoinPage() {
               {/* Step 3: Review & Submit */}
               {currentStep === 3 && (
                 <div className="space-y-6">
-                  <div className="bg-gray-50 rounded-lg p-6 space-y-4">
-                    <h3 className="font-semibold text-gray-900 mb-4">Prehľad údajov</h3>
+                  <div className="bg-dark-50 rounded-lg p-6 space-y-4">
+                    <h3 className="font-semibold text-white mb-4">Prehľad údajov</h3>
                     
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-gray-600">Typ účtu:</span>
-                        <span className="ml-2 font-medium text-gray-900">{isCompany ? 'Firma' : 'Súkromná osoba'}</span>
+                        <span className="text-gray-500">Typ účtu:</span>
+                        <span className="ml-2 font-medium text-white">{isCompany ? 'Firma' : 'Súkromná osoba'}</span>
                       </div>
                       <div>
-                        <span className="text-gray-600">Email:</span>
-                        <span className="ml-2 font-medium text-gray-900">{formData.email}</span>
+                        <span className="text-gray-500">Email:</span>
+                        <span className="ml-2 font-medium text-white">{formData.email}</span>
                       </div>
                       <div>
-                        <span className="text-gray-600">Meno:</span>
-                        <span className="ml-2 font-medium text-gray-900">{formData.firstName} {formData.lastName}</span>
+                        <span className="text-gray-500">Meno:</span>
+                        <span className="ml-2 font-medium text-white">{formData.firstName} {formData.lastName}</span>
                       </div>
                       <div>
-                        <span className="text-gray-600">Telefón:</span>
-                        <span className="ml-2 font-medium text-gray-900">{formData.phone}</span>
+                        <span className="text-gray-500">Telefón:</span>
+                        <span className="ml-2 font-medium text-white">{formData.phone}</span>
                       </div>
                       {isCompany && (
                         <>
                           <div>
-                            <span className="text-gray-600">Názov firmy:</span>
-                            <span className="ml-2 font-medium text-gray-900">{formData.companyName}</span>
+                            <span className="text-gray-500">Názov firmy:</span>
+                            <span className="ml-2 font-medium text-white">{formData.companyName}</span>
                           </div>
                           <div>
-                            <span className="text-gray-600">IČO:</span>
-                            <span className="ml-2 font-medium text-gray-900">{formData.companyId}</span>
+                            <span className="text-gray-500">IČO:</span>
+                            <span className="ml-2 font-medium text-white">{formData.companyId}</span>
                           </div>
                         </>
                       )}
                       {formData.city && (
                         <div>
-                          <span className="text-gray-600">Mesto:</span>
-                          <span className="ml-2 font-medium text-gray-900">{formData.city}</span>
+                          <span className="text-gray-500">Mesto:</span>
+                          <span className="ml-2 font-medium text-white">{formData.city}</span>
                         </div>
                       )}
                     </div>
@@ -605,14 +605,14 @@ export default function JoinPage() {
                     <button
                       type="button"
                       onClick={prevStep}
-                      className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-3 px-4 rounded-lg transition duration-200"
+                      className="flex-1 bg-dark-200 hover:bg-dark-200/10 text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
                     >
                       Späť
                     </button>
                     <button
                       type="submit"
                       disabled={loading}
-                      className="flex-1 bg-[#1dbf73] hover:bg-[#19a463] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
+                      className="flex-1 bg-accent hover:bg-accent-light disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
                     >
                       {loading ? 'Registrácia...' : 'Dokončiť registráciu'}
                     </button>
@@ -622,9 +622,9 @@ export default function JoinPage() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-gray-600">
+              <p className="text-gray-500">
                 Už máte účet?{' '}
-                <Link href="/signin" className="text-[#1dbf73] hover:text-[#19a463] font-medium">
+                <Link href="/signin" className="text-accent hover:text-accent font-medium">
                   Prihláste sa
                 </Link>
               </p>

@@ -4,10 +4,32 @@
 
 @layer base {
   body {
-    @apply bg-white text-gray-900;
-    font-family: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', 'Nimbus Sans L', 'DejaVu Sans', FreeSans, sans-serif;
+    @apply bg-dark text-white/90;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-playfair), Georgia, serif;
   }
 }
 
@@ -24,7 +46,19 @@
   }
 }
 
-/* Mapa – špendlíkové markery */
+@layer components {
+  .section-card {
+    @apply bg-dark-100 border border-white/[0.06] rounded-2xl;
+  }
+  .accent-text {
+    @apply text-accent;
+  }
+  .accent-btn {
+    @apply bg-accent text-dark font-semibold px-6 py-3 rounded-xl hover:bg-accent-light transition-colors;
+  }
+}
+
+/* ── Mapa – špendlíkové markery ── */
 .ad-map-pin-root.leaflet-marker-icon {
   background: transparent !important;
   border: none !important;
@@ -43,11 +77,11 @@
   font-size: 10px;
   font-weight: 700;
   color: #fff;
-  background: #111827;
+  background: #1a1a1a;
   padding: 2px 6px;
   border-radius: 6px;
   margin-bottom: 2px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   white-space: nowrap;
   max-width: 72px;
   overflow: hidden;
@@ -55,26 +89,28 @@
 }
 .ad-map-pin-svg {
   display: block;
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.22));
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
 }
 .ad-map-pin--selected .ad-map-pin-svg {
-  filter: drop-shadow(0 4px 10px rgba(15, 157, 92, 0.45));
+  filter: drop-shadow(0 4px 10px rgba(201, 169, 110, 0.45));
 }
 .ad-map-region-tooltip {
   font-size: 12px;
   padding: 4px 8px;
 }
 
-/* Popup karta inzerátu */
+/* ── Popup karta inzerátu ── */
 .leaflet-popup-content-wrapper {
   border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.06);
+  background: #1a1a1a;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.06);
   padding: 0;
   overflow: hidden;
 }
 .leaflet-popup-content { margin: 0; min-width: 0; }
 .leaflet-popup-tip {
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  background: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 .leaflet-container a.leaflet-popup-close-button {
   width: 28px;
@@ -84,13 +120,13 @@
   padding: 0;
   font-size: 20px;
   line-height: 26px;
-  color: #6b7280;
+  color: #9ca3af;
   border-radius: 8px;
   transition: background 0.15s ease, color 0.15s ease;
 }
 .leaflet-container a.leaflet-popup-close-button:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
 }
 .ad-map-popup-card {
   display: flex;
@@ -110,7 +146,7 @@
 .ad-map-popup-img-wrap {
   width: 100%;
   height: 148px;
-  background: linear-gradient(145deg, #f9fafb 0%, #f3f4f6 100%);
+  background: linear-gradient(145deg, #1a1a1a 0%, #222222 100%);
   overflow: hidden;
 }
 .ad-map-popup-img {
@@ -121,7 +157,7 @@
 .ad-map-popup-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 50%, #e5e7eb 100%);
+  background: linear-gradient(135deg, #222 0%, #2a2a2a 50%, #222 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,8 +172,8 @@
   display: inline-block;
   font-size: 11px;
   font-weight: 500;
-  color: #4b5563;
-  background: #f3f4f6;
+  color: #c9a96e;
+  background: rgba(201, 169, 110, 0.1);
   padding: 3px 9px;
   border-radius: 999px;
   margin-bottom: 8px;
@@ -145,13 +181,13 @@
 .ad-map-popup-title {
   font-size: 16px;
   font-weight: 600;
-  color: #111827;
+  color: #fff;
   margin: 0 0 8px 0;
   line-height: 1.35;
 }
 .ad-map-popup-loc {
   font-size: 12px;
-  color: #6b7280;
+  color: #9ca3af;
   margin: 0 0 8px 0;
   display: flex;
   align-items: center;
@@ -160,7 +196,7 @@
 .ad-map-popup-price {
   font-size: 17px;
   font-weight: 700;
-  color: #1dbf73;
+  color: #c9a96e;
   margin: 0 0 12px 0;
   letter-spacing: -0.02em;
 }
@@ -175,14 +211,14 @@
   gap: 4px;
   font-size: 13px;
   font-weight: 600;
-  color: #1dbf73;
+  color: #c9a96e;
   text-decoration: none;
   padding: 8px 0 0;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   width: 100%;
 }
 .ad-map-popup-link:hover {
-  color: #17a062;
+  color: #dfc9a0;
 }
 .ad-map-popup-link-arrow {
   transition: transform 0.15s ease;

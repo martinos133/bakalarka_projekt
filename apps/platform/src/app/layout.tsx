@@ -1,5 +1,16 @@
 import type { Metadata } from 'next'
+import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
+
+const inter = Inter({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-inter',
+})
+
+const playfair = Playfair_Display({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-playfair',
+})
 
 export const metadata: Metadata = {
   title: 'RentMe | Trh freelancerských služieb | Nájdite top globálne talenty',
@@ -12,16 +23,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="sk" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-      </head>
-      <body className="antialiased">{children}</body>
+    <html lang="sk" suppressHydrationWarning className={`${inter.variable} ${playfair.variable}`}>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   )
 }

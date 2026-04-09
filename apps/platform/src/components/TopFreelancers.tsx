@@ -56,10 +56,10 @@ export default function TopFreelancers() {
   if (freelancers.length === 0) return null
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-dark-50">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             {title}
           </h2>
         </div>
@@ -70,7 +70,7 @@ export default function TopFreelancers() {
               href={freelancer.adId ? `/inzerat/${freelancer.adId}` : `/dashboard`}
               targetType="AD"
               targetId={freelancer.adId || freelancer.id}
-              className="bg-white p-6 rounded-lg hover:shadow-lg transition-shadow cursor-pointer group block"
+              className="bg-dark p-6 rounded-lg hover:shadow-lg transition-shadow cursor-pointer group block"
             >
               <div className="flex items-center gap-4 mb-4">
                 <div className="relative">
@@ -79,13 +79,13 @@ export default function TopFreelancers() {
                     alt={freelancer.name}
                     className="w-16 h-16 rounded-full object-cover"
                   />
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white"></div>
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-accent rounded-full border-2 border-white"></div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 group-hover:text-[#1dbf73] transition-colors">
+                  <h3 className="font-semibold text-white group-hover:text-[#c9a96e] transition-colors">
                     {freelancer.name}
                   </h3>
-                  <p className="text-sm text-gray-600">{freelancer.title}</p>
+                  <p className="text-sm text-gray-500">{freelancer.title}</p>
                 </div>
               </div>
               <div className="flex items-center gap-1 mb-3">
@@ -95,11 +95,11 @@ export default function TopFreelancers() {
                 </span>
               </div>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
+                <span className="text-xs px-2 py-1 bg-accent/15 text-accent rounded">
                   Predajca
                 </span>
                 {freelancer.price > 0 && (
-                  <span className="text-lg font-bold text-gray-900">
+                  <span className="text-lg font-bold text-white">
                     Od {freelancer.price}€
                   </span>
                 )}

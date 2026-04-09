@@ -108,43 +108,43 @@ function BecomeSellerDefaultContent() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-dark">
       <Header />
       <CategoryNav />
 
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-gray-50 via-white to-emerald-50/30 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-dark via-dark-50 to-dark-100 overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMxZGJmNzMiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyem0wLTR2MkgyNHYtMmgxMnoiLz48L2g+PC9nPjwvc3ZnPg==')] opacity-60" />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <p className="inline-flex items-center gap-2 text-emerald-600 font-medium mb-4">
+              <p className="inline-flex items-center gap-2 text-accent font-medium mb-4">
                 <Sparkles className="w-5 h-5" />
                 Stať sa predajcom
               </p>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight mb-6">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-6">
                 Ponúkajte služby alebo prenájmy a nájdite zákazníkov na jednej platforme
               </h1>
-              <p className="text-lg text-gray-600 mb-8 max-w-xl">
+              <p className="text-lg text-gray-500 mb-8 max-w-xl">
                 Jednoduchý postup od registrácie po prvú objednávku. Bez skrytých poplatkov za založenie účtu.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/join"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg font-semibold text-white bg-[#1dbf73] hover:bg-[#19a463] transition shadow-lg shadow-[#1dbf73]/25"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg font-semibold text-white bg-accent hover:bg-accent-light transition shadow-lg shadow-black/20 shadow-accent/25"
                 >
                   Vytvoriť účet
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
                   href="/signin"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg font-semibold text-gray-700 bg-white border-2 border-gray-200 hover:border-[#1dbf73] hover:text-[#1dbf73] transition"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg font-semibold text-gray-300 bg-dark border-2 border-white/[0.08] hover:border-accent hover:text-accent-light transition"
                 >
                   Už mám účet
                 </Link>
               </div>
             </div>
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-gray-200/80 ring-1 ring-gray-100">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/40 shadow-gray-200/80 ring-1 ring-gray-100">
               <Image
                 src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1000&q=85"
                 alt="Spolupráca a freelancing"
@@ -161,13 +161,13 @@ function BecomeSellerDefaultContent() {
       </section>
 
       {/* How it works */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24 bg-dark">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
               Ako začať predávať
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-gray-500 max-w-2xl mx-auto">
               Postupujte podľa piatich jednoduchých krokov od registrácie po prvé zákazníky.
             </p>
           </div>
@@ -183,27 +183,27 @@ function BecomeSellerDefaultContent() {
                 >
                   <div className={isEven ? '' : 'md:order-2'}>
                     <div className="flex items-center gap-3 mb-4">
-                      <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[#1dbf73] text-white font-bold text-lg">
+                      <span className="flex items-center justify-center w-10 h-10 rounded-full bg-accent text-white font-bold text-lg">
                         {step.num}
                       </span>
-                      <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
+                      <h3 className="text-xl sm:text-2xl font-bold text-white">
                         {step.title}
                       </h3>
                     </div>
-                    <p className="text-gray-600 leading-relaxed mb-6">
+                    <p className="text-gray-500 leading-relaxed mb-6">
                       {step.description}
                     </p>
                     {step.cta && getStepHref(step) && (
                       <Link
                         href={getStepHref(step)!}
-                        className="inline-flex items-center gap-2 text-[#1dbf73] font-semibold hover:underline"
+                        className="inline-flex items-center gap-2 text-accent font-semibold hover:underline"
                       >
                         {step.cta}
                         <ArrowRight className="w-4 h-4" />
                       </Link>
                     )}
                   </div>
-                  <div className={`relative rounded-2xl overflow-hidden shadow-xl ring-1 ring-gray-100 ${!isEven ? 'md:order-1' : ''}`}>
+                  <div className={`relative rounded-2xl overflow-hidden shadow-xl shadow-black/30 ring-1 ring-gray-100 ${!isEven ? 'md:order-1' : ''}`}>
                     <Image
                       src={step.image}
                       alt={step.title}
@@ -212,8 +212,8 @@ function BecomeSellerDefaultContent() {
                       className="w-full h-auto object-cover aspect-[5/3]"
                       sizes="(max-width: 768px) 100vw, 50vw"
                     />
-                    <div className="absolute top-4 left-4 flex items-center justify-center w-12 h-12 rounded-xl bg-white/95 shadow-lg">
-                      <Icon className="w-6 h-6 text-[#1dbf73]" />
+                    <div className="absolute top-4 left-4 flex items-center justify-center w-12 h-12 rounded-xl bg-dark-200/95 shadow-lg shadow-black/20">
+                      <Icon className="w-6 h-6 text-accent" />
                     </div>
                   </div>
                 </div>
@@ -224,18 +224,18 @@ function BecomeSellerDefaultContent() {
       </section>
 
       {/* Benefits */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="py-16 md:py-24 bg-dark-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
             Prečo predávať u nás
           </h2>
-          <p className="text-gray-600 mb-12 max-w-xl mx-auto">
+          <p className="text-gray-500 mb-12 max-w-xl mx-auto">
             Platforma prispôsobená pre poskytovateľov služieb a prenájmov na Slovensku.
           </p>
           <ul className="grid sm:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
             {BENEFITS.map((item, i) => (
-              <li key={i} className="flex items-start gap-3 text-gray-700">
-                <CheckCircle2 className="w-6 h-6 text-[#1dbf73] shrink-0 mt-0.5" />
+              <li key={i} className="flex items-start gap-3 text-gray-300">
+                <CheckCircle2 className="w-6 h-6 text-accent shrink-0 mt-0.5" />
                 <span>{item}</span>
               </li>
             ))}
@@ -244,7 +244,7 @@ function BecomeSellerDefaultContent() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 md:py-24 bg-[#1dbf73]">
+      <section className="py-16 md:py-24 bg-accent">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
             Začnite ešte dnes
@@ -255,14 +255,14 @@ function BecomeSellerDefaultContent() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/join"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-lg font-semibold text-[#1dbf73] bg-white hover:bg-gray-100 transition shadow-lg"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-lg font-semibold text-accent bg-dark hover:bg-dark-200/[0.06] transition shadow-lg shadow-black/20"
             >
               Zaregistrovať sa
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-lg font-semibold text-white border-2 border-white/80 hover:bg-white/10 transition"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-lg font-semibold text-white border-2 border-white/80 hover:bg-dark-200/10 transition"
             >
               Späť na domov
             </Link>

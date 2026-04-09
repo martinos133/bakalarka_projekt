@@ -26,18 +26,19 @@ export default function Testimonials() {
   ]
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-dark">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Dôverujú nám popredné značky a startupy
+          <p className="text-accent text-sm font-semibold uppercase tracking-[0.2em] mb-3">Referencie</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Dôvera je našou <span className="font-serif italic">jedinou menou</span>
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="bg-gray-50 p-6 rounded-lg border border-gray-200"
+              className="bg-dark-50 p-6 rounded-lg border border-white/[0.08]"
             >
               <div className="flex items-center gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
@@ -50,7 +51,7 @@ export default function Testimonials() {
                   </svg>
                 ))}
               </div>
-              <p className="text-gray-700 mb-6 italic">"{testimonial.text}"</p>
+              <p className="text-gray-300 mb-6 italic">"{testimonial.text}"</p>
               <div className="flex items-center gap-3">
                 <img
                   src={testimonial.image}
@@ -58,10 +59,10 @@ export default function Testimonials() {
                   className="w-12 h-12 rounded-full object-cover"
                 />
                 <div>
-                  <div className="font-semibold text-gray-900">
+                  <div className="font-semibold text-white">
                     {testimonial.name}
                   </div>
-                  <div className="text-sm text-gray-600">{testimonial.role}</div>
+                  <div className="text-sm text-gray-500">{testimonial.role}</div>
                 </div>
               </div>
             </div>

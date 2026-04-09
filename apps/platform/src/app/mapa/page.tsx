@@ -87,10 +87,10 @@ function ProSelect({
           aria-haspopup="listbox"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className={`w-full border rounded-xl px-3.5 py-2.5 text-sm bg-white shadow-sm outline-none transition-all flex items-center justify-between gap-3 ${
+          className={`w-full border rounded-xl px-3.5 py-2.5 text-sm bg-dark shadow-sm outline-none transition-all flex items-center justify-between gap-3 ${
             open
-              ? 'border-[#1dbf73] ring-2 ring-[#1dbf73]/20'
-              : 'border-gray-200 hover:border-gray-300 text-gray-900'
+              ? 'border-accent ring-2 ring-[#c9a96e]/20'
+              : 'border-white/[0.08] hover:border-white/15 text-white'
           }`}
         >
           <span className="truncate">{selected?.label || ''}</span>
@@ -101,7 +101,7 @@ function ProSelect({
         </button>
 
         {open && (
-          <div className="absolute z-[1200] mt-2 w-full rounded-xl border border-gray-200 bg-white shadow-xl ring-1 ring-black/5 overflow-hidden">
+          <div className="absolute z-[1200] mt-2 w-full rounded-xl border border-white/[0.08] bg-dark shadow-xl shadow-black/30 ring-1 ring-black/5 overflow-hidden">
             <ul role="listbox" className="max-h-64 overflow-auto py-1">
               {options.map((opt) => {
                 const active = opt.value === value
@@ -117,8 +117,8 @@ function ProSelect({
                       }}
                       className={`w-full text-left px-3 py-2.5 text-sm flex items-center justify-between gap-3 transition-colors ${
                         active
-                          ? 'bg-[#1dbf73]/10 text-[#0f7f4f] font-medium'
-                          : 'text-gray-700 hover:bg-gray-50'
+                          ? 'bg-accent/10 text-accent font-medium'
+                          : 'text-gray-300 hover:bg-white/[0.04]'
                       }`}
                     >
                       <span className="truncate">{opt.label}</span>
@@ -235,7 +235,7 @@ function MapPageInner() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#f6f7f9] flex flex-col">
+    <div className="min-h-screen bg-dark flex flex-col">
       <Header />
       <CategoryNav />
 
@@ -243,57 +243,57 @@ function MapPageInner() {
         <nav className="mb-6" aria-label="Drobečková navigácia">
           <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
             <li>
-              <Link href="/" className="hover:text-[#1dbf73] transition-colors">
+              <Link href="/" className="hover:text-accent-light transition-colors">
                 Domov
               </Link>
             </li>
             <li aria-hidden="true" className="text-gray-300">
               /
             </li>
-            <li className="text-gray-900 font-medium">Mapa inzerátov</li>
+            <li className="text-white font-medium">Mapa inzerátov</li>
           </ol>
         </nav>
 
-        <header className="relative mb-8 rounded-2xl border border-gray-200/80 bg-white p-6 sm:p-8 shadow-sm overflow-hidden">
+        <header className="relative mb-8 rounded-2xl border border-white/[0.08] bg-dark p-6 sm:p-8 shadow-sm overflow-hidden">
           <div
-            className="pointer-events-none absolute -right-16 -top-24 h-56 w-56 rounded-full bg-[#1dbf73]/[0.07]"
+            className="pointer-events-none absolute -right-16 -top-24 h-56 w-56 rounded-full bg-[#c9a96e]/[0.07]"
             aria-hidden="true"
           />
           <div
-            className="pointer-events-none absolute -bottom-20 -left-10 h-44 w-44 rounded-full bg-emerald-500/[0.06]"
+            className="pointer-events-none absolute -bottom-20 -left-10 h-44 w-44 rounded-full bg-accent/[0.06]"
             aria-hidden="true"
           />
           <div className="relative max-w-3xl">
-            <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#1dbf73] mb-3">
+            <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-accent mb-3">
               <MapPin className="w-3.5 h-3.5" aria-hidden />
               Prehľad podľa lokality
             </p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight text-balance">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight text-balance">
               Mapa inzerátov
             </h1>
-            <p className="mt-3 text-base sm:text-lg text-gray-600 leading-relaxed">
+            <p className="mt-3 text-base sm:text-lg text-gray-500 leading-relaxed">
               Objavte služby a ponuky na prenájom priamo na mape Slovenska. Filtrujte podľa kategórie, typu
               inzerátu alebo kraja – výsledky sa okamžite prekreslia a zodpovedajúcim bodom na mape.
             </p>
-            <ul className="mt-5 grid sm:grid-cols-3 gap-3 text-sm text-gray-600">
-              <li className="flex gap-2 rounded-xl bg-gray-50 border border-gray-100 px-3 py-2.5">
-                <Sparkles className="w-4 h-4 text-[#1dbf73] shrink-0 mt-0.5" aria-hidden />
+            <ul className="mt-5 grid sm:grid-cols-3 gap-3 text-sm text-gray-500">
+              <li className="flex gap-2 rounded-xl bg-dark-50 border border-white/[0.06] px-3 py-2.5">
+                <Sparkles className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden />
                 <span>
-                  <span className="font-medium text-gray-800">Kliknite na špendlík</span> – zobrazí sa náhľad
+                  <span className="font-medium text-white/90">Kliknite na špendlík</span> – zobrazí sa náhľad
                   inzerátu s odkazom na detail.
                 </span>
               </li>
-              <li className="flex gap-2 rounded-xl bg-gray-50 border border-gray-100 px-3 py-2.5">
-                <Layers className="w-4 h-4 text-[#1dbf73] shrink-0 mt-0.5" aria-hidden />
+              <li className="flex gap-2 rounded-xl bg-dark-50 border border-white/[0.06] px-3 py-2.5">
+                <Layers className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden />
                 <span>
-                  <span className="font-medium text-gray-800">Zoznam vpravo</span> je synchronizovaný s mapou –
+                  <span className="font-medium text-white/90">Zoznam vpravo</span> je synchronizovaný s mapou –
                   výber zvýrazní príslušný bod.
                 </span>
               </li>
-              <li className="flex gap-2 rounded-xl bg-gray-50 border border-gray-100 px-3 py-2.5">
-                <Info className="w-4 h-4 text-[#1dbf73] shrink-0 mt-0.5" aria-hidden />
+              <li className="flex gap-2 rounded-xl bg-dark-50 border border-white/[0.06] px-3 py-2.5">
+                <Info className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden />
                 <span>
-                  Inzeráty <span className="font-medium text-gray-800">bez miesta alebo súradníc</span> v zozname
+                  Inzeráty <span className="font-medium text-white/90">bez miesta alebo súradníc</span> v zozname
                   ostávajú, na mape sa nezobrazia.
                 </span>
               </li>
@@ -302,12 +302,12 @@ function MapPageInner() {
         </header>
 
         <section
-          className="mb-6 rounded-2xl border border-gray-200/80 bg-white p-4 sm:p-5 shadow-sm"
+          className="mb-6 rounded-2xl border border-white/[0.08] bg-dark p-4 sm:p-5 shadow-sm"
           aria-labelledby="map-filters-heading"
         >
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-4">
             <div>
-              <h2 id="map-filters-heading" className="text-sm font-semibold text-gray-900">
+              <h2 id="map-filters-heading" className="text-sm font-semibold text-white">
                 Filtre
               </h2>
               <p className="text-sm text-gray-500 mt-0.5">
@@ -321,7 +321,7 @@ function MapPageInner() {
                 setTypeFilter('')
                 setRegionFilter('')
               }}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors shrink-0"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-300 bg-dark-100 rounded-xl hover:bg-dark-200/10 transition-colors shrink-0"
             >
               <RotateCcw className="w-4 h-4" aria-hidden />
               Resetovať filtre
@@ -353,21 +353,21 @@ function MapPageInner() {
         </section>
 
         {!mounted ? (
-          <div className="min-h-[480px] flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white text-gray-500">
-            <span className="inline-block w-8 h-8 border-2 border-gray-200 border-t-[#1dbf73] rounded-full animate-spin mb-3" />
+          <div className="min-h-[480px] flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.08] bg-dark text-gray-500">
+            <span className="inline-block w-8 h-8 border-2 border-white/[0.08] border-t-[#c9a96e] rounded-full animate-spin mb-3" />
             <p className="text-sm font-medium">Pripravujeme mapu…</p>
           </div>
         ) : (
           <>
             {loading && (
               <p className="text-sm text-gray-500 mb-3 flex items-center gap-2">
-                <span className="inline-block w-3.5 h-3.5 border-2 border-gray-200 border-t-[#1dbf73] rounded-full animate-spin" />
+                <span className="inline-block w-3.5 h-3.5 border-2 border-white/[0.08] border-t-[#c9a96e] rounded-full animate-spin" />
                 Načítavam inzeráty podľa zvolených filtrov…
               </p>
             )}
 
             <div className="flex flex-col lg:flex-row gap-5 lg:gap-6">
-              <div className="lg:flex-1 min-h-[420px] lg:min-h-[580px] rounded-2xl overflow-hidden border border-gray-200/90 shadow-md bg-white ring-1 ring-black/[0.03]">
+              <div className="lg:flex-1 min-h-[420px] lg:min-h-[580px] rounded-2xl overflow-hidden border border-white/[0.08] shadow-md bg-dark ring-1 ring-black/[0.03]">
                 <AdMap
                   key="sk-map"
                   points={points}
@@ -377,9 +377,9 @@ function MapPageInner() {
               </div>
 
               <aside className="w-full lg:w-[400px] flex-shrink-0">
-                <div className="rounded-2xl border border-gray-200/90 bg-white shadow-md overflow-hidden ring-1 ring-black/[0.03]">
-                  <div className="px-5 py-4 border-b border-gray-100 bg-gradient-to-b from-gray-50/80 to-white">
-                    <h2 className="font-semibold text-gray-900 text-base">Inzeráty na mape</h2>
+                <div className="rounded-2xl border border-white/[0.08] bg-dark shadow-md overflow-hidden ring-1 ring-black/[0.03]">
+                  <div className="px-5 py-4 border-b border-white/[0.06] bg-dark-50">
+                    <h2 className="font-semibold text-white text-base">Inzeráty na mape</h2>
                     <p className="text-sm text-gray-500 mt-1">
                       {points.length === 0
                         ? hasActiveFilters
@@ -389,15 +389,15 @@ function MapPageInner() {
                     </p>
                     {list.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-3">
-                        <span className="inline-flex items-center rounded-lg bg-[#1dbf73]/10 text-[#0f766e] text-xs font-semibold px-2.5 py-1">
+                        <span className="inline-flex items-center rounded-lg bg-accent/10 text-accent text-xs font-semibold px-2.5 py-1">
                           Na mape: {points.length}
                         </span>
-                        <span className="inline-flex items-center rounded-lg bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-1">
+                        <span className="inline-flex items-center rounded-lg bg-dark-100 text-gray-500 text-xs font-medium px-2.5 py-1">
                           Spolu v výsledku: {list.length}
                         </span>
                         {notOnMapCount > 0 && (
                           <span
-                            className="inline-flex items-center rounded-lg bg-amber-50 text-amber-800 text-xs font-medium px-2.5 py-1 border border-amber-100"
+                            className="inline-flex items-center rounded-lg bg-amber-900/20 text-amber-400 text-xs font-medium px-2.5 py-1 border border-amber-800/30"
                             title="Inzeráty bez súradníc alebo rozpoznateľnej lokality"
                           >
                             Bez mapy: {notOnMapCount}
@@ -409,9 +409,9 @@ function MapPageInner() {
 
                   <div className="max-h-[420px] lg:max-h-[540px] overflow-y-auto p-3 space-y-3">
                     {points.length === 0 ? (
-                      <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50/50 p-6 text-center">
+                      <div className="rounded-xl border border-dashed border-white/[0.08] bg-dark-50/50 p-6 text-center">
                         <MapPin className="w-10 h-10 text-gray-300 mx-auto mb-3" aria-hidden />
-                        <p className="text-sm font-medium text-gray-800">
+                        <p className="text-sm font-medium text-white/90">
                           {regionFilter
                             ? 'V tomto kraji nemáme inzeráty s polohou na mape.'
                             : 'Žiadne body na mape'}
@@ -430,8 +430,8 @@ function MapPageInner() {
                             key={ad.id}
                             className={`rounded-xl border transition-all duration-200 overflow-hidden ${
                               active
-                                ? 'border-[#1dbf73] bg-[#1dbf73]/[0.06] shadow-md ring-2 ring-[#1dbf73]/25'
-                                : 'border-gray-100 bg-white shadow-sm hover:border-gray-200 hover:shadow'
+                                ? 'border-accent bg-[#c9a96e]/[0.06] shadow-md ring-2 ring-[#c9a96e]/25'
+                                : 'border-white/[0.06] bg-dark shadow-sm hover:border-white/10 hover:shadow'
                             }`}
                           >
                             <button
@@ -439,7 +439,7 @@ function MapPageInner() {
                               onClick={() => setSelectedAdId(ad.id)}
                               className="w-full text-left p-3.5 flex gap-3.5"
                             >
-                              <div className="w-[4.5rem] h-[4.5rem] rounded-xl overflow-hidden flex-shrink-0 bg-gradient-to-br from-gray-100 to-gray-200 ring-1 ring-black/[0.04]">
+                              <div className="w-[4.5rem] h-[4.5rem] rounded-xl overflow-hidden flex-shrink-0 bg-gradient-to-br from-dark-100 to-dark-200 ring-1 ring-white/[0.04]">
                                 {ad.image ? (
                                   <img
                                     src={ad.image}
@@ -447,7 +447,7 @@ function MapPageInner() {
                                     className="w-full h-full object-cover"
                                   />
                                 ) : (
-                                  <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 gap-1">
+                                  <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 gap-1">
                                     <ImageOff className="w-6 h-6 opacity-70" aria-hidden />
                                     <span className="text-[10px] font-medium uppercase tracking-wide">
                                       Bez fotky
@@ -457,23 +457,23 @@ function MapPageInner() {
                               </div>
                               <div className="min-w-0 flex-1 flex flex-col">
                                 {ad.category && (
-                                  <span className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                                  <span className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">
                                     {ad.category.name}
                                   </span>
                                 )}
-                                <h3 className="font-semibold text-gray-900 leading-snug mt-0.5 line-clamp-2">
+                                <h3 className="font-semibold text-white leading-snug mt-0.5 line-clamp-2">
                                   {ad.title}
                                 </h3>
                                 {ad.location && (
                                   <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
-                                    <MapPin className="w-3.5 h-3.5 text-[#1dbf73] shrink-0" aria-hidden />
+                                    <MapPin className="w-3.5 h-3.5 text-accent shrink-0" aria-hidden />
                                     {ad.location}
                                   </p>
                                 )}
                                 <div className="mt-auto pt-2 flex items-end justify-between gap-2">
                                   <p
                                     className={`text-sm font-bold tabular-nums ${
-                                      ad.price != null ? 'text-[#1dbf73]' : 'text-gray-400 font-medium'
+                                      ad.price != null ? 'text-accent' : 'text-gray-500 font-medium'
                                     }`}
                                   >
                                     {ad.price != null ? formatPriceSk(ad.price) : 'Cena na vyžiadanie'}
@@ -484,7 +484,7 @@ function MapPageInner() {
                             <div className="px-3.5 pb-3.5 -mt-1">
                               <Link
                                 href={`/inzerat/${ad.id}`}
-                                className="inline-flex items-center gap-1 text-sm font-semibold text-[#1dbf73] hover:text-[#17a062] transition-colors group"
+                                className="inline-flex items-center gap-1 text-sm font-semibold text-accent hover:text-[#a8884e] transition-colors group"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 Zobraziť inzerát
@@ -503,23 +503,23 @@ function MapPageInner() {
               </aside>
             </div>
 
-            <footer className="mt-6 rounded-xl border border-gray-200/80 bg-white/80 px-4 py-3 sm:px-5 sm:py-4 text-sm text-gray-600 shadow-sm">
+            <footer className="mt-6 rounded-xl border border-white/[0.08] bg-dark-100/80 px-4 py-3 sm:px-5 sm:py-4 text-sm text-gray-500 shadow-sm">
               {points.length > 0 ? (
                 <p>
-                  <span className="font-medium text-gray-800">Zhrnutie:</span> Na mape je{' '}
-                  <strong className="text-gray-900">{points.length}</strong>{' '}
+                  <span className="font-medium text-white/90">Zhrnutie:</span> Na mape je{' '}
+                  <strong className="text-white">{points.length}</strong>{' '}
                   {points.length === 1 ? 'inzerát' : points.length < 5 ? 'inzeráty' : 'inzerátov'}
                   {notOnMapCount > 0 && list.length > 0 && (
                     <>
                       {' '}
                       Mapa zobrazuje len ponuky s rozpoznateľnou polohou; v aktuálnom výbere ich je ešte{' '}
-                      <strong className="text-gray-900">{notOnMapCount}</strong> bez zobrazenia na mape.
+                      <strong className="text-white">{notOnMapCount}</strong> bez zobrazenia na mape.
                     </>
                   )}
                 </p>
               ) : (
                 <p>
-                  <span className="font-medium text-gray-800">Tip:</span> Inzeráty sa na mape zobrazia po zadaní
+                  <span className="font-medium text-white/90">Tip:</span> Inzeráty sa na mape zobrazia po zadaní
                   mesta alebo kraja pri vytváraní ponuky. Ak ste predajca, skontrolujte, či má váš inzerát vyplnenú
                   lokalitu – zvýši to šancu, že vás zákazníci nájdu práve tu.
                 </p>

@@ -14,7 +14,7 @@ function formatPriceSk(price: number): string {
 
 /** Špendlík s voliteľnou cenou – vybraný stav je výraznejší */
 function createPinIcon(isSelected: boolean, price: number | null) {
-  const fill = isSelected ? '#0f9d5c' : '#1dbf73'
+  const fill = isSelected ? '#0f9d5c' : '#c9a96e'
   const priceBlock =
     price != null
       ? `<span class="ad-map-pin-label">${escapeHtml(formatPriceSk(price))}</span>`
@@ -163,7 +163,7 @@ export default function AdMap({ points, selectedPointId, onMarkerClick }: AdMapP
   return (
     <div
       ref={containerRef}
-      className="w-full h-full min-h-[500px] bg-white"
+      className="w-full h-full min-h-[500px] bg-dark"
     />
   )
 }

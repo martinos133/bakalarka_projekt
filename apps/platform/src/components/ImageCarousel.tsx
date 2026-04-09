@@ -33,7 +33,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
   return (
     <div className="mb-8">
       {/* Main Image */}
-      <div className="relative overflow-hidden rounded-lg aspect-video bg-gray-100 mb-4">
+      <div className="relative overflow-hidden rounded-lg aspect-video bg-dark-100 mb-4">
         <img
           src={images[currentIndex]}
           alt={`${title} - obrázok ${currentIndex + 1}`}
@@ -45,7 +45,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
           <>
             <button
               onClick={goToPrevious}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-900 p-2 rounded-full shadow-lg transition-all hover:scale-110"
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-dark-200/90 hover:bg-dark-200 text-white p-2 rounded-full shadow-lg shadow-black/20 transition-all hover:scale-110"
               aria-label="Predchádzajúci obrázok"
             >
               <svg
@@ -64,7 +64,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
             </button>
             <button
               onClick={goToNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-900 p-2 rounded-full shadow-lg transition-all hover:scale-110"
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-dark-200/90 hover:bg-dark-200 text-white p-2 rounded-full shadow-lg shadow-black/20 transition-all hover:scale-110"
               aria-label="Ďalší obrázok"
             >
               <svg
@@ -101,8 +101,8 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
               onClick={() => goToSlide(index)}
               className={`flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border-2 transition-all ${
                 index === currentIndex
-                  ? 'border-[#1dbf73] ring-2 ring-[#1dbf73]/20'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-accent ring-2 ring-[#c9a96e]/20'
+                  : 'border-white/[0.08] hover:border-white/15'
               }`}
             >
               <img

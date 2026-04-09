@@ -89,20 +89,21 @@ export default function Hero() {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-110"
           style={{
             backgroundImage: `url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1976&q=80')`,
-            filter: 'blur(3px) brightness(0.7)',
+            filter: 'blur(3px) brightness(0.5)',
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/60"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-dark/60 via-dark/70 to-dark"></div>
       </div>
 
       {/* Content */}
       <div className="relative z-10 max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 w-full py-20">
         <div className="max-w-4xl">
+          <p className="text-accent text-sm font-semibold uppercase tracking-[0.2em] mb-4">Profesionálne služby</p>
           {/* Main Heading */}
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight font-sans">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight">
             Naši freelanceri
             <br />
-            sa o to postarajú
+            <span className="font-serif italic text-accent">sa o to postarajú</span>
           </h1>
 
           {/* Search Bar */}
@@ -117,11 +118,11 @@ export default function Hero() {
                   if (e.key === 'Escape') setShowSuggestions(false)
                 }}
                 placeholder="Hľadať akúkoľvek službu..."
-                className="flex-1 px-6 py-4 text-lg rounded-l-md rounded-r-none border-0 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] text-gray-900 placeholder-gray-500 shadow-lg"
+                className="flex-1 px-6 py-4 text-lg rounded-l-xl rounded-r-none border border-white/10 border-r-0 bg-dark-50/80 backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-accent text-white placeholder-gray-500"
               />
               <button
                 type="submit"
-                className="px-8 py-4 bg-black text-white rounded-r-md hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-[#1dbf73] shadow-lg"
+                className="px-8 py-4 bg-accent text-dark font-semibold rounded-r-xl hover:bg-accent-light transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
                 aria-label="Search"
               >
                 <svg
@@ -142,7 +143,7 @@ export default function Hero() {
 
             {/* Dropdown s návrhmi (ako v navbare) */}
             {showSuggestions && searchQuery.trim().length >= 3 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-xl z-50 overflow-hidden">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-dark border border-white/[0.08] rounded-md shadow-xl shadow-black/30 z-50 overflow-hidden">
                 {suggestionsLoading ? (
                   <div className="px-4 py-6 text-center text-gray-500 text-sm">Načítavam...</div>
                 ) : hasSuggestions ? (
@@ -157,15 +158,15 @@ export default function Hero() {
                         key={cat.id}
                         href={`/kategoria/${cat.slug}`}
                         onClick={() => setShowSuggestions(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-dark-200/[0.04] transition-colors"
                       >
-                        <FolderOpen className="w-4 h-4 text-[#1dbf73] flex-shrink-0" />
-                        <span className="text-sm font-medium text-gray-900">{cat.name}</span>
-                        <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">Kategória</span>
+                        <FolderOpen className="w-4 h-4 text-accent flex-shrink-0" />
+                        <span className="text-sm font-medium text-white">{cat.name}</span>
+                        <span className="ml-auto text-xs text-gray-500 bg-dark-100 px-2 py-0.5 rounded">Kategória</span>
                       </Link>
                     ))}
                     {suggestions.advertisements.length > 0 && (
-                      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1 border-t border-gray-100">
+                      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1 border-t border-white/[0.06]">
                         Inzeráty
                       </div>
                     )}
@@ -174,20 +175,20 @@ export default function Hero() {
                         key={ad.id}
                         href={`/inzerat/${ad.id}`}
                         onClick={() => setShowSuggestions(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-dark-200/[0.04] transition-colors"
                       >
                         {ad.images?.[0] ? (
                           <img src={ad.images[0]} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
                         ) : (
-                          <FileText className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                          <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
                         )}
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm font-medium text-gray-900 block truncate">{ad.title}</span>
+                          <span className="text-sm font-medium text-white block truncate">{ad.title}</span>
                           {ad.price != null && (
-                            <span className="text-xs text-[#1dbf73] font-semibold">{ad.price} €</span>
+                            <span className="text-xs text-accent font-semibold">{ad.price} €</span>
                           )}
                         </div>
-                        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded flex-shrink-0">Inzerát</span>
+                        <span className="text-xs text-gray-500 bg-dark-100 px-2 py-0.5 rounded flex-shrink-0">Inzerát</span>
                       </Link>
                     ))}
                   </div>
@@ -208,7 +209,7 @@ export default function Hero() {
                 <Link
                   key={category.id}
                   href={category.href || '#'}
-                  className="px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full hover:bg-white/20 transition-colors text-sm border border-white/20"
+                  className="px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full hover:bg-dark-200/20 transition-colors text-sm border border-white/20"
                 >
                   {category.label}
                 </Link>

@@ -71,7 +71,7 @@
    return (
      <div ref={rootRef} className={`w-full ${className}`}>
        {label && (
-         <label className="block text-sm font-medium text-gray-700 mb-2">
+         <label className="block text-sm font-medium text-gray-300 mb-2">
            {label}
          </label>
        )}
@@ -82,11 +82,11 @@
          onClick={() => setOpen((v) => !v)}
          className={`w-full flex items-center justify-between gap-3 border rounded-lg px-4 py-2 text-left transition-colors ${
            disabled
-             ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'
-             : 'bg-white text-gray-900 border-gray-300 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent'
+             ? 'bg-dark-50 text-gray-500 border-white/[0.08] cursor-not-allowed'
+             : 'bg-dark text-white border-white/10 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent'
          }`}
        >
-         <span className={displayValue ? 'text-gray-900' : 'text-gray-400'}>
+         <span className={displayValue ? 'text-white' : 'text-gray-500'}>
            {displayValue || 'Vyberte dátum'}
          </span>
          <Calendar className="w-4 h-4 text-gray-500" />
@@ -94,7 +94,7 @@
  
        {open && (
          <div className="relative">
-           <div className="absolute z-50 mt-2 w-full sm:w-[360px] bg-white border border-gray-200 rounded-xl shadow-xl p-3">
+           <div className="absolute z-50 mt-2 w-full sm:w-[360px] bg-dark border border-white/[0.08] rounded-xl shadow-xl shadow-black/30 p-3">
              <DayPicker
                mode={props.mode}
                selected={props.value as any}
@@ -107,22 +107,22 @@
                  months: 'flex flex-col',
                  month: 'space-y-4',
                  caption: 'flex items-center justify-between px-2',
-                 caption_label: 'text-sm font-semibold text-gray-900',
+                 caption_label: 'text-sm font-semibold text-white',
                  nav: 'flex items-center gap-1',
                  nav_button:
-                   'h-8 w-8 inline-flex items-center justify-center rounded-md border border-gray-200 hover:bg-gray-50 text-gray-700',
+                   'h-8 w-8 inline-flex items-center justify-center rounded-md border border-white/[0.08] hover:bg-dark-200/[0.04] text-gray-300',
                  table: 'w-full border-collapse',
                  head_row: 'flex',
                  head_cell: 'w-9 text-[11px] font-medium text-gray-500 text-center',
                  row: 'flex w-full mt-1',
                  cell: 'w-9 h-9 text-center text-sm relative',
-                 day: 'w-9 h-9 rounded-md hover:bg-gray-50 text-gray-900 aria-selected:bg-[#1dbf73] aria-selected:text-white',
-                 day_today: 'ring-1 ring-[#1dbf73] ring-offset-2',
+                 day: 'w-9 h-9 rounded-md hover:bg-dark-200/[0.04] text-white aria-selected:bg-[#c9a96e] aria-selected:text-white',
+                 day_today: 'ring-1 ring-[#c9a96e] ring-offset-2',
                  day_outside: 'text-gray-300',
                  day_disabled: 'text-gray-300 opacity-50',
-                 day_range_start: 'aria-selected:bg-[#1dbf73] aria-selected:text-white',
-                 day_range_end: 'aria-selected:bg-[#1dbf73] aria-selected:text-white',
-                 day_range_middle: 'aria-selected:bg-[#1dbf73]/15 aria-selected:text-gray-900 rounded-none',
+                 day_range_start: 'aria-selected:bg-[#c9a96e] aria-selected:text-white',
+                 day_range_end: 'aria-selected:bg-[#c9a96e] aria-selected:text-white',
+                 day_range_middle: 'aria-selected:bg-[#c9a96e]/15 aria-selected:text-white rounded-none',
                }}
              />
            </div>

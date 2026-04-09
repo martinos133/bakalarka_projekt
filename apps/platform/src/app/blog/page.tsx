@@ -29,26 +29,26 @@ function BlogPageInner() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-dark">
       <Header />
       <CategoryNav />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <nav className="mb-6 text-sm text-gray-600">
-          <Link href="/" className="hover:text-gray-900">Domov</Link>
+        <nav className="mb-6 text-sm text-gray-500">
+          <Link href="/" className="hover:text-white">Domov</Link>
           <span className="mx-2">/</span>
-          <span className="text-gray-900 font-medium">Blog</span>
+          <span className="text-white font-medium">Blog</span>
         </nav>
 
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Blog</h1>
-        <p className="text-gray-600 mb-12">Články a novinky z našej platformy</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Blog</h1>
+        <p className="text-gray-500 mb-12">Články a novinky z našej platformy</p>
 
         {loading ? (
           <div className="text-center py-16 text-gray-500">Načítavam...</div>
         ) : posts.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-gray-500 mb-4">Zatiaľ tu nie sú žiadne príspevky</p>
-            <Link href="/" className="text-[#1dbf73] hover:underline">
+            <Link href="/" className="text-accent hover:underline">
               Späť na domov
             </Link>
           </div>
@@ -57,7 +57,7 @@ function BlogPageInner() {
             {posts.map((post) => (
               <article
                 key={post.id}
-                className="border-b border-gray-200 pb-12 last:border-0 last:pb-0"
+                className="border-b border-white/[0.08] pb-12 last:border-0 last:pb-0"
               >
                 <Link href={`/blog/${post.slug}`} className="block group">
                   {post.featuredImage && (
@@ -69,11 +69,11 @@ function BlogPageInner() {
                       />
                     </div>
                   )}
-                  <h2 className="text-2xl font-bold text-gray-900 group-hover:text-[#1dbf73] transition-colors mb-2">
+                  <h2 className="text-2xl font-bold text-white group-hover:text-[#c9a96e] transition-colors mb-2">
                     {post.title}
                   </h2>
                   {post.excerpt && (
-                    <p className="text-gray-600 mb-3 line-clamp-2">{post.excerpt}</p>
+                    <p className="text-gray-500 mb-3 line-clamp-2">{post.excerpt}</p>
                   )}
                   <time className="text-sm text-gray-500">
                     {post.publishedAt

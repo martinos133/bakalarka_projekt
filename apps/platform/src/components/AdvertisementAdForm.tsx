@@ -62,72 +62,72 @@ export default function AdvertisementAdForm({
 }: AdvertisementAdFormProps) {
   const a = variant === 'admin'
   const c = {
-    label: a ? 'block text-sm font-medium text-gray-300 mb-2' : 'block text-sm font-medium text-gray-700 mb-2',
-    labelXs: a ? 'block text-xs text-gray-400 mb-1' : 'block text-xs text-gray-600 mb-1',
+    label: a ? 'block text-sm font-medium text-gray-300 mb-2' : 'block text-sm font-medium text-gray-300 mb-2',
+    labelXs: a ? 'block text-xs text-gray-500 mb-1' : 'block text-xs text-gray-500 mb-1',
     input:
       a
         ? 'w-full px-4 py-2.5 rounded-lg border border-card bg-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
-        : 'w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900',
+        : 'w-full px-4 py-2 border border-white/10 rounded-lg text-white',
     textarea:
       a
         ? 'w-full px-4 py-2.5 rounded-lg border border-card bg-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
-        : 'w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900',
+        : 'w-full px-4 py-2 border border-white/10 rounded-lg text-white',
     inpFocus:
       a
         ? 'w-full px-4 py-2 rounded-lg border border-card bg-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
-        : 'w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent',
+        : 'w-full px-4 py-2 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
     inpSm:
       a
         ? 'w-full px-3 py-2 rounded-lg border border-card bg-dark text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
-        : 'w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent',
+        : 'w-full px-3 py-2 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
     flexInp:
       a
         ? 'flex-1 px-4 py-2 rounded-lg border border-card bg-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
-        : 'flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent',
+        : 'flex-1 px-4 py-2 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
     flexInpSm:
       a
         ? 'flex-1 px-3 py-2 rounded-lg border border-card bg-dark text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
-        : 'flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1dbf73] focus:border-transparent',
-    secBorder: a ? 'border-t border-card pt-6 mt-6' : 'border-t border-gray-200 pt-6 mt-6',
-    secTitle: a ? 'text-lg font-semibold text-white mb-4' : 'text-lg font-semibold text-gray-900 mb-4',
+        : 'flex-1 px-3 py-2 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
+    secBorder: a ? 'border-t border-card pt-6 mt-6' : 'border-t border-white/[0.08] pt-6 mt-6',
+    secTitle: a ? 'text-lg font-semibold text-white mb-4' : 'text-lg font-semibold text-white mb-4',
     hint: 'text-xs text-gray-500 mt-1',
-    panel: a ? 'space-y-2 p-4 bg-dark rounded-xl border border-card' : 'space-y-2 p-4 bg-gray-50 rounded-lg border border-gray-200',
-    panelLg: a ? 'space-y-4 p-4 bg-dark rounded-xl border border-card' : 'space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200',
+    panel: a ? 'space-y-2 p-4 bg-dark rounded-xl border border-card' : 'space-y-2 p-4 bg-dark-50 rounded-lg border border-white/[0.08]',
+    panelLg: a ? 'space-y-4 p-4 bg-dark rounded-xl border border-card' : 'space-y-4 p-4 bg-dark-50 rounded-lg border border-white/[0.08]',
     featureChip: a
       ? 'px-3 py-1 bg-card rounded-lg text-sm text-gray-200 border border-card flex items-center gap-2'
-      : 'px-3 py-1 bg-gray-100 rounded-lg text-sm text-gray-900 flex items-center gap-2',
+      : 'px-3 py-1 bg-dark-100 rounded-lg text-sm text-white flex items-center gap-2',
     chipSm: a
       ? 'px-2 py-1 bg-card rounded text-xs text-gray-300 border border-card flex items-center gap-1'
-      : 'px-2 py-1 bg-gray-200 rounded text-xs text-gray-900 flex items-center gap-1',
+      : 'px-2 py-1 bg-dark-200 rounded text-xs text-white flex items-center gap-1',
     pkgList: a
       ? 'p-3 bg-card rounded-xl border border-card flex items-start justify-between'
-      : 'p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-start justify-between',
-    pkgTitle: a ? 'font-medium text-white' : 'font-medium text-gray-900',
-    pkgDesc: a ? 'text-sm text-gray-400' : 'text-sm text-gray-600',
-    pkgMeta: a ? 'text-sm text-gray-300 mt-1' : 'text-sm text-gray-700 mt-1',
-    innerTag: a ? 'px-2 py-1 bg-dark rounded text-xs text-gray-300 border border-card' : 'px-2 py-1 bg-white rounded text-xs text-gray-700',
+      : 'p-3 bg-dark-50 rounded-lg border border-white/[0.08] flex items-start justify-between',
+    pkgTitle: a ? 'font-medium text-white' : 'font-medium text-white',
+    pkgDesc: a ? 'text-sm text-gray-500' : 'text-sm text-gray-500',
+    pkgMeta: a ? 'text-sm text-gray-300 mt-1' : 'text-sm text-gray-300 mt-1',
+    innerTag: a ? 'px-2 py-1 bg-dark rounded text-xs text-gray-300 border border-card' : 'px-2 py-1 bg-dark rounded text-xs text-gray-300',
     btnPri: a
       ? 'px-4 py-2 bg-primary hover:opacity-90 text-white rounded-lg transition-opacity'
-      : 'px-4 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg',
+      : 'px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg',
     btnPriSm: a
       ? 'px-3 py-2 bg-primary hover:opacity-90 text-white rounded-lg text-sm transition-opacity'
-      : 'px-3 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg text-sm',
+      : 'px-3 py-2 bg-accent hover:bg-accent-light text-white rounded-lg text-sm',
     btnPriWide: a
       ? 'w-full px-4 py-2 bg-primary hover:opacity-90 text-white rounded-lg text-sm flex items-center justify-center gap-2 transition-opacity'
-      : 'w-full px-4 py-2 bg-[#1dbf73] hover:bg-[#19a463] text-white rounded-lg text-sm flex items-center justify-center gap-2',
-    danger: a ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-700',
+      : 'w-full px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg text-sm flex items-center justify-center gap-2',
+    danger: a ? 'text-red-400 hover:text-red-300' : 'text-red-400 hover:text-red-700',
     imgBox: a
       ? 'flex items-center justify-center w-full h-32 border-2 border-dashed border-card rounded-lg cursor-pointer hover:bg-card/50 transition-colors'
-      : 'flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors',
-    imgIcon: a ? 'w-8 h-8 text-gray-500 mb-2' : 'w-8 h-8 text-gray-400 mb-2',
-    imgText: a ? 'text-sm text-gray-400' : 'text-sm text-gray-600',
+      : 'flex items-center justify-center w-full h-32 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:bg-dark-200/[0.04] transition-colors',
+    imgIcon: a ? 'w-8 h-8 text-gray-500 mb-2' : 'w-8 h-8 text-gray-500 mb-2',
+    imgText: a ? 'text-sm text-gray-500' : 'text-sm text-gray-500',
     imgSub: a ? 'text-xs text-gray-500 mt-1' : 'text-xs text-gray-500 mt-1',
-    imgThumb: a ? 'w-full h-32 object-cover rounded-lg border border-card' : 'w-full h-32 object-cover rounded-lg border border-gray-200',
+    imgThumb: a ? 'w-full h-32 object-cover rounded-lg border border-card' : 'w-full h-32 object-cover rounded-lg border border-white/[0.08]',
     submit: a
       ? 'flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity'
-      : 'flex items-center gap-2 px-6 py-3 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463] disabled:opacity-50',
-    faqQ: a ? 'font-medium text-white mb-1' : 'font-medium text-gray-900 mb-1',
-    faqA: a ? 'text-sm text-gray-400' : 'text-sm text-gray-600',
+      : 'flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-light disabled:opacity-50',
+    faqQ: a ? 'font-medium text-white mb-1' : 'font-medium text-white mb-1',
+    faqA: a ? 'text-sm text-gray-500' : 'text-sm text-gray-500',
   }
 
   return (

@@ -13,7 +13,7 @@ import { CmsGate } from '@/components/CmsGate'
 
 function HomeInner() {
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-dark">
       <Header />
       <CategoryNav />
       <Hero />
