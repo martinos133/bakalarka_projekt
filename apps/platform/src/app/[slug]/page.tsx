@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
+import { StaticPageArticle } from '@/components/StaticPageArticle'
 import { api } from '@/lib/api'
 
 const RESERVED_PATHS = ['inzerat', 'kategoria', 'dashboard', 'vyhladavanie', 'signin', 'join', 'api', 'blog']
@@ -74,20 +75,7 @@ export default function StaticPageRoute({
     <div className="min-h-screen bg-white">
       <Header />
       <CategoryNav />
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <nav className="mb-6 text-sm text-gray-600">
-          <Link href="/" className="hover:text-gray-900">Domov</Link>
-          <span className="mx-2">/</span>
-          <span className="text-gray-900 font-medium">{page.title}</span>
-        </nav>
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
-          {page.title}
-        </h1>
-        <div
-          className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-600 prose-a:text-[#1dbf73] prose-a:no-underline hover:prose-a:underline"
-          dangerouslySetInnerHTML={{ __html: page.content || '' }}
-        />
-      </article>
+      <StaticPageArticle slug={slug} title={page.title} content={page.content || ''} />
       <Footer />
     </div>
   )

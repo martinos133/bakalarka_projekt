@@ -3,11 +3,10 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { Report, ReportStatus } from '@inzertna-platforma/shared'
 import { Check, X, Eye, Calendar, User, MapPin, Euro, Image as ImageIcon, Search, Filter as FilterIcon, Trash2, AlertTriangle, AlertCircle } from 'lucide-react'
+import DashboardLayout from '@/components/DashboardLayout'
 
 // Dôvody nahlásenia ako string literály (kvôli problémom s enum importom v Next.js)
 type ReportReasonType = 'SPAM' | 'INAPPROPRIATE' | 'FAKE' | 'SCAM' | 'COPYRIGHT' | 'OTHER'
@@ -254,13 +253,9 @@ export default function ReportedAdvertisementsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-dark text-white flex">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Header />
-        <main className="p-6">
+    <DashboardLayout>
           {/* Filtre */}
-          <div className="bg-card rounded-lg p-4 border border-dark mb-6">
+          <div className="card p-4 mb-6">
             <div className="flex items-center space-x-2 mb-4">
               <FilterIcon className="w-5 h-5 text-gray-400" />
               <h3 className="text-sm font-semibold text-gray-300">Filtre</h3>
@@ -275,7 +270,7 @@ export default function ReportedAdvertisementsPage() {
                     value={filters.search}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                     placeholder="Názov inzerátu, popis..."
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover text-sm"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover text-sm"
                   />
                 </div>
               </div>
@@ -284,7 +279,7 @@ export default function ReportedAdvertisementsPage() {
                 <select
                   value={filters.reason}
                   onChange={(e) => setFilters({ ...filters, reason: e.target.value as '' | ReportReasonType })}
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                 >
                   <option value="">Všetky</option>
                   {REPORT_REASONS.map((reason) => (
@@ -299,7 +294,7 @@ export default function ReportedAdvertisementsPage() {
                 <select
                   value={filters.status}
                   onChange={(e) => setFilters({ ...filters, status: e.target.value as '' | ReportStatus })}
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                 >
                   <option value="">Všetky</option>
                   <option value="PENDING">Čakajúce</option>
@@ -320,7 +315,7 @@ export default function ReportedAdvertisementsPage() {
             )}
           </div>
 
-          <div className="bg-card rounded-lg border border-dark">
+          <div className="card">
             {loading ? (
               <div className="p-6 text-center text-gray-400">Načítavam...</div>
             ) : filteredReports.length === 0 ? (
@@ -405,7 +400,7 @@ export default function ReportedAdvertisementsPage() {
                             <div className="flex items-center justify-end space-x-2">
                               <button
                                 onClick={() => handleViewDetail(report)}
-                                className="p-2 bg-dark hover:bg-cardHover rounded-lg transition-colors"
+                                className="p-2 bg-dark hover:bg-cardHover rounded-xl transition-colors"
                                 title="Zobraziť detail"
                               >
                                 <Eye className="w-4 h-4" />
@@ -423,9 +418,9 @@ export default function ReportedAdvertisementsPage() {
 
           {/* Detail Modal */}
           {showDetailModal && selectedReport && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <div className="bg-card rounded-lg border border-dark max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                <div className="p-6 border-b border-dark">
+            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+              <div className="card max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="p-6 border-b border-white/[0.06]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <AlertTriangle className="w-6 h-6 text-red-400" />
@@ -437,7 +432,7 @@ export default function ReportedAdvertisementsPage() {
                         setSelectedReport(null)
                         setResolutionNote('')
                       }}
-                      className="p-2 hover:bg-dark rounded-lg transition-colors"
+                      className="p-2 hover:bg-dark rounded-xl transition-colors"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -448,7 +443,7 @@ export default function ReportedAdvertisementsPage() {
                   {/* Informácie o nahlásení */}
                   <div>
                     <h3 className="text-sm font-semibold text-gray-400 mb-3">Informácie o nahlásení</h3>
-                    <div className="bg-dark rounded-lg p-4 space-y-3">
+                    <div className="bg-dark rounded-xl p-4 space-y-3">
                       <div>
                         <div className="text-xs text-gray-400 mb-1">Dôvod</div>
                         <div className={`text-sm font-medium ${getReasonColor(selectedReport.reason)}`}>
@@ -480,7 +475,7 @@ export default function ReportedAdvertisementsPage() {
                     <>
                       <div>
                         <h3 className="text-sm font-semibold text-gray-400 mb-3">Nahlásený inzerát</h3>
-                        <div className="bg-dark rounded-lg p-4 space-y-4">
+                        <div className="bg-dark rounded-xl p-4 space-y-4">
                           {/* Obrázky */}
                           {(selectedReport as any).advertisement.images && (selectedReport as any).advertisement.images.length > 0 && (
                             <div>
@@ -491,7 +486,7 @@ export default function ReportedAdvertisementsPage() {
                                     key={idx}
                                     src={img}
                                     alt={`${(selectedReport as any).advertisement.title} ${idx + 1}`}
-                                    className="w-full h-32 object-cover rounded-lg"
+                                    className="w-full h-32 object-cover rounded-xl"
                                   />
                                 ))}
                               </div>
@@ -541,16 +536,16 @@ export default function ReportedAdvertisementsPage() {
                       value={resolutionNote}
                       onChange={(e) => setResolutionNote(e.target.value)}
                       placeholder="Zadajte poznámku k vyriešeniu nahlásenia..."
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
                       rows={4}
                     />
                   </div>
 
                   {/* Akcie */}
-                  <div className="flex items-center justify-between pt-4 border-t border-dark">
+                  <div className="flex items-center justify-between pt-4 border-t border-white/[0.06]">
                     <button
                       onClick={() => handleDeleteAdvertisement((selectedReport as any).advertisement.id, selectedReport.id)}
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center space-x-2"
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl transition-colors flex items-center space-x-2"
                     >
                       <Trash2 className="w-4 h-4" />
                       <span>Odstrániť inzerát</span>
@@ -562,19 +557,19 @@ export default function ReportedAdvertisementsPage() {
                           setSelectedReport(null)
                           setResolutionNote('')
                         }}
-                        className="px-4 py-2 bg-dark hover:bg-cardHover rounded-lg transition-colors"
+                        className="px-4 py-2 bg-dark hover:bg-cardHover rounded-xl transition-colors"
                       >
                         Zrušiť
                       </button>
                       <button
                         onClick={() => handleResolve(selectedReport.id, ReportStatus.DISMISSED)}
-                        className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors"
+                        className="px-4 py-2 bg-gray-600 hover:bg-white/[0.08] rounded-xl transition-colors"
                       >
                         Zamietnuť nahlásenie
                       </button>
                       <button
                         onClick={() => handleResolve(selectedReport.id, ReportStatus.RESOLVED)}
-                        className="px-4 py-2 bg-primary hover:opacity-90 rounded-lg transition-colors"
+                        className="px-4 py-2 bg-primary hover:opacity-90 rounded-xl transition-colors"
                       >
                         Vyriešiť nahlásenie
                       </button>
@@ -588,8 +583,8 @@ export default function ReportedAdvertisementsPage() {
           {/* Resolve Modal with Ban Options */}
           {showResolveModal && selectedReport && (
             <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4">
-              <div className="bg-card rounded-lg border border-dark max-w-lg w-full shadow-xl">
-                <div className="p-6 border-b border-dark">
+              <div className="card max-w-lg w-full shadow-xl">
+                <div className="p-6 border-b border-white/[0.06]">
                   <div className="flex items-center justify-between">
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
                       <AlertTriangle className="w-5 h-5 text-yellow-400" />
@@ -603,7 +598,7 @@ export default function ReportedAdvertisementsPage() {
                         setBanDurationValue(1)
                         setBanReason('')
                       }}
-                      className="p-2 hover:bg-dark rounded-lg transition-colors"
+                      className="p-2 hover:bg-dark rounded-xl transition-colors"
                     >
                       <X className="w-5 h-5 text-gray-400" />
                     </button>
@@ -619,12 +614,12 @@ export default function ReportedAdvertisementsPage() {
                       value={resolutionNote}
                       onChange={(e) => setResolutionNote(e.target.value)}
                       placeholder="Zadajte poznámku k vyriešeniu nahlásenia..."
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
                       rows={4}
                     />
                   </div>
 
-                  <div className="border-t border-dark pt-4">
+                  <div className="border-t border-white/[0.06] pt-4">
                     <label className="flex items-center space-x-3 cursor-pointer">
                       <input
                         type="checkbox"
@@ -639,7 +634,7 @@ export default function ReportedAdvertisementsPage() {
                   </div>
 
                   {banUser && (
-                    <div className="bg-dark rounded-lg p-4 space-y-4 border border-card">
+                    <div className="bg-dark rounded-xl p-4 space-y-4 border border-card">
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
                           Trvanie banu
@@ -647,7 +642,7 @@ export default function ReportedAdvertisementsPage() {
                         <select
                           value={banDuration}
                           onChange={(e) => setBanDuration(e.target.value as any)}
-                          className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                          className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
                         >
                           <option value="minutes">Minúty</option>
                           <option value="hours">Hodiny</option>
@@ -667,7 +662,7 @@ export default function ReportedAdvertisementsPage() {
                             min="1"
                             value={banDurationValue}
                             onChange={(e) => setBanDurationValue(parseInt(e.target.value) || 1)}
-                            className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                            className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
                           />
                         </div>
                       )}
@@ -680,14 +675,14 @@ export default function ReportedAdvertisementsPage() {
                           value={banReason}
                           onChange={(e) => setBanReason(e.target.value)}
                           placeholder="Zadajte dôvod banu..."
-                          className="w-full bg-dark border border-card rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
+                          className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
                           rows={3}
                         />
                       </div>
                     </div>
                   )}
 
-                  <div className="flex items-center justify-end gap-3 pt-4 border-t border-dark">
+                  <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/[0.06]">
                     <button
                       onClick={() => {
                         setShowResolveModal(false)
@@ -696,14 +691,14 @@ export default function ReportedAdvertisementsPage() {
                         setBanDurationValue(1)
                         setBanReason('')
                       }}
-                      className="px-4 py-2 bg-dark hover:bg-cardHover rounded-lg transition-colors text-sm font-medium"
+                      className="px-4 py-2 bg-dark hover:bg-cardHover rounded-xl transition-colors text-sm font-medium"
                     >
                       Zrušiť
                     </button>
                     <button
                       onClick={handleConfirmResolve}
                       disabled={banUser && banDuration !== 'permanent' && (!banDurationValue || banDurationValue <= 0)}
-                      className="px-4 py-2 bg-primary hover:opacity-90 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-colors text-sm font-medium text-white"
+                      className="px-4 py-2 bg-primary hover:opacity-90 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-xl transition-colors text-sm font-medium text-white"
                     >
                       Potvrdiť vyriešenie
                     </button>
@@ -716,7 +711,7 @@ export default function ReportedAdvertisementsPage() {
           {/* Delete Confirmation Modal */}
           {deleteConfirmModal.show && (
             <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-              <div className="bg-card rounded-lg border border-dark max-w-md w-full shadow-xl">
+              <div className="card max-w-md w-full shadow-xl">
                 <div className="p-6">
                   <div className="flex items-start space-x-4">
                     <div className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center bg-red-500/20">
@@ -732,13 +727,13 @@ export default function ReportedAdvertisementsPage() {
                       <div className="flex items-center justify-end space-x-3">
                         <button
                           onClick={() => setDeleteConfirmModal({ show: false, advertisementId: '', reportId: '' })}
-                          className="px-4 py-2 bg-dark hover:bg-cardHover rounded-lg transition-colors text-sm font-medium"
+                          className="px-4 py-2 bg-dark hover:bg-cardHover rounded-xl transition-colors text-sm font-medium"
                         >
                           Zrušiť
                         </button>
                         <button
                           onClick={confirmDeleteAdvertisement}
-                          className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors text-sm font-medium text-white"
+                          className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl transition-colors text-sm font-medium text-white"
                         >
                           Odstrániť
                         </button>
@@ -753,7 +748,7 @@ export default function ReportedAdvertisementsPage() {
           {/* Alert Modal */}
           {alertModal.show && (
             <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-              <div className="bg-card rounded-lg border border-dark max-w-md w-full shadow-xl">
+              <div className="card max-w-md w-full shadow-xl">
                 <div className="p-6">
                   <div className="flex items-start space-x-4">
                     <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
@@ -785,7 +780,7 @@ export default function ReportedAdvertisementsPage() {
                       <div className="flex items-center justify-end">
                         <button
                           onClick={() => setAlertModal({ ...alertModal, show: false })}
-                          className="px-4 py-2 bg-primary hover:opacity-90 rounded-lg transition-colors text-sm font-medium text-white"
+                          className="px-4 py-2 bg-primary hover:opacity-90 rounded-xl transition-colors text-sm font-medium text-white"
                         >
                           OK
                         </button>
@@ -796,8 +791,6 @@ export default function ReportedAdvertisementsPage() {
               </div>
             </div>
           )}
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   )
 }

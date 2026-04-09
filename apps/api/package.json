@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "DATABASE_URL='postgresql://neondb_owner:npg_ueoHkzx0l9Dh@ep-raspy-firefly-agodd80d-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require&pgbouncer=true' JWT_SECRET='8fca7e4c7a1c2aafc98d30abd7488d28e55cf52a7f60bd74ce1a71f24a7ce98f' ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/main.ts",
+    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/main.ts",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/apps/api/src/main.js",

@@ -5,7 +5,9 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
+import { CmsArticleView, CmsLoadingView } from '@/components/CmsGate'
 import { api } from '@/lib/api'
+import { useCmsOverride } from '@/lib/useCmsOverride'
 
 export default function BlogPostPage({
   params,
@@ -13,6 +15,8 @@ export default function BlogPostPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = use(params)
+  const blogCmsSlug = slug ? `blog-cms-${slug}` : ''
+  const { loading: cmsLoading, page: cmsPage } = useCmsOverride(blogCmsSlug)
   const [post, setPost] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -32,6 +36,20 @@ export default function BlogPostPage({
     } finally {
       setLoading(false)
     }
+  }
+
+  if (cmsLoading) {
+    return <CmsLoadingView shell="withCategoryNav" />
+  }
+  if (cmsPage && blogCmsSlug) {
+    return (
+      <CmsArticleView
+        shell="withCategoryNav"
+        slug={blogCmsSlug}
+        title={cmsPage.title}
+        content={cmsPage.content}
+      />
+    )
   }
 
   if (loading) {

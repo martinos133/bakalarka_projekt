@@ -4,12 +4,11 @@ import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { isAuthenticated } from '@/lib/auth'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import type { Category } from '@inzertna-platforma/shared'
 import { FolderTree, FolderOpen, Folder, Search, Filter as FilterIcon, BarChart3, ListChecks } from 'lucide-react'
 import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts'
+import DashboardLayout from '@/components/DashboardLayout'
 
 const CATEGORY_STATUS = {
   ACTIVE: 'ACTIVE',
@@ -134,11 +133,7 @@ export default function CategoriesPage() {
   const hasActiveFilters = filters.search || filters.status || filters.type
 
   return (
-    <div className="min-h-screen bg-dark text-gray-200 flex">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Header />
-        <main className="p-6">
+    <DashboardLayout>
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-200">Kategórie</h1>
             <p className="text-sm text-gray-400 mt-1">Podrobný prehľad kategórií, štatistiky a rozloženie.</p>
@@ -146,9 +141,9 @@ export default function CategoriesPage() {
 
           {/* KPI karty */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/20">
+                <div className="p-2 rounded-xl bg-primary/20">
                   <FolderTree className="w-5 h-5 text-primary" />
                 </div>
                 <div>
@@ -157,9 +152,9 @@ export default function CategoriesPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-500/20">
+                <div className="p-2 rounded-xl bg-blue-500/20">
                   <FolderOpen className="w-5 h-5 text-blue-400" />
                 </div>
                 <div>
@@ -168,9 +163,9 @@ export default function CategoriesPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-purple-500/20">
+                <div className="p-2 rounded-xl bg-purple-500/20">
                   <Folder className="w-5 h-5 text-purple-400" />
                 </div>
                 <div>
@@ -179,9 +174,9 @@ export default function CategoriesPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-green-500/20">
+                <div className="p-2 rounded-xl bg-green-500/20">
                   <BarChart3 className="w-5 h-5 text-green-400" />
                 </div>
                 <div>
@@ -196,7 +191,7 @@ export default function CategoriesPage() {
 
           {/* Grafy */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <h3 className="text-lg font-semibold text-gray-200 mb-1">Podľa statusu</h3>
               <p className="text-xs text-gray-500 mb-4">Aktívne, koncept, neaktívne.</p>
               <div className="flex items-center justify-center" style={{ minHeight: 200 }}>
@@ -236,10 +231,10 @@ export default function CategoriesPage() {
                   </RechartsPieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-4 pt-4 border-t border-dark overflow-hidden">
+              <div className="mt-4 pt-4 border-t border-white/[0.06] overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-left text-gray-400 border-b border-dark">
+                    <tr className="text-left text-gray-400 border-b border-white/[0.06]">
                       <th className="py-2 px-3 font-medium">Status</th>
                       <th className="py-2 px-3 font-medium text-right">Počet</th>
                       <th className="py-2 px-3 font-medium text-right">Podiel</th>
@@ -247,7 +242,7 @@ export default function CategoriesPage() {
                   </thead>
                   <tbody>
                     {chartDataByStatus.map((d) => (
-                      <tr key={d.name} className="border-b border-dark/50 last:border-0 hover:bg-dark/30">
+                      <tr key={d.name} className="border-b border-white/[0.06]/50 last:border-0 hover:bg-dark/30">
                         <td className="py-2 px-3 flex items-center gap-2">
                           <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.fill }} />
                           <span className="text-gray-200">{d.name}</span>
@@ -261,14 +256,14 @@ export default function CategoriesPage() {
               </div>
             </div>
 
-            <div className="bg-card rounded-lg border border-dark overflow-hidden">
-              <div className="p-4 border-b border-dark">
+            <div className="card overflow-hidden">
+              <div className="p-4 border-b border-white/[0.06]">
                 <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wide text-gray-400">
                   Hlavné vs. podkategórie
                 </h3>
               </div>
               <div className="p-4 grid grid-cols-2 gap-4">
-                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
                     <span className="text-sm font-medium text-gray-300">Hlavné</span>
@@ -284,7 +279,7 @@ export default function CategoriesPage() {
                     </div>
                   )}
                 </div>
-                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0" />
                     <span className="text-sm font-medium text-gray-300">Podkategórie</span>
@@ -338,7 +333,7 @@ export default function CategoriesPage() {
               </div>
             </div>
 
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <h3 className="text-lg font-semibold text-gray-200 mb-1">Top kategórie podľa inzerátov</h3>
               <p className="text-xs text-gray-500 mb-4">Kategórie s najväčším počtom inzerátov.</p>
               {topCategoriesByAds.length > 0 ? (
@@ -378,7 +373,7 @@ export default function CategoriesPage() {
           </div>
 
           {/* Filtre */}
-          <div className="bg-card rounded-lg p-4 border border-dark mb-6">
+          <div className="card p-4 mb-6">
             <div className="flex items-center space-x-2 mb-4">
               <FilterIcon className="w-5 h-5 text-gray-400" />
               <h3 className="text-sm font-semibold text-gray-300">Filtre</h3>
@@ -393,7 +388,7 @@ export default function CategoriesPage() {
                     value={filters.search}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                     placeholder="Názov, slug..."
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 pl-10 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 pl-10 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                   />
                 </div>
               </div>
@@ -402,7 +397,7 @@ export default function CategoriesPage() {
                 <select
                   value={filters.status}
                   onChange={(e) => setFilters({ ...filters, status: e.target.value as '' | CategoryStatus })}
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                 >
                   <option value="">Všetky</option>
                   <option value={CATEGORY_STATUS.ACTIVE}>Aktívna</option>
@@ -415,7 +410,7 @@ export default function CategoriesPage() {
                 <select
                   value={filters.type}
                   onChange={(e) => setFilters({ ...filters, type: e.target.value as '' | 'main' | 'sub' })}
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                 >
                   <option value="">Všetky</option>
                   <option value="main">Hlavné kategórie</option>
@@ -436,7 +431,7 @@ export default function CategoriesPage() {
           </div>
 
           {/* Tabuľka kategórií */}
-          <div className="bg-card rounded-lg border border-dark">
+          <div className="card">
             {loading ? (
               <div className="p-6 text-center text-gray-400">Načítavam...</div>
             ) : filteredCategories.length === 0 ? (
@@ -517,8 +512,6 @@ export default function CategoriesPage() {
               </div>
             )}
           </div>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   )
 }

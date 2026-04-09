@@ -4,16 +4,19 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { CmsArticleView, CmsLoadingView } from '@/components/CmsGate'
 import { api } from '@/lib/api'
 import { isAuthenticated, getAuthUser, setAuthUser } from '@/lib/auth'
 import { User, Building2, Eye, EyeOff, Edit, Trash2, X, Lock, Mail, Phone, MapPin, Calendar, Briefcase, MessageSquare, Archive, CheckCircle, Paperclip, FileText, Download, Heart } from 'lucide-react'
 import CreateAdvertisementWizard from '@/components/CreateAdvertisementWizard'
 import Link from 'next/link'
 import { sellerPlanLabel } from '@/lib/sellerPlan'
+import { useCmsOverride } from '@/lib/useCmsOverride'
 
 export default function DashboardPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { loading: cmsLoading, page: cmsPage } = useCmsOverride('dashboard')
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState<'profile' | 'advertisements' | 'favorites' | 'create' | 'messages'>('profile')
   const [user, setUser] = useState<any>(null)
@@ -279,6 +282,20 @@ export default function DashboardPage() {
     } catch (err: any) {
       setError(err.message || 'Chyba pri odstraňovaní inzerátu')
     }
+  }
+
+  if (cmsLoading) {
+    return <CmsLoadingView shell="headerFooterOnly" />
+  }
+  if (cmsPage) {
+    return (
+      <CmsArticleView
+        shell="headerFooterOnly"
+        slug="dashboard"
+        title={cmsPage.title}
+        content={cmsPage.content}
+      />
+    )
   }
 
   if (!mounted || loading) {

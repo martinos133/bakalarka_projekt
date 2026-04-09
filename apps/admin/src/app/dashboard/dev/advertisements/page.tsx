@@ -3,12 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import CreateAdvertisementWizard from '@/components/CreateAdvertisementWizard'
 import { Advertisement, AdvertisementStatus, Category } from '@inzertna-platforma/shared'
 import { Plus, Edit, Trash2, X, Search, Filter as FilterIcon } from 'lucide-react'
+import DashboardLayout from '@/components/DashboardLayout'
 
 type AdvertisementType = 'SERVICE' | 'RENTAL'
 
@@ -119,11 +118,7 @@ export default function DevAdvertisementsPage() {
   const filteredAdvertisements = getFilteredAdvertisements()
 
   return (
-    <div className="min-h-screen bg-dark text-white flex">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Header />
-        <main className="p-6">
+    <DashboardLayout>
           <div className="mb-6 flex items-center justify-between">
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
               <div>
@@ -133,8 +128,8 @@ export default function DevAdvertisementsPage() {
               <div className="flex items-center gap-3 sm:ml-2">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                  showFilters ? 'bg-primary text-white' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-colors ${
+                  showFilters ? 'bg-primary text-white' : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <FilterIcon className="w-4 h-4" />
@@ -155,7 +150,7 @@ export default function DevAdvertisementsPage() {
               <button
                 type="button"
                 onClick={openNewAdvertisement}
-                className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 Nový inzerát
@@ -164,7 +159,7 @@ export default function DevAdvertisementsPage() {
           </div>
 
           {showFilters && (
-            <div className="bg-card rounded-lg p-6 border border-dark mb-6">
+            <div className="card p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-white">Pokročilé filtre</h3>
                 <button
@@ -196,7 +191,7 @@ export default function DevAdvertisementsPage() {
                       value={filters.search}
                       onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                       placeholder="Názov, popis, lokalita..."
-                      className="w-full bg-dark border border-card rounded-lg pl-10 pr-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl pl-10 pr-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
                     />
                   </div>
                 </div>
@@ -205,7 +200,7 @@ export default function DevAdvertisementsPage() {
                   <select
                     value={filters.status}
                     onChange={(e) => setFilters({ ...filters, status: e.target.value as '' | AdvertisementStatus })}
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
                   >
                     <option value="">Všetky</option>
                     <option value={AdvertisementStatus.ACTIVE}>Aktívne</option>
@@ -220,7 +215,7 @@ export default function DevAdvertisementsPage() {
                   <select
                     value={filters.type}
                     onChange={(e) => setFilters({ ...filters, type: e.target.value as '' | AdvertisementType })}
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
                   >
                     <option value="">Všetky</option>
                     <option value="SERVICE">Služby</option>
@@ -232,7 +227,7 @@ export default function DevAdvertisementsPage() {
                   <select
                     value={filters.categoryId}
                     onChange={(e) => setFilters({ ...filters, categoryId: e.target.value })}
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
                   >
                     <option value="">Všetky kategórie</option>
                     {categories.map((cat) => (
@@ -249,7 +244,7 @@ export default function DevAdvertisementsPage() {
                     value={filters.location}
                     onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                     placeholder="Mesto, región..."
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
                   />
                 </div>
                 <div className="lg:col-span-2">
@@ -261,7 +256,7 @@ export default function DevAdvertisementsPage() {
                       value={filters.minPrice}
                       onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
                       placeholder="Min"
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
                     />
                     <span className="text-gray-400 self-center">–</span>
                     <input
@@ -270,7 +265,7 @@ export default function DevAdvertisementsPage() {
                       value={filters.maxPrice}
                       onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
                       placeholder="Max"
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
                     />
                   </div>
                 </div>
@@ -281,14 +276,14 @@ export default function DevAdvertisementsPage() {
                       type="date"
                       value={filters.dateFrom}
                       onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
                     />
                     <span className="text-gray-400 self-center">–</span>
                     <input
                       type="date"
                       value={filters.dateTo}
                       onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
                     />
                   </div>
                 </div>
@@ -306,7 +301,7 @@ export default function DevAdvertisementsPage() {
                 <button
                   type="button"
                   onClick={resetWizardPanel}
-                  className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-card hover:text-white"
+                  className="rounded-xl p-2 text-gray-400 transition-colors hover:bg-card hover:text-white"
                   aria-label="Zavrieť editor"
                 >
                   <X className="w-5 h-5" />
@@ -328,7 +323,7 @@ export default function DevAdvertisementsPage() {
             </div>
           )}
 
-          <div className="bg-card rounded-lg border border-dark">
+          <div className="card">
             {loading ? (
               <div className="p-6 text-center text-gray-400">Načítavam...</div>
             ) : filteredAdvertisements.length === 0 ? (
@@ -386,8 +381,6 @@ export default function DevAdvertisementsPage() {
               </div>
             )}
           </div>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   )
 }

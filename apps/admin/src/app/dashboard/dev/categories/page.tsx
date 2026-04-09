@@ -3,11 +3,10 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { Category } from '@inzertna-platforma/shared'
 import { Plus, Edit, Trash2, X, Save, FolderTree, Image as ImageIcon, FolderPlus, ChevronDown, ChevronRight, GripVertical, Filter, Search } from 'lucide-react'
+import DashboardLayout from '@/components/DashboardLayout'
 
 type CategoryStatus = 'ACTIVE' | 'DRAFT' | 'INACTIVE'
 
@@ -572,14 +571,10 @@ export default function DevCategoriesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark text-white flex">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Header />
-        <main className="p-6">
+    <DashboardLayout>
           {/* Filtre hore */}
           {!showForm && (
-            <div className="bg-card rounded-lg p-4 border border-dark mb-6">
+            <div className="card p-4 mb-6">
               <div className="flex items-center gap-4 flex-wrap">
                 {/* Vyhľadávanie */}
                 <div className="flex-1 min-w-[200px]">
@@ -590,7 +585,7 @@ export default function DevCategoriesPage() {
                       value={filterData.search}
                       onChange={(e) => setFilterData({ ...filterData, search: e.target.value })}
                       placeholder="Vyhľadať kategórie..."
-                      className="w-full bg-dark border border-card rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 text-sm"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 text-sm"
                     />
                   </div>
                 </div>
@@ -600,7 +595,7 @@ export default function DevCategoriesPage() {
                   <select
                     value={filterData.status}
                     onChange={(e) => setFilterData({ ...filterData, status: e.target.value as '' | 'active' | 'inactive' })}
-                    className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
                   >
                     <option value="">Všetky</option>
                     <option value="active">Aktívne</option>
@@ -613,7 +608,7 @@ export default function DevCategoriesPage() {
                   <select
                     value={filterData.type}
                     onChange={(e) => setFilterData({ ...filterData, type: e.target.value as '' | 'main' | 'subcategory' })}
-                    className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
                   >
                     <option value="">Všetky typy</option>
                     <option value="main">Hlavné</option>
@@ -628,14 +623,14 @@ export default function DevCategoriesPage() {
                     value={filterData.minAdvertisements}
                     onChange={(e) => setFilterData({ ...filterData, minAdvertisements: e.target.value })}
                     placeholder="Min inz."
-                    className="w-24 bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
                   />
                   <input
                     type="number"
                     value={filterData.maxAdvertisements}
                     onChange={(e) => setFilterData({ ...filterData, maxAdvertisements: e.target.value })}
                     placeholder="Max inz."
-                    className="w-24 bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
                   />
                 </div>
 
@@ -646,14 +641,14 @@ export default function DevCategoriesPage() {
                     value={filterData.minSubcategories}
                     onChange={(e) => setFilterData({ ...filterData, minSubcategories: e.target.value })}
                     placeholder="Min pod."
-                    className="w-24 bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
                   />
                   <input
                     type="number"
                     value={filterData.maxSubcategories}
                     onChange={(e) => setFilterData({ ...filterData, maxSubcategories: e.target.value })}
                     placeholder="Max pod."
-                    className="w-24 bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
                   />
                 </div>
 
@@ -664,14 +659,14 @@ export default function DevCategoriesPage() {
                     value={filterData.minFilters}
                     onChange={(e) => setFilterData({ ...filterData, minFilters: e.target.value })}
                     placeholder="Min filt."
-                    className="w-24 bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
                   />
                   <input
                     type="number"
                     value={filterData.maxFilters}
                     onChange={(e) => setFilterData({ ...filterData, maxFilters: e.target.value })}
                     placeholder="Max filt."
-                    className="w-24 bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
                   />
                 </div>
 
@@ -694,7 +689,7 @@ export default function DevCategoriesPage() {
                   </div>
                   <button
                     onClick={() => setShowForm(true)}
-                    className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors whitespace-nowrap"
+                    className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-xl flex items-center space-x-2 transition-colors whitespace-nowrap"
                   >
                     <Plus className="w-5 h-5" />
                     <span>Nová kategória</span>
@@ -705,7 +700,7 @@ export default function DevCategoriesPage() {
           )}
 
           {showForm && (
-            <div className="bg-card rounded-lg p-6 border border-dark mb-6" data-form="category-form">
+            <div className="card p-6 mb-6" data-form="category-form">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold">
                   {editingId ? 'Upraviť kategóriu' : 'Nová kategória'}
@@ -730,7 +725,7 @@ export default function DevCategoriesPage() {
                       value={formData.name}
                       onChange={(e) => handleNameChange(e.target.value)}
                       placeholder="Napríklad: Autá, Nehnuteľnosti, Elektronika..."
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                     />
                   </div>
 
@@ -746,7 +741,7 @@ export default function DevCategoriesPage() {
                     <select
                       value={formData.parentId}
                       onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                     >
                       <option value="">-- Hlavná kategória --</option>
                       {categories
@@ -776,7 +771,7 @@ export default function DevCategoriesPage() {
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                     placeholder="Automaticky generovaný z názvu..."
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                   />
                   <p className="mt-1 text-xs text-gray-400">
                     URL-friendly identifikátor kategórie (automaticky generovaný z názvu)
@@ -792,7 +787,7 @@ export default function DevCategoriesPage() {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
                     placeholder="Krátky popis kategórie..."
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                   />
                 </div>
 
@@ -806,7 +801,7 @@ export default function DevCategoriesPage() {
                       <img
                         src={formData.banner}
                         alt={formData.bannerAlt || 'Banner preview'}
-                        className="w-full max-h-64 object-cover rounded-lg border border-card"
+                        className="w-full max-h-64 object-cover rounded-xl border border-card"
                       />
                       <button
                         type="button"
@@ -817,7 +812,7 @@ export default function DevCategoriesPage() {
                       </button>
                     </div>
                   ) : (
-                    <div className="border-2 border-dashed border-card rounded-lg p-6 text-center hover:border-gray-600 transition-colors">
+                    <div className="border-2 border-dashed border-card rounded-xl p-6 text-center hover:border-gray-600 transition-colors">
                       <input
                         type="file"
                         accept="image/*"
@@ -846,7 +841,7 @@ export default function DevCategoriesPage() {
                         value={formData.bannerAlt}
                         onChange={(e) => setFormData({ ...formData, bannerAlt: e.target.value })}
                         placeholder="Alt text pre banner (SEO)"
-                        className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         Popis bannera pre vyhľadávače a prístupnosť
@@ -864,7 +859,7 @@ export default function DevCategoriesPage() {
                       <img
                         src={formData.image}
                         alt="Preview"
-                        className="w-32 h-32 object-cover rounded-lg border border-card"
+                        className="w-32 h-32 object-cover rounded-xl border border-card"
                       />
                       <button
                         type="button"
@@ -875,7 +870,7 @@ export default function DevCategoriesPage() {
                       </button>
                     </div>
                   ) : (
-                    <div className="border-2 border-dashed border-card rounded-lg p-6 text-center hover:border-gray-600 transition-colors">
+                    <div className="border-2 border-dashed border-card rounded-xl p-6 text-center hover:border-gray-600 transition-colors">
                       <input
                         type="file"
                         accept="image/*"
@@ -909,7 +904,7 @@ export default function DevCategoriesPage() {
                       value={formData.icon}
                       onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
                       placeholder="Napríklad: Car, Home, Smartphone..."
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                     />
                   </div>
 
@@ -922,7 +917,7 @@ export default function DevCategoriesPage() {
                       value={formData.color}
                       onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                       placeholder="#3b82f6"
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                     />
                   </div>
                 </div>
@@ -944,7 +939,7 @@ export default function DevCategoriesPage() {
                         value={formData.imageAlt}
                         onChange={(e) => setFormData({ ...formData, imageAlt: e.target.value })}
                         placeholder="Napríklad: Logo kategórie Autá a motocykle"
-                        className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         Popis obrázka pre vyhľadávače a používateľov so zrakovým postihnutím
@@ -962,7 +957,7 @@ export default function DevCategoriesPage() {
                         onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
                         placeholder="Napríklad: Autá a motocykle na predaj - Najlepšie ponuky"
                         maxLength={60}
-                        className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         {formData.metaTitle.length}/60 znakov (odporúčané: 50-60 znakov)
@@ -980,7 +975,7 @@ export default function DevCategoriesPage() {
                         placeholder="Napríklad: Nájdite najlepšie autá a motocykle na predaj. Tisíce inzerátov od overených predajcov. Rýchle vyhľadávanie a jednoduchá komunikácia."
                         maxLength={160}
                         rows={3}
-                        className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         {formData.metaDescription.length}/160 znakov (odporúčané: 150-160 znakov)
@@ -997,7 +992,7 @@ export default function DevCategoriesPage() {
                         value={formData.metaKeywords}
                         onChange={(e) => setFormData({ ...formData, metaKeywords: e.target.value })}
                         placeholder="Napríklad: autá, motocykle, predaj áut, ojazdené autá, nové autá"
-                        className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         Kľúčové slová oddelené čiarkou (napr: autá, motocykle, predaj)
@@ -1014,7 +1009,7 @@ export default function DevCategoriesPage() {
                           <img
                             src={formData.ogImage}
                             alt="OG Preview"
-                            className="w-32 h-32 object-cover rounded-lg border border-card"
+                            className="w-32 h-32 object-cover rounded-xl border border-card"
                           />
                           <button
                             type="button"
@@ -1025,7 +1020,7 @@ export default function DevCategoriesPage() {
                           </button>
                         </div>
                       ) : (
-                        <div className="border-2 border-dashed border-card rounded-lg p-4 text-center hover:border-gray-600 transition-colors">
+                        <div className="border-2 border-dashed border-card rounded-xl p-4 text-center hover:border-gray-600 transition-colors">
                           <input
                             type="file"
                             accept="image/*"
@@ -1068,7 +1063,7 @@ export default function DevCategoriesPage() {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as CategoryStatus })}
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                   >
                     <option value="ACTIVE">Aktívna</option>
                     <option value="DRAFT">Koncept</option>
@@ -1083,13 +1078,13 @@ export default function DevCategoriesPage() {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="px-4 py-2 border border-card rounded-lg text-gray-300 hover:bg-cardHover transition-colors"
+                    className="px-4 py-2 border border-card rounded-xl text-gray-300 hover:bg-cardHover transition-colors"
                   >
                     Zrušiť
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-primary hover:opacity-90 text-white rounded-lg flex items-center space-x-2 transition-colors"
+                    className="px-4 py-2 bg-primary hover:opacity-90 text-white rounded-xl flex items-center space-x-2 transition-colors"
                   >
                     <Save className="w-4 h-4" />
                     <span>{editingId ? 'Uložiť zmeny' : 'Vytvoriť'}</span>
@@ -1099,7 +1094,7 @@ export default function DevCategoriesPage() {
             </div>
           )}
 
-          <div className="bg-card rounded-lg border border-dark">
+          <div className="card">
             {loading ? (
               <div className="p-6 text-center text-gray-400">Načítavam...</div>
             ) : categories.length === 0 ? (
@@ -1128,12 +1123,12 @@ export default function DevCategoriesPage() {
                         key={category.id} 
                         className={`bg-card border overflow-hidden transition-all cursor-move ${
                           isFirst ? 'rounded-t-lg' : ''
-                        } ${shouldRoundBottom ? 'rounded-b-lg' : ''} ${
+                        } ${shouldRoundBottom ? 'rounded-b-xl' : ''} ${
                           draggedCategoryId === category.id 
                             ? 'border-primary opacity-50 scale-95' 
                             : draggedOverCategoryId === category.id
                             ? 'border-green-500 border-2 scale-105'
-                            : 'border-dark border-t-0'
+                            : 'border-white/[0.06] border-t-0'
                         } ${!isFirst ? 'border-t-0' : ''}`}
                         draggable
                         onDragStart={(e) => handleDragStart(e, category.id)}
@@ -1155,10 +1150,10 @@ export default function DevCategoriesPage() {
                                 <img
                                   src={category.image}
                                   alt={category.name}
-                                  className="w-16 h-16 object-cover rounded-lg"
+                                  className="w-16 h-16 object-cover rounded-xl"
                                 />
                               ) : (
-                                <div className="w-16 h-16 bg-dark rounded-lg flex items-center justify-center">
+                                <div className="w-16 h-16 bg-dark rounded-xl flex items-center justify-center">
                                   <FolderTree className="w-8 h-8 text-gray-400" />
                                 </div>
                               )}
@@ -1239,7 +1234,7 @@ export default function DevCategoriesPage() {
                             <div className="flex items-center gap-2 flex-shrink-0">
                               <button
                                 onClick={() => handleAddSubcategory(category)}
-                                className="px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm flex items-center gap-1.5 transition-colors whitespace-nowrap"
+                                className="px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl text-sm flex items-center gap-1.5 transition-colors whitespace-nowrap"
                                 title="Pridať podkategóriu"
                               >
                                 <FolderPlus className="w-4 h-4" />
@@ -1265,9 +1260,9 @@ export default function DevCategoriesPage() {
 
                         {/* Expandovaná sekcia s podkategóriami */}
                         {isExpanded && (
-                          <div className="border-t border-dark bg-dark/30 rounded-b-lg">
+                          <div className="border-t border-white/[0.06] bg-white/[0.02] rounded-b-xl">
                             {/* Filtre */}
-                            <div className="p-4 border-b border-dark/50">
+                            <div className="p-4 border-b border-white/[0.06]/50">
                               <div className="flex items-center justify-between mb-3">
                                 <h4 className="text-sm font-semibold text-white flex items-center gap-2">
                                   <span className="w-1 h-4 bg-purple-400 rounded"></span>
@@ -1278,7 +1273,7 @@ export default function DevCategoriesPage() {
                                   onClick={() =>
                                     window.open(`/dashboard/dev/filters?categoryId=${category.id}`, '_blank')
                                   }
-                                  className="text-xs px-3 py-1.5 rounded-lg border border-purple-500/50 text-purple-300 hover:bg-purple-500/10 transition-colors"
+                                  className="text-xs px-3 py-1.5 rounded-xl border border-purple-500/50 text-purple-300 hover:bg-purple-500/10 transition-colors"
                                 >
                                   Spravovať filtre
                                 </button>
@@ -1288,7 +1283,7 @@ export default function DevCategoriesPage() {
                                   {category.filters.map((filter: any) => (
                                     <div
                                       key={filter.id}
-                                      className="px-3 py-1.5 bg-purple-500/20 border border-purple-500/30 rounded-lg text-xs text-purple-300 flex items-center gap-2"
+                                      className="px-3 py-1.5 bg-purple-500/20 border border-purple-500/30 rounded-xl text-xs text-purple-300 flex items-center gap-2"
                                     >
                                       <span className="font-medium">{filter.name}</span>
                                       <span className="text-purple-400/70">({filter.type})</span>
@@ -1311,7 +1306,7 @@ export default function DevCategoriesPage() {
                             
                             {/* Formulár pre pridanie podkategórie */}
                             {showForm && (
-                              <div className="p-4 bg-card/50 border-b border-card">
+                              <div className="p-4 bg-white/[0.03] border-b border-card">
                                 <form onSubmit={handleSubcategorySubmit} className="space-y-3">
                                   <div className="flex items-center space-x-2 mb-3">
                                     <FolderPlus className="w-4 h-4 text-green-400" />
@@ -1328,7 +1323,7 @@ export default function DevCategoriesPage() {
                                         setFormData({ ...formData, name, slug })
                                       }}
                                       placeholder="Názov podkategórie *"
-                                      className="w-full bg-card border border-dark rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                                      className="w-full bg-card border border-white/[0.06] rounded-2xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
                                     />
                                     <input
                                       type="text"
@@ -1336,14 +1331,14 @@ export default function DevCategoriesPage() {
                                       value={formData.slug}
                                       onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                                       placeholder="Slug (automaticky generovaný) *"
-                                      className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
                                     />
                                     <input
                                       type="text"
                                       value={formData.description}
                                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                       placeholder="Popis (voliteľné)"
-                                      className="w-full bg-dark border border-card rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
                                     />
                                   </div>
                                   <div className="flex items-center justify-end space-x-2">
@@ -1369,13 +1364,13 @@ export default function DevCategoriesPage() {
                                           parentId: '',
                                         })
                                       }}
-                                      className="px-3 py-1.5 border border-card rounded-lg text-gray-300 hover:bg-cardHover text-sm transition-colors"
+                                      className="px-3 py-1.5 border border-card rounded-xl text-gray-300 hover:bg-cardHover text-sm transition-colors"
                                     >
                                       Zrušiť
                                     </button>
                                     <button
                                       type="submit"
-                                      className="px-3 py-1.5 bg-primary hover:opacity-90 text-white rounded-lg text-sm flex items-center space-x-1 transition-colors"
+                                      className="px-3 py-1.5 bg-primary hover:opacity-90 text-white rounded-xl text-sm flex items-center space-x-1 transition-colors"
                                     >
                                       <Save className="w-3 h-3" />
                                       <span>Vytvoriť</span>
@@ -1391,12 +1386,12 @@ export default function DevCategoriesPage() {
                                 {[...children].sort((a: any, b: any) => (a.order || 0) - (b.order || 0)).map((child: Category) => (
                                   <div
                                     key={child.id}
-                                    className={`flex items-center gap-3 p-3 rounded-lg transition-all cursor-move ${
+                                    className={`flex items-center gap-3 p-3 rounded-xl transition-all cursor-move ${
                                       draggedCategoryId === child.id 
                                         ? 'bg-primary/20 opacity-50 border-2 border-primary scale-95' 
                                         : draggedOverCategoryId === child.id
                                         ? 'bg-green-500/20 border-2 border-green-500 scale-105'
-                                        : 'bg-dark/50 hover:bg-dark/70 border border-dark/50'
+                                        : 'bg-white/[0.04] hover:bg-white/[0.06] border border-white/[0.06]'
                                     }`}
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, child.id)}
@@ -1410,7 +1405,7 @@ export default function DevCategoriesPage() {
                                     </div>
                                     
                                     {/* Ikona */}
-                                    <div className="w-12 h-12 bg-dark rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div className="w-12 h-12 bg-dark rounded-xl flex items-center justify-center flex-shrink-0">
                                       <FolderTree className="w-6 h-6 text-gray-500" />
                                     </div>
                                     
@@ -1474,8 +1469,6 @@ export default function DevCategoriesPage() {
               </div>
             )}
           </div>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   )
 }

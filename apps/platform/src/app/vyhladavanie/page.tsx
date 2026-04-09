@@ -8,8 +8,9 @@ import TrackedLink from '@/components/TrackedLink'
 import Header from '@/components/Header'
 import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
+import { CmsGate } from '@/components/CmsGate'
 
-export default function SearchPage() {
+function SearchPageInner() {
   const searchParams = useSearchParams()
   const q = searchParams?.get('q') || ''
   const [advertisements, setAdvertisements] = useState<any[]>([])
@@ -144,5 +145,13 @@ export default function SearchPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <CmsGate cmsSlug="vyhladavanie">
+      <SearchPageInner />
+    </CmsGate>
   )
 }

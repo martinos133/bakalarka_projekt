@@ -3,10 +3,9 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { Reply, X } from 'lucide-react'
+import DashboardLayout from '@/components/DashboardLayout'
 
 interface MessageSender {
   id: string
@@ -102,11 +101,7 @@ export default function ContactFormsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark text-gray-200 flex">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Header />
-        <main className="p-6">
+    <DashboardLayout>
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-200">Kontaktné formuláre / Správy</h1>
             <p className="text-sm text-gray-400 mt-1">
@@ -119,7 +114,7 @@ export default function ContactFormsPage() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="bg-card border border-dark rounded-lg px-3 py-2 text-sm text-gray-200"
+              className="bg-card border border-white/[0.06] rounded-2xl px-3 py-2 text-sm text-gray-200"
             >
               <option value="">Všetky stavy</option>
               <option value="UNREAD">Neprečítaná</option>
@@ -129,7 +124,7 @@ export default function ContactFormsPage() {
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="bg-card border border-dark rounded-lg px-3 py-2 text-sm text-gray-200"
+              className="bg-card border border-white/[0.06] rounded-2xl px-3 py-2 text-sm text-gray-200"
             >
               <option value="">Všetky typy</option>
               <option value="INQUIRY">Dotaz na inzerát</option>
@@ -138,15 +133,15 @@ export default function ContactFormsPage() {
           </div>
 
           {loading ? (
-            <div className="bg-card rounded-lg border border-dark p-12 text-center text-gray-400">
+            <div className="card p-12 text-center text-gray-400">
               Načítavam správy...
             </div>
           ) : messages.length === 0 ? (
-            <div className="bg-card rounded-lg border border-dark p-12 text-center text-gray-500">
+            <div className="card p-12 text-center text-gray-500">
               Žiadne správy.
             </div>
           ) : (
-            <div className="bg-card rounded-lg border border-dark overflow-hidden">
+            <div className="card overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -164,7 +159,7 @@ export default function ContactFormsPage() {
                       <tr
                         key={msg.id}
                         onClick={() => openDetail(msg)}
-                        className="border-b border-dark/50 last:border-0 hover:bg-dark/30 cursor-pointer"
+                        className="border-b border-white/[0.06]/50 last:border-0 hover:bg-dark/30 cursor-pointer"
                       >
                         <td className="py-2.5 px-4 text-gray-200">
                           <span className="truncate max-w-[180px] block" title={senderLabel(msg.sender)}>
@@ -207,12 +202,12 @@ export default function ContactFormsPage() {
           {/* Detail správy + odpovedať */}
           {showDetailModal && selectedMessage && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-              <div className="bg-card border border-dark rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-xl">
-                <div className="flex items-center justify-between p-4 border-b border-dark">
+              <div className="bg-card border border-white/[0.06] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-xl">
+                <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
                   <h2 className="text-lg font-semibold text-gray-200">Detail správy</h2>
                   <button
                     onClick={() => { setShowDetailModal(false); setSelectedMessage(null) }}
-                    className="p-2 rounded-lg hover:bg-dark/50 text-gray-400 hover:text-gray-200"
+                    className="p-2 rounded-xl hover:bg-dark/50 text-gray-400 hover:text-gray-200"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -238,7 +233,7 @@ export default function ContactFormsPage() {
                   )}
                   <div>
                     <span className="text-xs text-gray-500">Správa</span>
-                    <div className="mt-1 p-3 rounded-lg bg-dark/40 text-gray-200 whitespace-pre-wrap">
+                    <div className="mt-1 p-3 rounded-xl bg-dark/40 text-gray-200 whitespace-pre-wrap">
                       {selectedMessage.content}
                     </div>
                   </div>
@@ -246,7 +241,7 @@ export default function ContactFormsPage() {
                     {selectedMessage.sender?.email && (
                       <a
                         href={`mailto:${selectedMessage.sender.email}?subject=Re: ${encodeURIComponent(selectedMessage.subject)}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-gray-100 text-sm font-medium hover:opacity-90"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-gray-100 text-sm font-medium hover:opacity-90"
                       >
                         <Reply className="w-4 h-4" />
                         Odpovedať
@@ -257,8 +252,6 @@ export default function ContactFormsPage() {
               </div>
             </div>
           )}
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   )
 }

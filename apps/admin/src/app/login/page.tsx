@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Lock } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -31,20 +32,17 @@ export default function LoginPage() {
         throw new Error(data.message || 'Prihlásenie zlyhalo')
       }
 
-      // Uloženie tokenu do localStorage
       if (data.token) {
         localStorage.setItem('admin_token', data.token)
         localStorage.setItem('admin_user', JSON.stringify(data.user))
       }
 
-      // Kontrola, či je používateľ admin
       if (data.user.role !== 'ADMIN') {
         localStorage.removeItem('admin_token')
         localStorage.removeItem('admin_user')
         throw new Error('Nemáte oprávnenie na prístup do admin panelu')
       }
 
-      // Presmerovanie na dashboard
       router.push('/dashboard')
     } catch (err: any) {
       if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
@@ -58,25 +56,30 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="w-full max-w-md">
-        <div className="bg-gray-900 rounded-lg shadow-xl p-8 border border-gray-800">
-          <h1 className="text-3xl font-bold text-white mb-2 text-center">
+    <div className="min-h-screen flex items-center justify-center bg-dark">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-6 h-6 text-primary" />
+          </div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">
             Admin Panel
           </h1>
-          <p className="text-gray-400 text-center mb-8">
+          <p className="text-sm text-muted mt-1">
             Prihláste sa do administračného panelu
           </p>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="card p-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-red-900/50 border border-red-700 text-red-200 px-4 py-3 rounded">
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">
                 Email
               </label>
               <input
@@ -85,13 +88,13 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.06] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/40 focus:bg-white/[0.06] transition-all text-sm"
                 placeholder="admin@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1.5">
                 Heslo
               </label>
               <input
@@ -100,7 +103,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.06] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/40 focus:bg-white/[0.06] transition-all text-sm"
                 placeholder="••••••••"
               />
             </div>
@@ -108,9 +111,16 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
+              className="w-full bg-primary hover:bg-blue-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-4 rounded-xl transition-all duration-200 text-sm"
             >
-              {loading ? 'Prihlasovanie...' : 'Prihlásiť sa'}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Prihlasovanie...
+                </span>
+              ) : (
+                'Prihlásiť sa'
+              )}
             </button>
           </form>
         </div>

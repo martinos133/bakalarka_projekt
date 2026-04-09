@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { CmsGate } from '@/components/CmsGate'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
@@ -65,6 +66,7 @@ export default function SignInPage() {
   }
 
   return (
+    <CmsGate cmsSlug="signin" shell="headerFooterOnly">
     <div className="min-h-screen bg-white">
       <Header />
       <div className="flex items-center justify-center py-12 px-4">
@@ -136,5 +138,6 @@ export default function SignInPage() {
       </div>
       <Footer />
     </div>
+    </CmsGate>
   )
 }

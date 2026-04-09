@@ -3,11 +3,10 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { Advertisement } from '@inzertna-platforma/shared'
 import { Check, X, Eye, Calendar, User, MapPin, Euro, Image as ImageIcon, Search, Filter as FilterIcon, AlertCircle } from 'lucide-react'
+import DashboardLayout from '@/components/DashboardLayout'
 
 export default function PendingAdvertisementsPage() {
   const router = useRouter()
@@ -198,13 +197,9 @@ export default function PendingAdvertisementsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-dark text-white flex">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Header />
-        <main className="p-6">
+    <DashboardLayout>
           {/* Filtre */}
-          <div className="bg-card rounded-lg p-4 border border-dark mb-6">
+          <div className="card p-4 mb-6">
             <div className="flex items-center space-x-2 mb-4">
               <FilterIcon className="w-5 h-5 text-gray-400" />
               <h3 className="text-sm font-semibold text-gray-300">Filtre</h3>
@@ -219,7 +214,7 @@ export default function PendingAdvertisementsPage() {
                     value={filters.search}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                     placeholder="Názov, popis, používateľ..."
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover text-sm"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover text-sm"
                   />
                 </div>
               </div>
@@ -228,7 +223,7 @@ export default function PendingAdvertisementsPage() {
                 <select
                   value={filters.categoryId}
                   onChange={(e) => setFilters({ ...filters, categoryId: e.target.value })}
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                 >
                   <option value="">Všetky</option>
                   {categories.map((cat) => (
@@ -247,7 +242,7 @@ export default function PendingAdvertisementsPage() {
                   placeholder="0"
                   min="0"
                   step="0.01"
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover placeholder-gray-500"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover placeholder-gray-500"
                 />
               </div>
               <div>
@@ -259,7 +254,7 @@ export default function PendingAdvertisementsPage() {
                   placeholder="∞"
                   min="0"
                   step="0.01"
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover placeholder-gray-500"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover placeholder-gray-500"
                 />
               </div>
               <div>
@@ -269,7 +264,7 @@ export default function PendingAdvertisementsPage() {
                   value={filters.location}
                   onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                   placeholder="Mesto, región..."
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover placeholder-gray-500"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover placeholder-gray-500"
                 />
               </div>
             </div>
@@ -285,7 +280,7 @@ export default function PendingAdvertisementsPage() {
             )}
           </div>
 
-          <div className="bg-card rounded-lg border border-dark">
+          <div className="card">
             {loading ? (
               <div className="p-6 text-center text-gray-400">Načítavam...</div>
             ) : filteredAdvertisements.length === 0 ? (
@@ -391,14 +386,14 @@ export default function PendingAdvertisementsPage() {
                             <div className="flex items-center justify-end space-x-2">
                               <button
                                 onClick={() => handleViewDetail(ad)}
-                                className="p-2 bg-dark hover:bg-cardHover rounded-lg transition-colors"
+                                className="p-2 bg-dark hover:bg-cardHover rounded-xl transition-colors"
                                 title="Zobraziť detail"
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleApprove(ad.id)}
-                                className="p-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+                                className="p-2 bg-green-600 hover:bg-green-700 rounded-xl transition-colors"
                                 title="Schváliť"
                               >
                                 <Check className="w-4 h-4" />
@@ -408,7 +403,7 @@ export default function PendingAdvertisementsPage() {
                                   setSelectedAd(ad)
                                   setShowDetailModal(true)
                                 }}
-                                className="p-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                                className="p-2 bg-red-600 hover:bg-red-700 rounded-xl transition-colors"
                                 title="Zamietnuť"
                               >
                                 <X className="w-4 h-4" />
@@ -426,9 +421,9 @@ export default function PendingAdvertisementsPage() {
 
           {/* Detail Modal */}
           {showDetailModal && selectedAd && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <div className="bg-card rounded-lg border border-dark max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                <div className="p-6 border-b border-dark">
+            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+              <div className="card max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="p-6 border-b border-white/[0.06]">
                   <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold">Detail inzerátu</h2>
                     <button
@@ -437,7 +432,7 @@ export default function PendingAdvertisementsPage() {
                         setSelectedAd(null)
                         setRejectReason('')
                       }}
-                      className="p-2 hover:bg-dark rounded-lg transition-colors"
+                      className="p-2 hover:bg-dark rounded-xl transition-colors"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -455,7 +450,7 @@ export default function PendingAdvertisementsPage() {
                             key={idx}
                             src={img}
                             alt={`${selectedAd.title} ${idx + 1}`}
-                            className="w-full h-48 object-cover rounded-lg"
+                            className="w-full h-48 object-cover rounded-xl"
                           />
                         ))}
                       </div>
@@ -465,7 +460,7 @@ export default function PendingAdvertisementsPage() {
                   {/* Základné informácie */}
                   <div>
                     <h3 className="text-sm font-semibold text-gray-400 mb-3">Základné informácie</h3>
-                    <div className="bg-dark rounded-lg p-4 space-y-3">
+                    <div className="bg-dark rounded-xl p-4 space-y-3">
                       <div>
                         <div className="text-xs text-gray-400 mb-1">Názov</div>
                         <div className="text-lg font-medium">{selectedAd.title}</div>
@@ -495,7 +490,7 @@ export default function PendingAdvertisementsPage() {
                   {(selectedAd as any).user && (
                     <div>
                       <h3 className="text-sm font-semibold text-gray-400 mb-3">Používateľ</h3>
-                      <div className="bg-dark rounded-lg p-4">
+                      <div className="bg-dark rounded-xl p-4">
                         <div className="text-sm">
                           {(selectedAd as any).user.firstName} {(selectedAd as any).user.lastName}
                         </div>
@@ -511,7 +506,7 @@ export default function PendingAdvertisementsPage() {
                   {(selectedAd as any).category && (
                     <div>
                       <h3 className="text-sm font-semibold text-gray-400 mb-3">Kategória</h3>
-                      <div className="bg-dark rounded-lg p-4">
+                      <div className="bg-dark rounded-xl p-4">
                         <div className="text-sm">{(selectedAd as any).category.name}</div>
                       </div>
                     </div>
@@ -524,33 +519,33 @@ export default function PendingAdvertisementsPage() {
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="Zadajte dôvod zamietnutia inzerátu..."
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
                       rows={4}
                     />
                   </div>
 
                   {/* Akcie */}
-                  <div className="flex items-center justify-end space-x-3 pt-4 border-t border-dark">
+                  <div className="flex items-center justify-end space-x-3 pt-4 border-t border-white/[0.06]">
                     <button
                       onClick={() => {
                         setShowDetailModal(false)
                         setSelectedAd(null)
                         setRejectReason('')
                       }}
-                      className="px-4 py-2 bg-dark hover:bg-cardHover rounded-lg transition-colors"
+                      className="px-4 py-2 bg-dark hover:bg-cardHover rounded-xl transition-colors"
                     >
                       Zrušiť
                     </button>
                     <button
                       onClick={() => handleReject(selectedAd.id)}
                       disabled={!rejectReason.trim()}
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-colors"
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-xl transition-colors"
                     >
                       Zamietnuť
                     </button>
                     <button
                       onClick={() => handleApprove(selectedAd.id)}
-                      className="px-4 py-2 bg-primary hover:opacity-90 rounded-lg transition-colors"
+                      className="px-4 py-2 bg-primary hover:opacity-90 rounded-xl transition-colors"
                     >
                       Schváliť
                     </button>
@@ -563,7 +558,7 @@ export default function PendingAdvertisementsPage() {
           {/* Confirmation Modal */}
           {confirmModal.show && (
             <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-              <div className="bg-card rounded-lg border border-dark max-w-md w-full shadow-xl">
+              <div className="card max-w-md w-full shadow-xl">
                 <div className="p-6">
                   <div className="flex items-start space-x-4">
                     <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
@@ -587,13 +582,13 @@ export default function PendingAdvertisementsPage() {
                       <div className="flex items-center justify-end space-x-3">
                         <button
                           onClick={() => setConfirmModal({ ...confirmModal, show: false })}
-                          className="px-4 py-2 bg-dark hover:bg-cardHover rounded-lg transition-colors text-sm font-medium"
+                          className="px-4 py-2 bg-dark hover:bg-cardHover rounded-xl transition-colors text-sm font-medium"
                         >
                           Zrušiť
                         </button>
                         <button
                           onClick={confirmModal.onConfirm}
-                          className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium text-white ${
+                          className={`px-4 py-2 rounded-xl transition-colors text-sm font-medium text-white ${
                             confirmModal.type === 'approve'
                               ? 'bg-primary hover:opacity-90'
                               : 'bg-red-600 hover:bg-red-700'
@@ -612,7 +607,7 @@ export default function PendingAdvertisementsPage() {
           {/* Alert Modal */}
           {alertModal.show && (
             <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-              <div className="bg-card rounded-lg border border-dark max-w-md w-full shadow-xl">
+              <div className="card max-w-md w-full shadow-xl">
                 <div className="p-6">
                   <div className="flex items-start space-x-4">
                     <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
@@ -644,7 +639,7 @@ export default function PendingAdvertisementsPage() {
                       <div className="flex items-center justify-end">
                         <button
                           onClick={() => setAlertModal({ ...alertModal, show: false })}
-                          className="px-4 py-2 bg-primary hover:opacity-90 rounded-lg transition-colors text-sm font-medium text-white"
+                          className="px-4 py-2 bg-primary hover:opacity-90 rounded-xl transition-colors text-sm font-medium text-white"
                         >
                           OK
                         </button>
@@ -655,8 +650,6 @@ export default function PendingAdvertisementsPage() {
               </div>
             </div>
           )}
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   )
 }

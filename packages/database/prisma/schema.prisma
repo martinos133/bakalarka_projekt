@@ -5,6 +5,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+/// Entitno-relačný diagram: po `npm run db:generate` otvor súbor `prisma/database-erd.svg` v prehliadači.
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "./database-erd.svg"
+  theme    = "neutral"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
@@ -49,69 +56,69 @@ enum SellerPlan {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  password      String
-  firstName     String?
-  lastName      String?
-  phone         String?
-  dateOfBirth   DateTime?
-  gender        Gender?
-  isCompany     Boolean   @default(false)
-  companyName   String?
-  companyId     String?   // IČO
-  companyTaxId  String?   // DIČ
-  address       String?
-  city          String?
-  postalCode    String?
-  country       String?
-  role          UserRole  @default(USER)
-  sellerPlan          SellerPlan @default(STANDARD)
+  id                   String          @id @default(uuid())
+  email                String          @unique
+  password             String
+  firstName            String?
+  lastName             String?
+  phone                String?
+  dateOfBirth          DateTime?
+  gender               Gender?
+  isCompany            Boolean         @default(false)
+  companyName          String?
+  companyId            String? // IČO
+  companyTaxId         String? // DIČ
+  address              String?
+  city                 String?
+  postalCode           String?
+  country              String?
+  role                 UserRole        @default(USER)
+  sellerPlan           SellerPlan      @default(STANDARD)
   sellerPlanValidUntil DateTime?
-  banned        Boolean   @default(false)
-  bannedUntil   DateTime?
-  banReason     String?
-  lastLoginAt   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  advertisements Advertisement[]
-  paymentsReceived Payment[] @relation("Owner")
-  paymentsMade Payment[]     @relation("Renter")
-  reports        Report[]    @relation("Reports")
-  messagesReceived Message[] @relation("MessageRecipient")
-  messagesSent   Message[]   @relation("MessageSender")
-  favorites      Favorite[]
-  
+  banned               Boolean         @default(false)
+  bannedUntil          DateTime?
+  banReason            String?
+  lastLoginAt          DateTime?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  advertisements       Advertisement[]
+  paymentsReceived     Payment[]       @relation("Owner")
+  paymentsMade         Payment[]       @relation("Renter")
+  reports              Report[]        @relation("Reports")
+  messagesReceived     Message[]       @relation("MessageRecipient")
+  messagesSent         Message[]       @relation("MessageSender")
+  favorites            Favorite[]
+
   @@index([banned])
   @@index([bannedUntil])
   @@index([isCompany])
 }
 
 model Category {
-  id            String         @id @default(uuid())
-  name          String         @unique
-  slug          String         @unique
-  description   String?        @db.Text
-  icon          String?
-  color         String?
-  image         String?        // URL alebo base64 obrázka
-  imageAlt      String?        // Alt text pre obrázok (SEO)
-  banner        String?        // Banner obrázok pre stránku kategórie
-  bannerAlt     String?        // Alt text pre banner (SEO)
-  metaTitle     String?        // SEO meta title
-  metaDescription String?      @db.Text // SEO meta description
-  metaKeywords  String?        // SEO meta keywords (oddelené čiarkou)
-  ogImage       String?        // Open Graph obrázok (voliteľné)
-  status        CategoryStatus @default(ACTIVE)
-  parentId      String?
-  order         Int            @default(0)
-  parent        Category?      @relation("CategoryChildren", fields: [parentId], references: [id], onDelete: Cascade)
-  children      Category[]     @relation("CategoryChildren")
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  advertisements Advertisement[]
-  filters       Filter[]
-  
+  id              String          @id @default(uuid())
+  name            String          @unique
+  slug            String          @unique
+  description     String?         @db.Text
+  icon            String?
+  color           String?
+  image           String? // URL alebo base64 obrázka
+  imageAlt        String? // Alt text pre obrázok (SEO)
+  banner          String? // Banner obrázok pre stránku kategórie
+  bannerAlt       String? // Alt text pre banner (SEO)
+  metaTitle       String? // SEO meta title
+  metaDescription String?         @db.Text // SEO meta description
+  metaKeywords    String? // SEO meta keywords (oddelené čiarkou)
+  ogImage         String? // Open Graph obrázok (voliteľné)
+  status          CategoryStatus  @default(ACTIVE)
+  parentId        String?
+  order           Int             @default(0)
+  parent          Category?       @relation("CategoryChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children        Category[]      @relation("CategoryChildren")
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  advertisements  Advertisement[]
+  filters         Filter[]
+
   @@index([slug])
   @@index([status])
   @@index([parentId])
@@ -136,13 +143,13 @@ model Filter {
   categoryId  String
   category    Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   description String?    @db.Text
-  options     String[]   // Pre SELECT a MULTISELECT typy
+  options     String[] // Pre SELECT a MULTISELECT typy
   isRequired  Boolean    @default(false)
   isActive    Boolean    @default(true)
   order       Int        @default(0)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  
+
   @@unique([categoryId, slug])
   @@index([categoryId])
   @@index([isActive])
@@ -157,41 +164,41 @@ enum PaymentStatus {
 }
 
 model Advertisement {
-  id          String             @id @default(uuid())
-  title       String
-  description String             @db.Text
-  price       Float?
-  status      AdvertisementStatus @default(PENDING)
-  type        AdvertisementType  @default(SERVICE)
-  categoryId  String?
-  category    Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  location    String?
-  latitude    Float?
-  longitude   Float?
-  postalCode String?
-  images      String[]
+  id              String              @id @default(uuid())
+  title           String
+  description     String              @db.Text
+  price           Float?
+  status          AdvertisementStatus @default(PENDING)
+  type            AdvertisementType   @default(SERVICE)
+  categoryId      String?
+  category        Category?           @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  location        String?
+  latitude        Float?
+  longitude       Float?
+  postalCode      String?
+  images          String[]
   // Service-specific fields
-  pricingType String?            // 'FIXED', 'HOURLY', 'DAILY', 'PACKAGE'
-  hourlyRate  Float?
-  dailyRate   Float?
-  packages    Json?              // Array of package objects with name, description, price, deliveryTime
-  deliveryTime String?           // e.g., "3-5 dní", "1 týždeň"
-  revisions   String?            // e.g., "Neobmedzené", "3 revízie"
-  features    String[]           // Array of features/included items
-  faq         Json?              // Array of FAQ objects with question and answer
+  pricingType     String? // 'FIXED', 'HOURLY', 'DAILY', 'PACKAGE'
+  hourlyRate      Float?
+  dailyRate       Float?
+  packages        Json? // Array of package objects with name, description, price, deliveryTime
+  deliveryTime    String? // e.g., "3-5 dní", "1 týždeň"
+  revisions       String? // e.g., "Neobmedzené", "3 revízie"
+  features        String[] // Array of features/included items
+  faq             Json? // Array of FAQ objects with question and answer
   /// Hodnoty špecifikácií podľa slugov filtrov danej kategórie (TEXT, NUMBER, SELECT, …)
-  specifications Json?
+  specifications  Json?
   /// Zvýraznenie vo výsledkoch (balík Plus/Pro/Firma) – zoradenie navrch
-  priorityBoosted Boolean         @default(false)
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  userId      String
-  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  payments    Payment[]          @relation("AdvertisementOwner")
-  reports     Report[]
-  messages   Message[]
-  favorites  Favorite[]
-  
+  priorityBoosted Boolean             @default(false)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  userId          String
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments        Payment[]           @relation("AdvertisementOwner")
+  reports         Report[]
+  messages        Message[]
+  favorites       Favorite[]
+
   @@index([userId])
   @@index([status])
   @@index([categoryId])
@@ -200,22 +207,22 @@ model Advertisement {
 }
 
 model Payment {
-  id              String         @id @default(uuid())
+  id              String        @id @default(uuid())
   advertisementId String
-  advertisement   Advertisement  @relation("AdvertisementOwner", fields: [advertisementId], references: [id], onDelete: Cascade)
+  advertisement   Advertisement @relation("AdvertisementOwner", fields: [advertisementId], references: [id], onDelete: Cascade)
   renterId        String
-  renter          User           @relation("Renter", fields: [renterId], references: [id], onDelete: Cascade)
+  renter          User          @relation("Renter", fields: [renterId], references: [id], onDelete: Cascade)
   ownerId         String
-  owner           User           @relation("Owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  owner           User          @relation("Owner", fields: [ownerId], references: [id], onDelete: Cascade)
   amount          Float
-  status          PaymentStatus  @default(PENDING)
+  status          PaymentStatus @default(PENDING)
   paymentDate     DateTime?
   startDate       DateTime?
   endDate         DateTime?
-  notes           String?        @db.Text
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  
+  notes           String?       @db.Text
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
   @@index([advertisementId])
   @@index([renterId])
   @@index([ownerId])
@@ -238,20 +245,20 @@ enum ReportReason {
 }
 
 model Report {
-  id              String         @id @default(uuid())
+  id              String        @id @default(uuid())
   advertisementId String
-  advertisement   Advertisement  @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+  advertisement   Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
   reporterId      String
-  reporter        User           @relation("Reports", fields: [reporterId], references: [id], onDelete: Cascade)
+  reporter        User          @relation("Reports", fields: [reporterId], references: [id], onDelete: Cascade)
   reason          ReportReason
-  description     String?        @db.Text
-  status          ReportStatus   @default(PENDING)
-  resolvedBy      String?        // Admin ID
+  description     String?       @db.Text
+  status          ReportStatus  @default(PENDING)
+  resolvedBy      String? // Admin ID
   resolvedAt      DateTime?
-  resolutionNote  String?        @db.Text
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  
+  resolutionNote  String?       @db.Text
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
   @@index([advertisementId])
   @@index([reporterId])
   @@index([status])
@@ -259,12 +266,12 @@ model Report {
 }
 
 enum MessageType {
-  INQUIRY           // Správa od záujemcu o inzerát
-  SYSTEM            // Systémová správa
-  BAN_NOTIFICATION  // Notifikácia o banu
-  VIOLATION         // Porušenie pravidiel
-  AD_APPROVED       // Inzerát schválený
-  AD_REJECTED       // Inzerát zamietnutý
+  INQUIRY // Správa od záujemcu o inzerát
+  SYSTEM // Systémová správa
+  BAN_NOTIFICATION // Notifikácia o banu
+  VIOLATION // Porušenie pravidiel
+  AD_APPROVED // Inzerát schválený
+  AD_REJECTED // Inzerát zamietnutý
 }
 
 enum MessageStatus {
@@ -274,26 +281,26 @@ enum MessageStatus {
 }
 
 model Message {
-  id              String        @id @default(uuid())
+  id              String         @id @default(uuid())
   type            MessageType
   subject         String
-  content         String        @db.Text
-  status          MessageStatus @default(UNREAD)
+  content         String         @db.Text
+  status          MessageStatus  @default(UNREAD)
   recipientId     String
-  recipient       User          @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  recipient       User           @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
   senderId        String?
   sender          User?          @relation("MessageSender", fields: [senderId], references: [id], onDelete: SetNull)
   advertisementId String?
   advertisement   Advertisement? @relation(fields: [advertisementId], references: [id], onDelete: SetNull)
-  parentId        String?       // Pre odpovede v konverzácii – odkaz na koreňovú správu
-  parent          Message?      @relation("MessageReplies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies         Message[]     @relation("MessageReplies")
-  attachments     String[]      @default([]) // Prílohy – base64 alebo URL (obrázky, súbory)
-  metadata        Json?         // Ďalšie informácie (napr. dôvod banu, dátum banu, atď.)
+  parentId        String? // Pre odpovede v konverzácii – odkaz na koreňovú správu
+  parent          Message?       @relation("MessageReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies         Message[]      @relation("MessageReplies")
+  attachments     String[]       @default([]) // Prílohy – base64 alebo URL (obrázky, súbory)
+  metadata        Json? // Ďalšie informácie (napr. dôvod banu, dátum banu, atď.)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   readAt          DateTime?
-  
+
   @@index([recipientId])
   @@index([senderId])
   @@index([advertisementId])
@@ -311,7 +318,7 @@ model Favorite {
   advertisementId String
   advertisement   Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
   createdAt       DateTime      @default(now())
-  
+
   @@unique([userId, advertisementId])
   @@index([userId])
   @@index([advertisementId])
@@ -320,12 +327,12 @@ model Favorite {
 // Statické stránky (blog, Stať sa predajcom, atď.)
 model StaticPage {
   id              String   @id @default(uuid())
-  slug            String   @unique  // napr. "blog", "stat-sa-predajcom" -> URL /blog, /stat-sa-predajcom
+  slug            String   @unique // napr. "blog", "stat-sa-predajcom" -> URL /blog, /stat-sa-predajcom
   title           String
   content         String   @db.Text // HTML obsah
-  metaTitle       String?  // SEO
+  metaTitle       String? // SEO
   metaDescription String?  @db.Text // SEO
-  status          String   @default("DRAFT")   // DRAFT | PUBLISHED
+  status          String   @default("DRAFT") // DRAFT | PUBLISHED
   order           Int      @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -344,7 +351,7 @@ model BlogPost {
   featuredImage   String?
   metaTitle       String?
   metaDescription String?   @db.Text
-  status          String    @default("DRAFT")   // DRAFT | PUBLISHED
+  status          String    @default("DRAFT") // DRAFT | PUBLISHED
   publishedAt     DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -358,7 +365,7 @@ model BlogPost {
 model SiteConfig {
   id        String   @id @default(uuid())
   key       String   @unique // 'platform' | 'admin'
-  value     Json     // Konfigurácia podľa kľúča
+  value     Json // Konfigurácia podľa kľúča
   updatedAt DateTime @updatedAt
 }
 
@@ -366,21 +373,21 @@ model SiteConfig {
 model SiteMenu {
   id        String   @id @default(uuid())
   type      String   @unique // 'navbar' | 'footer'
-  data      Json     // Štruktúra závisí od typu
+  data      Json // Štruktúra závisí od typu
   updatedAt DateTime @updatedAt
 }
 
 // Monitoring kliknutí – ženy, muži, firmy, fyzické osoby
 model ClickEvent {
-  id          String   @id @default(uuid())
-  userId      String?   // ak je používateľ prihlásený
-  sessionId   String?   // pre anonymné návštevy
-  gender      Gender?   // MALE, FEMALE, OTHER
-  isCompany   Boolean?  // true = firma, false = fyzická osoba
-  eventType   String    @default("CLICK") // CLICK, VIEW, ...
-  targetType  String?   // AD, CATEGORY, ...
-  targetId    String?
-  createdAt   DateTime @default(now())
+  id         String   @id @default(uuid())
+  userId     String? // ak je používateľ prihlásený
+  sessionId  String? // pre anonymné návštevy
+  gender     Gender? // MALE, FEMALE, OTHER
+  isCompany  Boolean? // true = firma, false = fyzická osoba
+  eventType  String   @default("CLICK") // CLICK, VIEW, ...
+  targetType String? // AD, CATEGORY, ...
+  targetId   String?
+  createdAt  DateTime @default(now())
 
   @@index([userId])
   @@index([gender])

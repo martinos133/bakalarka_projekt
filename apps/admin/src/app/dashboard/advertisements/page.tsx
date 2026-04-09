@@ -3,12 +3,11 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { Advertisement, AdvertisementStatus, Category } from '@inzertna-platforma/shared'
 import { Search, Filter as FilterIcon, TrendingUp, Euro, Tag, BarChart3, Calendar, MapPin, PieChart, FileText, Briefcase, Home } from 'lucide-react'
 import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts'
+import DashboardLayout from '@/components/DashboardLayout'
 
 type TypeView = 'all' | 'SERVICE' | 'RENTAL'
 
@@ -189,19 +188,15 @@ export default function AdvertisementsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark text-gray-200 flex">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Header />
-        <main className="p-6">
+    <DashboardLayout>
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-200">Inzeráty – prehľad pre CEO</h1>
             <p className="text-sm text-gray-400 mt-1">Podrobné štatistiky a agregácie. Správa inzerátov v sekcii Development → Inzeráty.</p>
             <div className="flex flex-wrap gap-2 mt-4">
               <button
                 onClick={() => setTypeView('all')}
-                className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                  typeView === 'all' ? 'bg-primary text-gray-200' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-colors ${
+                  typeView === 'all' ? 'bg-primary text-gray-200' : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <BarChart3 className="w-4 h-4" />
@@ -209,8 +204,8 @@ export default function AdvertisementsPage() {
               </button>
               <button
                 onClick={() => setTypeView('SERVICE')}
-                className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                  typeView === 'SERVICE' ? 'bg-blue-600 text-gray-200' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-colors ${
+                  typeView === 'SERVICE' ? 'bg-blue-600 text-gray-200' : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <Briefcase className="w-4 h-4" />
@@ -218,8 +213,8 @@ export default function AdvertisementsPage() {
               </button>
               <button
                 onClick={() => setTypeView('RENTAL')}
-                className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                  typeView === 'RENTAL' ? 'bg-purple-600 text-gray-200' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-colors ${
+                  typeView === 'RENTAL' ? 'bg-purple-600 text-gray-200' : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <Home className="w-4 h-4" />
@@ -230,7 +225,7 @@ export default function AdvertisementsPage() {
 
           {/* Hlavné KPI */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-400">Celkom inzerátov</span>
                 <BarChart3 className="w-5 h-5 text-blue-400" />
@@ -238,7 +233,7 @@ export default function AdvertisementsPage() {
               <div className="text-3xl font-bold text-gray-200">{displayAds.length}</div>
               <div className="text-xs text-gray-500 mt-2">Aktívnych: {byStatus.active} • Konceptov: {byStatus.draft}</div>
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-400">Aktívne inzeráty</span>
                 <TrendingUp className="w-5 h-5 text-green-400" />
@@ -248,7 +243,7 @@ export default function AdvertisementsPage() {
                 {displayAds.length ? ((byStatus.active / displayAds.length) * 100).toFixed(1) : 0}% z celkového počtu
               </div>
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-400">Priemerná cena</span>
                 <Euro className="w-5 h-5 text-yellow-400" />
@@ -256,7 +251,7 @@ export default function AdvertisementsPage() {
               <div className="text-3xl font-bold text-gray-200">{avgPrice.toFixed(2)} €</div>
               <div className="text-xs text-gray-500 mt-2">Celková hodnota: {totalValue.toFixed(2)} €</div>
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-400">Služby / Prenájom</span>
                 <Tag className="w-5 h-5 text-purple-400" />
@@ -268,12 +263,12 @@ export default function AdvertisementsPage() {
 
           {/* Grafy */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <div className="bg-card rounded-lg border border-dark overflow-hidden">
-              <div className="p-4 border-b border-dark">
+            <div className="card overflow-hidden">
+              <div className="p-4 border-b border-white/[0.06]">
                 <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wide text-gray-400">Rozloženie podľa typu</h3>
               </div>
               <div className="p-4 grid grid-cols-2 gap-4">
-                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
                     <span className="text-sm font-medium text-gray-300">Služby</span>
@@ -289,7 +284,7 @@ export default function AdvertisementsPage() {
                     </div>
                   )}
                 </div>
-                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0" />
                     <span className="text-sm font-medium text-gray-300">Prenájom</span>
@@ -341,7 +336,7 @@ export default function AdvertisementsPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <h3 className="text-lg font-semibold text-gray-200 mb-1">Podľa statusu</h3>
               <p className="text-xs text-gray-500 mb-4">Vizuálny prehľad podielov. Presné čísla v tabuľke pod grafom.</p>
               <div className="flex items-center justify-center" style={{ minHeight: 240 }}>
@@ -381,10 +376,10 @@ export default function AdvertisementsPage() {
                   </RechartsPieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-4 pt-4 border-t border-dark overflow-hidden">
+              <div className="mt-4 pt-4 border-t border-white/[0.06] overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-left text-gray-400 border-b border-dark">
+                    <tr className="text-left text-gray-400 border-b border-white/[0.06]">
                       <th className="py-2 px-3 font-medium">Status</th>
                       <th className="py-2 px-3 font-medium text-right">Počet</th>
                       <th className="py-2 px-3 font-medium text-right">Podiel</th>
@@ -392,7 +387,7 @@ export default function AdvertisementsPage() {
                   </thead>
                   <tbody>
                     {chartDataByStatus.map((d) => (
-                      <tr key={d.name} className="border-b border-dark/50 last:border-0 hover:bg-dark/30">
+                      <tr key={d.name} className="border-b border-white/[0.06]/50 last:border-0 hover:bg-dark/30">
                         <td className="py-2 px-3 flex items-center gap-2">
                           <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.fill }} />
                           <span className="text-gray-200">{d.name}</span>
@@ -406,7 +401,7 @@ export default function AdvertisementsPage() {
               </div>
             </div>
             {chartDataByMonth.length > 0 && (
-              <div className="bg-card rounded-lg p-6 border border-dark">
+              <div className="card p-6">
                 <h3 className="text-lg font-semibold text-gray-200 mb-4">Inzeráty za mesiace</h3>
                 <p className="text-xs text-gray-500 mb-2">Posledných 6 mesiacov. Tmavší stĺpec = 0 inzerátov.</p>
                 <div className="pt-1">
@@ -434,34 +429,34 @@ export default function AdvertisementsPage() {
 
           {/* Podrobné štatistiky – status, ceny */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-card rounded-lg p-4 border border-dark">
+            <div className="card p-4">
               <span className="text-xs text-gray-400">Koncepty</span>
               <div className="text-xl font-bold text-gray-300">{byStatus.draft}</div>
             </div>
-            <div className="bg-card rounded-lg p-4 border border-dark">
+            <div className="card p-4">
               <span className="text-xs text-gray-400">Neaktívne</span>
               <div className="text-xl font-bold text-yellow-400">{byStatus.inactive}</div>
             </div>
-            <div className="bg-card rounded-lg p-4 border border-dark">
+            <div className="card p-4">
               <span className="text-xs text-gray-400">Archivované</span>
               <div className="text-xl font-bold text-red-400">{byStatus.archived}</div>
             </div>
-            <div className="bg-card rounded-lg p-4 border border-dark">
+            <div className="card p-4">
               <span className="text-xs text-gray-400">Čakajúce</span>
               <div className="text-xl font-bold text-blue-400">{byStatus.pending}</div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-card rounded-lg p-4 border border-dark">
+            <div className="card p-4">
               <span className="text-xs text-gray-400">Min. cena</span>
               <div className="text-xl font-bold text-gray-200">{minPrice.toFixed(2)} €</div>
             </div>
-            <div className="bg-card rounded-lg p-4 border border-dark">
+            <div className="card p-4">
               <span className="text-xs text-gray-400">Max. cena</span>
               <div className="text-xl font-bold text-gray-200">{maxPrice.toFixed(2)} €</div>
             </div>
-            <div className="bg-card rounded-lg p-4 border border-dark">
+            <div className="card p-4">
               <span className="text-xs text-gray-400">S cenou / Bez ceny</span>
               <div className="text-xl font-bold text-gray-200">{adsWithPrice.length} / {adsWithoutPrice.length}</div>
             </div>
@@ -469,7 +464,7 @@ export default function AdvertisementsPage() {
 
           {/* Rozloženie podľa kategórie a lokality */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center gap-2 mb-4">
                 <PieChart className="w-5 h-5 text-primary" />
                 <h3 className="text-lg font-semibold text-gray-200">Top kategórie</h3>
@@ -485,7 +480,7 @@ export default function AdvertisementsPage() {
                 )}
               </ul>
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center gap-2 mb-4">
                 <MapPin className="w-5 h-5 text-primary" />
                 <h3 className="text-lg font-semibold text-gray-200">Top lokality</h3>
@@ -505,7 +500,7 @@ export default function AdvertisementsPage() {
 
           {/* Inzeráty za mesiace */}
           {byMonth.length > 0 && (
-            <div className="bg-card rounded-lg p-6 border border-dark mb-6">
+            <div className="card p-6 mb-6">
               <div className="flex items-center gap-2 mb-4">
                 <Calendar className="w-5 h-5 text-primary" />
                 <h3 className="text-lg font-semibold text-gray-200">Inzeráty za mesiace</h3>
@@ -526,8 +521,8 @@ export default function AdvertisementsPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                  showFilters ? 'bg-primary text-gray-200' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-colors ${
+                  showFilters ? 'bg-primary text-gray-200' : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <FilterIcon className="w-4 h-4" />
@@ -548,7 +543,7 @@ export default function AdvertisementsPage() {
           </div>
 
           {showFilters && (
-            <div className="bg-card rounded-lg p-6 border border-dark mb-6">
+            <div className="card p-6 mb-6">
               <h3 className="text-lg font-semibold text-gray-200 mb-4">Filtre pre prehľad</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="lg:col-span-2">
@@ -560,7 +555,7 @@ export default function AdvertisementsPage() {
                       value={filters.search}
                       onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                       placeholder="Názov, popis, lokalita..."
-                      className="w-full bg-dark border border-card rounded-lg pl-10 pr-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl pl-10 pr-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
                     />
                   </div>
                 </div>
@@ -569,7 +564,7 @@ export default function AdvertisementsPage() {
                   <select
                     value={filters.status}
                     onChange={(e) => setFilters({ ...filters, status: e.target.value as '' | AdvertisementStatus })}
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
                   >
                     <option value="">Všetky</option>
                     <option value={AdvertisementStatus.ACTIVE}>Aktívne</option>
@@ -584,7 +579,7 @@ export default function AdvertisementsPage() {
                   <select
                     value={filters.type}
                     onChange={(e) => setFilters({ ...filters, type: e.target.value as '' | 'SERVICE' | 'RENTAL' })}
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
                   >
                     <option value="">Všetky</option>
                     <option value="SERVICE">Služby</option>
@@ -596,7 +591,7 @@ export default function AdvertisementsPage() {
                   <select
                     value={filters.categoryId}
                     onChange={(e) => setFilters({ ...filters, categoryId: e.target.value })}
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
                   >
                     <option value="">Všetky kategórie</option>
                     {categories.map((cat) => (
@@ -611,7 +606,7 @@ export default function AdvertisementsPage() {
                     value={filters.location}
                     onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                     placeholder="Mesto, región..."
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
                   />
                 </div>
                 <div className="lg:col-span-2">
@@ -623,7 +618,7 @@ export default function AdvertisementsPage() {
                       value={filters.minPrice}
                       onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
                       placeholder="Min"
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
                     />
                     <span className="text-gray-400 self-center">–</span>
                     <input
@@ -632,7 +627,7 @@ export default function AdvertisementsPage() {
                       value={filters.maxPrice}
                       onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
                       placeholder="Max"
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
                     />
                   </div>
                 </div>
@@ -643,14 +638,14 @@ export default function AdvertisementsPage() {
                       type="date"
                       value={filters.dateFrom}
                       onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
                     />
                     <span className="text-gray-400 self-center">–</span>
                     <input
                       type="date"
                       value={filters.dateTo}
                       onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
                     />
                   </div>
                 </div>
@@ -659,8 +654,8 @@ export default function AdvertisementsPage() {
           )}
 
           {/* Prehľadová tabuľka (iba na čítanie) */}
-          <div className="bg-card rounded-lg border border-dark">
-            <div className="flex items-center gap-2 p-4 border-b border-dark">
+          <div className="card">
+            <div className="flex items-center gap-2 p-4 border-b border-white/[0.06]">
               <FileText className="w-5 h-5 text-gray-400" />
               <h3 className="text-lg font-semibold text-gray-200">Zoznam inzerátov (podľa filtrov)</h3>
             </div>
@@ -710,8 +705,6 @@ export default function AdvertisementsPage() {
               </div>
             )}
           </div>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   )
 }

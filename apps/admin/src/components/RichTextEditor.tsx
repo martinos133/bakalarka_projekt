@@ -94,7 +94,7 @@ export default function RichTextEditor({
   if (!mounted) {
     return (
       <div
-        className={`bg-dark border border-card rounded-lg ${className}`}
+        className={`bg-white/[0.04] border border-white/[0.06] rounded-xl ${className}`}
         style={{ minHeight, padding: 16 }}
       >
         <div className="text-gray-500">Načítavam editor...</div>
@@ -113,7 +113,7 @@ export default function RichTextEditor({
         formats={formats}
         placeholder={placeholder}
         style={{ minHeight }}
-        className="bg-dark border border-card rounded-lg"
+        className="bg-white/[0.04] border border-white/[0.06] rounded-xl"
       />
       <style jsx global>{`
         .blog-editor .ql-container {

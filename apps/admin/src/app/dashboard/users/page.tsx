@@ -3,14 +3,13 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { User } from '@inzertna-platforma/shared'
 import { Ban, Unlock, Eye, Calendar, Shield, Mail, Phone, User as UserIcon, MapPin, Building2, CreditCard, X, FileText, Euro, TrendingUp, TrendingDown, Search, Filter as FilterIcon, Users, UserCheck, UserX, Building, UserCog } from 'lucide-react'
 import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import AlertDialog from '@/components/AlertDialog'
+import DashboardLayout from '@/components/DashboardLayout'
 
 export default function UsersPage() {
   const router = useRouter()
@@ -295,11 +294,7 @@ export default function UsersPage() {
   [byMonth])
 
   return (
-    <div className="min-h-screen bg-dark text-white flex">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Header />
-        <main className="p-6">
+    <DashboardLayout>
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-200">Používatelia</h1>
             <p className="text-sm text-gray-400 mt-1">Prehľad používateľov a štatistiky.</p>
@@ -307,9 +302,9 @@ export default function UsersPage() {
 
           {/* KPI karty */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/20">
+                <div className="p-2 rounded-xl bg-primary/20">
                   <Users className="w-5 h-5 text-primary" />
                 </div>
                 <div>
@@ -318,9 +313,9 @@ export default function UsersPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-green-500/20">
+                <div className="p-2 rounded-xl bg-green-500/20">
                   <UserCheck className="w-5 h-5 text-green-400" />
                 </div>
                 <div>
@@ -329,9 +324,9 @@ export default function UsersPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-red-500/20">
+                <div className="p-2 rounded-xl bg-red-500/20">
                   <UserX className="w-5 h-5 text-red-400" />
                 </div>
                 <div>
@@ -340,9 +335,9 @@ export default function UsersPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-purple-500/20">
+                <div className="p-2 rounded-xl bg-purple-500/20">
                   <UserCog className="w-5 h-5 text-purple-400" />
                 </div>
                 <div>
@@ -355,12 +350,12 @@ export default function UsersPage() {
 
           {/* Grafy */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <div className="bg-card rounded-lg border border-dark overflow-hidden">
-              <div className="p-4 border-b border-dark">
+            <div className="card overflow-hidden">
+              <div className="p-4 border-b border-white/[0.06]">
                 <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wide text-gray-400">Rozloženie podľa role</h3>
               </div>
               <div className="p-4 grid grid-cols-2 gap-4">
-                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0" />
                     <span className="text-sm font-medium text-gray-300">Admin</span>
@@ -373,7 +368,7 @@ export default function UsersPage() {
                     </div>
                   )}
                 </div>
-                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
                     <span className="text-sm font-medium text-gray-300">Používateľ</span>
@@ -416,7 +411,7 @@ export default function UsersPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <h3 className="text-lg font-semibold text-gray-200 mb-1">Podľa statusu</h3>
               <p className="text-xs text-gray-500 mb-4">Aktívni vs. zablokovaní.</p>
               <div className="flex items-center justify-center" style={{ minHeight: 200 }}>
@@ -442,10 +437,10 @@ export default function UsersPage() {
                   </RechartsPieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-4 pt-4 border-t border-dark overflow-hidden">
+              <div className="mt-4 pt-4 border-t border-white/[0.06] overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-left text-gray-400 border-b border-dark">
+                    <tr className="text-left text-gray-400 border-b border-white/[0.06]">
                       <th className="py-2 px-3 font-medium">Status</th>
                       <th className="py-2 px-3 font-medium text-right">Počet</th>
                       <th className="py-2 px-3 font-medium text-right">Podiel</th>
@@ -453,7 +448,7 @@ export default function UsersPage() {
                   </thead>
                   <tbody>
                     {chartDataByStatus.map((d) => (
-                      <tr key={d.name} className="border-b border-dark/50 last:border-0 hover:bg-dark/30">
+                      <tr key={d.name} className="border-b border-white/[0.06]/50 last:border-0 hover:bg-dark/30">
                         <td className="py-2 px-3 flex items-center gap-2">
                           <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.fill }} />
                           <span className="text-gray-200">{d.name}</span>
@@ -467,7 +462,7 @@ export default function UsersPage() {
               </div>
             </div>
             {chartDataByMonth.length > 0 && (
-              <div className="bg-card rounded-lg p-6 border border-dark">
+              <div className="card p-6">
                 <h3 className="text-lg font-semibold text-gray-200 mb-4">Registrácie za mesiace</h3>
                 <p className="text-xs text-gray-500 mb-2">Posledných 6 mesiacov.</p>
                 <div className="pt-1">
@@ -487,12 +482,12 @@ export default function UsersPage() {
                 </div>
               </div>
             )}
-            <div className="bg-card rounded-lg border border-dark overflow-hidden">
-              <div className="p-4 border-b border-dark">
+            <div className="card overflow-hidden">
+              <div className="p-4 border-b border-white/[0.06]">
                 <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wide text-gray-400">Typ účtu</h3>
               </div>
               <div className="p-4 grid grid-cols-2 gap-4">
-                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Building className="w-4 h-4 text-amber-400" />
                     <span className="text-sm font-medium text-gray-300">Spoločnosti</span>
@@ -505,7 +500,7 @@ export default function UsersPage() {
                     </div>
                   )}
                 </div>
-                <div className="rounded-lg bg-dark/40 border border-dark/80 p-4">
+                <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <UserIcon className="w-4 h-4 text-cyan-400" />
                     <span className="text-sm font-medium text-gray-300">Súkromné osoby</span>
@@ -520,7 +515,7 @@ export default function UsersPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <h3 className="text-lg font-semibold text-gray-200 mb-1">Pohlavie</h3>
               <p className="text-xs text-gray-500 mb-4">Muž / Žena / Iné (iba osoby s vyplneným pohlavím).</p>
               {chartDataByGender.length > 0 ? (
@@ -548,11 +543,11 @@ export default function UsersPage() {
                       </RechartsPieChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="mt-4 pt-4 border-t border-dark overflow-hidden">
+                  <div className="mt-4 pt-4 border-t border-white/[0.06] overflow-hidden">
                     <table className="w-full text-sm">
                       <tbody>
                         {chartDataByGender.map((d) => (
-                          <tr key={d.name} className="border-b border-dark/50 last:border-0">
+                          <tr key={d.name} className="border-b border-white/[0.06]/50 last:border-0">
                             <td className="py-1.5 px-3 flex items-center gap-2">
                               <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.fill }} />
                               <span className="text-gray-200">{d.name}</span>
@@ -568,7 +563,7 @@ export default function UsersPage() {
                 <p className="text-sm text-gray-500 py-4">Žiadne dáta o pohlaví.</p>
               )}
             </div>
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <h3 className="text-lg font-semibold text-gray-200 mb-1">Priemerný vek</h3>
               <p className="text-xs text-gray-500 mb-4">Celkový priemer a podľa pohlavia (iba používatelia s dátumom narodenia).</p>
               {avgAge != null ? (
@@ -598,16 +593,16 @@ export default function UsersPage() {
                           </Bar>
                         </BarChart>
                       </ResponsiveContainer>
-                      <table className="w-full text-sm mt-4 border-t border-dark pt-3">
+                      <table className="w-full text-sm mt-4 border-t border-white/[0.06] pt-3">
                         <thead>
-                          <tr className="text-left text-gray-400 border-b border-dark/50">
+                          <tr className="text-left text-gray-400 border-b border-white/[0.06]/50">
                             <th className="py-2 px-0 font-medium">Pohlavie</th>
                             <th className="py-2 px-0 font-medium text-right">Priem. vek</th>
                           </tr>
                         </thead>
                         <tbody>
                           {avgAgeByGender.map((d) => (
-                            <tr key={d.name} className="border-b border-dark/50 last:border-0">
+                            <tr key={d.name} className="border-b border-white/[0.06]/50 last:border-0">
                               <td className="py-2 px-0 flex items-center gap-2">
                                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.fill }} />
                                 <span className="text-gray-200">{d.name}</span>
@@ -627,7 +622,7 @@ export default function UsersPage() {
           </div>
 
           {/* Filtre */}
-          <div className="bg-card rounded-lg p-4 border border-dark mb-6">
+          <div className="card p-4 mb-6">
             <div className="flex items-center space-x-2 mb-4">
               <FilterIcon className="w-5 h-5 text-gray-400" />
               <h3 className="text-sm font-semibold text-gray-300">Filtre</h3>
@@ -642,7 +637,7 @@ export default function UsersPage() {
                     value={filters.search}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                     placeholder="Meno, email..."
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover text-sm"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover text-sm"
                   />
                 </div>
               </div>
@@ -651,7 +646,7 @@ export default function UsersPage() {
                 <select
                   value={filters.role}
                   onChange={(e) => setFilters({ ...filters, role: e.target.value as '' | 'ADMIN' | 'USER' })}
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                 >
                   <option value="">Všetky</option>
                   <option value="ADMIN">Admin</option>
@@ -663,7 +658,7 @@ export default function UsersPage() {
                 <select
                   value={filters.status}
                   onChange={(e) => setFilters({ ...filters, status: e.target.value as '' | 'active' | 'banned' })}
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                 >
                   <option value="">Všetky</option>
                   <option value="active">Aktívny</option>
@@ -675,7 +670,7 @@ export default function UsersPage() {
                 <select
                   value={filters.accountType}
                   onChange={(e) => setFilters({ ...filters, accountType: e.target.value as '' | 'company' | 'private' })}
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                 >
                   <option value="">Všetky</option>
                   <option value="company">Spoločnosť</option>
@@ -687,7 +682,7 @@ export default function UsersPage() {
                 <select
                   value={filters.gender}
                   onChange={(e) => setFilters({ ...filters, gender: e.target.value as '' | 'MALE' | 'FEMALE' | 'OTHER' })}
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                 >
                   <option value="">Všetky</option>
                   <option value="MALE">Muž</option>
@@ -704,7 +699,7 @@ export default function UsersPage() {
                   placeholder="napr. 18"
                   value={filters.minAge}
                   onChange={(e) => setFilters({ ...filters, minAge: e.target.value })}
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                 />
               </div>
               <div>
@@ -716,7 +711,7 @@ export default function UsersPage() {
                   placeholder="napr. 65"
                   value={filters.maxAge}
                   onChange={(e) => setFilters({ ...filters, maxAge: e.target.value })}
-                  className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                 />
               </div>
             </div>
@@ -732,7 +727,7 @@ export default function UsersPage() {
             )}
           </div>
 
-          <div className="bg-card rounded-lg border border-dark">
+          <div className="card">
             {loading ? (
               <div className="p-6 text-center text-gray-400">Načítavam...</div>
             ) : filteredUsers.length === 0 ? (
@@ -887,9 +882,9 @@ export default function UsersPage() {
           </div>
 
           {showDetailModal && selectedUser && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <div className="bg-card rounded-lg border border-dark w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <div className="sticky top-0 bg-card border-b border-dark px-6 py-4 flex items-center justify-between">
+            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+              <div className="card w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <div className="sticky top-0 bg-card border-b border-white/[0.06] px-6 py-4 flex items-center justify-between">
                   <h2 className="text-xl font-semibold">Detail používateľa</h2>
                   <button
                     onClick={() => {
@@ -1076,7 +1071,7 @@ export default function UsersPage() {
                     ) : userStats ? (
                       <div className="space-y-4">
                         {/* Inzeráty */}
-                        <div className="bg-dark rounded-lg p-4 border border-card">
+                        <div className="bg-dark rounded-xl p-4 border border-card">
                           <div className="flex items-center space-x-2 mb-3">
                             <FileText className="w-5 h-5 text-blue-400" />
                             <h4 className="font-semibold">Inzeráty</h4>
@@ -1094,7 +1089,7 @@ export default function UsersPage() {
                         </div>
 
                         {/* Platby - prijaté */}
-                        <div className="bg-dark rounded-lg p-4 border border-card">
+                        <div className="bg-dark rounded-xl p-4 border border-card">
                           <div className="flex items-center space-x-2 mb-3">
                             <TrendingUp className="w-5 h-5 text-green-400" />
                             <h4 className="font-semibold">Prijaté platby</h4>
@@ -1117,7 +1112,7 @@ export default function UsersPage() {
                         </div>
 
                         {/* Platby - uskutočnené */}
-                        <div className="bg-dark rounded-lg p-4 border border-card">
+                        <div className="bg-dark rounded-xl p-4 border border-card">
                           <div className="flex items-center space-x-2 mb-3">
                             <TrendingDown className="w-5 h-5 text-blue-400" />
                             <h4 className="font-semibold">Uskutočnené platby</h4>
@@ -1173,14 +1168,14 @@ export default function UsersPage() {
                   )}
 
                   {/* Akcie */}
-                  <div className="flex justify-end space-x-3 pt-4 border-t border-dark">
+                  <div className="flex justify-end space-x-3 pt-4 border-t border-white/[0.06]">
                     {selectedUser.banned ? (
                       <button
                         onClick={() => {
                           setShowDetailModal(false)
                           handleUnbanClick(selectedUser)
                         }}
-                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center space-x-2 transition-colors"
+                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl flex items-center space-x-2 transition-colors"
                       >
                         <Unlock className="w-4 h-4" />
                         <span>Odblokovať</span>
@@ -1191,7 +1186,7 @@ export default function UsersPage() {
                           setShowDetailModal(false)
                           handleBan(selectedUser)
                         }}
-                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center space-x-2 transition-colors"
+                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl flex items-center space-x-2 transition-colors"
                       >
                         <Ban className="w-4 h-4" />
                         <span>Zablokovať</span>
@@ -1204,8 +1199,8 @@ export default function UsersPage() {
           )}
 
           {showBanModal && selectedUser && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-card rounded-lg p-6 border border-dark w-full max-w-md">
+            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+              <div className="card p-6 w-full max-w-md">
                 <h2 className="text-xl font-semibold mb-4">Zablokovať používateľa</h2>
                 <p className="text-gray-400 mb-4">
                   {selectedUser.firstName && selectedUser.lastName
@@ -1221,7 +1216,7 @@ export default function UsersPage() {
                     <select
                       value={banForm.banType}
                       onChange={(e) => setBanForm({ ...banForm, banType: e.target.value as 'permanent' | 'temporary' })}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                     >
                       <option value="permanent">Trvalý ban</option>
                       <option value="temporary">Dočasný ban</option>
@@ -1238,7 +1233,7 @@ export default function UsersPage() {
                         min="1"
                         value={banForm.days}
                         onChange={(e) => setBanForm({ ...banForm, days: parseInt(e.target.value) || 1 })}
-                        className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                       />
                     </div>
                   )}
@@ -1252,7 +1247,7 @@ export default function UsersPage() {
                       onChange={(e) => setBanForm({ ...banForm, reason: e.target.value })}
                       rows={3}
                       placeholder="Napríklad: Porušenie podmienok používania..."
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                     />
                   </div>
 
@@ -1263,13 +1258,13 @@ export default function UsersPage() {
                         setShowBanModal(false)
                         setSelectedUser(null)
                       }}
-                      className="px-4 py-2 border border-card rounded-lg text-gray-300 hover:bg-cardHover transition-colors"
+                      className="px-4 py-2 border border-card rounded-xl text-gray-300 hover:bg-cardHover transition-colors"
                     >
                       Zrušiť
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors"
                     >
                       Zablokovať
                     </button>
@@ -1300,8 +1295,6 @@ export default function UsersPage() {
             message={alertMessage?.message ?? ''}
             onClose={() => setAlertMessage(null)}
           />
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   )
 }

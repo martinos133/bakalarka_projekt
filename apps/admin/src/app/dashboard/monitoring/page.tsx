@@ -3,11 +3,10 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import { MousePointerClick, UserCheck, Building, User, Radio, FolderTree, FileText, Calendar } from 'lucide-react'
 import { PieChart as RechartsPieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import DashboardLayout from '@/components/DashboardLayout'
 
 type Period = '1d' | '7d' | '30d' | '3m'
 type BreakdownPeriod = '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m'
@@ -169,11 +168,7 @@ export default function MonitoringPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark text-gray-200 flex">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Header />
-        <main className="p-6">
+    <DashboardLayout>
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-200">Monitoring kliknutí</h1>
@@ -187,21 +182,21 @@ export default function MonitoringPage() {
                   <button
                     key={p}
                     onClick={() => setPeriod(p)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      period === p ? 'bg-primary text-gray-100' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                      period === p ? 'bg-primary text-gray-100' : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                     }`}
                   >
                     {periodLabel[p]}
                   </button>
                 ))}
               </div>
-              <div className="flex gap-3 items-center border-l border-dark pl-4">
+              <div className="flex gap-3 items-center border-l border-white/[0.06] pl-4">
                 <label className="flex items-center gap-2 text-sm text-gray-400">
                   Pohlavie:
                   <select
                     value={filterGender}
                     onChange={(e) => setFilterGender(e.target.value)}
-                    className="bg-card border border-dark rounded-lg px-2 py-1.5 text-gray-200 text-sm"
+                    className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-2 py-1.5 text-gray-200 text-sm"
                   >
                     <option value="all">Všetci</option>
                     <option value="MALE">Muži</option>
@@ -215,7 +210,7 @@ export default function MonitoringPage() {
                   <select
                     value={filterAccountType}
                     onChange={(e) => setFilterAccountType(e.target.value)}
-                    className="bg-card border border-dark rounded-lg px-2 py-1.5 text-gray-200 text-sm"
+                    className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-2 py-1.5 text-gray-200 text-sm"
                   >
                     <option value="all">Všetky</option>
                     <option value="company">Firmy</option>
@@ -228,7 +223,7 @@ export default function MonitoringPage() {
           </div>
 
           {/* Live monitoring */}
-          <div className="mb-6 p-4 rounded-xl bg-card border border-dark border-l-4 border-l-green-500">
+          <div className="mb-6 p-4 rounded-xl bg-card border border-white/[0.06] border-l-4 border-l-green-500">
             <div className="flex items-center gap-2 mb-3">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
@@ -239,14 +234,14 @@ export default function MonitoringPage() {
               <span className="text-xs text-gray-500 ml-auto">Obnoví sa za {liveCountdown} s</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-dark/50 rounded-lg p-4 border border-dark/80">
+              <div className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06]">
                 <span className="text-xs text-gray-400">Za poslednú minútu</span>
                 <div className="text-2xl font-bold text-gray-200 tabular-nums mt-1">
                   {live1m ? live1m.total : '–'}
                 </div>
                 <span className="text-xs text-gray-500">kliknutí</span>
               </div>
-              <div className="bg-dark/50 rounded-lg p-4 border border-dark/80">
+              <div className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06]">
                 <span className="text-xs text-gray-400">
                   Za posledných {formatMinutesLabel(liveSliderMinutes).toLowerCase()}
                 </span>
@@ -257,7 +252,7 @@ export default function MonitoringPage() {
               </div>
             </div>
             {/* Časový slider – 1 min až 8 hodín po minútach */}
-            <div className="mt-4 pt-4 border-t border-dark/60">
+            <div className="mt-4 pt-4 border-t border-white/[0.06]/60">
               <label className="block text-xs font-medium text-gray-400 mb-2">
                 Časové obdobie (druhý blok): ťahaj sliderom (1 min – 8 hodín)
               </label>
@@ -270,7 +265,7 @@ export default function MonitoringPage() {
                   value={liveSliderMinutes}
                   onInput={handleSliderChange}
                   onChange={handleSliderChange}
-                  className="flex-1 h-2 rounded-lg appearance-none bg-dark/80 accent-primary cursor-pointer"
+                  className="flex-1 h-2 rounded-xl appearance-none bg-dark/80 accent-primary cursor-pointer"
                 />
                 <span className="text-sm font-medium text-gray-200 min-w-[8rem] tabular-nums">
                   {formatMinutesLabel(liveSliderMinutes)}
@@ -283,20 +278,20 @@ export default function MonitoringPage() {
           </div>
 
           {loading ? (
-            <div className="bg-card rounded-lg border border-dark p-12 text-center text-gray-400">
+            <div className="card p-12 text-center text-gray-400">
               Načítavam štatistiky...
             </div>
           ) : !stats ? (
-            <div className="bg-card rounded-lg border border-dark p-12 text-center text-gray-400">
+            <div className="card p-12 text-center text-gray-400">
               Nepodarilo sa načítať štatistiky alebo ešte neexistujú žiadne záznamy kliknutí.
             </div>
           ) : (
             <>
               {/* KPI */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-                <div className="bg-card rounded-lg p-6 border border-dark">
+                <div className="card p-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/20">
+                    <div className="p-2 rounded-xl bg-primary/20">
                       <MousePointerClick className="w-5 h-5 text-primary" />
                     </div>
                     <div>
@@ -306,9 +301,9 @@ export default function MonitoringPage() {
                     </div>
                   </div>
                 </div>
-                <div className="bg-card rounded-lg p-6 border border-dark">
+                <div className="card p-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-pink-500/20">
+                    <div className="p-2 rounded-xl bg-pink-500/20">
                       <UserCheck className="w-5 h-5 text-pink-400" />
                     </div>
                     <div>
@@ -317,9 +312,9 @@ export default function MonitoringPage() {
                     </div>
                   </div>
                 </div>
-                <div className="bg-card rounded-lg p-6 border border-dark">
+                <div className="card p-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-blue-500/20">
+                    <div className="p-2 rounded-xl bg-blue-500/20">
                       <User className="w-5 h-5 text-blue-400" />
                     </div>
                     <div>
@@ -328,9 +323,9 @@ export default function MonitoringPage() {
                     </div>
                   </div>
                 </div>
-                <div className="bg-card rounded-lg p-6 border border-dark">
+                <div className="card p-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-amber-500/20">
+                    <div className="p-2 rounded-xl bg-amber-500/20">
                       <Building className="w-5 h-5 text-amber-400" />
                     </div>
                     <div>
@@ -341,9 +336,9 @@ export default function MonitoringPage() {
                     </div>
                   </div>
                 </div>
-                <div className="bg-card rounded-lg p-6 border border-dark">
+                <div className="card p-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-cyan-500/20">
+                    <div className="p-2 rounded-xl bg-cyan-500/20">
                       <Calendar className="w-5 h-5 text-cyan-400" />
                     </div>
                     <div>
@@ -359,7 +354,7 @@ export default function MonitoringPage() {
 
               {/* Grafy */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <div className="bg-card rounded-lg p-6 border border-dark">
+                <div className="card p-6">
                   <h3 className="text-lg font-semibold text-gray-200 mb-1">Kliknutia podľa pohlavia</h3>
                   <p className="text-xs text-gray-500 mb-4">Ženy, muži, iné, nešpecifikované.</p>
                   {chartDataByGender.length > 0 ? (
@@ -397,7 +392,7 @@ export default function MonitoringPage() {
                           </RechartsPieChart>
                         </ResponsiveContainer>
                       </div>
-                      <table className="w-full text-sm mt-4 border-t border-dark pt-3">
+                      <table className="w-full text-sm mt-4 border-t border-white/[0.06] pt-3">
                         <tbody>
                           {[
                             { name: 'Ženy', count: stats.byGender.female },
@@ -405,7 +400,7 @@ export default function MonitoringPage() {
                             { name: 'Iné', count: stats.byGender.other },
                             { name: 'Nešpecifikované', count: stats.byGender.unspecified },
                           ].map((d) => (
-                            <tr key={d.name} className="border-b border-dark/50 last:border-0">
+                            <tr key={d.name} className="border-b border-white/[0.06]/50 last:border-0">
                               <td className="py-2 px-0 text-gray-200">{d.name}</td>
                               <td className="py-2 px-0 text-right text-gray-200 font-semibold tabular-nums">{d.count}</td>
                             </tr>
@@ -418,7 +413,7 @@ export default function MonitoringPage() {
                   )}
                 </div>
 
-                <div className="bg-card rounded-lg p-6 border border-dark">
+                <div className="card p-6">
                   <h3 className="text-lg font-semibold text-gray-200 mb-1">Kliknutia podľa typu účtu</h3>
                   <p className="text-xs text-gray-500 mb-4">Firmy vs. fyzické osoby.</p>
                   {chartDataByAccountType.length > 0 ? (
@@ -456,14 +451,14 @@ export default function MonitoringPage() {
                           </RechartsPieChart>
                         </ResponsiveContainer>
                       </div>
-                      <table className="w-full text-sm mt-4 border-t border-dark pt-3">
+                      <table className="w-full text-sm mt-4 border-t border-white/[0.06] pt-3">
                         <tbody>
                           {[
                             { name: 'Firmy', count: stats.byAccountType.company },
                             { name: 'Fyzické osoby', count: stats.byAccountType.individual },
                             { name: 'Nešpecifikované', count: stats.byAccountType.unspecified },
                           ].map((d) => (
-                            <tr key={d.name} className="border-b border-dark/50 last:border-0">
+                            <tr key={d.name} className="border-b border-white/[0.06]/50 last:border-0">
                               <td className="py-2 px-0 text-gray-200">{d.name}</td>
                               <td className="py-2 px-0 text-right text-gray-200 font-semibold tabular-nums">{d.count}</td>
                             </tr>
@@ -477,7 +472,7 @@ export default function MonitoringPage() {
                 </div>
               </div>
 
-              <div className="bg-card rounded-lg p-4 border border-dark text-sm text-gray-400">
+              <div className="card p-4 text-sm text-gray-400">
                 <strong className="text-gray-300">Ako to funguje:</strong> Platforma pri kliknutí (inzerát, kategória, …) volá API a posiela pohlavie a typ účtu prihláseného používateľa. Nešpecifikované = anonymné kliknutia alebo používatelia bez vyplnených údajov.
                 <br />
                 <span className="text-gray-500 mt-2 block">Ak sa nič nepočíta: (1) Vytvor tabuľku v DB: v koreni projektu <code className="bg-dark px-1 rounded text-xs">cd packages/database && npx prisma db push</code> alebo <code className="bg-dark px-1 rounded text-xs">npx prisma migrate deploy</code>. (2) V prehliadači (F12 → Console) pri kliku na platforme uvidíš „[trackClick] Odosielam klik“ a „[trackClick] OK“ – ak „Zlyhalo“, API nebeží alebo platforma nemá správne <code className="bg-dark px-1 rounded">NEXT_PUBLIC_API_URL</code>. (3) V termináli API pri kliku uvidíš „[Analytics] Click recorded“.</span>
@@ -495,8 +490,8 @@ export default function MonitoringPage() {
                   <button
                     key={p}
                     onClick={() => setBreakdownPeriod(p)}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                      breakdownPeriod === p ? 'bg-primary text-gray-100' : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                    className={`px-2.5 py-1.5 rounded-xl text-xs font-medium transition-colors ${
+                      breakdownPeriod === p ? 'bg-primary text-gray-100' : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                     }`}
                   >
                     {breakdownPeriodLabel[p]}
@@ -507,10 +502,10 @@ export default function MonitoringPage() {
                   <button
                     key={f}
                     onClick={() => setBreakdownFilter(f)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-3 py-1.5 rounded-xl text-sm font-medium transition-colors ${
                       breakdownFilter === f
                         ? 'bg-primary text-gray-100'
-                        : 'bg-card border border-dark text-gray-300 hover:bg-cardHover'
+                        : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                     }`}
                   >
                     {f === 'all' ? 'Všetko' : f === 'categories' ? 'Kategórie' : 'Inzeráty'}
@@ -520,14 +515,14 @@ export default function MonitoringPage() {
             </div>
 
             {breakdownLoading ? (
-              <div className="bg-card rounded-lg border border-dark p-8 text-center text-gray-400">
+              <div className="card p-8 text-center text-gray-400">
                 Načítavam rozklad...
               </div>
             ) : breakdown ? (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-card rounded-lg p-4 border border-dark flex items-center gap-4">
-                    <div className="p-2 rounded-lg bg-emerald-500/20">
+                  <div className="card p-4 flex items-center gap-4">
+                    <div className="p-2 rounded-xl bg-emerald-500/20">
                       <FolderTree className="w-5 h-5 text-emerald-400" />
                     </div>
                     <div>
@@ -537,8 +532,8 @@ export default function MonitoringPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="bg-card rounded-lg p-4 border border-dark flex items-center gap-4">
-                    <div className="p-2 rounded-lg bg-sky-500/20">
+                  <div className="card p-4 flex items-center gap-4">
+                    <div className="p-2 rounded-xl bg-sky-500/20">
                       <FileText className="w-5 h-5 text-sky-400" />
                     </div>
                     <div>
@@ -551,8 +546,8 @@ export default function MonitoringPage() {
                 </div>
 
                 {(breakdownFilter === 'all' || breakdownFilter === 'categories') && (
-                  <div className="bg-card rounded-lg border border-dark overflow-hidden">
-                    <h3 className="text-sm font-semibold text-gray-200 p-4 border-b border-dark">
+                  <div className="card overflow-hidden">
+                    <h3 className="text-sm font-semibold text-gray-200 p-4 border-b border-white/[0.06]">
                       Podľa kategórie ({breakdownPeriodLabel[breakdownPeriod]})
                     </h3>
                     <div className="overflow-x-auto">
@@ -575,7 +570,7 @@ export default function MonitoringPage() {
                             (() => {
                               const totalCat = breakdown.topCategories.reduce((s, r) => s + r.count, 0)
                               return breakdown.topCategories.map((row) => (
-                                <tr key={row.categoryId} className="border-b border-dark/50 last:border-0 hover:bg-dark/30">
+                                <tr key={row.categoryId} className="border-b border-white/[0.06]/50 last:border-0 hover:bg-dark/30">
                                   <td className="py-2.5 px-4 text-gray-200">
                                     <span className="font-medium">{row.name}</span>
                                     <span className="text-gray-500 ml-2 text-xs">/{row.slug}</span>
@@ -595,8 +590,8 @@ export default function MonitoringPage() {
                 )}
 
                 {(breakdownFilter === 'all' || breakdownFilter === 'ads') && (
-                  <div className="bg-card rounded-lg border border-dark overflow-hidden">
-                    <h3 className="text-sm font-semibold text-gray-200 p-4 border-b border-dark">
+                  <div className="card overflow-hidden">
+                    <h3 className="text-sm font-semibold text-gray-200 p-4 border-b border-white/[0.06]">
                       Podľa inzerátu ({breakdownPeriodLabel[breakdownPeriod]})
                     </h3>
                     <div className="overflow-x-auto max-h-96 overflow-y-auto">
@@ -619,7 +614,7 @@ export default function MonitoringPage() {
                             (() => {
                               const totalAd = breakdown.topAdvertisements.reduce((s, r) => s + r.count, 0)
                               return breakdown.topAdvertisements.map((row) => (
-                                <tr key={row.advertisementId} className="border-b border-dark/50 last:border-0 hover:bg-dark/30">
+                                <tr key={row.advertisementId} className="border-b border-white/[0.06]/50 last:border-0 hover:bg-dark/30">
                                   <td className="py-2.5 px-4 text-gray-200">
                                     <span className="line-clamp-2" title={row.title}>{row.title}</span>
                                   </td>
@@ -638,13 +633,11 @@ export default function MonitoringPage() {
                 )}
               </div>
             ) : (
-              <div className="bg-card rounded-lg border border-dark p-6 text-center text-gray-500 text-sm">
+              <div className="card p-6 text-center text-gray-500 text-sm">
                 Nepodarilo sa načítať rozklad alebo ešte nie sú dáta.
               </div>
             )}
           </div>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   )
 }

@@ -3,9 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
 import { api } from '@/lib/api'
+import DashboardLayout from '@/components/DashboardLayout'
 import {
   Plus,
   Trash2,
@@ -477,24 +476,14 @@ export default function DevMenuPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark text-white flex">
-        <Sidebar />
-        <div className="flex-1 ml-64">
-          <Header />
-          <main className="p-6">
+      <DashboardLayout>
             <div className="text-gray-400">Načítavam...</div>
-          </main>
-        </div>
-      </div>
+          </DashboardLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-dark text-white flex">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Header />
-        <main className="p-6">
+    <DashboardLayout>
           <div className="mb-6">
             <h1 className="text-2xl font-bold mb-2">Menu – Navbar a Footer</h1>
             <p className="text-gray-400">
@@ -503,7 +492,7 @@ export default function DevMenuPage() {
           </div>
 
           {successMessage && (
-            <div className="mb-6 px-4 py-3 bg-[#1dbf73]/20 border border-[#1dbf73] rounded-lg text-[#1dbf73] flex items-center gap-2">
+            <div className="mb-6 px-4 py-3 bg-[#1dbf73]/20 border border-[#1dbf73] rounded-xl text-[#1dbf73] flex items-center gap-2">
               <Save className="w-5 h-5 flex-shrink-0" />
               <span>{successMessage}</span>
             </div>
@@ -513,7 +502,7 @@ export default function DevMenuPage() {
           <div className="flex gap-2 mb-6">
             <button
               onClick={() => setActiveTab('navbar')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-colors ${
                 activeTab === 'navbar'
                   ? 'bg-card text-white'
                   : 'bg-cardHover text-gray-400 hover:text-white'
@@ -524,7 +513,7 @@ export default function DevMenuPage() {
             </button>
             <button
               onClick={() => setActiveTab('footer')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-colors ${
                 activeTab === 'footer'
                   ? 'bg-card text-white'
                   : 'bg-cardHover text-gray-400 hover:text-white'
@@ -535,7 +524,7 @@ export default function DevMenuPage() {
             </button>
             <button
               onClick={() => setActiveTab('categoryNav')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-colors ${
                 activeTab === 'categoryNav'
                   ? 'bg-card text-white'
                   : 'bg-cardHover text-gray-400 hover:text-white'
@@ -546,7 +535,7 @@ export default function DevMenuPage() {
             </button>
             <button
               onClick={() => setActiveTab('madeOnRentMe')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-colors ${
                 activeTab === 'madeOnRentMe'
                   ? 'bg-card text-white'
                   : 'bg-cardHover text-gray-400 hover:text-white'
@@ -557,7 +546,7 @@ export default function DevMenuPage() {
             </button>
             <button
               onClick={() => setActiveTab('popularCategories')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-colors ${
                 activeTab === 'popularCategories'
                   ? 'bg-card text-white'
                   : 'bg-cardHover text-gray-400 hover:text-white'
@@ -570,7 +559,7 @@ export default function DevMenuPage() {
 
           {/* Navbar tab */}
           {activeTab === 'navbar' && (
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-semibold">Položky navbaru</h2>
                 <div className="flex gap-2">
@@ -581,14 +570,14 @@ export default function DevMenuPage() {
                         e.stopPropagation()
                         setShowCategoryPicker(showCategoryPicker === 'navbar' ? null : 'navbar')
                       }}
-                      className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-500 transition-colors"
                     >
                       <FolderTree className="w-4 h-4" />
                       Pridať kategóriu
                     </button>
                     {showCategoryPicker === 'navbar' && (
                       <div
-                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-dark border border-dark rounded-lg shadow-lg z-20"
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.04] border border-white/[0.06] rounded-xl shadow-lg z-20"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {categories.length === 0 ? (
@@ -617,7 +606,7 @@ export default function DevMenuPage() {
                   </div>
                   <button
                     onClick={addNavbarItem}
-                    className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463] transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-xl hover:bg-[#19a463] transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Pridať položku
@@ -625,7 +614,7 @@ export default function DevMenuPage() {
                   <button
                     onClick={handleSaveNavbar}
                     disabled={saving}
-                    className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-500 transition-colors disabled:opacity-50"
                   >
                     <Save className="w-4 h-4" />
                     {saving ? 'Ukladám...' : 'Uložiť'}
@@ -636,7 +625,7 @@ export default function DevMenuPage() {
                 {navbarData.items.map((item, index) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 p-3 bg-dark rounded-lg border border-dark"
+                    className="flex items-center gap-3 p-3 bg-white/[0.03] rounded-xl border border-white/[0.06]"
                   >
                     <GripVertical className="w-5 h-5 text-gray-500 flex-shrink-0" />
                     <span className="text-gray-500 w-8">{index + 1}.</span>
@@ -644,14 +633,14 @@ export default function DevMenuPage() {
                       type="text"
                       value={item.label}
                       onChange={(e) => updateNavbarItem(item.id, 'label', e.target.value)}
-                      className="flex-1 bg-card border border-dark rounded px-3 py-2 text-white placeholder-gray-500"
+                      className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500"
                       placeholder="Názov"
                     />
                     <input
                       type="text"
                       value={item.href}
                       onChange={(e) => updateNavbarItem(item.id, 'href', e.target.value)}
-                      className="flex-1 bg-card border border-dark rounded px-3 py-2 text-white placeholder-gray-500"
+                      className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500"
                       placeholder="Odkaz (href)"
                     />
                     <button
@@ -672,7 +661,7 @@ export default function DevMenuPage() {
 
           {/* CategoryNav tab */}
           {activeTab === 'categoryNav' && (
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-semibold">Pruh kategórií (pod navbarom)</h2>
                 <div className="flex gap-2">
@@ -685,14 +674,14 @@ export default function DevMenuPage() {
                           showCategoryPicker === 'categoryNav' ? null : 'categoryNav'
                         )
                       }}
-                      className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-500 transition-colors"
                     >
                       <FolderTree className="w-4 h-4" />
                       Pridať kategóriu
                     </button>
                     {showCategoryPicker === 'categoryNav' && (
                       <div
-                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-dark border border-dark rounded-lg shadow-lg z-20"
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.04] border border-white/[0.06] rounded-xl shadow-lg z-20"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {categories.length === 0 ? (
@@ -734,7 +723,7 @@ export default function DevMenuPage() {
                         ),
                       })
                     }}
-                    className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463] transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-xl hover:bg-[#19a463] transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Pridať položku
@@ -742,7 +731,7 @@ export default function DevMenuPage() {
                   <button
                     onClick={handleSaveCategoryNav}
                     disabled={saving}
-                    className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-500 transition-colors disabled:opacity-50"
                   >
                     <Save className="w-4 h-4" />
                     {saving ? 'Ukladám...' : 'Uložiť'}
@@ -763,14 +752,14 @@ export default function DevMenuPage() {
                       visibleCount: Math.max(1, parseInt(e.target.value) || 5),
                     })
                   }
-                  className="w-20 bg-card border border-dark rounded px-3 py-2 text-white text-sm"
+                  className="w-20 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm"
                 />
               </div>
               <div className="space-y-3">
                 {categoryNavData.items.map((item, index) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 p-3 bg-dark rounded-lg border border-dark"
+                    className="flex items-center gap-3 p-3 bg-white/[0.03] rounded-xl border border-white/[0.06]"
                   >
                     <GripVertical className="w-5 h-5 text-gray-500 flex-shrink-0" />
                     <span className="text-gray-500 w-8">{index + 1}.</span>
@@ -780,7 +769,7 @@ export default function DevMenuPage() {
                       onChange={(e) =>
                         updateCategoryNavItem(item.id, 'label', e.target.value)
                       }
-                      className="flex-1 bg-card border border-dark rounded px-3 py-2 text-white placeholder-gray-500"
+                      className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500"
                       placeholder="Názov"
                     />
                     <input
@@ -789,7 +778,7 @@ export default function DevMenuPage() {
                       onChange={(e) =>
                         updateCategoryNavItem(item.id, 'href', e.target.value)
                       }
-                      className="flex-1 bg-card border border-dark rounded px-3 py-2 text-white placeholder-gray-500"
+                      className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500"
                       placeholder="Odkaz (href)"
                     />
                     <button
@@ -812,7 +801,7 @@ export default function DevMenuPage() {
 
           {/* MadeOnRentMe tab */}
           {activeTab === 'madeOnRentMe' && (
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-semibold">Vytvorené na RentMe</h2>
                 <div className="flex gap-2">
@@ -825,14 +814,14 @@ export default function DevMenuPage() {
                           showCategoryPicker === 'madeOnRentMe' ? null : 'madeOnRentMe'
                         )
                       }}
-                      className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-500 transition-colors"
                     >
                       <FolderTree className="w-4 h-4" />
                       Pridať kategóriu
                     </button>
                     {showCategoryPicker === 'madeOnRentMe' && (
                       <div
-                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-dark border border-dark rounded-lg shadow-lg z-20"
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.04] border border-white/[0.06] rounded-xl shadow-lg z-20"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {categories.length === 0 ? (
@@ -875,7 +864,7 @@ export default function DevMenuPage() {
                         ),
                       })
                     }}
-                    className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463] transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-xl hover:bg-[#19a463] transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Pridať položku
@@ -883,7 +872,7 @@ export default function DevMenuPage() {
                   <button
                     onClick={handleSaveMadeOnRentMe}
                     disabled={saving}
-                    className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-500 transition-colors disabled:opacity-50"
                   >
                     <Save className="w-4 h-4" />
                     {saving ? 'Ukladám...' : 'Uložiť'}
@@ -894,7 +883,7 @@ export default function DevMenuPage() {
                 {madeOnRentMeData.items.map((item, index) => (
                   <div
                     key={item.id}
-                    className="flex flex-col md:flex-row gap-4 p-4 bg-dark rounded-lg border border-dark"
+                    className="flex flex-col md:flex-row gap-4 p-4 bg-white/[0.03] rounded-xl border border-white/[0.06]"
                   >
                     <div className="flex items-start gap-3 flex-1">
                       <GripVertical className="w-5 h-5 text-gray-500 flex-shrink-0 mt-2" />
@@ -906,7 +895,7 @@ export default function DevMenuPage() {
                           onChange={(e) =>
                             updateMadeOnRentMeItem(item.id, 'title', e.target.value)
                           }
-                          className="bg-card border border-dark rounded px-3 py-2 text-white"
+                          className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
                           placeholder="Názov"
                         />
                         <input
@@ -915,7 +904,7 @@ export default function DevMenuPage() {
                           onChange={(e) =>
                             updateMadeOnRentMeItem(item.id, 'href', e.target.value)
                           }
-                          className="bg-card border border-dark rounded px-3 py-2 text-white"
+                          className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
                           placeholder="Odkaz"
                         />
                         <input
@@ -924,7 +913,7 @@ export default function DevMenuPage() {
                           onChange={(e) =>
                             updateMadeOnRentMeItem(item.id, 'image', e.target.value)
                           }
-                          className="md:col-span-2 bg-card border border-dark rounded px-3 py-2 text-white"
+                          className="md:col-span-2 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
                           placeholder="URL obrázka"
                         />
                         <input
@@ -933,7 +922,7 @@ export default function DevMenuPage() {
                           onChange={(e) =>
                             updateMadeOnRentMeItem(item.id, 'description', e.target.value)
                           }
-                          className="md:col-span-2 bg-card border border-dark rounded px-3 py-2 text-white"
+                          className="md:col-span-2 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
                           placeholder="Popis"
                         />
                       </div>
@@ -958,7 +947,7 @@ export default function DevMenuPage() {
 
           {/* PopularCategories tab */}
           {activeTab === 'popularCategories' && (
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-semibold">
                   Populárne kategórie (v Hero sekcii)
@@ -975,14 +964,14 @@ export default function DevMenuPage() {
                             : 'popularCategories'
                         )
                       }}
-                      className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-500 transition-colors"
                     >
                       <FolderTree className="w-4 h-4" />
                       Pridať kategóriu
                     </button>
                     {showCategoryPicker === 'popularCategories' && (
                       <div
-                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-dark border border-dark rounded-lg shadow-lg z-20"
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.04] border border-white/[0.06] rounded-xl shadow-lg z-20"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {categories.length === 0 ? (
@@ -1018,7 +1007,7 @@ export default function DevMenuPage() {
                   <button
                     onClick={handleSavePopularCategories}
                     disabled={saving}
-                    className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-500 transition-colors disabled:opacity-50"
                   >
                     <Save className="w-4 h-4" />
                     {saving ? 'Ukladám...' : 'Uložiť'}
@@ -1033,7 +1022,7 @@ export default function DevMenuPage() {
                 {popularCategoriesData.items.map((item, index) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 p-3 bg-dark rounded-lg border border-dark"
+                    className="flex items-center gap-3 p-3 bg-white/[0.03] rounded-xl border border-white/[0.06]"
                   >
                     <GripVertical className="w-5 h-5 text-gray-500 flex-shrink-0" />
                     <span className="text-gray-500 w-8">{index + 1}.</span>
@@ -1043,7 +1032,7 @@ export default function DevMenuPage() {
                       onChange={(e) =>
                         updatePopularCategoriesItem(item.id, 'label', e.target.value)
                       }
-                      className="flex-1 bg-card border border-dark rounded px-3 py-2 text-white placeholder-gray-500"
+                      className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500"
                       placeholder="Názov"
                     />
                     <input
@@ -1052,7 +1041,7 @@ export default function DevMenuPage() {
                       onChange={(e) =>
                         updatePopularCategoriesItem(item.id, 'href', e.target.value)
                       }
-                      className="flex-1 bg-card border border-dark rounded px-3 py-2 text-white placeholder-gray-500"
+                      className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500"
                       placeholder="Odkaz (href)"
                     />
                     <button
@@ -1075,14 +1064,14 @@ export default function DevMenuPage() {
 
           {/* Footer tab */}
           {activeTab === 'footer' && (
-            <div className="bg-card rounded-lg p-6 border border-dark">
+            <div className="card p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-semibold">Položky footera</h2>
                 <div className="flex gap-2">
                   <button
                     onClick={handleSaveFooter}
                     disabled={saving}
-                    className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-500 transition-colors disabled:opacity-50"
                   >
                     <Save className="w-4 h-4" />
                     {saving ? 'Ukladám...' : 'Uložiť'}
@@ -1093,7 +1082,7 @@ export default function DevMenuPage() {
                 {footerData.sections.map((section) => (
                   <div
                     key={section.id}
-                    className="border border-dark rounded-lg overflow-hidden"
+                    className="border border-white/[0.06] rounded-xl overflow-hidden"
                   >
                     <button
                       onClick={() => toggleSection(section.id)}
@@ -1126,7 +1115,7 @@ export default function DevMenuPage() {
                             onChange={(e) =>
                               updateFooterSection(section.id, 'key', e.target.value)
                             }
-                            className="flex-1 bg-card border border-dark rounded px-3 py-2 text-white text-sm"
+                            className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm"
                           />
                         </div>
                         {section.links.map((link) => (
@@ -1140,7 +1129,7 @@ export default function DevMenuPage() {
                               onChange={(e) =>
                                 updateFooterLink(section.id, link.id, 'label', e.target.value)
                               }
-                              className="flex-1 bg-card border border-dark rounded px-3 py-2 text-white text-sm"
+                              className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm"
                               placeholder="Názov"
                             />
                             <input
@@ -1149,7 +1138,7 @@ export default function DevMenuPage() {
                               onChange={(e) =>
                                 updateFooterLink(section.id, link.id, 'href', e.target.value)
                               }
-                              className="flex-1 bg-card border border-dark rounded px-3 py-2 text-white text-sm"
+                              className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm"
                               placeholder="Odkaz"
                             />
                             <button
@@ -1170,14 +1159,14 @@ export default function DevMenuPage() {
                                   showCategoryPicker === section.id ? null : section.id
                                 )
                               }}
-                              className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
+                              className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-500 transition-colors"
                             >
                               <FolderTree className="w-4 h-4" />
                               Pridať kategóriu
                             </button>
                             {showCategoryPicker === section.id && (
                               <div
-                                className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-dark border border-dark rounded-lg shadow-lg z-20"
+                                className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.04] border border-white/[0.06] rounded-xl shadow-lg z-20"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {categories.length === 0 ? (
@@ -1206,7 +1195,7 @@ export default function DevMenuPage() {
                           </div>
                           <button
                             onClick={() => addFooterLink(section.id)}
-                            className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-lg hover:bg-[#19a463] transition-colors"
+                            className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-xl hover:bg-[#19a463] transition-colors"
                           >
                             <Plus className="w-4 h-4" />
                             Pridať položku
@@ -1219,8 +1208,6 @@ export default function DevMenuPage() {
               </div>
             </div>
           )}
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   )
 }

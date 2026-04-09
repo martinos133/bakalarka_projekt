@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Header from '@/components/Header'
 import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
+import { CmsGate } from '@/components/CmsGate'
 import { isAuthenticated } from '@/lib/auth'
 import {
   UserPlus,
@@ -87,6 +88,14 @@ const BENEFITS = [
 ]
 
 export default function BecomeSellerPage() {
+  return (
+    <CmsGate cmsSlug="become-seller">
+      <BecomeSellerDefaultContent />
+    </CmsGate>
+  )
+}
+
+function BecomeSellerDefaultContent() {
   const [loggedIn, setLoggedIn] = useState(false)
   useEffect(() => {
     setLoggedIn(isAuthenticated())

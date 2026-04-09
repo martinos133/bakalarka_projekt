@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { CmsGate } from '@/components/CmsGate'
 import { User, Building2, Eye, EyeOff } from 'lucide-react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
@@ -155,6 +156,7 @@ export default function JoinPage() {
   }
 
   return (
+    <CmsGate cmsSlug="join" shell="headerFooterOnly">
     <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="flex items-center justify-center py-12 px-4">
@@ -632,5 +634,6 @@ export default function JoinPage() {
       </div>
       <Footer />
     </div>
+    </CmsGate>
   )
 }

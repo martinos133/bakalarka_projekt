@@ -3,11 +3,10 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
 import { api } from '@/lib/api'
 import RichTextEditor from '@/components/RichTextEditor'
 import { Plus, Edit, Trash2, X, Save, BookOpen, ExternalLink } from 'lucide-react'
+import DashboardLayout from '@/components/DashboardLayout'
 
 interface BlogPost {
   id: string
@@ -125,11 +124,7 @@ export default function DevBlogPage() {
     : ''
 
   return (
-    <div className="min-h-screen bg-dark text-white flex">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Header />
-        <main className="p-6">
+    <DashboardLayout>
           <div className="mb-6">
             <h1 className="text-2xl font-bold mb-2">Blog</h1>
             <p className="text-gray-400">
@@ -141,7 +136,7 @@ export default function DevBlogPage() {
             {!showForm && (
               <button
                 onClick={() => setShowForm(true)}
-                className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+                className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-xl flex items-center space-x-2 transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 <span>Nový príspevok</span>
@@ -150,7 +145,7 @@ export default function DevBlogPage() {
           </div>
 
           {showForm && (
-            <div className="bg-card rounded-lg p-6 border border-dark mb-6">
+            <div className="card p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold">
                   {editingId ? 'Upraviť príspevok' : 'Nový príspevok'}
@@ -175,7 +170,7 @@ export default function DevBlogPage() {
                       value={formData.slug}
                       onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                       placeholder="napr. prvý-príspevok"
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                     />
                     <p className="text-xs text-gray-500 mt-1">URL: /blog/{formData.slug || 'slug'}</p>
                   </div>
@@ -189,7 +184,7 @@ export default function DevBlogPage() {
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                       placeholder="Názov príspevku"
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                     />
                   </div>
                 </div>
@@ -203,7 +198,7 @@ export default function DevBlogPage() {
                     onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
                     rows={2}
                     placeholder="Krátky popis pre zoznam príspevkov..."
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                   />
                 </div>
 
@@ -216,7 +211,7 @@ export default function DevBlogPage() {
                     value={formData.featuredImage}
                     onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })}
                     placeholder="https://..."
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                   />
                 </div>
 
@@ -242,7 +237,7 @@ export default function DevBlogPage() {
                       value={formData.metaTitle}
                       onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
                       placeholder="SEO názov"
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                     />
                   </div>
                   <div>
@@ -252,7 +247,7 @@ export default function DevBlogPage() {
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                     >
                       <option value="DRAFT">Koncept</option>
                       <option value="PUBLISHED">Publikovaný</option>
@@ -269,7 +264,7 @@ export default function DevBlogPage() {
                     onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
                     rows={2}
                     placeholder="SEO popis"
-                    className="w-full bg-dark border border-card rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
                   />
                 </div>
 
@@ -277,13 +272,13 @@ export default function DevBlogPage() {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="px-4 py-2 border border-card rounded-lg hover:bg-cardHover transition-colors"
+                    className="px-4 py-2 border border-card rounded-xl hover:bg-cardHover transition-colors"
                   >
                     Zrušiť
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-primary hover:opacity-90 text-white rounded-lg flex items-center gap-2 transition-colors"
+                    className="px-4 py-2 bg-primary hover:opacity-90 text-white rounded-xl flex items-center gap-2 transition-colors"
                   >
                     <Save className="w-4 h-4" />
                     Uložiť
@@ -293,7 +288,7 @@ export default function DevBlogPage() {
             </div>
           )}
 
-          <div className="bg-card rounded-lg border border-dark overflow-hidden">
+          <div className="card overflow-hidden">
             {loading ? (
               <div className="p-6 text-center text-gray-400">Načítavam...</div>
             ) : posts.length === 0 ? (
@@ -311,7 +306,7 @@ export default function DevBlogPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-dark text-left">
+                    <tr className="border-b border-white/[0.06] text-left">
                       <th className="px-4 py-3 text-sm font-semibold text-gray-400">Názov</th>
                       <th className="px-4 py-3 text-sm font-semibold text-gray-400">Slug</th>
                       <th className="px-4 py-3 text-sm font-semibold text-gray-400">Status</th>
@@ -321,7 +316,7 @@ export default function DevBlogPage() {
                   </thead>
                   <tbody>
                     {posts.map((post) => (
-                      <tr key={post.id} className="border-b border-dark hover:bg-cardHover hover:bg-opacity-30 transition-colors">
+                      <tr key={post.id} className="border-b border-white/[0.06] hover:bg-cardHover hover:bg-opacity-30 transition-colors">
                         <td className="px-4 py-3 font-medium">{post.title}</td>
                         <td className="px-4 py-3">
                           <code className="text-sm text-gray-300">{post.slug}</code>
@@ -374,8 +369,6 @@ export default function DevBlogPage() {
               </div>
             )}
           </div>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   )
 }

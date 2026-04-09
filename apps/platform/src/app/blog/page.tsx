@@ -5,9 +5,10 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
+import { CmsGate } from '@/components/CmsGate'
 import { api } from '@/lib/api'
 
-export default function BlogPage() {
+function BlogPageInner() {
   const [posts, setPosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -96,5 +97,13 @@ export default function BlogPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function BlogPage() {
+  return (
+    <CmsGate cmsSlug="blog">
+      <BlogPageInner />
+    </CmsGate>
   )
 }

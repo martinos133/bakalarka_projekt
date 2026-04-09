@@ -18,6 +18,7 @@ import { api } from '@/lib/api'
 import Header from '@/components/Header'
 import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
+import { CmsGate } from '@/components/CmsGate'
 import { getCoordsFromLocation } from '@/lib/mapRegions'
 
 const AdMap = dynamic(() => import('@/components/AdMap'), { ssr: false })
@@ -134,7 +135,7 @@ function ProSelect({
   )
 }
 
-export default function MapPage() {
+function MapPageInner() {
   const [categoryId, setCategoryId] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [regionFilter, setRegionFilter] = useState('')
@@ -530,5 +531,13 @@ export default function MapPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function MapPage() {
+  return (
+    <CmsGate cmsSlug="mapa">
+      <MapPageInner />
+    </CmsGate>
   )
 }

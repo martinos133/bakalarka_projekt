@@ -20,7 +20,7 @@ export class StaticPagesService {
   }
 
   async findBySlug(slug: string) {
-    const page = await prisma.staticPage.findUnique({
+    const page = await prisma.staticPage.findFirst({
       where: { slug, status: 'PUBLISHED' },
     });
     if (!page) {

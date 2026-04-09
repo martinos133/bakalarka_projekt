@@ -33,7 +33,7 @@ export default function ConfirmDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
       <div
-        className="bg-card border border-dark rounded-xl shadow-xl w-full max-w-md overflow-hidden"
+        className="bg-card border border-white/[0.06] rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
@@ -48,14 +48,14 @@ export default function ConfirmDialog({
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 bg-dark border border-card hover:bg-cardHover transition-colors"
+            className="px-4 py-2 rounded-xl text-sm font-medium text-gray-300 bg-dark border border-card hover:bg-cardHover transition-colors"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${confirmClass}`}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${confirmClass}`}
           >
             {confirmLabel}
           </button>

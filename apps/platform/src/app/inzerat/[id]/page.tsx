@@ -5,9 +5,11 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
+import { CmsArticleView, CmsLoadingView } from '@/components/CmsGate'
 import ImageCarousel from '@/components/ImageCarousel'
 import DatePicker from '@/components/DatePicker'
 import { api } from '@/lib/api'
+import { useCmsOverride } from '@/lib/useCmsOverride'
 import { isAuthenticated } from '@/lib/auth'
 import { isProSellerBadge } from '@/lib/sellerPlan'
 import type { Filter } from '@inzertna-platforma/shared'
@@ -92,6 +94,8 @@ export default function AdvertisementDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = use(params)
+  const cmsDetailSlug = `inzerat-${id}`
+  const { loading: cmsLoading, page: cmsPage } = useCmsOverride(cmsDetailSlug)
   const [advertisement, setAdvertisement] = useState<Advertisement | null>(null)
   const [loading, setLoading] = useState(true)
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null)
@@ -180,6 +184,20 @@ export default function AdvertisementDetailPage({
     } finally {
       setFavoriteLoading(false)
     }
+  }
+
+  if (cmsLoading) {
+    return <CmsLoadingView shell="withCategoryNav" />
+  }
+  if (cmsPage) {
+    return (
+      <CmsArticleView
+        shell="withCategoryNav"
+        slug={cmsDetailSlug}
+        title={cmsPage.title}
+        content={cmsPage.content}
+      />
+    )
   }
 
   if (loading) {

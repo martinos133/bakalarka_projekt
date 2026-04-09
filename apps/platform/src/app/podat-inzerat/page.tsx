@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { CmsGate } from '@/components/CmsGate'
 import CreateAdvertisementWizard from '@/components/CreateAdvertisementWizard'
 import { api } from '@/lib/api'
 import { isAuthenticated } from '@/lib/auth'
@@ -72,6 +73,7 @@ function PodatInzeratContent() {
 
 export default function PodatInzeratPage() {
   return (
+    <CmsGate cmsSlug="podat-inzerat" shell="headerFooterOnly">
     <div className="min-h-screen bg-gradient-to-b from-[#fff5ed] via-[#fffaf6] to-white">
       <Header />
       <Suspense
@@ -83,5 +85,6 @@ export default function PodatInzeratPage() {
       </Suspense>
       <Footer />
     </div>
+    </CmsGate>
   )
 }

@@ -23,6 +23,7 @@ import {
 import Header from '@/components/Header'
 import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
+import { CmsGate } from '@/components/CmsGate'
 
 const NAVY = 'text-[#0c1a2e]'
 const NAVY_BG = 'bg-[#0f172a]'
@@ -153,7 +154,7 @@ function formatPriceEUR(n: number | null): string {
   return `${n.toLocaleString('sk-SK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`
 }
 
-export default function PremiumPage() {
+function PremiumPageInner() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [checkoutDone, setCheckoutDone] = useState(false)
   const [checkoutSubmitting, setCheckoutSubmitting] = useState(false)
@@ -718,5 +719,13 @@ export default function PremiumPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function PremiumPage() {
+  return (
+    <CmsGate cmsSlug="premium">
+      <PremiumPageInner />
+    </CmsGate>
   )
 }

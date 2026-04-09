@@ -3,16 +3,20 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { api } from '@/lib/api'
+import { useCmsOverride } from '@/lib/useCmsOverride'
 import Link from 'next/link'
 import TrackedLink from '@/components/TrackedLink'
 import Image from 'next/image'
 import { isProSellerBadge } from '@/lib/sellerPlan'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { CmsArticleView, CmsLoadingView } from '@/components/CmsGate'
 
 export default function CategoryPage() {
   const params = useParams()
   const slug = params?.slug as string
+  const cmsSlug = slug ? `kategoria-${slug}` : ''
+  const { loading: cmsLoading, page: cmsPage } = useCmsOverride(cmsSlug)
   const [category, setCategory] = useState<any>(null)
   const [advertisements, setAdvertisements] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -47,6 +51,20 @@ export default function CategoryPage() {
     } catch (error) {
       console.error('Chyba pri načítaní inzerátov:', error)
     }
+  }
+
+  if (cmsLoading) {
+    return <CmsLoadingView shell="headerFooterOnly" />
+  }
+  if (cmsPage && cmsSlug) {
+    return (
+      <CmsArticleView
+        shell="headerFooterOnly"
+        slug={cmsSlug}
+        title={cmsPage.title}
+        content={cmsPage.content}
+      />
+    )
   }
 
   if (loading) {

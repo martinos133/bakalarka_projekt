@@ -20,7 +20,7 @@ export default function AlertDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
       <div
-        className="bg-card border border-dark rounded-xl shadow-xl w-full max-w-md overflow-hidden"
+        className="bg-card border border-white/[0.06] rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="alert-dialog-title"
@@ -35,7 +35,7 @@ export default function AlertDialog({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-gray-100 bg-primary hover:opacity-90 transition-colors"
+            className="px-4 py-2 rounded-xl text-sm font-medium text-gray-100 bg-primary hover:opacity-90 transition-colors"
           >
             {buttonLabel}
           </button>

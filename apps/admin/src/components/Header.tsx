@@ -1,56 +1,95 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Search } from 'lucide-react'
-import { getAuthUser } from '@/lib/auth'
+import { useState } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+import { Search, Bell } from 'lucide-react'
+
+const shortcuts = [
+  { label: 'Inzeráty', path: '/dashboard/advertisements' },
+  { label: 'Používatelia', path: '/dashboard/users' },
+  { label: 'Moderácia', path: '/dashboard/pending' },
+  { label: 'Nastavenia', path: '/dashboard/settings' },
+]
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [user, setUser] = useState<any>(null)
-  const [mounted, setMounted] = useState(false)
+  const [searchFocused, setSearchFocused] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
 
-  useEffect(() => {
-    setMounted(true)
-    setUser(getAuthUser())
-  }, [])
-
-  const getInitials = (firstName?: string, lastName?: string) => {
-    if (!mounted) return 'A'
-    const first = firstName?.charAt(0) || ''
-    const last = lastName?.charAt(0) || ''
-    return (first + last).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'A'
-  }
+  const pageTitle = getPageTitle(pathname)
 
   return (
-    <div className="bg-card border-b border-dark px-6 py-4 flex items-center justify-between">
-      <div className="flex-1 max-w-md">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Vyhľadať"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-dark border border-dark rounded-lg px-4 py-2 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-          />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-        </div>
-      </div>
+    <header className="sticky top-0 z-30 bg-dark/80 backdrop-blur-xl border-b border-white/[0.06]">
+      <div className="flex items-center justify-between px-8 h-16">
+        <h1 className="text-lg font-semibold text-white">{pageTitle}</h1>
 
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-dark flex items-center justify-center text-white font-semibold">
-            {getInitials(user?.firstName, user?.lastName)}
+        <div className="flex items-center gap-3">
+          {/* Shortcuts */}
+          <nav className="hidden lg:flex items-center gap-1 mr-2">
+            {shortcuts.map((s) => (
+              <button
+                key={s.path}
+                onClick={() => router.push(s.path)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
+                  ${pathname === s.path
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
+                  }
+                `}
+              >
+                {s.label}
+              </button>
+            ))}
+          </nav>
+
+          <div className="h-5 w-px bg-white/[0.08] hidden lg:block" />
+
+          {/* Search */}
+          <div className={`relative transition-all duration-200 ${searchFocused ? 'w-64' : 'w-48'}`}>
+            <input
+              type="text"
+              placeholder="Hľadať..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setSearchFocused(false)}
+              className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 pl-9 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/40 focus:bg-white/[0.06] transition-all"
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
           </div>
-          <div className="flex flex-col">
-            <span className="text-white font-medium text-sm">
-              {user?.firstName || 'Admin'} {user?.lastName || ''}
-            </span>
-            <span className="text-gray-400 text-xs">
-              {user?.email || 'admin@example.com'}
-            </span>
-          </div>
+
+          {/* Notifications */}
+          <button className="relative p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/[0.04] transition-colors">
+            <Bell className="w-[18px] h-[18px]" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
+          </button>
         </div>
       </div>
-    </div>
+    </header>
   )
+}
+
+function getPageTitle(pathname: string): string {
+  const map: Record<string, string> = {
+    '/dashboard': 'Dashboard',
+    '/dashboard/advertisements': 'Inzeráty',
+    '/dashboard/users': 'Používatelia',
+    '/dashboard/categories': 'Kategórie',
+    '/dashboard/specifications': 'Špecifikácie',
+    '/dashboard/monitoring': 'Monitoring kliknutí',
+    '/dashboard/contact-forms': 'Kontaktné formuláre',
+    '/dashboard/pending': 'Čakajúce inzeráty',
+    '/dashboard/reported': 'Nahlásené inzeráty',
+    '/dashboard/settings': 'Nastavenia',
+    '/dashboard/dev/static-pages': 'Statické stránky',
+    '/dashboard/dev/blog': 'Blog',
+    '/dashboard/dev/categories': 'Kategórie (DEV)',
+    '/dashboard/dev/advertisements': 'Inzeráty (DEV)',
+    '/dashboard/dev/menu': 'Menu',
+    '/dashboard/dev/components': 'Komponenty',
+    '/dashboard/dev/config': 'Konfigurácia',
+    '/dashboard/dev/filters': 'Filtre',
+  }
+  return map[pathname] || 'Admin Panel'
 }
