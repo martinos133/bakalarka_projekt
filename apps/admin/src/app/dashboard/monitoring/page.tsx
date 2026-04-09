@@ -7,6 +7,7 @@ import { api } from '@/lib/api'
 import { MousePointerClick, UserCheck, Building, User, Radio, FolderTree, FileText, Calendar } from 'lucide-react'
 import { PieChart as RechartsPieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import DashboardLayout from '@/components/DashboardLayout'
+import Select from '@/components/Select'
 
 type Period = '1d' | '7d' | '30d' | '3m'
 type BreakdownPeriod = '1m' | '5m' | '8h' | '1d' | '7d' | '30d' | '3m'
@@ -193,30 +194,30 @@ export default function MonitoringPage() {
               <div className="flex gap-3 items-center border-l border-white/[0.06] pl-4">
                 <label className="flex items-center gap-2 text-sm text-gray-400">
                   Pohlavie:
-                  <select
+                  <Select
                     value={filterGender}
-                    onChange={(e) => setFilterGender(e.target.value)}
-                    className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-2 py-1.5 text-gray-200 text-sm"
-                  >
-                    <option value="all">Všetci</option>
-                    <option value="MALE">Muži</option>
-                    <option value="FEMALE">Ženy</option>
-                    <option value="OTHER">Iné</option>
-                    <option value="unspecified">Nešpecifikované</option>
-                  </select>
+                    onChange={(val) => setFilterGender(val)}
+                    options={[
+                      { value: 'all', label: 'Všetci' },
+                      { value: 'MALE', label: 'Muži' },
+                      { value: 'FEMALE', label: 'Ženy' },
+                      { value: 'OTHER', label: 'Iné' },
+                      { value: 'unspecified', label: 'Nešpecifikované' },
+                    ]}
+                    />
                 </label>
                 <label className="flex items-center gap-2 text-sm text-gray-400">
                   Typ účtu:
-                  <select
+                  <Select
                     value={filterAccountType}
-                    onChange={(e) => setFilterAccountType(e.target.value)}
-                    className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-2 py-1.5 text-gray-200 text-sm"
-                  >
-                    <option value="all">Všetky</option>
-                    <option value="company">Firmy</option>
-                    <option value="individual">Fyzické osoby</option>
-                    <option value="unspecified">Nešpecifikované</option>
-                  </select>
+                    onChange={(val) => setFilterAccountType(val)}
+                    options={[
+                      { value: 'all', label: 'Všetky' },
+                      { value: 'company', label: 'Firmy' },
+                      { value: 'individual', label: 'Fyzické osoby' },
+                      { value: 'unspecified', label: 'Nešpecifikované' },
+                    ]}
+                    />
                 </label>
               </div>
             </div>

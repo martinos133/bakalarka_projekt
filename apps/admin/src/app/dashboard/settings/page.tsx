@@ -6,6 +6,7 @@ import { isAuthenticated } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Save, Globe, Shield, ChevronDown, ChevronRight } from 'lucide-react'
 import DashboardLayout from '@/components/DashboardLayout'
+import Select from '@/components/Select'
 
 interface PlatformConfig {
   siteName?: string
@@ -252,15 +253,15 @@ export default function SettingsPage() {
                   </div>
                   <div>
                     <label className="block text-gray-400 text-sm mb-2">Predvolený jazyk</label>
-                    <select
+                    <Select
                       value={platformConfig.defaultLanguage || 'sk'}
-                      onChange={(e) => updatePlatform('defaultLanguage', e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
-                    >
-                      <option value="sk">Slovenčina</option>
-                      <option value="en">English</option>
-                      <option value="cs">Čeština</option>
-                    </select>
+                      onChange={(val) => updatePlatform('defaultLanguage', val)}
+                      options={[
+                        { value: 'sk', label: 'Slovenčina' },
+                        { value: 'en', label: 'English' },
+                        { value: 'cs', label: 'Čeština' },
+                      ]}
+                      />
                   </div>
                   <div className="md:col-span-2 border-t border-white/[0.06] pt-4 mt-4">
                     <h3 className="text-white font-medium mb-3">Sekcia Top freelanceri</h3>

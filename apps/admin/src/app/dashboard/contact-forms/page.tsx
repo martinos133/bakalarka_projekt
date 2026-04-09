@@ -6,6 +6,7 @@ import { isAuthenticated } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Reply, X } from 'lucide-react'
 import DashboardLayout from '@/components/DashboardLayout'
+import Select from '@/components/Select'
 
 interface MessageSender {
   id: string
@@ -111,25 +112,25 @@ export default function ContactFormsPage() {
 
           <div className="mb-4 flex flex-wrap gap-3 items-center">
             <span className="text-sm text-gray-500">Filter:</span>
-            <select
+            <Select
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="bg-card border border-white/[0.06] rounded-2xl px-3 py-2 text-sm text-gray-200"
-            >
-              <option value="">Všetky stavy</option>
-              <option value="UNREAD">Neprečítaná</option>
-              <option value="READ">Prečítaná</option>
-              <option value="ARCHIVED">Archivovaná</option>
-            </select>
-            <select
+              onChange={(val) => setFilterStatus(val)}
+              options={[
+                { value: '', label: 'Všetky stavy' },
+                { value: 'UNREAD', label: 'Neprečítaná' },
+                { value: 'READ', label: 'Prečítaná' },
+                { value: 'ARCHIVED', label: 'Archivovaná' },
+              ]}
+              />
+            <Select
               value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="bg-card border border-white/[0.06] rounded-2xl px-3 py-2 text-sm text-gray-200"
-            >
-              <option value="">Všetky typy</option>
-              <option value="INQUIRY">Dotaz na inzerát</option>
-              <option value="SYSTEM">Systémová</option>
-            </select>
+              onChange={(val) => setFilterType(val)}
+              options={[
+                { value: '', label: 'Všetky typy' },
+                { value: 'INQUIRY', label: 'Dotaz na inzerát' },
+                { value: 'SYSTEM', label: 'Systémová' },
+              ]}
+              />
           </div>
 
           {loading ? (
@@ -201,8 +202,8 @@ export default function ContactFormsPage() {
 
           {/* Detail správy + odpovedať */}
           {showDetailModal && selectedMessage && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-              <div className="bg-card border border-white/[0.06] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-xl">
+            <div className="modal-overlay">
+              <div className="modal-panel-lg max-h-[90vh] overflow-hidden flex flex-col">
                 <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
                   <h2 className="text-lg font-semibold text-gray-200">Detail správy</h2>
                   <button

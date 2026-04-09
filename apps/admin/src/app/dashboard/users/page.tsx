@@ -10,6 +10,7 @@ import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, C
 import ConfirmDialog from '@/components/ConfirmDialog'
 import AlertDialog from '@/components/AlertDialog'
 import DashboardLayout from '@/components/DashboardLayout'
+import Select from '@/components/Select'
 
 export default function UsersPage() {
   const router = useRouter()
@@ -643,52 +644,52 @@ export default function UsersPage() {
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Rola</label>
-                <select
+                <Select
                   value={filters.role}
-                  onChange={(e) => setFilters({ ...filters, role: e.target.value as '' | 'ADMIN' | 'USER' })}
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                >
-                  <option value="">Všetky</option>
-                  <option value="ADMIN">Admin</option>
-                  <option value="USER">Používateľ</option>
-                </select>
+                  onChange={(val) => setFilters({ ...filters, role: val as '' | 'ADMIN' | 'USER' })}
+                  options={[
+                    { value: '', label: 'Všetky' },
+                    { value: 'ADMIN', label: 'Admin' },
+                    { value: 'USER', label: 'Používateľ' },
+                  ]}
+                  />
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Status</label>
-                <select
+                <Select
                   value={filters.status}
-                  onChange={(e) => setFilters({ ...filters, status: e.target.value as '' | 'active' | 'banned' })}
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                >
-                  <option value="">Všetky</option>
-                  <option value="active">Aktívny</option>
-                  <option value="banned">Zablokovaný</option>
-                </select>
+                  onChange={(val) => setFilters({ ...filters, status: val as '' | 'active' | 'banned' })}
+                  options={[
+                    { value: '', label: 'Všetky' },
+                    { value: 'active', label: 'Aktívny' },
+                    { value: 'banned', label: 'Zablokovaný' },
+                  ]}
+                  />
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Typ účtu</label>
-                <select
+                <Select
                   value={filters.accountType}
-                  onChange={(e) => setFilters({ ...filters, accountType: e.target.value as '' | 'company' | 'private' })}
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                >
-                  <option value="">Všetky</option>
-                  <option value="company">Spoločnosť</option>
-                  <option value="private">Súkromná osoba</option>
-                </select>
+                  onChange={(val) => setFilters({ ...filters, accountType: val as '' | 'company' | 'private' })}
+                  options={[
+                    { value: '', label: 'Všetky' },
+                    { value: 'company', label: 'Spoločnosť' },
+                    { value: 'private', label: 'Súkromná osoba' },
+                  ]}
+                  />
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Pohlavie</label>
-                <select
+                <Select
                   value={filters.gender}
-                  onChange={(e) => setFilters({ ...filters, gender: e.target.value as '' | 'MALE' | 'FEMALE' | 'OTHER' })}
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                >
-                  <option value="">Všetky</option>
-                  <option value="MALE">Muž</option>
-                  <option value="FEMALE">Žena</option>
-                  <option value="OTHER">Iné</option>
-                </select>
+                  onChange={(val) => setFilters({ ...filters, gender: val as '' | 'MALE' | 'FEMALE' | 'OTHER' })}
+                  options={[
+                    { value: '', label: 'Všetky' },
+                    { value: 'MALE', label: 'Muž' },
+                    { value: 'FEMALE', label: 'Žena' },
+                    { value: 'OTHER', label: 'Iné' },
+                  ]}
+                  />
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Vek od</label>
@@ -882,8 +883,8 @@ export default function UsersPage() {
           </div>
 
           {showDetailModal && selectedUser && (
-            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-              <div className="card w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="modal-overlay">
+              <div className="modal-panel-lg max-h-[90vh] overflow-y-auto">
                 <div className="sticky top-0 bg-card border-b border-white/[0.06] px-6 py-4 flex items-center justify-between">
                   <h2 className="text-xl font-semibold">Detail používateľa</h2>
                   <button
@@ -1199,8 +1200,8 @@ export default function UsersPage() {
           )}
 
           {showBanModal && selectedUser && (
-            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-              <div className="card p-6 w-full max-w-md">
+            <div className="modal-overlay">
+              <div className="modal-panel-sm p-6">
                 <h2 className="text-xl font-semibold mb-4">Zablokovať používateľa</h2>
                 <p className="text-gray-400 mb-4">
                   {selectedUser.firstName && selectedUser.lastName
@@ -1213,14 +1214,14 @@ export default function UsersPage() {
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Typ banu
                     </label>
-                    <select
+                    <Select
                       value={banForm.banType}
-                      onChange={(e) => setBanForm({ ...banForm, banType: e.target.value as 'permanent' | 'temporary' })}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                    >
-                      <option value="permanent">Trvalý ban</option>
-                      <option value="temporary">Dočasný ban</option>
-                    </select>
+                      onChange={(val) => setBanForm({ ...banForm, banType: val as 'permanent' | 'temporary' })}
+                      options={[
+                        { value: 'permanent', label: 'Trvalý ban' },
+                        { value: 'temporary', label: 'Dočasný ban' },
+                      ]}
+                      />
                   </div>
 
                   {banForm.banType === 'temporary' && (

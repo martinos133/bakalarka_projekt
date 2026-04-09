@@ -9,6 +9,7 @@ import type { Category } from '@inzertna-platforma/shared'
 import { FolderTree, FolderOpen, Folder, Search, Filter as FilterIcon, BarChart3, ListChecks } from 'lucide-react'
 import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts'
 import DashboardLayout from '@/components/DashboardLayout'
+import Select from '@/components/Select'
 
 const CATEGORY_STATUS = {
   ACTIVE: 'ACTIVE',
@@ -394,28 +395,25 @@ export default function CategoriesPage() {
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Status</label>
-                <select
+                <Select
                   value={filters.status}
-                  onChange={(e) => setFilters({ ...filters, status: e.target.value as '' | CategoryStatus })}
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                >
-                  <option value="">Všetky</option>
-                  <option value={CATEGORY_STATUS.ACTIVE}>Aktívna</option>
-                  <option value={CATEGORY_STATUS.DRAFT}>Koncept</option>
-                  <option value={CATEGORY_STATUS.INACTIVE}>Neaktívna</option>
-                </select>
+                  onChange={(val) => setFilters({ ...filters, status: val as '' | CategoryStatus })}
+                  options={[
+                    { value: '', label: 'Všetky' },
+                  ]}
+                  />
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Typ</label>
-                <select
+                <Select
                   value={filters.type}
-                  onChange={(e) => setFilters({ ...filters, type: e.target.value as '' | 'main' | 'sub' })}
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                >
-                  <option value="">Všetky</option>
-                  <option value="main">Hlavné kategórie</option>
-                  <option value="sub">Podkategórie</option>
-                </select>
+                  onChange={(val) => setFilters({ ...filters, type: val as '' | 'main' | 'sub' })}
+                  options={[
+                    { value: '', label: 'Všetky' },
+                    { value: 'main', label: 'Hlavné kategórie' },
+                    { value: 'sub', label: 'Podkategórie' },
+                  ]}
+                  />
               </div>
             </div>
             {hasActiveFilters && (

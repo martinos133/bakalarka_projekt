@@ -1,5 +1,7 @@
 'use client'
 
+import { AlertCircle } from 'lucide-react'
+
 interface AlertDialogProps {
   open: boolean
   title: string
@@ -18,25 +20,29 @@ export default function AlertDialog({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    <div className="modal-overlay" onClick={onClose}>
       <div
-        className="bg-card border border-white/[0.06] rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
+        className="modal-panel-sm"
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="alert-dialog-title"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6">
-          <h2 id="alert-dialog-title" className="text-lg font-semibold text-gray-200 mb-2">
-            {title}
-          </h2>
-          <p className="text-gray-400 text-sm leading-relaxed">{message}</p>
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="w-5 h-5 text-orange-400" />
+            </div>
+            <div className="min-w-0">
+              <h2 id="alert-dialog-title" className="text-base font-semibold text-white mb-1">
+                {title}
+              </h2>
+              <p className="text-sm text-gray-400 leading-relaxed">{message}</p>
+            </div>
+          </div>
         </div>
-        <div className="flex justify-end px-6 pb-6">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl text-sm font-medium text-gray-100 bg-primary hover:opacity-90 transition-colors"
-          >
+        <div className="flex justify-end px-6 pb-5 pt-2">
+          <button type="button" onClick={onClose} className="btn-primary">
             {buttonLabel}
           </button>
         </div>

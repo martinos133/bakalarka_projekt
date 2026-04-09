@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import StaticPageVisualEditor, { type StaticPageVisualEditorHandle } from '@/components/StaticPageVisualEditor'
 import DashboardLayout from '@/components/DashboardLayout'
+import Select from '@/components/Select'
 
 function builtInPreviewUrl(platformUrl: string, path: string): string | null {
   if (path.includes('[')) {
@@ -384,14 +385,14 @@ export default function DevStaticPagesPage() {
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Status
                     </label>
-                    <select
+                    <Select
                       value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                    >
-                      <option value="DRAFT">Koncept</option>
-                      <option value="PUBLISHED">Publikovaná</option>
-                    </select>
+                      onChange={(val) => setFormData({ ...formData, status: val })}
+                      options={[
+                        { value: 'DRAFT', label: 'Koncept' },
+                        { value: 'PUBLISHED', label: 'Publikovaná' },
+                      ]}
+                      />
                   </div>
                 </div>
 

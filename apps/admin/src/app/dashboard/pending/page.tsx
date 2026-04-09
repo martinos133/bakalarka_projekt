@@ -7,6 +7,7 @@ import { api } from '@/lib/api'
 import { Advertisement } from '@inzertna-platforma/shared'
 import { Check, X, Eye, Calendar, User, MapPin, Euro, Image as ImageIcon, Search, Filter as FilterIcon, AlertCircle } from 'lucide-react'
 import DashboardLayout from '@/components/DashboardLayout'
+import Select from '@/components/Select'
 
 export default function PendingAdvertisementsPage() {
   const router = useRouter()
@@ -220,18 +221,13 @@ export default function PendingAdvertisementsPage() {
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Kategória</label>
-                <select
+                <Select
                   value={filters.categoryId}
-                  onChange={(e) => setFilters({ ...filters, categoryId: e.target.value })}
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                >
-                  <option value="">Všetky</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => setFilters({ ...filters, categoryId: val })}
+                  options={[
+                    { value: '', label: 'Všetky' },
+                  ]}
+                  />
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Min. cena (€)</label>
@@ -421,8 +417,8 @@ export default function PendingAdvertisementsPage() {
 
           {/* Detail Modal */}
           {showDetailModal && selectedAd && (
-            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-              <div className="card max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="modal-overlay">
+              <div className="modal-panel-xl max-h-[90vh] overflow-y-auto">
                 <div className="p-6 border-b border-white/[0.06]">
                   <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold">Detail inzerátu</h2>
@@ -557,8 +553,8 @@ export default function PendingAdvertisementsPage() {
 
           {/* Confirmation Modal */}
           {confirmModal.show && (
-            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-              <div className="card max-w-md w-full shadow-xl">
+            <div className="modal-overlay">
+              <div className="modal-panel-sm">
                 <div className="p-6">
                   <div className="flex items-start space-x-4">
                     <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
@@ -606,8 +602,8 @@ export default function PendingAdvertisementsPage() {
 
           {/* Alert Modal */}
           {alertModal.show && (
-            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-              <div className="card max-w-md w-full shadow-xl">
+            <div className="modal-overlay">
+              <div className="modal-panel-sm">
                 <div className="p-6">
                   <div className="flex items-start space-x-4">
                     <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${

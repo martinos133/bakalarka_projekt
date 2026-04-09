@@ -8,6 +8,7 @@ import { Advertisement, AdvertisementStatus, Category } from '@inzertna-platform
 import { Search, Filter as FilterIcon, TrendingUp, Euro, Tag, BarChart3, Calendar, MapPin, PieChart, FileText, Briefcase, Home } from 'lucide-react'
 import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts'
 import DashboardLayout from '@/components/DashboardLayout'
+import Select from '@/components/Select'
 
 type TypeView = 'all' | 'SERVICE' | 'RENTAL'
 
@@ -561,43 +562,35 @@ export default function AdvertisementsPage() {
                 </div>
                 <div>
                   <label className="block text-xs text-gray-400 mb-2">Status</label>
-                  <select
+                  <Select
                     value={filters.status}
-                    onChange={(e) => setFilters({ ...filters, status: e.target.value as '' | AdvertisementStatus })}
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
-                  >
-                    <option value="">Všetky</option>
-                    <option value={AdvertisementStatus.ACTIVE}>Aktívne</option>
-                    <option value={AdvertisementStatus.DRAFT}>Koncepty</option>
-                    <option value={AdvertisementStatus.PENDING}>Čakajúce</option>
-                    <option value={AdvertisementStatus.INACTIVE}>Neaktívne</option>
-                    <option value={AdvertisementStatus.ARCHIVED}>Archivované</option>
-                  </select>
+                    onChange={(val) => setFilters({ ...filters, status: val as '' | AdvertisementStatus })}
+                    options={[
+                      { value: '', label: 'Všetky' },
+                    ]}
+                    />
                 </div>
                 <div>
                   <label className="block text-xs text-gray-400 mb-2">Typ</label>
-                  <select
+                  <Select
                     value={filters.type}
-                    onChange={(e) => setFilters({ ...filters, type: e.target.value as '' | 'SERVICE' | 'RENTAL' })}
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
-                  >
-                    <option value="">Všetky</option>
-                    <option value="SERVICE">Služby</option>
-                    <option value="RENTAL">Prenájom</option>
-                  </select>
+                    onChange={(val) => setFilters({ ...filters, type: val as '' | 'SERVICE' | 'RENTAL' })}
+                    options={[
+                      { value: '', label: 'Všetky' },
+                      { value: 'SERVICE', label: 'Služby' },
+                      { value: 'RENTAL', label: 'Prenájom' },
+                    ]}
+                    />
                 </div>
                 <div>
                   <label className="block text-xs text-gray-400 mb-2">Kategória</label>
-                  <select
+                  <Select
                     value={filters.categoryId}
-                    onChange={(e) => setFilters({ ...filters, categoryId: e.target.value })}
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
-                  >
-                    <option value="">Všetky kategórie</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
-                    ))}
-                  </select>
+                    onChange={(val) => setFilters({ ...filters, categoryId: val })}
+                    options={[
+                      { value: '', label: 'Všetky kategórie' },
+                    ]}
+                    />
                 </div>
                 <div>
                   <label className="block text-xs text-gray-400 mb-2">Lokalita</label>

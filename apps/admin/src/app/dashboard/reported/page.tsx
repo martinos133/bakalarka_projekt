@@ -7,6 +7,7 @@ import { api } from '@/lib/api'
 import { Report, ReportStatus } from '@inzertna-platforma/shared'
 import { Check, X, Eye, Calendar, User, MapPin, Euro, Image as ImageIcon, Search, Filter as FilterIcon, Trash2, AlertTriangle, AlertCircle } from 'lucide-react'
 import DashboardLayout from '@/components/DashboardLayout'
+import Select from '@/components/Select'
 
 // Dôvody nahlásenia ako string literály (kvôli problémom s enum importom v Next.js)
 type ReportReasonType = 'SPAM' | 'INAPPROPRIATE' | 'FAKE' | 'SCAM' | 'COPYRIGHT' | 'OTHER'
@@ -276,31 +277,26 @@ export default function ReportedAdvertisementsPage() {
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Dôvod nahlásenia</label>
-                <select
+                <Select
                   value={filters.reason}
-                  onChange={(e) => setFilters({ ...filters, reason: e.target.value as '' | ReportReasonType })}
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                >
-                  <option value="">Všetky</option>
-                  {REPORT_REASONS.map((reason) => (
-                    <option key={reason} value={reason}>
-                      {getReasonLabel(reason)}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => setFilters({ ...filters, reason: val as '' | ReportReasonType })}
+                  options={[
+                    { value: '', label: 'Všetky' },
+                  ]}
+                  />
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Status</label>
-                <select
+                <Select
                   value={filters.status}
-                  onChange={(e) => setFilters({ ...filters, status: e.target.value as '' | ReportStatus })}
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                >
-                  <option value="">Všetky</option>
-                  <option value="PENDING">Čakajúce</option>
-                  <option value="RESOLVED">Vyriešené</option>
-                  <option value="DISMISSED">Zamietnuté</option>
-                </select>
+                  onChange={(val) => setFilters({ ...filters, status: val as '' | ReportStatus })}
+                  options={[
+                    { value: '', label: 'Všetky' },
+                    { value: 'PENDING', label: 'Čakajúce' },
+                    { value: 'RESOLVED', label: 'Vyriešené' },
+                    { value: 'DISMISSED', label: 'Zamietnuté' },
+                  ]}
+                  />
               </div>
             </div>
             {(filters.search || filters.reason || filters.status) && (
@@ -418,8 +414,8 @@ export default function ReportedAdvertisementsPage() {
 
           {/* Detail Modal */}
           {showDetailModal && selectedReport && (
-            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-              <div className="card max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="modal-overlay">
+              <div className="modal-panel-xl max-h-[90vh] overflow-y-auto">
                 <div className="p-6 border-b border-white/[0.06]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -582,8 +578,8 @@ export default function ReportedAdvertisementsPage() {
 
           {/* Resolve Modal with Ban Options */}
           {showResolveModal && selectedReport && (
-            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4">
-              <div className="card max-w-lg w-full shadow-xl">
+            <div className="modal-overlay">
+              <div className="modal-panel-md">
                 <div className="p-6 border-b border-white/[0.06]">
                   <div className="flex items-center justify-between">
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
@@ -639,17 +635,17 @@ export default function ReportedAdvertisementsPage() {
                         <label className="block text-sm font-medium text-gray-300 mb-2">
                           Trvanie banu
                         </label>
-                        <select
+                        <Select
                           value={banDuration}
-                          onChange={(e) => setBanDuration(e.target.value as any)}
-                          className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
-                        >
-                          <option value="minutes">Minúty</option>
-                          <option value="hours">Hodiny</option>
-                          <option value="days">Dni</option>
-                          <option value="months">Mesiace</option>
-                          <option value="permanent">Navždy</option>
-                        </select>
+                          onChange={(val) => setBanDuration(val as any)}
+                          options={[
+                            { value: 'minutes', label: 'Minúty' },
+                            { value: 'hours', label: 'Hodiny' },
+                            { value: 'days', label: 'Dni' },
+                            { value: 'months', label: 'Mesiace' },
+                            { value: 'permanent', label: 'Navždy' },
+                          ]}
+                          />
                       </div>
 
                       {banDuration !== 'permanent' && (
@@ -710,8 +706,8 @@ export default function ReportedAdvertisementsPage() {
 
           {/* Delete Confirmation Modal */}
           {deleteConfirmModal.show && (
-            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-              <div className="card max-w-md w-full shadow-xl">
+            <div className="modal-overlay">
+              <div className="modal-panel-sm">
                 <div className="p-6">
                   <div className="flex items-start space-x-4">
                     <div className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center bg-red-500/20">
@@ -747,8 +743,8 @@ export default function ReportedAdvertisementsPage() {
 
           {/* Alert Modal */}
           {alertModal.show && (
-            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-              <div className="card max-w-md w-full shadow-xl">
+            <div className="modal-overlay">
+              <div className="modal-panel-sm">
                 <div className="p-6">
                   <div className="flex items-start space-x-4">
                     <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${

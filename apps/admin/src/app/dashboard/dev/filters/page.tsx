@@ -8,6 +8,7 @@ import AlertDialog from '@/components/AlertDialog'
 import { api } from '@/lib/api'
 import { Category, Filter } from '@inzertna-platforma/shared'
 import {
+import Select from '@/components/Select'
   Filter as FilterIcon,
   Plus,
   Edit,
@@ -410,21 +411,16 @@ export default function DevFiltersPage() {
                 <FilterIcon className="w-5 h-5 text-gray-400" />
                 <span className="text-sm text-gray-300">Kategória</span>
               </div>
-              <select
+              <Select
                 value={selectedCategoryId}
-                onChange={(e) => {
-                  setSelectedCategoryId(e.target.value)
-                  setFormState((prev) => ({ ...prev, categoryId: e.target.value }))
+                onChange={(val) => {
+                  setSelectedCategoryId(val)
+                  setFormState((prev) => ({ ...prev, categoryId: val }))
                 }}
-                className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary min-w-[260px] transition-shadow"
-              >
-                <option value="">-- Vyberte kategóriu --</option>
-                {categoriesForFilterSelect.map((row) => (
-                  <option key={row.id} value={row.id}>
-                    {row.label}
-                  </option>
-                ))}
-              </select>
+                options={[
+                  { value: '', label: '-- Vyberte kategóriu --' },
+                ]}
+                />
               {!!selectedCategoryId && (
                 <span className="text-xs text-gray-500">
                   Spravujete polia pre:{' '}
@@ -485,19 +481,19 @@ export default function DevFiltersPage() {
                             />
                           </td>
                           <td className="py-2.5 px-4 align-middle">
-                            <select
+                            <Select
                               value={row.type}
-                              onChange={(e) => updateBatchRow(row.id, 'type', e.target.value as FilterType | '')}
-                              className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
-                            >
-                              <option value="TEXT">Text</option>
-                              <option value="NUMBER">Číslo</option>
-                              <option value="SELECT">Výber (1)</option>
-                              <option value="MULTISELECT">Výber (viac)</option>
-                              <option value="BOOLEAN">Áno/Nie</option>
-                              <option value="DATE">Dátum</option>
-                              <option value="RANGE">Rozsah</option>
-                            </select>
+                              onChange={(val) => updateBatchRow(row.id, 'type', val as FilterType | '')}
+                              options={[
+                                { value: 'TEXT', label: 'Text' },
+                                { value: 'NUMBER', label: 'Číslo' },
+                                { value: 'SELECT', label: 'Výber (1)' },
+                                { value: 'MULTISELECT', label: 'Výber (viac)' },
+                                { value: 'BOOLEAN', label: 'Áno/Nie' },
+                                { value: 'DATE', label: 'Dátum' },
+                                { value: 'RANGE', label: 'Rozsah' },
+                              ]}
+                              />
                           </td>
                           <td className="py-2.5 px-4 align-middle text-center">
                             <label className="inline-flex items-center justify-center cursor-pointer rounded focus-within:ring-2 focus-within:ring-primary/30 focus-within:ring-offset-2 focus-within:ring-offset-card">
@@ -596,20 +592,14 @@ export default function DevFiltersPage() {
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Kategória *
                     </label>
-                    <select
+                    <Select
                       value={formState.categoryId}
-                      onChange={(e) =>
-                        setFormState((prev) => ({ ...prev, categoryId: e.target.value }))
+                      onChange={(val) => setFormState((prev) => ({ ...prev, categoryId: val }))
                       }
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow placeholder-gray-500"
-                    >
-                      <option value="">Vyberte kategóriu</option>
-                      {categoriesForFilterSelect.map((row) => (
-                        <option key={row.id} value={row.id}>
-                          {row.label}
-                        </option>
-                      ))}
-                    </select>
+                      options={[
+                        { value: '', label: 'Vyberte kategóriu' },
+                      ]}
+                      />
                     <p className="mt-1.5 text-xs text-gray-500">
                       Polia sa zobrazia pri výbere tejto kategórie pri podaní inzerátu.
                     </p>
@@ -619,25 +609,24 @@ export default function DevFiltersPage() {
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Typ poľa *
                     </label>
-                    <select
+                    <Select
                       value={formState.type}
-                      onChange={(e) =>
-                        setFormState((prev) => ({
+                      onChange={(val) => setFormState((prev) => ({
                           ...prev,
-                          type: e.target.value as FilterType | '',
+                          type: val as FilterType | '',
                         }))
                       }
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
-                    >
-                      <option value="">Vyberte typ</option>
-                      <option value="TEXT">Text</option>
-                      <option value="NUMBER">Číslo</option>
-                      <option value="SELECT">Výber (1 možnosť)</option>
-                      <option value="MULTISELECT">Výber (viac možností)</option>
-                      <option value="BOOLEAN">Áno/Nie</option>
-                      <option value="DATE">Dátum</option>
-                      <option value="RANGE">Rozsah</option>
-                    </select>
+                      options={[
+                        { value: '', label: 'Vyberte typ' },
+                        { value: 'TEXT', label: 'Text' },
+                        { value: 'NUMBER', label: 'Číslo' },
+                        { value: 'SELECT', label: 'Výber (1 možnosť)' },
+                        { value: 'MULTISELECT', label: 'Výber (viac možností)' },
+                        { value: 'BOOLEAN', label: 'Áno/Nie' },
+                        { value: 'DATE', label: 'Dátum' },
+                        { value: 'RANGE', label: 'Rozsah' },
+                      ]}
+                      />
                   </div>
                 </div>
 

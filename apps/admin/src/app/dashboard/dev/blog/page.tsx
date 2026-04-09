@@ -7,6 +7,7 @@ import { api } from '@/lib/api'
 import RichTextEditor from '@/components/RichTextEditor'
 import { Plus, Edit, Trash2, X, Save, BookOpen, ExternalLink } from 'lucide-react'
 import DashboardLayout from '@/components/DashboardLayout'
+import Select from '@/components/Select'
 
 interface BlogPost {
   id: string
@@ -244,14 +245,14 @@ export default function DevBlogPage() {
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Status
                     </label>
-                    <select
+                    <Select
                       value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                    >
-                      <option value="DRAFT">Koncept</option>
-                      <option value="PUBLISHED">Publikovaný</option>
-                    </select>
+                      onChange={(val) => setFormData({ ...formData, status: val })}
+                      options={[
+                        { value: 'DRAFT', label: 'Koncept' },
+                        { value: 'PUBLISHED', label: 'Publikovaný' },
+                      ]}
+                      />
                   </div>
                 </div>
 

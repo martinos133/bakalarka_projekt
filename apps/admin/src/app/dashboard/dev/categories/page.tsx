@@ -7,6 +7,7 @@ import { api } from '@/lib/api'
 import { Category } from '@inzertna-platforma/shared'
 import { Plus, Edit, Trash2, X, Save, FolderTree, Image as ImageIcon, FolderPlus, ChevronDown, ChevronRight, GripVertical, Filter, Search } from 'lucide-react'
 import DashboardLayout from '@/components/DashboardLayout'
+import Select from '@/components/Select'
 
 type CategoryStatus = 'ACTIVE' | 'DRAFT' | 'INACTIVE'
 
@@ -592,28 +593,28 @@ export default function DevCategoriesPage() {
 
                 {/* Status */}
                 <div className="w-40">
-                  <select
+                  <Select
                     value={filterData.status}
-                    onChange={(e) => setFilterData({ ...filterData, status: e.target.value as '' | 'active' | 'inactive' })}
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
-                  >
-                    <option value="">Všetky</option>
-                    <option value="active">Aktívne</option>
-                    <option value="inactive">Neaktívne</option>
-                  </select>
+                    onChange={(val) => setFilterData({ ...filterData, status: val as '' | 'active' | 'inactive' })}
+                    options={[
+                      { value: '', label: 'Všetky' },
+                      { value: 'active', label: 'Aktívne' },
+                      { value: 'inactive', label: 'Neaktívne' },
+                    ]}
+                    />
                 </div>
 
                 {/* Typ */}
                 <div className="w-48">
-                  <select
+                  <Select
                     value={filterData.type}
-                    onChange={(e) => setFilterData({ ...filterData, type: e.target.value as '' | 'main' | 'subcategory' })}
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
-                  >
-                    <option value="">Všetky typy</option>
-                    <option value="main">Hlavné</option>
-                    <option value="subcategory">Podkategórie</option>
-                  </select>
+                    onChange={(val) => setFilterData({ ...filterData, type: val as '' | 'main' | 'subcategory' })}
+                    options={[
+                      { value: '', label: 'Všetky typy' },
+                      { value: 'main', label: 'Hlavné' },
+                      { value: 'subcategory', label: 'Podkategórie' },
+                    ]}
+                    />
                 </div>
 
                 {/* Počet inzerátov */}
@@ -738,20 +739,13 @@ export default function DevCategoriesPage() {
                         </span>
                       )}
                     </label>
-                    <select
+                    <Select
                       value={formData.parentId}
-                      onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                    >
-                      <option value="">-- Hlavná kategória --</option>
-                      {categories
-                        .filter((cat) => !cat.parentId && cat.id !== editingId)
-                        .map((cat) => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.name}
-                          </option>
-                        ))}
-                    </select>
+                      onChange={(val) => setFormData({ ...formData, parentId: val })}
+                      options={[
+                        { value: '', label: '-- Hlavná kategória --' },
+                      ]}
+                      />
                     {formData.parentId && (
                       <p className="mt-1 text-xs text-gray-400">
                         Táto kategória bude podkategóriou: <span className="text-green-400">{categories.find(c => c.id === formData.parentId)?.name}</span>
@@ -1060,15 +1054,15 @@ export default function DevCategoriesPage() {
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Stav kategórie *
                   </label>
-                  <select
+                  <Select
                     value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value as CategoryStatus })}
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
-                  >
-                    <option value="ACTIVE">Aktívna</option>
-                    <option value="DRAFT">Koncept</option>
-                    <option value="INACTIVE">Neaktívna</option>
-                  </select>
+                    onChange={(val) => setFormData({ ...formData, status: val as CategoryStatus })}
+                    options={[
+                      { value: 'ACTIVE', label: 'Aktívna' },
+                      { value: 'DRAFT', label: 'Koncept' },
+                      { value: 'INACTIVE', label: 'Neaktívna' },
+                    ]}
+                    />
                   <p className="mt-1 text-xs text-gray-400">
                     Aktívne kategórie sú viditeľné na platforme. Koncept a neaktívne kategórie nie sú viditeľné.
                   </p>
