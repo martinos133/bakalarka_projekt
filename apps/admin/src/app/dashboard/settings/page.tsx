@@ -167,7 +167,7 @@ export default function SettingsPage() {
                       type="text"
                       value={platformConfig.siteName || ''}
                       onChange={(e) => updatePlatform('siteName', e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                      className="input px-3 py-2 text-white"
                       placeholder="RentMe"
                     />
                   </div>
@@ -177,7 +177,7 @@ export default function SettingsPage() {
                       type="text"
                       value={platformConfig.siteDescription || ''}
                       onChange={(e) => updatePlatform('siteDescription', e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                      className="input px-3 py-2 text-white"
                       placeholder="Inzertná platforma pre služby a prenájom"
                     />
                   </div>
@@ -187,7 +187,7 @@ export default function SettingsPage() {
                       type="email"
                       value={platformConfig.contactEmail || ''}
                       onChange={(e) => updatePlatform('contactEmail', e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                      className="input px-3 py-2 text-white"
                       placeholder="info@rentme.sk"
                     />
                   </div>
@@ -197,7 +197,7 @@ export default function SettingsPage() {
                       type="text"
                       value={platformConfig.contactPhone || ''}
                       onChange={(e) => updatePlatform('contactPhone', e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                      className="input px-3 py-2 text-white"
                       placeholder="+421 ..."
                     />
                   </div>
@@ -207,7 +207,7 @@ export default function SettingsPage() {
                       type="email"
                       value={platformConfig.supportEmail || ''}
                       onChange={(e) => updatePlatform('supportEmail', e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                      className="input px-3 py-2 text-white"
                       placeholder="podpora@rentme.sk"
                     />
                   </div>
@@ -217,7 +217,7 @@ export default function SettingsPage() {
                       type="text"
                       value={platformConfig.copyrightText || ''}
                       onChange={(e) => updatePlatform('copyrightText', e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                      className="input px-3 py-2 text-white"
                       placeholder="© RentMe International Ltd. 2024"
                     />
                   </div>
@@ -227,7 +227,7 @@ export default function SettingsPage() {
                       type="url"
                       value={platformConfig.facebookUrl || ''}
                       onChange={(e) => updatePlatform('facebookUrl', e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                      className="input px-3 py-2 text-white"
                       placeholder="https://facebook.com/..."
                     />
                   </div>
@@ -237,7 +237,7 @@ export default function SettingsPage() {
                       type="url"
                       value={platformConfig.twitterUrl || ''}
                       onChange={(e) => updatePlatform('twitterUrl', e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                      className="input px-3 py-2 text-white"
                       placeholder="https://twitter.com/..."
                     />
                   </div>
@@ -247,7 +247,7 @@ export default function SettingsPage() {
                       type="url"
                       value={platformConfig.instagramUrl || ''}
                       onChange={(e) => updatePlatform('instagramUrl', e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                      className="input px-3 py-2 text-white"
                       placeholder="https://instagram.com/..."
                     />
                   </div>
@@ -277,7 +277,7 @@ export default function SettingsPage() {
                           onChange={(e) =>
                             updatePlatform('topFreelancersTitle', e.target.value)
                           }
-                          className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                          className="input px-3 py-2 text-white"
                           placeholder="Top freelanceri"
                         />
                       </div>
@@ -297,7 +297,7 @@ export default function SettingsPage() {
                               isNaN(val) ? 4 : Math.min(12, Math.max(1, val))
                             )
                           }}
-                          className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                          className="input px-3 py-2 text-white"
                         />
                       </div>
                     </div>
@@ -344,7 +344,7 @@ export default function SettingsPage() {
                       onChange={(e) =>
                         updateAdmin('itemsPerPage', parseInt(e.target.value) || 20)
                       }
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                      className="input px-3 py-2 text-white"
                     />
                   </div>
                   <div>
@@ -359,7 +359,7 @@ export default function SettingsPage() {
                       onChange={(e) =>
                         updateAdmin('maxUploadSize', parseInt(e.target.value) || 10)
                       }
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                      className="input px-3 py-2 text-white"
                     />
                   </div>
                   <div className="flex items-center gap-3">
@@ -370,7 +370,7 @@ export default function SettingsPage() {
                       onChange={(e) =>
                         updateAdmin('enableNotifications', e.target.checked)
                       }
-                      className="w-4 h-4 rounded bg-white/[0.04] border-white/[0.1]"
+                      className="w-4 h-4 rounded bg-white/[0.06] border-white/[0.1]"
                     />
                     <label htmlFor="enableNotifications" className="text-gray-300">
                       Povoliť notifikácie
@@ -384,7 +384,7 @@ export default function SettingsPage() {
                       onChange={(e) =>
                         updateAdmin('maintenanceMode', e.target.checked)
                       }
-                      className="w-4 h-4 rounded bg-white/[0.04] border-white/[0.1]"
+                      className="w-4 h-4 rounded bg-white/[0.06] border-white/[0.1]"
                     />
                     <label htmlFor="maintenanceMode" className="text-gray-300">
                       Režim údržby (skryje platformu)

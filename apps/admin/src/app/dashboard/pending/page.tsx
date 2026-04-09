@@ -215,7 +215,7 @@ export default function PendingAdvertisementsPage() {
                     value={filters.search}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                     placeholder="Názov, popis, používateľ..."
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover text-sm"
+                    className="input px-4 py-2 pl-10 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover text-sm"
                   />
                 </div>
               </div>
@@ -238,7 +238,7 @@ export default function PendingAdvertisementsPage() {
                   placeholder="0"
                   min="0"
                   step="0.01"
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover placeholder-gray-500"
+                  className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-primary/40 hover:bg-cardHover placeholder-white/70"
                 />
               </div>
               <div>
@@ -250,7 +250,7 @@ export default function PendingAdvertisementsPage() {
                   placeholder="∞"
                   min="0"
                   step="0.01"
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover placeholder-gray-500"
+                  className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-primary/40 hover:bg-cardHover placeholder-white/70"
                 />
               </div>
               <div>
@@ -260,7 +260,7 @@ export default function PendingAdvertisementsPage() {
                   value={filters.location}
                   onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                   placeholder="Mesto, región..."
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover placeholder-gray-500"
+                  className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-primary/40 hover:bg-cardHover placeholder-white/70"
                 />
               </div>
             </div>
@@ -515,7 +515,7 @@ export default function PendingAdvertisementsPage() {
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="Zadajte dôvod zamietnutia inzerátu..."
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
+                      className="input px-4 py-3 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 resize-none"
                       rows={4}
                     />
                   </div>

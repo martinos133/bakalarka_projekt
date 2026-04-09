@@ -67,7 +67,7 @@ export default function Chart() {
             Celkový počet inzerátov: <span className="text-white font-medium">{totalAdvertisements.toLocaleString('sk-SK')}</span>
           </p>
         </div>
-        <div className="flex bg-white/[0.04] rounded-xl p-0.5">
+        <div className="flex bg-white/[0.06] rounded-xl p-0.5">
           {periods.map((p) => (
             <button
               key={p.key}

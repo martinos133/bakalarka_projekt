@@ -577,7 +577,7 @@ export default function DevMenuPage() {
                     </button>
                     {showCategoryPicker === 'navbar' && (
                       <div
-                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.04] border border-white/[0.06] rounded-xl shadow-lg z-20"
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.06] border border-white/[0.06] rounded-xl shadow-lg z-20"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {categories.length === 0 ? (
@@ -633,14 +633,14 @@ export default function DevMenuPage() {
                       type="text"
                       value={item.label}
                       onChange={(e) => updateNavbarItem(item.id, 'label', e.target.value)}
-                      className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500"
+                      className="flex-1 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70"
                       placeholder="Názov"
                     />
                     <input
                       type="text"
                       value={item.href}
                       onChange={(e) => updateNavbarItem(item.id, 'href', e.target.value)}
-                      className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500"
+                      className="flex-1 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70"
                       placeholder="Odkaz (href)"
                     />
                     <button
@@ -681,7 +681,7 @@ export default function DevMenuPage() {
                     </button>
                     {showCategoryPicker === 'categoryNav' && (
                       <div
-                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.04] border border-white/[0.06] rounded-xl shadow-lg z-20"
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.06] border border-white/[0.06] rounded-xl shadow-lg z-20"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {categories.length === 0 ? (
@@ -752,7 +752,7 @@ export default function DevMenuPage() {
                       visibleCount: Math.max(1, parseInt(e.target.value) || 5),
                     })
                   }
-                  className="w-20 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm"
+                  className="w-20 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm"
                 />
               </div>
               <div className="space-y-3">
@@ -769,7 +769,7 @@ export default function DevMenuPage() {
                       onChange={(e) =>
                         updateCategoryNavItem(item.id, 'label', e.target.value)
                       }
-                      className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500"
+                      className="flex-1 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70"
                       placeholder="Názov"
                     />
                     <input
@@ -778,7 +778,7 @@ export default function DevMenuPage() {
                       onChange={(e) =>
                         updateCategoryNavItem(item.id, 'href', e.target.value)
                       }
-                      className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500"
+                      className="flex-1 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70"
                       placeholder="Odkaz (href)"
                     />
                     <button
@@ -821,7 +821,7 @@ export default function DevMenuPage() {
                     </button>
                     {showCategoryPicker === 'madeOnRentMe' && (
                       <div
-                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.04] border border-white/[0.06] rounded-xl shadow-lg z-20"
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.06] border border-white/[0.06] rounded-xl shadow-lg z-20"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {categories.length === 0 ? (
@@ -895,7 +895,7 @@ export default function DevMenuPage() {
                           onChange={(e) =>
                             updateMadeOnRentMeItem(item.id, 'title', e.target.value)
                           }
-                          className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                          className="bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
                           placeholder="Názov"
                         />
                         <input
@@ -904,7 +904,7 @@ export default function DevMenuPage() {
                           onChange={(e) =>
                             updateMadeOnRentMeItem(item.id, 'href', e.target.value)
                           }
-                          className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                          className="bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
                           placeholder="Odkaz"
                         />
                         <input
@@ -913,7 +913,7 @@ export default function DevMenuPage() {
                           onChange={(e) =>
                             updateMadeOnRentMeItem(item.id, 'image', e.target.value)
                           }
-                          className="md:col-span-2 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                          className="md:col-span-2 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
                           placeholder="URL obrázka"
                         />
                         <input
@@ -922,7 +922,7 @@ export default function DevMenuPage() {
                           onChange={(e) =>
                             updateMadeOnRentMeItem(item.id, 'description', e.target.value)
                           }
-                          className="md:col-span-2 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
+                          className="md:col-span-2 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white"
                           placeholder="Popis"
                         />
                       </div>
@@ -971,7 +971,7 @@ export default function DevMenuPage() {
                     </button>
                     {showCategoryPicker === 'popularCategories' && (
                       <div
-                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.04] border border-white/[0.06] rounded-xl shadow-lg z-20"
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.06] border border-white/[0.06] rounded-xl shadow-lg z-20"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {categories.length === 0 ? (
@@ -1032,7 +1032,7 @@ export default function DevMenuPage() {
                       onChange={(e) =>
                         updatePopularCategoriesItem(item.id, 'label', e.target.value)
                       }
-                      className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500"
+                      className="flex-1 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70"
                       placeholder="Názov"
                     />
                     <input
@@ -1041,7 +1041,7 @@ export default function DevMenuPage() {
                       onChange={(e) =>
                         updatePopularCategoriesItem(item.id, 'href', e.target.value)
                       }
-                      className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500"
+                      className="flex-1 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70"
                       placeholder="Odkaz (href)"
                     />
                     <button
@@ -1115,7 +1115,7 @@ export default function DevMenuPage() {
                             onChange={(e) =>
                               updateFooterSection(section.id, 'key', e.target.value)
                             }
-                            className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm"
+                            className="flex-1 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm"
                           />
                         </div>
                         {section.links.map((link) => (
@@ -1129,7 +1129,7 @@ export default function DevMenuPage() {
                               onChange={(e) =>
                                 updateFooterLink(section.id, link.id, 'label', e.target.value)
                               }
-                              className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm"
+                              className="flex-1 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm"
                               placeholder="Názov"
                             />
                             <input
@@ -1138,7 +1138,7 @@ export default function DevMenuPage() {
                               onChange={(e) =>
                                 updateFooterLink(section.id, link.id, 'href', e.target.value)
                               }
-                              className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm"
+                              className="flex-1 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white text-sm"
                               placeholder="Odkaz"
                             />
                             <button
@@ -1166,7 +1166,7 @@ export default function DevMenuPage() {
                             </button>
                             {showCategoryPicker === section.id && (
                               <div
-                                className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.04] border border-white/[0.06] rounded-xl shadow-lg z-20"
+                                className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.06] border border-white/[0.06] rounded-xl shadow-lg z-20"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {categories.length === 0 ? (

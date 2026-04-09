@@ -153,7 +153,7 @@ export default function Sidebar() {
                       ${collapsed ? 'justify-center px-0 py-2.5' : 'px-3 py-2 gap-3'}
                       ${isActive
                         ? 'bg-primary/10 text-primary font-medium'
-                        : 'text-gray-400 hover:bg-white/[0.04] hover:text-white'
+                        : 'text-gray-400 hover:bg-white/[0.06] hover:text-white'
                       }
                     `}
                   >
@@ -171,7 +171,7 @@ export default function Sidebar() {
       <div className={`border-t border-white/[0.06] p-3 ${collapsed ? 'px-2' : ''}`}>
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-gray-400 hover:bg-white/[0.04] hover:text-white transition-colors"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-gray-400 hover:bg-white/[0.06] hover:text-white transition-colors"
         >
           <ChevronLeft className={`w-4 h-4 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
           {!collapsed && <span className="text-sm">Zbaliť</span>}

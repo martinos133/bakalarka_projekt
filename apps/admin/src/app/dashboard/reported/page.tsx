@@ -271,7 +271,7 @@ export default function ReportedAdvertisementsPage() {
                     value={filters.search}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                     placeholder="Názov inzerátu, popis..."
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover text-sm"
+                    className="input px-4 py-2 pl-10 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover text-sm"
                   />
                 </div>
               </div>
@@ -532,7 +532,7 @@ export default function ReportedAdvertisementsPage() {
                       value={resolutionNote}
                       onChange={(e) => setResolutionNote(e.target.value)}
                       placeholder="Zadajte poznámku k vyriešeniu nahlásenia..."
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
+                      className="input px-4 py-3 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 resize-none"
                       rows={4}
                     />
                   </div>
@@ -610,7 +610,7 @@ export default function ReportedAdvertisementsPage() {
                       value={resolutionNote}
                       onChange={(e) => setResolutionNote(e.target.value)}
                       placeholder="Zadajte poznámku k vyriešeniu nahlásenia..."
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
+                      className="input px-4 py-3 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 resize-none"
                       rows={4}
                     />
                   </div>
@@ -658,7 +658,7 @@ export default function ReportedAdvertisementsPage() {
                             min="1"
                             value={banDurationValue}
                             onChange={(e) => setBanDurationValue(parseInt(e.target.value) || 1)}
-                            className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-gray-600"
+                            className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-primary/40"
                           />
                         </div>
                       )}
@@ -671,7 +671,7 @@ export default function ReportedAdvertisementsPage() {
                           value={banReason}
                           onChange={(e) => setBanReason(e.target.value)}
                           placeholder="Zadajte dôvod banu..."
-                          className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 resize-none"
+                          className="input px-4 py-3 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 resize-none"
                           rows={3}
                         />
                       </div>

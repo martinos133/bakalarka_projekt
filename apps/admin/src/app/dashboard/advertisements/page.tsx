@@ -197,7 +197,7 @@ export default function AdvertisementsPage() {
               <button
                 onClick={() => setTypeView('all')}
                 className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-colors ${
-                  typeView === 'all' ? 'bg-primary text-gray-200' : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
+                  typeView === 'all' ? 'bg-primary text-gray-200' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <BarChart3 className="w-4 h-4" />
@@ -206,7 +206,7 @@ export default function AdvertisementsPage() {
               <button
                 onClick={() => setTypeView('SERVICE')}
                 className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-colors ${
-                  typeView === 'SERVICE' ? 'bg-blue-600 text-gray-200' : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
+                  typeView === 'SERVICE' ? 'bg-blue-600 text-gray-200' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <Briefcase className="w-4 h-4" />
@@ -215,7 +215,7 @@ export default function AdvertisementsPage() {
               <button
                 onClick={() => setTypeView('RENTAL')}
                 className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-colors ${
-                  typeView === 'RENTAL' ? 'bg-purple-600 text-gray-200' : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
+                  typeView === 'RENTAL' ? 'bg-purple-600 text-gray-200' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <Home className="w-4 h-4" />
@@ -523,7 +523,7 @@ export default function AdvertisementsPage() {
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-colors ${
-                  showFilters ? 'bg-primary text-gray-200' : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
+                  showFilters ? 'bg-primary text-gray-200' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <FilterIcon className="w-4 h-4" />
@@ -556,7 +556,7 @@ export default function AdvertisementsPage() {
                       value={filters.search}
                       onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                       placeholder="Názov, popis, lokalita..."
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl pl-10 pr-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                      className="input pl-10 pr-4 py-2.5 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/60 focus:bg-white/[0.12]"
                     />
                   </div>
                 </div>
@@ -599,7 +599,7 @@ export default function AdvertisementsPage() {
                     value={filters.location}
                     onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                     placeholder="Mesto, región..."
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                    className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40"
                   />
                 </div>
                 <div className="lg:col-span-2">
@@ -611,7 +611,7 @@ export default function AdvertisementsPage() {
                       value={filters.minPrice}
                       onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
                       placeholder="Min"
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                      className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40"
                     />
                     <span className="text-gray-400 self-center">–</span>
                     <input
@@ -620,7 +620,7 @@ export default function AdvertisementsPage() {
                       value={filters.maxPrice}
                       onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
                       placeholder="Max"
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                      className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40"
                     />
                   </div>
                 </div>
@@ -631,14 +631,14 @@ export default function AdvertisementsPage() {
                       type="date"
                       value={filters.dateFrom}
                       onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
+                      className="input px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-primary/40"
                     />
                     <span className="text-gray-400 self-center">–</span>
                     <input
                       type="date"
                       value={filters.dateTo}
                       onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-gray-600"
+                      className="input px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-primary/40"
                     />
                   </div>
                 </div>

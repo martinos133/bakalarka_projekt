@@ -184,7 +184,7 @@ export default function MonitoringPage() {
                     key={p}
                     onClick={() => setPeriod(p)}
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                      period === p ? 'bg-primary text-gray-100' : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
+                      period === p ? 'bg-primary text-gray-100' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                     }`}
                   >
                     {periodLabel[p]}
@@ -492,7 +492,7 @@ export default function MonitoringPage() {
                     key={p}
                     onClick={() => setBreakdownPeriod(p)}
                     className={`px-2.5 py-1.5 rounded-xl text-xs font-medium transition-colors ${
-                      breakdownPeriod === p ? 'bg-primary text-gray-100' : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
+                      breakdownPeriod === p ? 'bg-primary text-gray-100' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                     }`}
                   >
                     {breakdownPeriodLabel[p]}
@@ -506,7 +506,7 @@ export default function MonitoringPage() {
                     className={`px-3 py-1.5 rounded-xl text-sm font-medium transition-colors ${
                       breakdownFilter === f
                         ? 'bg-primary text-gray-100'
-                        : 'bg-white/[0.04] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
+                        : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                     }`}
                   >
                     {f === 'all' ? 'Všetko' : f === 'categories' ? 'Kategórie' : 'Inzeráty'}

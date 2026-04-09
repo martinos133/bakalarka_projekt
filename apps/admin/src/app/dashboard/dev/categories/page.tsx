@@ -586,7 +586,7 @@ export default function DevCategoriesPage() {
                       value={filterData.search}
                       onChange={(e) => setFilterData({ ...filterData, search: e.target.value })}
                       placeholder="Vyhľadať kategórie..."
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 text-sm"
+                      className="input pl-10 pr-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 text-sm"
                     />
                   </div>
                 </div>
@@ -624,14 +624,14 @@ export default function DevCategoriesPage() {
                     value={filterData.minAdvertisements}
                     onChange={(e) => setFilterData({ ...filterData, minAdvertisements: e.target.value })}
                     placeholder="Min inz."
-                    className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
                   />
                   <input
                     type="number"
                     value={filterData.maxAdvertisements}
                     onChange={(e) => setFilterData({ ...filterData, maxAdvertisements: e.target.value })}
                     placeholder="Max inz."
-                    className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
                   />
                 </div>
 
@@ -642,14 +642,14 @@ export default function DevCategoriesPage() {
                     value={filterData.minSubcategories}
                     onChange={(e) => setFilterData({ ...filterData, minSubcategories: e.target.value })}
                     placeholder="Min pod."
-                    className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
                   />
                   <input
                     type="number"
                     value={filterData.maxSubcategories}
                     onChange={(e) => setFilterData({ ...filterData, maxSubcategories: e.target.value })}
                     placeholder="Max pod."
-                    className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
                   />
                 </div>
 
@@ -660,14 +660,14 @@ export default function DevCategoriesPage() {
                     value={filterData.minFilters}
                     onChange={(e) => setFilterData({ ...filterData, minFilters: e.target.value })}
                     placeholder="Min filt."
-                    className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
                   />
                   <input
                     type="number"
                     value={filterData.maxFilters}
                     onChange={(e) => setFilterData({ ...filterData, maxFilters: e.target.value })}
                     placeholder="Max filt."
-                    className="w-24 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
                   />
                 </div>
 
@@ -726,7 +726,7 @@ export default function DevCategoriesPage() {
                       value={formData.name}
                       onChange={(e) => handleNameChange(e.target.value)}
                       placeholder="Napríklad: Autá, Nehnuteľnosti, Elektronika..."
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                     />
                   </div>
 
@@ -765,7 +765,7 @@ export default function DevCategoriesPage() {
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                     placeholder="Automaticky generovaný z názvu..."
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                   />
                   <p className="mt-1 text-xs text-gray-400">
                     URL-friendly identifikátor kategórie (automaticky generovaný z názvu)
@@ -781,7 +781,7 @@ export default function DevCategoriesPage() {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
                     placeholder="Krátky popis kategórie..."
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                   />
                 </div>
 
@@ -835,7 +835,7 @@ export default function DevCategoriesPage() {
                         value={formData.bannerAlt}
                         onChange={(e) => setFormData({ ...formData, bannerAlt: e.target.value })}
                         placeholder="Alt text pre banner (SEO)"
-                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                        className="input px-4 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         Popis bannera pre vyhľadávače a prístupnosť
@@ -898,7 +898,7 @@ export default function DevCategoriesPage() {
                       value={formData.icon}
                       onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
                       placeholder="Napríklad: Car, Home, Smartphone..."
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                     />
                   </div>
 
@@ -911,7 +911,7 @@ export default function DevCategoriesPage() {
                       value={formData.color}
                       onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                       placeholder="#3b82f6"
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                     />
                   </div>
                 </div>
@@ -933,7 +933,7 @@ export default function DevCategoriesPage() {
                         value={formData.imageAlt}
                         onChange={(e) => setFormData({ ...formData, imageAlt: e.target.value })}
                         placeholder="Napríklad: Logo kategórie Autá a motocykle"
-                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                        className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         Popis obrázka pre vyhľadávače a používateľov so zrakovým postihnutím
@@ -951,7 +951,7 @@ export default function DevCategoriesPage() {
                         onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
                         placeholder="Napríklad: Autá a motocykle na predaj - Najlepšie ponuky"
                         maxLength={60}
-                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                        className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         {formData.metaTitle.length}/60 znakov (odporúčané: 50-60 znakov)
@@ -969,7 +969,7 @@ export default function DevCategoriesPage() {
                         placeholder="Napríklad: Nájdite najlepšie autá a motocykle na predaj. Tisíce inzerátov od overených predajcov. Rýchle vyhľadávanie a jednoduchá komunikácia."
                         maxLength={160}
                         rows={3}
-                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                        className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         {formData.metaDescription.length}/160 znakov (odporúčané: 150-160 znakov)
@@ -986,7 +986,7 @@ export default function DevCategoriesPage() {
                         value={formData.metaKeywords}
                         onChange={(e) => setFormData({ ...formData, metaKeywords: e.target.value })}
                         placeholder="Napríklad: autá, motocykle, predaj áut, ojazdené autá, nové autá"
-                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                        className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         Kľúčové slová oddelené čiarkou (napr: autá, motocykle, predaj)
@@ -1317,7 +1317,7 @@ export default function DevCategoriesPage() {
                                         setFormData({ ...formData, name, slug })
                                       }}
                                       placeholder="Názov podkategórie *"
-                                      className="w-full bg-card border border-white/[0.06] rounded-2xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                                      className="w-full bg-card border border-white/[0.06] rounded-2xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
                                     />
                                     <input
                                       type="text"
@@ -1325,14 +1325,14 @@ export default function DevCategoriesPage() {
                                       value={formData.slug}
                                       onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                                       placeholder="Slug (automaticky generovaný) *"
-                                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                                      className="input px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
                                     />
                                     <input
                                       type="text"
                                       value={formData.description}
                                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                       placeholder="Popis (voliteľné)"
-                                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
+                                      className="input px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
                                     />
                                   </div>
                                   <div className="flex items-center justify-end space-x-2">
@@ -1385,7 +1385,7 @@ export default function DevCategoriesPage() {
                                         ? 'bg-primary/20 opacity-50 border-2 border-primary scale-95' 
                                         : draggedOverCategoryId === child.id
                                         ? 'bg-green-500/20 border-2 border-green-500 scale-105'
-                                        : 'bg-white/[0.04] hover:bg-white/[0.06] border border-white/[0.06]'
+                                        : 'bg-white/[0.06] hover:bg-white/[0.06] border border-white/[0.06]'
                                     }`}
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, child.id)}

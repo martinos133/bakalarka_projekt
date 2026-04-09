@@ -477,7 +477,7 @@ export default function DevFiltersPage() {
                               value={row.name}
                               onChange={(e) => updateBatchRow(row.id, 'name', e.target.value)}
                               placeholder="napr. Výkon (kW)"
-                              className="w-full max-w-xs bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
+                              className="w-full max-w-xs bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
                             />
                           </td>
                           <td className="py-2.5 px-4 align-middle">
@@ -515,7 +515,7 @@ export default function DevFiltersPage() {
                                 value={row.optionsInput}
                                 onChange={(e) => updateBatchRow(row.id, 'optionsInput', e.target.value)}
                                 placeholder="možnosť1, možnosť2, …"
-                                className="w-full max-w-xs bg-white/[0.04] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
+                                className="w-full max-w-xs bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
                               />
                             ) : (
                               <span className="text-gray-600 text-xs">—</span>
@@ -641,7 +641,7 @@ export default function DevFiltersPage() {
                       setFormState((prev) => ({ ...prev, name: e.target.value }))
                     }
                     placeholder="Napríklad: Výkon (kW), Výmera (m²), Počet izieb..."
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
+                    className="input px-4 py-2.5 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
                   />
                 </div>
 
@@ -658,7 +658,7 @@ export default function DevFiltersPage() {
                         setFormState((prev) => ({ ...prev, optionsInput: e.target.value }))
                       }
                       placeholder="Napríklad: Benzín, Nafta, Hybrid, Elektro"
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
+                      className="input px-4 py-2.5 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
                     />
                   </div>
                 )}
@@ -699,7 +699,7 @@ export default function DevFiltersPage() {
                         }
                         rows={2}
                         placeholder="Krátke vysvetlenie pre tvorcu inzerátu (napr. čo presne má zadať)."
-                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
+                        className="input px-4 py-2.5 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
                       />
                     </div>
 
@@ -731,7 +731,7 @@ export default function DevFiltersPage() {
                             }))
                           }
                           placeholder="1, 2, 3..."
-                          className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
+                          className="input px-4 py-2.5 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
                         />
                       </div>
                     </div>
@@ -879,7 +879,7 @@ export default function DevFiltersPage() {
                                     ;(e.target as HTMLInputElement).blur()
                                   }
                                 }}
-                                className="w-16 bg-white/[0.04] border border-white/[0.06] rounded-xl px-2 py-1.5 text-white text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary disabled:opacity-50"
+                                className="w-16 bg-white/[0.06] border border-white/[0.06] rounded-xl px-2 py-1.5 text-white text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary disabled:opacity-50"
                               />
                               {savingOrder && (
                                 <span className="inline-block w-3.5 h-3.5 border-2 border-gray-500 border-t-primary rounded-full animate-spin shrink-0" />

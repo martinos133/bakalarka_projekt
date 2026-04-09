@@ -171,7 +171,7 @@ export default function DevBlogPage() {
                       value={formData.slug}
                       onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                       placeholder="napr. prvý-príspevok"
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                     />
                     <p className="text-xs text-gray-500 mt-1">URL: /blog/{formData.slug || 'slug'}</p>
                   </div>
@@ -185,7 +185,7 @@ export default function DevBlogPage() {
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                       placeholder="Názov príspevku"
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                     />
                   </div>
                 </div>
@@ -199,7 +199,7 @@ export default function DevBlogPage() {
                     onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
                     rows={2}
                     placeholder="Krátky popis pre zoznam príspevkov..."
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                   />
                 </div>
 
@@ -212,7 +212,7 @@ export default function DevBlogPage() {
                     value={formData.featuredImage}
                     onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })}
                     placeholder="https://..."
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                   />
                 </div>
 
@@ -238,7 +238,7 @@ export default function DevBlogPage() {
                       value={formData.metaTitle}
                       onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
                       placeholder="SEO názov"
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                     />
                   </div>
                   <div>
@@ -265,7 +265,7 @@ export default function DevBlogPage() {
                     onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
                     rows={2}
                     placeholder="SEO popis"
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                   />
                 </div>
 

@@ -55,7 +55,7 @@ export default function Select({
         onClick={() => setOpen(!open)}
         className={`
           w-full flex items-center justify-between gap-2
-          bg-white/[0.04] border border-white/[0.06] rounded-xl
+          bg-white/[0.06] border border-white/[0.06] rounded-xl
           px-3 py-2 text-sm transition-all cursor-pointer
           hover:border-white/[0.12] hover:bg-white/[0.06]
           ${open ? 'border-primary/50 bg-white/[0.06] shadow-[0_0_0_3px_rgba(36,99,235,0.1)]' : ''}

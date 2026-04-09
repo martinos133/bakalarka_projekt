@@ -45,13 +45,13 @@
   textarea {
     appearance: none;
     -webkit-appearance: none;
-    background-color: rgba(255, 255, 255, 0.04);
+    background-color: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 0.75rem;
-    color: white;
+    color: rgba(255, 255, 255, 0.92);
     font-size: 0.875rem;
     line-height: 1.25rem;
-    padding: 0.5rem 0.75rem;
+    padding: 0.625rem 0.875rem;
     transition: all 0.15s ease;
   }
 
@@ -90,7 +90,7 @@
   select::placeholder,
   input::placeholder,
   textarea::placeholder {
-    color: rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.42);
   }
 
   /* Select custom arrow */
@@ -260,7 +260,18 @@
     @apply btn bg-transparent text-gray-300 hover:bg-white/[0.06] hover:text-white;
   }
   .btn-outline {
-    @apply btn bg-transparent text-gray-300 border border-white/[0.08] hover:bg-white/[0.04] hover:text-white hover:border-white/[0.15];
+    @apply btn bg-transparent text-gray-300 border border-white/[0.08] hover:bg-white/[0.06] hover:text-white hover:border-white/[0.15];
+  }
+
+  /* ── High-contrast inputs (use this everywhere) ── */
+  .input {
+    @apply w-full bg-white/[0.12] border border-white/[0.12] rounded-xl px-4 py-2.5 text-white text-sm;
+    @apply placeholder-white/70;
+    @apply focus:outline-none focus:border-primary/60 focus:bg-white/[0.14];
+  }
+
+  .input-icon-left {
+    @apply pl-10;
   }
 }
 

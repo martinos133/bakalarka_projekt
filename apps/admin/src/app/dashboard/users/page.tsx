@@ -638,7 +638,7 @@ export default function UsersPage() {
                     value={filters.search}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                     placeholder="Meno, email..."
-                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover text-sm"
+                    className="input px-4 py-2 pl-10 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover text-sm"
                   />
                 </div>
               </div>
@@ -700,7 +700,7 @@ export default function UsersPage() {
                   placeholder="napr. 18"
                   value={filters.minAge}
                   onChange={(e) => setFilters({ ...filters, minAge: e.target.value })}
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                 />
               </div>
               <div>
@@ -712,7 +712,7 @@ export default function UsersPage() {
                   placeholder="napr. 65"
                   value={filters.maxAge}
                   onChange={(e) => setFilters({ ...filters, maxAge: e.target.value })}
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                  className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                 />
               </div>
             </div>
@@ -1234,7 +1234,7 @@ export default function UsersPage() {
                         min="1"
                         value={banForm.days}
                         onChange={(e) => setBanForm({ ...banForm, days: parseInt(e.target.value) || 1 })}
-                        className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                        className="input px-4 py-2 text-white focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                       />
                     </div>
                   )}
@@ -1248,7 +1248,7 @@ export default function UsersPage() {
                       onChange={(e) => setBanForm({ ...banForm, reason: e.target.value })}
                       rows={3}
                       placeholder="Napríklad: Porušenie podmienok používania..."
-                      className="w-full bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
                     />
                   </div>
 
