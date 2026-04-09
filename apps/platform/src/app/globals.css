@@ -226,3 +226,14 @@
 .ad-map-popup-link:hover .ad-map-popup-link-arrow {
   transform: translateX(3px);
 }
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

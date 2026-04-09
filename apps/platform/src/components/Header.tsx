@@ -161,7 +161,7 @@ export default function Header() {
                     if (e.key === 'Escape') setShowSuggestions(false)
                   }}
                   placeholder="Akú službu hľadáte dnes?"
-                  className="flex-1 px-4 py-2 text-sm focus:outline-none text-white placeholder-gray-500 bg-transparent"
+                  className="flex-1 px-4 py-2 text-sm focus:outline-none text-white placeholder-white/40 bg-transparent"
                 />
                 <button
                   type="submit"
@@ -386,7 +386,7 @@ export default function Header() {
                 </Link>
                 <Link
                   href="/join"
-                  className="px-3 py-1.5 border-2 border-blue-500 text-blue-500 rounded-md text-sm font-medium"
+                  className="px-3 py-1.5 border-2 border-accent text-accent rounded-md text-sm font-medium"
                 >
                   Registrovať sa
                 </Link>

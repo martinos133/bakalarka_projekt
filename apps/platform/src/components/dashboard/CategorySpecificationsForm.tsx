@@ -39,12 +39,12 @@ export default function CategorySpecificationsForm({
     field:
       'w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ' +
       (a
-        ? 'border-card bg-dark text-white placeholder:text-gray-500 focus:border-primary focus:ring-primary/30'
+        ? 'border-card bg-dark text-white placeholder:text-gray-500 focus:border-accent/40 focus:ring-primary/30'
         : 'border-white/10 text-white placeholder:text-gray-400 focus:border-accent focus:ring-accent/30'),
     fieldNum:
       'min-w-0 flex-1 rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ' +
       (a
-        ? 'border-card bg-dark text-white focus:border-primary focus:ring-primary/30'
+        ? 'border-card bg-dark text-white focus:border-accent/40 focus:ring-primary/30'
         : 'border-white/10 text-white focus:border-accent focus:ring-accent/30'),
     spanOdDo: 'text-xs ' + (a ? 'text-gray-500' : 'text-gray-500'),
     multiOn:

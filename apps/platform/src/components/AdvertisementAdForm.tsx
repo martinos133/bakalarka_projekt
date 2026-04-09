@@ -66,28 +66,28 @@ export default function AdvertisementAdForm({
     labelXs: a ? 'block text-xs text-gray-500 mb-1' : 'block text-xs text-gray-500 mb-1',
     input:
       a
-        ? 'w-full px-4 py-2.5 rounded-lg border border-card bg-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
+        ? 'w-full px-4 py-2.5 rounded-lg border border-card bg-dark text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/35 focus:border-accent/40'
         : 'w-full px-4 py-2 border border-white/10 rounded-lg text-white',
     textarea:
       a
-        ? 'w-full px-4 py-2.5 rounded-lg border border-card bg-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
+        ? 'w-full px-4 py-2.5 rounded-lg border border-card bg-dark text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/35 focus:border-accent/40'
         : 'w-full px-4 py-2 border border-white/10 rounded-lg text-white',
     inpFocus:
       a
-        ? 'w-full px-4 py-2 rounded-lg border border-card bg-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
-        : 'w-full px-4 py-2 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
+        ? 'w-full px-4 py-2 rounded-lg border border-card bg-dark text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/35 focus:border-accent/40'
+        : 'w-full px-4 py-2 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
     inpSm:
       a
-        ? 'w-full px-3 py-2 rounded-lg border border-card bg-dark text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
-        : 'w-full px-3 py-2 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
+        ? 'w-full px-3 py-2 rounded-lg border border-card bg-dark text-white text-sm placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/35 focus:border-accent/40'
+        : 'w-full px-3 py-2 border border-white/10 rounded-lg text-white text-sm placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
     flexInp:
       a
-        ? 'flex-1 px-4 py-2 rounded-lg border border-card bg-dark text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
-        : 'flex-1 px-4 py-2 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
+        ? 'flex-1 px-4 py-2 rounded-lg border border-card bg-dark text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/35 focus:border-accent/40'
+        : 'flex-1 px-4 py-2 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
     flexInpSm:
       a
-        ? 'flex-1 px-3 py-2 rounded-lg border border-card bg-dark text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/35 focus:border-primary'
-        : 'flex-1 px-3 py-2 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
+        ? 'flex-1 px-3 py-2 rounded-lg border border-card bg-dark text-white text-sm placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/35 focus:border-accent/40'
+        : 'flex-1 px-3 py-2 border border-white/10 rounded-lg text-white text-sm placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
     secBorder: a ? 'border-t border-card pt-6 mt-6' : 'border-t border-white/[0.08] pt-6 mt-6',
     secTitle: a ? 'text-lg font-semibold text-white mb-4' : 'text-lg font-semibold text-white mb-4',
     hint: 'text-xs text-gray-500 mt-1',

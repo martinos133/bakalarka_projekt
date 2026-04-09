@@ -263,7 +263,7 @@ export default function JoinPage() {
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                         required
-                        className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                        className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                         placeholder="Ján"
                       />
                     </div>
@@ -278,7 +278,7 @@ export default function JoinPage() {
                         value={formData.lastName}
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                         required
-                        className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                        className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                         placeholder="Novák"
                       />
                     </div>
@@ -296,7 +296,7 @@ export default function JoinPage() {
                           value={formData.companyName}
                           onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                           required={isCompany}
-                          className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                          className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                           placeholder="Názov spoločnosti s.r.o."
                         />
                       </div>
@@ -312,7 +312,7 @@ export default function JoinPage() {
                             value={formData.companyId}
                             onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
                             required={isCompany}
-                            className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                            className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                             placeholder="12345678"
                           />
                         </div>
@@ -326,7 +326,7 @@ export default function JoinPage() {
                             type="text"
                             value={formData.companyTaxId}
                             onChange={(e) => setFormData({ ...formData, companyTaxId: e.target.value })}
-                            className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                            className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                             placeholder="2020123456"
                           />
                         </div>
@@ -344,7 +344,7 @@ export default function JoinPage() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       required
-                      className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                      className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                       placeholder="vas@email.com"
                     />
                   </div>
@@ -359,7 +359,7 @@ export default function JoinPage() {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       required
-                      className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                      className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                       placeholder="+421 912 345 678"
                     />
                   </div>
@@ -376,7 +376,7 @@ export default function JoinPage() {
                           value={formData.password}
                           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                           required
-                          className="w-full px-4 py-3 pr-12 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                          className="w-full px-4 py-3 pr-12 bg-dark-100 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                           placeholder="Min. 8 znakov"
                         />
                         <button
@@ -406,7 +406,7 @@ export default function JoinPage() {
                           value={formData.confirmPassword}
                           onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                           required
-                          className="w-full px-4 py-3 pr-12 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                          className="w-full px-4 py-3 pr-12 bg-dark-100 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                           placeholder="Zopakujte heslo"
                         />
                         <button
@@ -451,7 +451,7 @@ export default function JoinPage() {
                             value={formData.dateOfBirth}
                             onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
                             max={new Date().toISOString().split('T')[0]}
-                            className="w-full px-4 py-3 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                            className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                           />
                         </div>
 
@@ -463,7 +463,7 @@ export default function JoinPage() {
                             id="gender"
                             value={formData.gender}
                             onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                            className="w-full px-4 py-3 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                            className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                           >
                             <option value="">-- Vybrať --</option>
                             <option value="MALE">Muž</option>
@@ -484,7 +484,7 @@ export default function JoinPage() {
                       type="text"
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                      className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                       placeholder="Ulica a číslo"
                     />
                   </div>
@@ -499,7 +499,7 @@ export default function JoinPage() {
                         type="text"
                         value={formData.city}
                         onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                        className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                        className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                         placeholder="Bratislava"
                       />
                     </div>
@@ -513,7 +513,7 @@ export default function JoinPage() {
                         type="text"
                         value={formData.postalCode}
                         onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                        className="w-full px-4 py-3 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                        className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                         placeholder="811 01"
                       />
                     </div>
@@ -526,7 +526,7 @@ export default function JoinPage() {
                         id="country"
                         value={formData.country}
                         onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                        className="w-full px-4 py-3 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                        className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                       >
                         <option value="Slovensko">Slovensko</option>
                         <option value="Česko">Česko</option>

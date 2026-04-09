@@ -212,7 +212,7 @@ export default function DashboardPage() {
 
   const getMessageTypeColor = (type: string) => {
     const colors: { [key: string]: string } = {
-      INQUIRY: 'bg-blue-900/25 text-blue-400',
+      INQUIRY: 'bg-accent/15 text-accent',
       SYSTEM: 'bg-dark-100 text-white/90',
       BAN_NOTIFICATION: 'bg-red-100 text-red-400',
       VIOLATION: 'bg-orange-900/25 text-orange-400',
@@ -484,7 +484,7 @@ export default function DashboardPage() {
                   value={profileData.phone || ''}
                   onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
+                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 />
               </div>
 
@@ -497,7 +497,7 @@ export default function DashboardPage() {
                   value={profileData.firstName || ''}
                   onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
+                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 />
               </div>
 
@@ -510,7 +510,7 @@ export default function DashboardPage() {
                   value={profileData.lastName || ''}
                   onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
+                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 />
               </div>
 
@@ -522,7 +522,7 @@ export default function DashboardPage() {
                   value={profileData.gender || ''}
                   onChange={(e) => setProfileData({ ...profileData, gender: e.target.value || undefined })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
+                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 >
                   <option value="">-- Vybrať --</option>
                   <option value="MALE">Muž</option>
@@ -573,7 +573,7 @@ export default function DashboardPage() {
                       value={profileData.companyName || ''}
                       onChange={(e) => setProfileData({ ...profileData, companyName: e.target.value })}
                       disabled={!editing}
-                      className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
+                      className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                     />
                   </div>
 
@@ -587,7 +587,7 @@ export default function DashboardPage() {
                       value={profileData.companyId || ''}
                       onChange={(e) => setProfileData({ ...profileData, companyId: e.target.value })}
                       disabled={!editing}
-                      className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
+                      className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                     />
                   </div>
                 </>
@@ -603,7 +603,7 @@ export default function DashboardPage() {
                   value={profileData.address || ''}
                   onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
+                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 />
               </div>
 
@@ -616,7 +616,7 @@ export default function DashboardPage() {
                   value={profileData.city || ''}
                   onChange={(e) => setProfileData({ ...profileData, city: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
+                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 />
               </div>
 
@@ -629,7 +629,7 @@ export default function DashboardPage() {
                   value={profileData.postalCode || ''}
                   onChange={(e) => setProfileData({ ...profileData, postalCode: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
+                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 />
               </div>
 
@@ -641,7 +641,7 @@ export default function DashboardPage() {
                   value={profileData.country || 'Slovensko'}
                   onChange={(e) => setProfileData({ ...profileData, country: e.target.value })}
                   disabled={!editing}
-                  className="w-full px-4 py-2 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
+                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
                 >
                   <option value="Slovensko">Slovensko</option>
                   <option value="Česko">Česko</option>
@@ -815,7 +815,7 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-2 ml-4">
                         <Link
                           href={`/inzerat/${ad.id}`}
-                          className="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors"
+                          className="p-2 text-accent hover:bg-accent/10 rounded-lg transition-colors"
                           title="Zobraziť"
                         >
                           <Eye className="w-4 h-4" />
@@ -893,7 +893,7 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-2 ml-4">
                           <Link
                             href={`/inzerat/${ad.id}`}
-                            className="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors"
+                            className="p-2 text-accent hover:bg-accent/10 rounded-lg transition-colors"
                             title="Zobraziť"
                           >
                             <Eye className="w-4 h-4" />
@@ -982,7 +982,7 @@ export default function DashboardPage() {
                       key={message.id}
                       onClick={() => handleMessageClick(message)}
                       className={`p-4 cursor-pointer hover:bg-dark-200/[0.04] transition-colors ${
-                        message.status === 'UNREAD' ? 'bg-blue-900/20' : ''
+                        message.status === 'UNREAD' ? 'bg-accent/10' : ''
                       } ${selectedMessage?.id === message.id ? 'bg-accent/10' : ''}`}
                     >
                       <div className="flex items-start justify-between">
@@ -992,7 +992,7 @@ export default function DashboardPage() {
                               {getMessageTypeLabel(message.type)}
                             </span>
                             {message.status === 'UNREAD' && (
-                              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                              <span className="w-2 h-2 bg-accent rounded-full"></span>
                             )}
                           </div>
                           <h3 className="font-medium text-white mb-1">{message.subject}</h3>
@@ -1019,7 +1019,7 @@ export default function DashboardPage() {
                                 e.stopPropagation()
                                 api.markAsRead(message.id).then(() => loadMessages())
                               }}
-                              className="p-1 text-gray-500 hover:text-blue-600"
+                              className="p-1 text-gray-500 hover:text-accent"
                               title="Označiť ako prečítané"
                             >
                               <CheckCircle className="w-4 h-4" />
@@ -1225,7 +1225,7 @@ export default function DashboardPage() {
                           onChange={(e) => setReplyContent(e.target.value)}
                           placeholder="Napíšte odpoveď... (môžete pridať fotky alebo súbory)"
                           rows={2}
-                          className="flex-1 border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-sm"
+                          className="flex-1 bg-dark-100 border border-white/10 rounded-lg px-4 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none text-sm"
                         />
                       </div>
                       <button

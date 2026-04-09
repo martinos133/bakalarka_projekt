@@ -118,7 +118,7 @@ export default function Hero() {
                   if (e.key === 'Escape') setShowSuggestions(false)
                 }}
                 placeholder="Hľadať akúkoľvek službu..."
-                className="flex-1 px-6 py-4 text-lg rounded-l-xl rounded-r-none border border-white/10 border-r-0 bg-dark-50/80 backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-accent text-white placeholder-gray-500"
+                className="flex-1 px-6 py-4 text-lg rounded-l-xl rounded-r-none border border-white/10 border-r-0 bg-dark-50/80 backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-accent text-white placeholder-white/40"
               />
               <button
                 type="submit"

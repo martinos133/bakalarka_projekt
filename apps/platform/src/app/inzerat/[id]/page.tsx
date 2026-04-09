@@ -14,6 +14,7 @@ import { isAuthenticated } from '@/lib/auth'
 import { isProSellerBadge } from '@/lib/sellerPlan'
 import type { Filter } from '@inzertna-platforma/shared'
 import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone, Heart } from 'lucide-react'
+import CustomSelect from '@/components/CustomSelect'
 import type { DateRange } from 'react-day-picker'
 
 interface ServicePackage {
@@ -848,7 +849,7 @@ export default function AdvertisementDetailPage({
                       type="text"
                       value={inquirySubject}
                       onChange={(e) => setInquirySubject(e.target.value)}
-                      className="w-full border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                      className="w-full bg-dark-100 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/40"
                       placeholder="Predmet správy"
                     />
                   </div>
@@ -860,12 +861,12 @@ export default function AdvertisementDetailPage({
                       value={inquiryContent}
                       onChange={(e) => setInquiryContent(e.target.value)}
                       rows={4}
-                      className="w-full border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
+                      className="w-full bg-dark-100 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/40 resize-none"
                       placeholder="Napíšte svoju správu..."
                     />
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 bg-blue-900/20 p-3 rounded-lg">
-                    <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                  <div className="flex items-center gap-2 text-sm text-white/50 bg-accent/10 p-3 rounded-lg">
+                    <AlertCircle className="w-5 h-5 text-accent/60 flex-shrink-0" />
                     <p>
                       Pre písanie cez chat musia byť obaja používatelia zaregistrovaní. Správa sa odošle predajcovi a môžete pokračovať v komunikácii v sekcii Správy.
                     </p>
@@ -873,7 +874,7 @@ export default function AdvertisementDetailPage({
                   <div className="flex items-center gap-3 pt-2">
                     <button
                       onClick={() => setContactMode('choice')}
-                      className="px-4 py-2 border border-white/10 text-gray-300 rounded-lg font-medium hover:bg-dark-200/[0.04] transition-colors"
+                      className="px-4 py-2.5 border border-white/10 text-white/70 rounded-lg font-medium hover:bg-white/[0.06] hover:text-white transition-colors"
                     >
                       Späť
                     </button>
@@ -884,7 +885,7 @@ export default function AdvertisementDetailPage({
                         !inquiryContent.trim() ||
                         inquirySubmitting
                       }
-                      className="flex-1 px-4 py-2 bg-accent text-white rounded-lg font-medium hover:bg-accent-light disabled:bg-dark-300 disabled:cursor-not-allowed transition-colors"
+                      className="flex-1 px-4 py-2.5 bg-accent text-dark rounded-lg font-semibold hover:bg-accent-light disabled:bg-dark-300 disabled:text-white/30 disabled:cursor-not-allowed transition-colors"
                     >
                       {inquirySubmitting ? 'Odosielam...' : 'Odoslať správu'}
                     </button>
@@ -1007,7 +1008,7 @@ export default function AdvertisementDetailPage({
                       value={continueContent}
                       onChange={(e) => setContinueContent(e.target.value)}
                       rows={3}
-                      className="w-full border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
+                      className="w-full bg-dark-100 border border-white/10 rounded-lg px-4 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
                       placeholder={
                         advertisement.type === 'SERVICE'
                           ? 'Čo potrebujete vyriešiť, preferovaný čas, kontakt...'
@@ -1032,7 +1033,7 @@ export default function AdvertisementDetailPage({
                           : !continueRentalRange?.from || !continueRentalRange?.to) ||
                         continueSubmitting
                       }
-                      className="flex-1 px-4 py-2 bg-accent text-white rounded-lg font-medium hover:bg-accent-light disabled:bg-dark-300 disabled:cursor-not-allowed transition-colors"
+                      className="flex-1 px-4 py-2.5 bg-accent text-dark rounded-lg font-semibold hover:bg-accent-light disabled:bg-dark-300 disabled:text-white/30 disabled:cursor-not-allowed transition-colors"
                     >
                       {continueSubmitting ? 'Odosielam...' : 'Odoslať žiadosť'}
                     </button>
@@ -1086,18 +1087,12 @@ export default function AdvertisementDetailPage({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Dôvod nahlásenia <span className="text-red-500">*</span>
                   </label>
-                  <select
+                  <CustomSelect
                     value={reportReason}
-                    onChange={(e) => setReportReason(e.target.value)}
-                    className="w-full border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-                  >
-                    <option value="">Vyberte dôvod...</option>
-                    {reportReasons.map((reason) => (
-                      <option key={reason.value} value={reason.value}>
-                        {reason.label}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) => setReportReason(val)}
+                    options={reportReasons}
+                    placeholder="Vyberte dôvod..."
+                  />
                 </div>
 
                 <div>
@@ -1109,12 +1104,12 @@ export default function AdvertisementDetailPage({
                     onChange={(e) => setReportDescription(e.target.value)}
                     placeholder="Poskytnite viac informácií o probléme..."
                     rows={4}
-                    className="w-full border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
+                    className="w-full bg-dark-100 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/40 resize-none"
                   />
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-gray-500 bg-blue-900/20 p-3 rounded-lg">
-                  <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                <div className="flex items-center gap-2 text-sm text-white/50 bg-accent/10 p-3 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-accent/60 flex-shrink-0" />
                   <p>
                     Nahlásené inzeráty sú kontrolované našim tímom. Inzerát zostane aktívny, pokiaľ ho nerozhodneme odstrániť.
                   </p>
@@ -1127,14 +1122,14 @@ export default function AdvertisementDetailPage({
                       setReportReason('')
                       setReportDescription('')
                     }}
-                    className="px-4 py-2 border border-white/10 text-gray-300 rounded-lg font-medium hover:bg-dark-200/[0.04] transition-colors"
+                    className="px-4 py-2.5 border border-white/10 text-white/70 rounded-lg font-medium hover:bg-white/[0.06] hover:text-white transition-colors"
                   >
                     Zrušiť
                   </button>
                   <button
                     onClick={handleReport}
                     disabled={!reportReason || reportSubmitting}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:bg-dark-300 disabled:cursor-not-allowed transition-colors"
+                    className="px-4 py-2.5 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 disabled:bg-dark-300 disabled:text-white/30 disabled:cursor-not-allowed transition-colors"
                   >
                     {reportSubmitting ? 'Odosielam...' : 'Nahlásiť'}
                   </button>

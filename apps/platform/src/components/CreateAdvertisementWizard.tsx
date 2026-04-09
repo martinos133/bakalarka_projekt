@@ -516,7 +516,7 @@ export default function CreateAdvertisementWizard({
                           active
                             ? 'bg-primary text-white shadow-sm'
                             : passed
-                              ? 'bg-primary/20 text-blue-200'
+                              ? 'bg-primary/20 text-accent-light'
                               : 'bg-dark text-gray-500 ring-1 ring-card'
                         }`
                       : `rounded-full px-3 py-1.5 text-xs font-semibold sm:text-sm ${
@@ -581,7 +581,7 @@ export default function CreateAdvertisementWizard({
                 placeholder="Hľadať kategóriu..."
                 className={
                   isAdmin
-                    ? 'w-full rounded-xl border border-card bg-card py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25'
+                    ? 'w-full rounded-xl border border-card bg-card py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-gray-500 focus:border-accent/40 focus:outline-none focus:ring-2 focus:ring-primary/25'
                     : 'w-full rounded-xl border border-orange-100 bg-dark py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-gray-400 focus:border-accent focus:outline-none focus:ring-2 focus:ring-[#c9a96e]/25'
                 }
               />
@@ -713,7 +713,7 @@ export default function CreateAdvertisementWizard({
                 {subId && (
                   <span
                     className={`rounded-full px-3 py-1 text-sm font-medium ${
-                      isAdmin ? 'bg-primary/15 text-blue-200 ring-1 ring-primary/30' : 'bg-accent/10 text-[#148a55]'
+                      isAdmin ? 'bg-primary/15 text-accent-light ring-1 ring-primary/30' : 'bg-accent/10 text-[#148a55]'
                     }`}
                   >
                     {findCategoryNode(categories, subId)?.name || 'Podkategória'}
