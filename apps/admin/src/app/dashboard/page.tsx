@@ -61,12 +61,9 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      {/* Greeting */}
+      {/* Quick actions */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white tracking-tight">Nástenka</h2>
-        <p className="text-sm text-muted mt-1">
-          Naplánujte si mesiac: {currentMonth}
-        </p>
+        <QuickActions />
       </div>
 
       {/* Metric cards */}
@@ -116,9 +113,6 @@ export default function DashboardPage() {
       <div className="mb-8">
         <Chart />
       </div>
-
-      {/* Quick actions */}
-      <QuickActions />
     </DashboardLayout>
   )
 }
