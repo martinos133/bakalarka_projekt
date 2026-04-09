@@ -153,7 +153,7 @@ export default function Sidebar() {
                       ${collapsed ? 'justify-center px-0 py-2.5' : 'px-3 py-2 gap-3'}
                       ${isActive
                         ? 'bg-accent/10 text-accent font-medium'
-                        : 'text-gray-400 hover:bg-white/[0.06] hover:text-dark'
+                        : 'text-gray-400 hover:bg-white/[0.06] hover:text-white'
                       }
                     `}
                   >

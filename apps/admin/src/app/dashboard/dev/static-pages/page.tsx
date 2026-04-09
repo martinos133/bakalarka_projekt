@@ -331,7 +331,7 @@ export default function DevStaticPagesPage() {
                         className={`px-3 py-1.5 text-xs font-medium flex items-center gap-1.5 transition-colors ${
                           contentMode === 'visual'
                             ? 'bg-accent text-dark'
-                            : 'bg-dark text-gray-400 hover:text-dark'
+                            : 'bg-dark text-gray-400 hover:text-white'
                         }`}
                       >
                         <LayoutTemplate className="w-3.5 h-3.5" />
@@ -343,7 +343,7 @@ export default function DevStaticPagesPage() {
                         className={`px-3 py-1.5 text-xs font-medium flex items-center gap-1.5 transition-colors ${
                           contentMode === 'html'
                             ? 'bg-accent text-dark'
-                            : 'bg-dark text-gray-400 hover:text-dark'
+                            : 'bg-dark text-gray-400 hover:text-white'
                         }`}
                       >
                         <Code2 className="w-3.5 h-3.5" />

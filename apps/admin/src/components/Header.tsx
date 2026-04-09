@@ -34,7 +34,7 @@ export default function Header() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
                   ${pathname === s.path
                     ? 'bg-accent/10 text-accent'
-                    : 'text-gray-400 hover:text-dark hover:bg-white/[0.06]'
+                    : 'text-gray-400 hover:text-white hover:bg-white/[0.06]'
                   }
                 `}
               >
@@ -54,9 +54,10 @@ export default function Header() {
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
-              className="input px-4 py-2.5 pl-9 text-sm text-white placeholder-white/70 focus:outline-none focus:border-accent/40 focus:bg-white/[0.08] transition-all"
+              style={{ paddingLeft: '2.25rem' }}
+              className="w-full bg-white/[0.08] border border-white/[0.10] rounded-xl pr-4 py-2 text-sm text-white transition-all focus:outline-none focus:border-accent/40 focus:bg-white/[0.12]"
             />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50 pointer-events-none" />
           </div>
 
           {/* Notifications */}

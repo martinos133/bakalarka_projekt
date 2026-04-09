@@ -76,7 +76,7 @@ export default function Chart() {
                 px-4 py-1.5 rounded-[10px] text-xs font-medium transition-all duration-200
                 ${period === p.key
                   ? 'bg-accent text-dark shadow-sm'
-                  : 'text-gray-400 hover:text-dark'
+                  : 'text-gray-400 hover:text-white'
                 }
               `}
             >
