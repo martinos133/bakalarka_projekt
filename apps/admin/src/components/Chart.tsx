@@ -50,7 +50,7 @@ export default function Chart() {
       <div className="card p-6">
         <div className="flex items-center justify-center h-72">
           <div className="flex items-center gap-2 text-muted text-sm">
-            <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-accent/30 border-t-primary rounded-full animate-spin" />
             Načítavanie grafu...
           </div>
         </div>
@@ -75,8 +75,8 @@ export default function Chart() {
               className={`
                 px-4 py-1.5 rounded-[10px] text-xs font-medium transition-all duration-200
                 ${period === p.key
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-accent text-dark shadow-sm'
+                  : 'text-gray-400 hover:text-dark'
                 }
               `}
             >
@@ -90,12 +90,12 @@ export default function Chart() {
         <AreaChart data={data}>
           <defs>
             <linearGradient id="colorAds" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#2463eb" stopOpacity={0.2} />
-              <stop offset="100%" stopColor="#2463eb" stopOpacity={0} />
+              <stop offset="0%" stopColor="#c9a96e" stopOpacity={0.2} />
+              <stop offset="100%" stopColor="#c9a96e" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#10b981" stopOpacity={0.15} />
-              <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+              <stop offset="0%" stopColor="#dfc9a0" stopOpacity={0.15} />
+              <stop offset="100%" stopColor="#dfc9a0" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -145,22 +145,22 @@ export default function Chart() {
             type="monotone"
             dataKey="advertisements"
             name="Inzeráty"
-            stroke="#2463eb"
+            stroke="#c9a96e"
             strokeWidth={2}
             fill="url(#colorAds)"
             dot={false}
-            activeDot={{ r: 4, fill: '#2463eb', stroke: '#fff', strokeWidth: 2 }}
+            activeDot={{ r: 4, fill: '#c9a96e', stroke: '#fff', strokeWidth: 2 }}
           />
           <Area
             yAxisId="right"
             type="monotone"
             dataKey="active"
             name="Aktívne"
-            stroke="#10b981"
+            stroke="#dfc9a0"
             strokeWidth={2}
             fill="url(#colorActive)"
             dot={false}
-            activeDot={{ r: 4, fill: '#10b981', stroke: '#fff', strokeWidth: 2 }}
+            activeDot={{ r: 4, fill: '#dfc9a0', stroke: '#fff', strokeWidth: 2 }}
           />
         </AreaChart>
       </ResponsiveContainer>

@@ -19,8 +19,8 @@ interface QuickAction {
 }
 
 const colorMap: Record<string, { bg: string; text: string }> = {
-  blue:   { bg: 'bg-blue-500/10',    text: 'text-blue-400' },
-  green:  { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
+  blue:   { bg: 'bg-accent/10',    text: 'text-accent' },
+  green:  { bg: 'bg-accent/10', text: 'text-accent' },
   purple: { bg: 'bg-purple-500/10',  text: 'text-purple-400' },
   orange: { bg: 'bg-orange-500/10',  text: 'text-orange-400' },
   red:    { bg: 'bg-red-500/10',     text: 'text-red-400' },

@@ -137,7 +137,7 @@ export default function DevBlogPage() {
             {!showForm && (
               <button
                 onClick={() => setShowForm(true)}
-                className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-xl flex items-center space-x-2 transition-colors"
+                className="bg-accent hover:opacity-90 text-dark px-4 py-2 rounded-xl flex items-center space-x-2 transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 <span>Nový príspevok</span>
@@ -171,7 +171,7 @@ export default function DevBlogPage() {
                       value={formData.slug}
                       onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                       placeholder="napr. prvý-príspevok"
-                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                     />
                     <p className="text-xs text-gray-500 mt-1">URL: /blog/{formData.slug || 'slug'}</p>
                   </div>
@@ -185,7 +185,7 @@ export default function DevBlogPage() {
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                       placeholder="Názov príspevku"
-                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                     />
                   </div>
                 </div>
@@ -199,7 +199,7 @@ export default function DevBlogPage() {
                     onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
                     rows={2}
                     placeholder="Krátky popis pre zoznam príspevkov..."
-                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                   />
                 </div>
 
@@ -212,7 +212,7 @@ export default function DevBlogPage() {
                     value={formData.featuredImage}
                     onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })}
                     placeholder="https://..."
-                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                   />
                 </div>
 
@@ -238,7 +238,7 @@ export default function DevBlogPage() {
                       value={formData.metaTitle}
                       onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
                       placeholder="SEO názov"
-                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                     />
                   </div>
                   <div>
@@ -265,7 +265,7 @@ export default function DevBlogPage() {
                     onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
                     rows={2}
                     placeholder="SEO popis"
-                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                   />
                 </div>
 
@@ -279,7 +279,7 @@ export default function DevBlogPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-primary hover:opacity-90 text-white rounded-xl flex items-center gap-2 transition-colors"
+                    className="px-4 py-2 bg-accent hover:opacity-90 text-dark rounded-xl flex items-center gap-2 transition-colors"
                   >
                     <Save className="w-4 h-4" />
                     Uložiť
@@ -298,7 +298,7 @@ export default function DevBlogPage() {
                 <p className="text-gray-400 mb-4">Zatiaľ nemáte žiadne blog príspevky</p>
                 <button
                   onClick={() => setShowForm(true)}
-                  className="text-primary hover:underline"
+                  className="text-accent hover:underline"
                 >
                   Vytvoriť prvý príspevok
                 </button>

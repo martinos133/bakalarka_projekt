@@ -110,7 +110,7 @@ export default function Sidebar() {
       {/* User profile */}
       <div className={`p-4 ${collapsed ? 'px-3' : 'px-5'} pt-6 pb-4`}>
         <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold text-sm flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-semibold text-sm flex-shrink-0">
             {getInitials(user?.firstName, user?.lastName)}
           </div>
           {!collapsed && (
@@ -152,12 +152,12 @@ export default function Sidebar() {
                       flex items-center
                       ${collapsed ? 'justify-center px-0 py-2.5' : 'px-3 py-2 gap-3'}
                       ${isActive
-                        ? 'bg-primary/10 text-primary font-medium'
-                        : 'text-gray-400 hover:bg-white/[0.06] hover:text-white'
+                        ? 'bg-accent/10 text-accent font-medium'
+                        : 'text-gray-400 hover:bg-white/[0.06] hover:text-dark'
                       }
                     `}
                   >
-                    <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? 'text-primary' : ''}`} />
+                    <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? 'text-accent' : ''}`} />
                     {!collapsed && <span className="text-sm">{item.label}</span>}
                   </button>
                 )

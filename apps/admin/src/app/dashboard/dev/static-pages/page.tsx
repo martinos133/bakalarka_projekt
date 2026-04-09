@@ -268,7 +268,7 @@ export default function DevStaticPagesPage() {
                 type="button"
                 onClick={openNewForm}
                 disabled={editLoading}
-                className="bg-primary hover:opacity-90 disabled:opacity-50 text-white px-4 py-2 rounded-xl flex items-center space-x-2 transition-colors"
+                className="bg-accent hover:opacity-90 disabled:opacity-50 text-dark px-4 py-2 rounded-xl flex items-center space-x-2 transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 <span>Nová stránka</span>
@@ -302,7 +302,7 @@ export default function DevStaticPagesPage() {
                       value={formData.slug}
                       onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                       placeholder="napr. blog, stat-sa-predajcom"
-                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                     />
                     <p className="text-xs text-gray-500 mt-1">URL bude: /{formData.slug || 'slug'}</p>
                   </div>
@@ -316,7 +316,7 @@ export default function DevStaticPagesPage() {
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                       placeholder="napr. Stať sa predajcom"
-                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                     />
                   </div>
                 </div>
@@ -330,8 +330,8 @@ export default function DevStaticPagesPage() {
                         onClick={switchToVisualBuilder}
                         className={`px-3 py-1.5 text-xs font-medium flex items-center gap-1.5 transition-colors ${
                           contentMode === 'visual'
-                            ? 'bg-primary text-white'
-                            : 'bg-dark text-gray-400 hover:text-white'
+                            ? 'bg-accent text-dark'
+                            : 'bg-dark text-gray-400 hover:text-dark'
                         }`}
                       >
                         <LayoutTemplate className="w-3.5 h-3.5" />
@@ -342,8 +342,8 @@ export default function DevStaticPagesPage() {
                         onClick={switchToHtmlSource}
                         className={`px-3 py-1.5 text-xs font-medium flex items-center gap-1.5 transition-colors ${
                           contentMode === 'html'
-                            ? 'bg-primary text-white'
-                            : 'bg-dark text-gray-400 hover:text-white'
+                            ? 'bg-accent text-dark'
+                            : 'bg-dark text-gray-400 hover:text-dark'
                         }`}
                       >
                         <Code2 className="w-3.5 h-3.5" />
@@ -363,7 +363,7 @@ export default function DevStaticPagesPage() {
                       onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                       rows={16}
                       placeholder="<p>HTML obsah stránky…</p>"
-                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover font-mono text-sm"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover font-mono text-sm"
                     />
                   )}
                 </div>
@@ -378,7 +378,7 @@ export default function DevStaticPagesPage() {
                       value={formData.metaTitle}
                       onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
                       placeholder="SEO názov"
-                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                     />
                   </div>
                   <div>
@@ -405,7 +405,7 @@ export default function DevStaticPagesPage() {
                     onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
                     rows={2}
                     placeholder="SEO popis"
-                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                   />
                 </div>
 
@@ -419,7 +419,7 @@ export default function DevStaticPagesPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-primary hover:opacity-90 text-white rounded-xl flex items-center gap-2 transition-colors"
+                    className="px-4 py-2 bg-accent hover:opacity-90 text-dark rounded-xl flex items-center gap-2 transition-colors"
                   >
                     <Save className="w-4 h-4" />
                     Uložiť
@@ -459,7 +459,7 @@ export default function DevStaticPagesPage() {
                           className="border-b border-white/[0.06] hover:bg-cardHover hover:bg-opacity-30 transition-colors"
                         >
                           <td className="px-4 py-3">
-                            <code className="text-sm text-emerald-400/90">{row.path}</code>
+                            <code className="text-sm text-accent/90">{row.path}</code>
                           </td>
                           <td className="px-4 py-3 font-medium text-gray-200">{row.title}</td>
                           <td className="px-4 py-3 text-sm text-gray-500">{row.note ?? '—'}</td>
@@ -469,7 +469,7 @@ export default function DevStaticPagesPage() {
                                 type="button"
                                 disabled={editLoading}
                                 onClick={() => startCmsOverride(cms, row.title)}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-primary/90 hover:bg-primary disabled:opacity-50 text-white transition-colors"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-accent/90 hover:bg-accent disabled:opacity-50 text-dark transition-colors"
                                 title={`CMS slug: ${cms}`}
                               >
                                 <Pencil className="w-3.5 h-3.5" />
@@ -480,7 +480,7 @@ export default function DevStaticPagesPage() {
                                 type="button"
                                 disabled={editLoading}
                                 onClick={() => startCmsOverrideWithPrefix(prefix, row.title)}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-primary/90 hover:bg-primary disabled:opacity-50 text-white transition-colors"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-accent/90 hover:bg-accent disabled:opacity-50 text-dark transition-colors"
                                 title={`Doplňte slug za „${prefix}“ podľa poznámky v stĺpci Poznámka`}
                               >
                                 <Pencil className="w-3.5 h-3.5" />
@@ -542,7 +542,7 @@ export default function DevStaticPagesPage() {
                   <button
                     type="button"
                     onClick={openNewForm}
-                    className="text-primary hover:underline"
+                    className="text-accent hover:underline"
                   >
                     Vytvoriť prvú CMS stránku
                   </button>
@@ -550,7 +550,7 @@ export default function DevStaticPagesPage() {
                 {loadError && (
                   <button
                     onClick={() => loadPages()}
-                    className="text-primary hover:underline"
+                    className="text-accent hover:underline"
                   >
                     Obnoviť zoznam
                   </button>

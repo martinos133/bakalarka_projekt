@@ -9,7 +9,7 @@
 
   body {
     color: rgba(255, 255, 255, 0.9);
-    background: rgb(10, 10, 10);
+    background: #0a0a0a;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -82,9 +82,9 @@
   input[type="datetime-local"]:focus,
   textarea:focus {
     outline: none;
-    border-color: rgba(36, 99, 235, 0.5);
+    border-color: rgba(201, 169, 110, 0.5);
     background-color: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.1);
   }
 
   select::placeholder,
@@ -93,7 +93,6 @@
     color: rgba(255, 255, 255, 0.42);
   }
 
-  /* Select custom arrow */
   select {
     padding-right: 2.25rem;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(156,163,175,0.8)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
@@ -103,14 +102,12 @@
     cursor: pointer;
   }
 
-  /* Select option styling (works in Chromium) */
   option {
     background-color: rgb(28, 28, 28);
     color: white;
     padding: 8px 12px;
   }
 
-  /* Checkbox & radio */
   input[type="checkbox"],
   input[type="radio"] {
     appearance: none;
@@ -135,49 +132,46 @@
 
   input[type="checkbox"]:hover,
   input[type="radio"]:hover {
-    border-color: rgba(36, 99, 235, 0.5);
+    border-color: rgba(201, 169, 110, 0.5);
     background-color: rgba(255, 255, 255, 0.06);
   }
 
   input[type="checkbox"]:checked {
-    background-color: rgb(36, 99, 235);
-    border-color: rgb(36, 99, 235);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+    background-color: #c9a96e;
+    border-color: #c9a96e;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: center;
     background-size: 0.75rem;
   }
 
   input[type="radio"]:checked {
-    background-color: rgb(36, 99, 235);
-    border-color: rgb(36, 99, 235);
+    background-color: #c9a96e;
+    border-color: #c9a96e;
     box-shadow: inset 0 0 0 3px rgb(28, 28, 28);
   }
 
   input[type="checkbox"]:focus,
   input[type="radio"]:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.15);
+    box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.15);
   }
 
   input[type="checkbox"]:checked:focus {
-    box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.25);
+    box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.25);
   }
 
-  /* Date input icon */
   input[type="date"]::-webkit-calendar-picker-indicator,
   input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     filter: invert(0.6);
     cursor: pointer;
   }
 
-  /* Number input spinners */
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     opacity: 0.3;
   }
 
-  /* Table base */
   table {
     border-collapse: separate;
     border-spacing: 0;
@@ -217,13 +211,13 @@
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
   .pill-green {
-    @apply pill bg-emerald-500/10 text-emerald-400;
+    @apply pill text-accent;
+    background-color: rgba(201, 169, 110, 0.1);
   }
   .pill-red {
     @apply pill bg-red-500/10 text-red-400;
   }
 
-  /* ── Modal overlay ── */
   .modal-overlay {
     @apply fixed inset-0 z-50 flex items-center justify-center p-4;
     background: rgba(0, 0, 0, 0.7);
@@ -232,7 +226,6 @@
     animation: fadeIn 0.15s ease-out;
   }
 
-  /* ── Modal panel ── */
   .modal-panel {
     @apply bg-card border border-white/[0.08] rounded-2xl shadow-2xl w-full overflow-hidden;
     animation: slideUp 0.2s ease-out;
@@ -243,18 +236,17 @@
   .modal-panel-lg { @apply modal-panel max-w-2xl; }
   .modal-panel-xl { @apply modal-panel max-w-4xl; }
 
-  /* ── Button styles ── */
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-150;
   }
   .btn-primary {
-    @apply btn bg-primary text-white hover:bg-blue-600 active:scale-[0.98];
+    @apply btn bg-accent text-dark hover:bg-accent-light active:scale-[0.98];
   }
   .btn-danger {
     @apply btn bg-red-600 text-white hover:bg-red-700 active:scale-[0.98];
   }
   .btn-success {
-    @apply btn bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.98];
+    @apply btn bg-accent text-dark hover:bg-accent-dark active:scale-[0.98];
   }
   .btn-ghost {
     @apply btn bg-transparent text-gray-300 hover:bg-white/[0.06] hover:text-white;
@@ -263,11 +255,11 @@
     @apply btn bg-transparent text-gray-300 border border-white/[0.08] hover:bg-white/[0.06] hover:text-white hover:border-white/[0.15];
   }
 
-  /* ── High-contrast inputs (use this everywhere) ── */
   .input {
     @apply w-full bg-white/[0.12] border border-white/[0.12] rounded-xl px-4 py-2.5 text-white text-sm;
     @apply placeholder-white/70;
-    @apply focus:outline-none focus:border-primary/60 focus:bg-white/[0.14];
+    @apply focus:outline-none focus:bg-white/[0.14];
+    &:focus { border-color: rgba(201, 169, 110, 0.6); }
   }
 
   .input-icon-left {

@@ -7,8 +7,8 @@ import DashboardLayout from '@/components/DashboardLayout'
 import AlertDialog from '@/components/AlertDialog'
 import { api } from '@/lib/api'
 import { Category, Filter } from '@inzertna-platforma/shared'
-import {
 import Select from '@/components/Select'
+import {
   Filter as FilterIcon,
   Plus,
   Edit,
@@ -397,7 +397,7 @@ export default function DevFiltersPage() {
                 }
                 addBatchRow()
               }}
-              className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-xl flex items-center space-x-2 transition-colors"
+              className="bg-accent hover:opacity-90 text-dark px-4 py-2 rounded-xl flex items-center space-x-2 transition-colors"
             >
               <Plus className="w-5 h-5" />
               <span>Pridať pole</span>
@@ -450,7 +450,7 @@ export default function DevFiltersPage() {
                   <button
                     type="button"
                     onClick={addBatchRow}
-                    className="mt-4 inline-flex items-center gap-2 text-primary hover:text-primary/90 font-medium text-sm transition-colors"
+                    className="mt-4 inline-flex items-center gap-2 text-accent hover:text-accent/90 font-medium text-sm transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Pridať prvý riadok
@@ -477,7 +477,7 @@ export default function DevFiltersPage() {
                               value={row.name}
                               onChange={(e) => updateBatchRow(row.id, 'name', e.target.value)}
                               placeholder="napr. Výkon (kW)"
-                              className="w-full max-w-xs bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
+                              className="w-full max-w-xs bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-accent transition-shadow"
                             />
                           </td>
                           <td className="py-2.5 px-4 align-middle">
@@ -503,7 +503,7 @@ export default function DevFiltersPage() {
                                 onChange={(e) => updateBatchRow(row.id, 'isRequired', e.target.checked)}
                                 className="sr-only peer"
                               />
-                              <span className="flex items-center justify-center w-5 h-5 rounded border-2 border-gray-500 bg-dark text-transparent peer-checked:bg-primary peer-checked:border-primary peer-checked:text-white transition-colors hover:border-gray-400">
+                              <span className="flex items-center justify-center w-5 h-5 rounded border-2 border-gray-500 bg-dark text-transparent peer-checked:bg-accent peer-checked:border-accent peer-checked:text-dark transition-colors hover:border-gray-400">
                                 <Check className="w-3 h-3" strokeWidth={3} />
                               </span>
                             </label>
@@ -515,7 +515,7 @@ export default function DevFiltersPage() {
                                 value={row.optionsInput}
                                 onChange={(e) => updateBatchRow(row.id, 'optionsInput', e.target.value)}
                                 placeholder="možnosť1, možnosť2, …"
-                                className="w-full max-w-xs bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
+                                className="w-full max-w-xs bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-accent transition-shadow"
                               />
                             ) : (
                               <span className="text-gray-600 text-xs">—</span>
@@ -551,7 +551,7 @@ export default function DevFiltersPage() {
                     type="button"
                     onClick={saveAllBatch}
                     disabled={batchSaving}
-                    className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-white hover:opacity-90 disabled:opacity-50 text-sm font-medium transition-opacity"
+                    className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-accent text-dark hover:opacity-90 disabled:opacity-50 text-sm font-medium transition-opacity"
                   >
                     {batchSaving ? (
                       <>
@@ -641,7 +641,7 @@ export default function DevFiltersPage() {
                       setFormState((prev) => ({ ...prev, name: e.target.value }))
                     }
                     placeholder="Napríklad: Výkon (kW), Výmera (m²), Počet izieb..."
-                    className="input px-4 py-2.5 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
+                    className="input px-4 py-2.5 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-accent transition-shadow"
                   />
                 </div>
 
@@ -658,7 +658,7 @@ export default function DevFiltersPage() {
                         setFormState((prev) => ({ ...prev, optionsInput: e.target.value }))
                       }
                       placeholder="Napríklad: Benzín, Nafta, Hybrid, Elektro"
-                      className="input px-4 py-2.5 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
+                      className="input px-4 py-2.5 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-accent transition-shadow"
                     />
                   </div>
                 )}
@@ -672,7 +672,7 @@ export default function DevFiltersPage() {
                       onChange={(e) =>
                         setFormState((prev) => ({ ...prev, isRequired: e.target.checked }))
                       }
-                      className="w-4 h-4 rounded bg-dark border-card text-primary"
+                      className="w-4 h-4 rounded bg-dark border-card text-accent"
                     />
                     <span className="text-sm text-gray-300">Povinné pole</span>
                   </label>
@@ -699,7 +699,7 @@ export default function DevFiltersPage() {
                         }
                         rows={2}
                         placeholder="Krátke vysvetlenie pre tvorcu inzerátu (napr. čo presne má zadať)."
-                        className="input px-4 py-2.5 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
+                        className="input px-4 py-2.5 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-accent transition-shadow"
                       />
                     </div>
 
@@ -712,7 +712,7 @@ export default function DevFiltersPage() {
                           onChange={(e) =>
                             setFormState((prev) => ({ ...prev, isActive: e.target.checked }))
                           }
-                          className="w-4 h-4 rounded bg-dark border-card text-primary"
+                          className="w-4 h-4 rounded bg-dark border-card text-accent"
                         />
                         <span className="text-sm text-gray-300">Aktívne (zobrazuje sa)</span>
                       </label>
@@ -731,7 +731,7 @@ export default function DevFiltersPage() {
                             }))
                           }
                           placeholder="1, 2, 3..."
-                          className="input px-4 py-2.5 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
+                          className="input px-4 py-2.5 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-accent transition-shadow"
                         />
                       </div>
                     </div>
@@ -749,7 +749,7 @@ export default function DevFiltersPage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-4 py-2 bg-primary hover:opacity-90 disabled:opacity-60 text-white rounded-xl flex items-center space-x-2 transition-colors"
+                    className="px-4 py-2 bg-accent hover:opacity-90 disabled:opacity-60 text-dark rounded-xl flex items-center space-x-2 transition-colors"
                   >
                     <Save className="w-4 h-4" />
                     <span>{formState.id ? 'Uložiť' : 'Vytvoriť'}</span>
@@ -772,7 +772,7 @@ export default function DevFiltersPage() {
                   <div className="mt-4">
                     <button
                       onClick={addBatchRow}
-                      className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-xl inline-flex items-center gap-2 transition-colors"
+                      className="bg-accent hover:opacity-90 text-dark px-4 py-2 rounded-xl inline-flex items-center gap-2 transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       Pridať prvé pole
@@ -879,7 +879,7 @@ export default function DevFiltersPage() {
                                     ;(e.target as HTMLInputElement).blur()
                                   }
                                 }}
-                                className="w-16 bg-white/[0.06] border border-white/[0.06] rounded-xl px-2 py-1.5 text-white text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary disabled:opacity-50"
+                                className="w-16 bg-white/[0.06] border border-white/[0.06] rounded-xl px-2 py-1.5 text-white text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-accent disabled:opacity-50"
                               />
                               {savingOrder && (
                                 <span className="inline-block w-3.5 h-3.5 border-2 border-gray-500 border-t-primary rounded-full animate-spin shrink-0" />
@@ -890,7 +890,7 @@ export default function DevFiltersPage() {
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => startEdit(filter)}
-                                className="p-2 text-blue-400 hover:text-blue-300 hover:bg-cardHover rounded transition-colors"
+                                className="p-2 text-accent hover:text-accent-light hover:bg-cardHover rounded transition-colors"
                                 title="Upraviť"
                               >
                                 <Edit className="w-4 h-4" />

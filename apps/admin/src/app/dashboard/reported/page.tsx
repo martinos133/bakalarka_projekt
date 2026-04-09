@@ -271,7 +271,7 @@ export default function ReportedAdvertisementsPage() {
                     value={filters.search}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                     placeholder="Názov inzerátu, popis..."
-                    className="input px-4 py-2 pl-10 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover text-sm"
+                    className="input px-4 py-2 pl-10 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover text-sm"
                   />
                 </div>
               </div>
@@ -532,7 +532,7 @@ export default function ReportedAdvertisementsPage() {
                       value={resolutionNote}
                       onChange={(e) => setResolutionNote(e.target.value)}
                       placeholder="Zadajte poznámku k vyriešeniu nahlásenia..."
-                      className="input px-4 py-3 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 resize-none"
+                      className="input px-4 py-3 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 resize-none"
                       rows={4}
                     />
                   </div>
@@ -565,7 +565,7 @@ export default function ReportedAdvertisementsPage() {
                       </button>
                       <button
                         onClick={() => handleResolve(selectedReport.id, ReportStatus.RESOLVED)}
-                        className="px-4 py-2 bg-primary hover:opacity-90 rounded-xl transition-colors"
+                        className="px-4 py-2 bg-accent hover:opacity-90 rounded-xl transition-colors"
                       >
                         Vyriešiť nahlásenie
                       </button>
@@ -610,7 +610,7 @@ export default function ReportedAdvertisementsPage() {
                       value={resolutionNote}
                       onChange={(e) => setResolutionNote(e.target.value)}
                       placeholder="Zadajte poznámku k vyriešeniu nahlásenia..."
-                      className="input px-4 py-3 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 resize-none"
+                      className="input px-4 py-3 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 resize-none"
                       rows={4}
                     />
                   </div>
@@ -621,7 +621,7 @@ export default function ReportedAdvertisementsPage() {
                         type="checkbox"
                         checked={banUser}
                         onChange={(e) => setBanUser(e.target.checked)}
-                        className="w-5 h-5 rounded border-card bg-dark text-primary focus:ring-primary focus:ring-offset-dark"
+                        className="w-5 h-5 rounded border-card bg-dark text-accent focus:ring-primary focus:ring-offset-dark"
                       />
                       <span className="text-sm font-medium text-white">
                         Zabanovať používateľa
@@ -658,7 +658,7 @@ export default function ReportedAdvertisementsPage() {
                             min="1"
                             value={banDurationValue}
                             onChange={(e) => setBanDurationValue(parseInt(e.target.value) || 1)}
-                            className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-primary/40"
+                            className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-accent/40"
                           />
                         </div>
                       )}
@@ -671,7 +671,7 @@ export default function ReportedAdvertisementsPage() {
                           value={banReason}
                           onChange={(e) => setBanReason(e.target.value)}
                           placeholder="Zadajte dôvod banu..."
-                          className="input px-4 py-3 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 resize-none"
+                          className="input px-4 py-3 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 resize-none"
                           rows={3}
                         />
                       </div>
@@ -694,7 +694,7 @@ export default function ReportedAdvertisementsPage() {
                     <button
                       onClick={handleConfirmResolve}
                       disabled={banUser && banDuration !== 'permanent' && (!banDurationValue || banDurationValue <= 0)}
-                      className="px-4 py-2 bg-primary hover:opacity-90 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-xl transition-colors text-sm font-medium text-white"
+                      className="px-4 py-2 bg-accent hover:opacity-90 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-xl transition-colors text-sm font-medium text-dark"
                     >
                       Potvrdiť vyriešenie
                     </button>
@@ -752,14 +752,14 @@ export default function ReportedAdvertisementsPage() {
                         ? 'bg-green-500/20'
                         : alertModal.type === 'error'
                         ? 'bg-red-500/20'
-                        : 'bg-blue-500/20'
+                        : 'bg-accent/20'
                     }`}>
                       {alertModal.type === 'success' ? (
                         <Check className="w-6 h-6 text-green-400" />
                       ) : alertModal.type === 'error' ? (
                         <X className="w-6 h-6 text-red-400" />
                       ) : (
-                        <AlertCircle className="w-6 h-6 text-blue-400" />
+                        <AlertCircle className="w-6 h-6 text-accent" />
                       )}
                     </div>
                     <div className="flex-1">
@@ -776,7 +776,7 @@ export default function ReportedAdvertisementsPage() {
                       <div className="flex items-center justify-end">
                         <button
                           onClick={() => setAlertModal({ ...alertModal, show: false })}
-                          className="px-4 py-2 bg-primary hover:opacity-90 rounded-xl transition-colors text-sm font-medium text-white"
+                          className="px-4 py-2 bg-accent hover:opacity-90 rounded-xl transition-colors text-sm font-medium text-dark"
                         >
                           OK
                         </button>

@@ -144,8 +144,8 @@ export default function CategoriesPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className="card p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-primary/20">
-                  <FolderTree className="w-5 h-5 text-primary" />
+                <div className="p-2 rounded-xl bg-accent/20">
+                  <FolderTree className="w-5 h-5 text-accent" />
                 </div>
                 <div>
                   <span className="text-xs text-gray-400">Celkom kategórií</span>
@@ -155,8 +155,8 @@ export default function CategoriesPage() {
             </div>
             <div className="card p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-blue-500/20">
-                  <FolderOpen className="w-5 h-5 text-blue-400" />
+                <div className="p-2 rounded-xl bg-accent/20">
+                  <FolderOpen className="w-5 h-5 text-accent" />
                 </div>
                 <div>
                   <span className="text-xs text-gray-400">Hlavné kategórie</span>
@@ -266,7 +266,7 @@ export default function CategoriesPage() {
               <div className="p-4 grid grid-cols-2 gap-4">
                 <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                    <span className="w-2 h-2 rounded-full bg-accent shrink-0" />
                     <span className="text-sm font-medium text-gray-300">Hlavné</span>
                   </div>
                   <div className="text-2xl font-bold text-gray-200 tabular-nums">{mainCategories.length}</div>
@@ -274,7 +274,7 @@ export default function CategoriesPage() {
                   {categories.length > 0 && (
                     <div className="mt-2 h-1.5 rounded-full bg-dark overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-blue-500 transition-all"
+                        className="h-full rounded-full bg-accent transition-all"
                         style={{ width: `${(mainCategories.length / categories.length) * 100}%` }}
                       />
                     </div>
@@ -389,7 +389,7 @@ export default function CategoriesPage() {
                     value={filters.search}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                     placeholder="Názov, slug..."
-                    className="input px-4 py-2 pl-10 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                    className="input px-4 py-2 pl-10 text-white text-sm placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                   />
                 </div>
               </div>
@@ -471,7 +471,7 @@ export default function CategoriesPage() {
                           <td className="px-6 py-4">
                             <span
                               className={`px-2 py-1 rounded text-xs font-medium ${
-                                cat.parentId ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'
+                                cat.parentId ? 'bg-purple-500/20 text-purple-400' : 'bg-accent/20 text-accent'
                               }`}
                             >
                               {cat.parentId ? 'Podkategória' : 'Hlavná'}
@@ -496,7 +496,7 @@ export default function CategoriesPage() {
                           <td className="px-6 py-4 text-right">
                             <Link
                               href={`/dashboard/specifications?categoryId=${encodeURIComponent(cat.id)}`}
-                              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+                              className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
                             >
                               <ListChecks className="w-4 h-4 shrink-0" />
                               Upraviť

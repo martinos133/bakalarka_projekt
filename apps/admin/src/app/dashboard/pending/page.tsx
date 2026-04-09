@@ -215,7 +215,7 @@ export default function PendingAdvertisementsPage() {
                     value={filters.search}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                     placeholder="Názov, popis, používateľ..."
-                    className="input px-4 py-2 pl-10 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover text-sm"
+                    className="input px-4 py-2 pl-10 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover text-sm"
                   />
                 </div>
               </div>
@@ -238,7 +238,7 @@ export default function PendingAdvertisementsPage() {
                   placeholder="0"
                   min="0"
                   step="0.01"
-                  className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-primary/40 hover:bg-cardHover placeholder-white/70"
+                  className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-accent/40 hover:bg-cardHover placeholder-white/70"
                 />
               </div>
               <div>
@@ -250,7 +250,7 @@ export default function PendingAdvertisementsPage() {
                   placeholder="∞"
                   min="0"
                   step="0.01"
-                  className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-primary/40 hover:bg-cardHover placeholder-white/70"
+                  className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-accent/40 hover:bg-cardHover placeholder-white/70"
                 />
               </div>
               <div>
@@ -260,7 +260,7 @@ export default function PendingAdvertisementsPage() {
                   value={filters.location}
                   onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                   placeholder="Mesto, región..."
-                  className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-primary/40 hover:bg-cardHover placeholder-white/70"
+                  className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-accent/40 hover:bg-cardHover placeholder-white/70"
                 />
               </div>
             </div>
@@ -515,7 +515,7 @@ export default function PendingAdvertisementsPage() {
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="Zadajte dôvod zamietnutia inzerátu..."
-                      className="input px-4 py-3 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 resize-none"
+                      className="input px-4 py-3 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 resize-none"
                       rows={4}
                     />
                   </div>
@@ -541,7 +541,7 @@ export default function PendingAdvertisementsPage() {
                     </button>
                     <button
                       onClick={() => handleApprove(selectedAd.id)}
-                      className="px-4 py-2 bg-primary hover:opacity-90 rounded-xl transition-colors"
+                      className="px-4 py-2 bg-accent hover:opacity-90 rounded-xl transition-colors"
                     >
                       Schváliť
                     </button>
@@ -586,7 +586,7 @@ export default function PendingAdvertisementsPage() {
                           onClick={confirmModal.onConfirm}
                           className={`px-4 py-2 rounded-xl transition-colors text-sm font-medium text-white ${
                             confirmModal.type === 'approve'
-                              ? 'bg-primary hover:opacity-90'
+                              ? 'bg-accent hover:opacity-90'
                               : 'bg-red-600 hover:bg-red-700'
                           }`}
                         >
@@ -611,14 +611,14 @@ export default function PendingAdvertisementsPage() {
                         ? 'bg-green-500/20'
                         : alertModal.type === 'error'
                         ? 'bg-red-500/20'
-                        : 'bg-blue-500/20'
+                        : 'bg-accent/20'
                     }`}>
                       {alertModal.type === 'success' ? (
                         <Check className="w-6 h-6 text-green-400" />
                       ) : alertModal.type === 'error' ? (
                         <X className="w-6 h-6 text-red-400" />
                       ) : (
-                        <AlertCircle className="w-6 h-6 text-blue-400" />
+                        <AlertCircle className="w-6 h-6 text-accent" />
                       )}
                     </div>
                     <div className="flex-1">
@@ -635,7 +635,7 @@ export default function PendingAdvertisementsPage() {
                       <div className="flex items-center justify-end">
                         <button
                           onClick={() => setAlertModal({ ...alertModal, show: false })}
-                          className="px-4 py-2 bg-primary hover:opacity-90 rounded-xl transition-colors text-sm font-medium text-white"
+                          className="px-4 py-2 bg-accent hover:opacity-90 rounded-xl transition-colors text-sm font-medium text-dark"
                         >
                           OK
                         </button>

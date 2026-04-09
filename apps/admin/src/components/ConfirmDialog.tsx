@@ -22,14 +22,14 @@ const variantConfig = {
   },
   success: {
     icon: CheckCircle2,
-    iconBg: 'bg-emerald-500/10',
-    iconColor: 'text-emerald-400',
+    iconBg: 'bg-accent/10',
+    iconColor: 'text-accent',
     btnClass: 'btn-success',
   },
   default: {
     icon: HelpCircle,
-    iconBg: 'bg-primary/10',
-    iconColor: 'text-primary',
+    iconBg: 'bg-accent/10',
+    iconColor: 'text-accent',
     btnClass: 'btn-primary',
   },
 }

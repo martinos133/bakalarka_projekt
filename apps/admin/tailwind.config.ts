@@ -13,10 +13,21 @@ const config: Config = {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
       },
       colors: {
-        dark: 'rgb(10,10,10)',
+        dark: {
+          DEFAULT: '#0a0a0a',
+          50: '#141414',
+          100: '#1a1a1a',
+          200: '#222222',
+          300: '#2a2a2a',
+        },
         card: 'rgb(28,28,28)',
         cardHover: 'rgb(38,38,38)',
-        primary: 'rgb(36,99,235)',
+        accent: {
+          DEFAULT: '#c9a96e',
+          light: '#dfc9a0',
+          dark: '#a8884e',
+        },
+        primary: '#c9a96e',
         surface: 'rgb(22,22,22)',
         muted: 'rgb(156,163,175)',
       },

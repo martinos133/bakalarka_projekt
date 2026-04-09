@@ -586,7 +586,7 @@ export default function DevCategoriesPage() {
                       value={filterData.search}
                       onChange={(e) => setFilterData({ ...filterData, search: e.target.value })}
                       placeholder="Vyhľadať kategórie..."
-                      className="input pl-10 pr-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 text-sm"
+                      className="input pl-10 pr-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 text-sm"
                     />
                   </div>
                 </div>
@@ -624,14 +624,14 @@ export default function DevCategoriesPage() {
                     value={filterData.minAdvertisements}
                     onChange={(e) => setFilterData({ ...filterData, minAdvertisements: e.target.value })}
                     placeholder="Min inz."
-                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
+                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-accent/40"
                   />
                   <input
                     type="number"
                     value={filterData.maxAdvertisements}
                     onChange={(e) => setFilterData({ ...filterData, maxAdvertisements: e.target.value })}
                     placeholder="Max inz."
-                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
+                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-accent/40"
                   />
                 </div>
 
@@ -642,14 +642,14 @@ export default function DevCategoriesPage() {
                     value={filterData.minSubcategories}
                     onChange={(e) => setFilterData({ ...filterData, minSubcategories: e.target.value })}
                     placeholder="Min pod."
-                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
+                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-accent/40"
                   />
                   <input
                     type="number"
                     value={filterData.maxSubcategories}
                     onChange={(e) => setFilterData({ ...filterData, maxSubcategories: e.target.value })}
                     placeholder="Max pod."
-                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
+                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-accent/40"
                   />
                 </div>
 
@@ -660,14 +660,14 @@ export default function DevCategoriesPage() {
                     value={filterData.minFilters}
                     onChange={(e) => setFilterData({ ...filterData, minFilters: e.target.value })}
                     placeholder="Min filt."
-                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
+                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-accent/40"
                   />
                   <input
                     type="number"
                     value={filterData.maxFilters}
                     onChange={(e) => setFilterData({ ...filterData, maxFilters: e.target.value })}
                     placeholder="Max filt."
-                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
+                    className="w-24 bg-white/[0.06] border border-white/[0.06] rounded-xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-accent/40"
                   />
                 </div>
 
@@ -690,7 +690,7 @@ export default function DevCategoriesPage() {
                   </div>
                   <button
                     onClick={() => setShowForm(true)}
-                    className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-xl flex items-center space-x-2 transition-colors whitespace-nowrap"
+                    className="bg-accent hover:opacity-90 text-dark px-4 py-2 rounded-xl flex items-center space-x-2 transition-colors whitespace-nowrap"
                   >
                     <Plus className="w-5 h-5" />
                     <span>Nová kategória</span>
@@ -726,7 +726,7 @@ export default function DevCategoriesPage() {
                       value={formData.name}
                       onChange={(e) => handleNameChange(e.target.value)}
                       placeholder="Napríklad: Autá, Nehnuteľnosti, Elektronika..."
-                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                     />
                   </div>
 
@@ -765,7 +765,7 @@ export default function DevCategoriesPage() {
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                     placeholder="Automaticky generovaný z názvu..."
-                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                   />
                   <p className="mt-1 text-xs text-gray-400">
                     URL-friendly identifikátor kategórie (automaticky generovaný z názvu)
@@ -781,7 +781,7 @@ export default function DevCategoriesPage() {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
                     placeholder="Krátky popis kategórie..."
-                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                   />
                 </div>
 
@@ -835,7 +835,7 @@ export default function DevCategoriesPage() {
                         value={formData.bannerAlt}
                         onChange={(e) => setFormData({ ...formData, bannerAlt: e.target.value })}
                         placeholder="Alt text pre banner (SEO)"
-                        className="input px-4 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                        className="input px-4 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         Popis bannera pre vyhľadávače a prístupnosť
@@ -898,7 +898,7 @@ export default function DevCategoriesPage() {
                       value={formData.icon}
                       onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
                       placeholder="Napríklad: Car, Home, Smartphone..."
-                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                     />
                   </div>
 
@@ -911,7 +911,7 @@ export default function DevCategoriesPage() {
                       value={formData.color}
                       onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                       placeholder="#3b82f6"
-                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                     />
                   </div>
                 </div>
@@ -933,7 +933,7 @@ export default function DevCategoriesPage() {
                         value={formData.imageAlt}
                         onChange={(e) => setFormData({ ...formData, imageAlt: e.target.value })}
                         placeholder="Napríklad: Logo kategórie Autá a motocykle"
-                        className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                        className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         Popis obrázka pre vyhľadávače a používateľov so zrakovým postihnutím
@@ -951,7 +951,7 @@ export default function DevCategoriesPage() {
                         onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
                         placeholder="Napríklad: Autá a motocykle na predaj - Najlepšie ponuky"
                         maxLength={60}
-                        className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                        className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         {formData.metaTitle.length}/60 znakov (odporúčané: 50-60 znakov)
@@ -969,7 +969,7 @@ export default function DevCategoriesPage() {
                         placeholder="Napríklad: Nájdite najlepšie autá a motocykle na predaj. Tisíce inzerátov od overených predajcov. Rýchle vyhľadávanie a jednoduchá komunikácia."
                         maxLength={160}
                         rows={3}
-                        className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                        className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         {formData.metaDescription.length}/160 znakov (odporúčané: 150-160 znakov)
@@ -986,7 +986,7 @@ export default function DevCategoriesPage() {
                         value={formData.metaKeywords}
                         onChange={(e) => setFormData({ ...formData, metaKeywords: e.target.value })}
                         placeholder="Napríklad: autá, motocykle, predaj áut, ojazdené autá, nové autá"
-                        className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                        className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         Kľúčové slová oddelené čiarkou (napr: autá, motocykle, predaj)
@@ -1078,7 +1078,7 @@ export default function DevCategoriesPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-primary hover:opacity-90 text-white rounded-xl flex items-center space-x-2 transition-colors"
+                    className="px-4 py-2 bg-accent hover:opacity-90 text-dark rounded-xl flex items-center space-x-2 transition-colors"
                   >
                     <Save className="w-4 h-4" />
                     <span>{editingId ? 'Uložiť zmeny' : 'Vytvoriť'}</span>
@@ -1119,7 +1119,7 @@ export default function DevCategoriesPage() {
                           isFirst ? 'rounded-t-lg' : ''
                         } ${shouldRoundBottom ? 'rounded-b-xl' : ''} ${
                           draggedCategoryId === category.id 
-                            ? 'border-primary opacity-50 scale-95' 
+                            ? 'border-accent opacity-50 scale-95' 
                             : draggedOverCategoryId === category.id
                             ? 'border-green-500 border-2 scale-105'
                             : 'border-white/[0.06] border-t-0'
@@ -1181,7 +1181,7 @@ export default function DevCategoriesPage() {
                             {children.length > 0 && (
                               <>
                                 <div className="flex-shrink-0 text-gray-600">•</div>
-                                <div className="flex-shrink-0 text-sm text-blue-400 font-medium">
+                                <div className="flex-shrink-0 text-sm text-accent font-medium">
                                   <span className="whitespace-nowrap">{children.length} {children.length === 1 ? 'podkategória' : children.length < 5 ? 'podkategórie' : 'podkategórií'}</span>
                                 </div>
                               </>
@@ -1236,7 +1236,7 @@ export default function DevCategoriesPage() {
                               </button>
                               <button
                                 onClick={() => handleEdit(category)}
-                                className="p-2 text-blue-400 hover:text-blue-300 hover:bg-cardHover rounded transition-colors"
+                                className="p-2 text-accent hover:text-accent-light hover:bg-cardHover rounded transition-colors"
                                 title="Upraviť"
                               >
                                 <Edit className="w-4 h-4" />
@@ -1317,7 +1317,7 @@ export default function DevCategoriesPage() {
                                         setFormData({ ...formData, name, slug })
                                       }}
                                       placeholder="Názov podkategórie *"
-                                      className="w-full bg-card border border-white/[0.06] rounded-2xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
+                                      className="w-full bg-card border border-white/[0.06] rounded-2xl px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-accent/40"
                                     />
                                     <input
                                       type="text"
@@ -1325,14 +1325,14 @@ export default function DevCategoriesPage() {
                                       value={formData.slug}
                                       onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                                       placeholder="Slug (automaticky generovaný) *"
-                                      className="input px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
+                                      className="input px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-accent/40"
                                     />
                                     <input
                                       type="text"
                                       value={formData.description}
                                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                       placeholder="Popis (voliteľné)"
-                                      className="input px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-primary/40"
+                                      className="input px-3 py-2 text-white placeholder-white/70 text-sm focus:outline-none focus:border-accent/40"
                                     />
                                   </div>
                                   <div className="flex items-center justify-end space-x-2">
@@ -1364,7 +1364,7 @@ export default function DevCategoriesPage() {
                                     </button>
                                     <button
                                       type="submit"
-                                      className="px-3 py-1.5 bg-primary hover:opacity-90 text-white rounded-xl text-sm flex items-center space-x-1 transition-colors"
+                                      className="px-3 py-1.5 bg-accent hover:opacity-90 text-dark rounded-xl text-sm flex items-center space-x-1 transition-colors"
                                     >
                                       <Save className="w-3 h-3" />
                                       <span>Vytvoriť</span>
@@ -1382,7 +1382,7 @@ export default function DevCategoriesPage() {
                                     key={child.id}
                                     className={`flex items-center gap-3 p-3 rounded-xl transition-all cursor-move ${
                                       draggedCategoryId === child.id 
-                                        ? 'bg-primary/20 opacity-50 border-2 border-primary scale-95' 
+                                        ? 'bg-accent/20 opacity-50 border-2 border-accent scale-95' 
                                         : draggedOverCategoryId === child.id
                                         ? 'bg-green-500/20 border-2 border-green-500 scale-105'
                                         : 'bg-white/[0.06] hover:bg-white/[0.06] border border-white/[0.06]'
@@ -1431,7 +1431,7 @@ export default function DevCategoriesPage() {
                                     <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
                                       <button
                                         onClick={() => handleEdit(child)}
-                                        className="p-1.5 text-blue-400 hover:text-blue-300 hover:bg-cardHover rounded transition-colors"
+                                        className="p-1.5 text-accent hover:text-accent-light hover:bg-cardHover rounded transition-colors"
                                         title="Upraviť"
                                       >
                                         <Edit className="w-4 h-4" />

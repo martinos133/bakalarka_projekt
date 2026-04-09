@@ -140,11 +140,11 @@ export default function RichTextEditor({
         }
         .blog-editor .ql-toolbar button:hover .ql-stroke,
         .blog-editor .ql-toolbar button.ql-active .ql-stroke {
-          stroke: #1dbf73;
+          stroke: #c9a96e;
         }
         .blog-editor .ql-toolbar button:hover .ql-fill,
         .blog-editor .ql-toolbar button.ql-active .ql-fill {
-          fill: #1dbf73;
+          fill: #c9a96e;
         }
       `}</style>
     </div>

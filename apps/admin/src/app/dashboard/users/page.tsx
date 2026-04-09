@@ -305,8 +305,8 @@ export default function UsersPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className="card p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-primary/20">
-                  <Users className="w-5 h-5 text-primary" />
+                <div className="p-2 rounded-xl bg-accent/20">
+                  <Users className="w-5 h-5 text-accent" />
                 </div>
                 <div>
                   <span className="text-xs text-gray-400">Celkom používateľov</span>
@@ -371,14 +371,14 @@ export default function UsersPage() {
                 </div>
                 <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                    <span className="w-2 h-2 rounded-full bg-accent shrink-0" />
                     <span className="text-sm font-medium text-gray-300">Používateľ</span>
                   </div>
                   <div className="text-2xl font-bold text-gray-200 tabular-nums">{byRole.user}</div>
                   <div className="text-xs text-gray-500 mt-0.5">používateľov</div>
                   {users.length > 0 && (
                     <div className="mt-2 h-1.5 rounded-full bg-dark overflow-hidden">
-                      <div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${(byRole.user / users.length) * 100}%` }} />
+                      <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${(byRole.user / users.length) * 100}%` }} />
                     </div>
                   )}
                 </div>
@@ -638,7 +638,7 @@ export default function UsersPage() {
                     value={filters.search}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                     placeholder="Meno, email..."
-                    className="input px-4 py-2 pl-10 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover text-sm"
+                    className="input px-4 py-2 pl-10 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover text-sm"
                   />
                 </div>
               </div>
@@ -700,7 +700,7 @@ export default function UsersPage() {
                   placeholder="napr. 18"
                   value={filters.minAge}
                   onChange={(e) => setFilters({ ...filters, minAge: e.target.value })}
-                  className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                  className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                 />
               </div>
               <div>
@@ -712,7 +712,7 @@ export default function UsersPage() {
                   placeholder="napr. 65"
                   value={filters.maxAge}
                   onChange={(e) => setFilters({ ...filters, maxAge: e.target.value })}
-                  className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                  className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                 />
               </div>
             </div>
@@ -804,7 +804,7 @@ export default function UsersPage() {
                             <span className={`px-2 py-1 rounded text-xs font-medium ${
                               user.role === 'ADMIN'
                                 ? 'bg-purple-500/20 text-purple-400'
-                                : 'bg-blue-500/20 text-blue-400'
+                                : 'bg-accent/20 text-accent'
                             }`}>
                               {user.role === 'ADMIN' ? 'Admin' : 'Používateľ'}
                             </span>
@@ -849,7 +849,7 @@ export default function UsersPage() {
                                     setLoadingStats(false)
                                   }
                                 }}
-                                className="p-2 text-blue-400 hover:text-blue-300 hover:bg-cardHover rounded transition-colors"
+                                className="p-2 text-accent hover:text-accent-light hover:bg-cardHover rounded transition-colors"
                                 title="Zobraziť detail"
                               >
                                 <Eye className="w-4 h-4" />
@@ -1022,7 +1022,7 @@ export default function UsersPage() {
                           <span className={`px-2 py-1 rounded text-xs font-medium ${
                             selectedUser.role === 'ADMIN'
                               ? 'bg-purple-500/20 text-purple-400'
-                              : 'bg-blue-500/20 text-blue-400'
+                              : 'bg-accent/20 text-accent'
                           }`}>
                             {selectedUser.role === 'ADMIN' ? 'Admin' : 'Používateľ'}
                           </span>
@@ -1074,7 +1074,7 @@ export default function UsersPage() {
                         {/* Inzeráty */}
                         <div className="bg-dark rounded-xl p-4 border border-card">
                           <div className="flex items-center space-x-2 mb-3">
-                            <FileText className="w-5 h-5 text-blue-400" />
+                            <FileText className="w-5 h-5 text-accent" />
                             <h4 className="font-semibold">Inzeráty</h4>
                           </div>
                           <div className="grid grid-cols-2 gap-4">
@@ -1115,7 +1115,7 @@ export default function UsersPage() {
                         {/* Platby - uskutočnené */}
                         <div className="bg-dark rounded-xl p-4 border border-card">
                           <div className="flex items-center space-x-2 mb-3">
-                            <TrendingDown className="w-5 h-5 text-blue-400" />
+                            <TrendingDown className="w-5 h-5 text-accent" />
                             <h4 className="font-semibold">Uskutočnené platby</h4>
                           </div>
                           <div className="grid grid-cols-2 gap-4">
@@ -1128,7 +1128,7 @@ export default function UsersPage() {
                             </div>
                             <div>
                               <label className="text-sm text-gray-400">Celková suma</label>
-                              <p className="text-2xl font-bold text-blue-400">
+                              <p className="text-2xl font-bold text-accent">
                                 {userStats.paymentsMadeAmount.toFixed(2)} €
                               </p>
                             </div>
@@ -1234,7 +1234,7 @@ export default function UsersPage() {
                         min="1"
                         value={banForm.days}
                         onChange={(e) => setBanForm({ ...banForm, days: parseInt(e.target.value) || 1 })}
-                        className="input px-4 py-2 text-white focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                        className="input px-4 py-2 text-white focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                       />
                     </div>
                   )}
@@ -1248,7 +1248,7 @@ export default function UsersPage() {
                       onChange={(e) => setBanForm({ ...banForm, reason: e.target.value })}
                       rows={3}
                       placeholder="Napríklad: Porušenie podmienok používania..."
-                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-primary/40 hover:bg-cardHover"
+                      className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
                     />
                   </div>
 

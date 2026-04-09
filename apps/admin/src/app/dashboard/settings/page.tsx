@@ -138,7 +138,7 @@ export default function SettingsPage() {
           </div>
 
           {successMessage && (
-            <div className="mb-6 px-4 py-3 bg-[#1dbf73]/20 border border-[#1dbf73] rounded-xl text-[#1dbf73] flex items-center gap-2">
+            <div className="mb-6 px-4 py-3 bg-accent/20 border border-accent rounded-xl text-accent flex items-center gap-2">
               <Save className="w-5 h-5 flex-shrink-0" />
               <span>{successMessage}</span>
             </div>
@@ -155,7 +155,7 @@ export default function SettingsPage() {
               ) : (
                 <ChevronRight className="w-5 h-5 text-gray-400" />
               )}
-              <Globe className="w-5 h-5 text-[#1dbf73]" />
+              <Globe className="w-5 h-5 text-accent" />
               <span className="font-semibold">Nastavenia platformy</span>
             </button>
             {expandedPlatform && (
@@ -306,7 +306,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleSavePlatform}
                   disabled={saving}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#1dbf73] text-white rounded-xl hover:bg-[#19a463] transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2 bg-accent text-dark rounded-xl hover:bg-accent-dark transition-colors disabled:opacity-50"
                 >
                   <Save className="w-4 h-4" />
                   Uložiť nastavenia platformy
@@ -326,7 +326,7 @@ export default function SettingsPage() {
               ) : (
                 <ChevronRight className="w-5 h-5 text-gray-400" />
               )}
-              <Shield className="w-5 h-5 text-[#1dbf73]" />
+              <Shield className="w-5 h-5 text-accent" />
               <span className="font-semibold">Nastavenia adminu</span>
             </button>
             {expandedAdmin && (
@@ -394,7 +394,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleSaveAdmin}
                   disabled={saving}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#1dbf73] text-white rounded-xl hover:bg-[#19a463] transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2 bg-accent text-dark rounded-xl hover:bg-accent-dark transition-colors disabled:opacity-50"
                 >
                   <Save className="w-4 h-4" />
                   Uložiť nastavenia adminu

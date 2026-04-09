@@ -242,7 +242,7 @@ export default function ContactFormsPage() {
                     {selectedMessage.sender?.email && (
                       <a
                         href={`mailto:${selectedMessage.sender.email}?subject=Re: ${encodeURIComponent(selectedMessage.subject)}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-gray-100 text-sm font-medium hover:opacity-90"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-gray-100 text-sm font-medium hover:opacity-90"
                       >
                         <Reply className="w-4 h-4" />
                         Odpovedať

@@ -492,7 +492,7 @@ export default function DevMenuPage() {
           </div>
 
           {successMessage && (
-            <div className="mb-6 px-4 py-3 bg-[#1dbf73]/20 border border-[#1dbf73] rounded-xl text-[#1dbf73] flex items-center gap-2">
+            <div className="mb-6 px-4 py-3 bg-accent/20 border border-accent rounded-xl text-accent flex items-center gap-2">
               <Save className="w-5 h-5 flex-shrink-0" />
               <span>{successMessage}</span>
             </div>
@@ -606,7 +606,7 @@ export default function DevMenuPage() {
                   </div>
                   <button
                     onClick={addNavbarItem}
-                    className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-xl hover:bg-[#19a463] transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 bg-accent text-dark rounded-xl hover:bg-accent-dark transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Pridať položku
@@ -723,7 +723,7 @@ export default function DevMenuPage() {
                         ),
                       })
                     }}
-                    className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-xl hover:bg-[#19a463] transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 bg-accent text-dark rounded-xl hover:bg-accent-dark transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Pridať položku
@@ -864,7 +864,7 @@ export default function DevMenuPage() {
                         ),
                       })
                     }}
-                    className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-xl hover:bg-[#19a463] transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 bg-accent text-dark rounded-xl hover:bg-accent-dark transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Pridať položku
@@ -1195,7 +1195,7 @@ export default function DevMenuPage() {
                           </div>
                           <button
                             onClick={() => addFooterLink(section.id)}
-                            className="flex items-center gap-2 px-3 py-2 bg-[#1dbf73] text-white rounded-xl hover:bg-[#19a463] transition-colors"
+                            className="flex items-center gap-2 px-3 py-2 bg-accent text-dark rounded-xl hover:bg-accent-dark transition-colors"
                           >
                             <Plus className="w-4 h-4" />
                             Pridať položku

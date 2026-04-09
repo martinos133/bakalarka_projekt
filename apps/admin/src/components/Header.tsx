@@ -33,8 +33,8 @@ export default function Header() {
                 onClick={() => router.push(s.path)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
                   ${pathname === s.path
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-gray-400 hover:text-white hover:bg-white/[0.06]'
+                    ? 'bg-accent/10 text-accent'
+                    : 'text-gray-400 hover:text-dark hover:bg-white/[0.06]'
                   }
                 `}
               >
@@ -54,7 +54,7 @@ export default function Header() {
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
-              className="input px-4 py-2.5 pl-9 text-sm text-white placeholder-white/70 focus:outline-none focus:border-primary/40 focus:bg-white/[0.08] transition-all"
+              className="input px-4 py-2.5 pl-9 text-sm text-white placeholder-white/70 focus:outline-none focus:border-accent/40 focus:bg-white/[0.08] transition-all"
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
           </div>
@@ -62,7 +62,7 @@ export default function Header() {
           {/* Notifications */}
           <button className="relative p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/[0.06] transition-colors">
             <Bell className="w-[18px] h-[18px]" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full" />
           </button>
         </div>
       </div>

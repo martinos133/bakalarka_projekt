@@ -197,7 +197,7 @@ export default function AdvertisementsPage() {
               <button
                 onClick={() => setTypeView('all')}
                 className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-colors ${
-                  typeView === 'all' ? 'bg-primary text-gray-200' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
+                  typeView === 'all' ? 'bg-accent text-gray-200' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <BarChart3 className="w-4 h-4" />
@@ -206,7 +206,7 @@ export default function AdvertisementsPage() {
               <button
                 onClick={() => setTypeView('SERVICE')}
                 className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-colors ${
-                  typeView === 'SERVICE' ? 'bg-blue-600 text-gray-200' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
+                  typeView === 'SERVICE' ? 'bg-accent text-gray-200' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <Briefcase className="w-4 h-4" />
@@ -229,7 +229,7 @@ export default function AdvertisementsPage() {
             <div className="card p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-400">Celkom inzerátov</span>
-                <BarChart3 className="w-5 h-5 text-blue-400" />
+                <BarChart3 className="w-5 h-5 text-accent" />
               </div>
               <div className="text-3xl font-bold text-gray-200">{displayAds.length}</div>
               <div className="text-xs text-gray-500 mt-2">Aktívnych: {byStatus.active} • Konceptov: {byStatus.draft}</div>
@@ -271,7 +271,7 @@ export default function AdvertisementsPage() {
               <div className="p-4 grid grid-cols-2 gap-4">
                 <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                    <span className="w-2 h-2 rounded-full bg-accent shrink-0" />
                     <span className="text-sm font-medium text-gray-300">Služby</span>
                   </div>
                   <div className="text-2xl font-bold text-gray-200 tabular-nums">{byType.services}</div>
@@ -279,7 +279,7 @@ export default function AdvertisementsPage() {
                   {displayAds.length > 0 && (
                     <div className="mt-2 h-1.5 rounded-full bg-dark overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-blue-500 transition-all"
+                        className="h-full rounded-full bg-accent transition-all"
                         style={{ width: `${(byType.services / displayAds.length) * 100}%` }}
                       />
                     </div>
@@ -444,7 +444,7 @@ export default function AdvertisementsPage() {
             </div>
             <div className="card p-4">
               <span className="text-xs text-gray-400">Čakajúce</span>
-              <div className="text-xl font-bold text-blue-400">{byStatus.pending}</div>
+              <div className="text-xl font-bold text-accent">{byStatus.pending}</div>
             </div>
           </div>
 
@@ -467,7 +467,7 @@ export default function AdvertisementsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div className="card p-6">
               <div className="flex items-center gap-2 mb-4">
-                <PieChart className="w-5 h-5 text-primary" />
+                <PieChart className="w-5 h-5 text-accent" />
                 <h3 className="text-lg font-semibold text-gray-200">Top kategórie</h3>
               </div>
               <ul className="space-y-2">
@@ -483,7 +483,7 @@ export default function AdvertisementsPage() {
             </div>
             <div className="card p-6">
               <div className="flex items-center gap-2 mb-4">
-                <MapPin className="w-5 h-5 text-primary" />
+                <MapPin className="w-5 h-5 text-accent" />
                 <h3 className="text-lg font-semibold text-gray-200">Top lokality</h3>
               </div>
               <ul className="space-y-2">
@@ -503,7 +503,7 @@ export default function AdvertisementsPage() {
           {byMonth.length > 0 && (
             <div className="card p-6 mb-6">
               <div className="flex items-center gap-2 mb-4">
-                <Calendar className="w-5 h-5 text-primary" />
+                <Calendar className="w-5 h-5 text-accent" />
                 <h3 className="text-lg font-semibold text-gray-200">Inzeráty za mesiace</h3>
               </div>
               <div className="flex flex-wrap gap-4">
@@ -523,13 +523,13 @@ export default function AdvertisementsPage() {
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-colors ${
-                  showFilters ? 'bg-primary text-gray-200' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
+                  showFilters ? 'bg-accent text-gray-200' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <FilterIcon className="w-4 h-4" />
                 Filtre
                 {Object.values(filters).some((v) => v !== '') && (
-                  <span className="ml-1 px-2 py-0.5 bg-primary/20 text-primary rounded-full text-xs">
+                  <span className="ml-1 px-2 py-0.5 bg-accent/20 text-accent rounded-full text-xs">
                     {Object.values(filters).filter((v) => v !== '').length}
                   </span>
                 )}
@@ -556,7 +556,7 @@ export default function AdvertisementsPage() {
                       value={filters.search}
                       onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                       placeholder="Názov, popis, lokalita..."
-                      className="input pl-10 pr-4 py-2.5 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/60 focus:bg-white/[0.12]"
+                      className="input pl-10 pr-4 py-2.5 text-white text-sm placeholder-white/70 focus:outline-none focus:border-accent/60 focus:bg-white/[0.12]"
                     />
                   </div>
                 </div>
@@ -599,7 +599,7 @@ export default function AdvertisementsPage() {
                     value={filters.location}
                     onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                     placeholder="Mesto, región..."
-                    className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40"
+                    className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-accent/40"
                   />
                 </div>
                 <div className="lg:col-span-2">
@@ -611,7 +611,7 @@ export default function AdvertisementsPage() {
                       value={filters.minPrice}
                       onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
                       placeholder="Min"
-                      className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40"
+                      className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-accent/40"
                     />
                     <span className="text-gray-400 self-center">–</span>
                     <input
@@ -620,7 +620,7 @@ export default function AdvertisementsPage() {
                       value={filters.maxPrice}
                       onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
                       placeholder="Max"
-                      className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40"
+                      className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-accent/40"
                     />
                   </div>
                 </div>
@@ -631,14 +631,14 @@ export default function AdvertisementsPage() {
                       type="date"
                       value={filters.dateFrom}
                       onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                      className="input px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-primary/40"
+                      className="input px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-accent/40"
                     />
                     <span className="text-gray-400 self-center">–</span>
                     <input
                       type="date"
                       value={filters.dateTo}
                       onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                      className="input px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-primary/40"
+                      className="input px-4 py-2 text-gray-200 text-sm focus:outline-none focus:border-accent/40"
                     />
                   </div>
                 </div>

@@ -184,7 +184,7 @@ export default function MonitoringPage() {
                     key={p}
                     onClick={() => setPeriod(p)}
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                      period === p ? 'bg-primary text-gray-100' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
+                      period === p ? 'bg-accent text-gray-100' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                     }`}
                   >
                     {periodLabel[p]}
@@ -292,8 +292,8 @@ export default function MonitoringPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
                 <div className="card p-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-primary/20">
-                      <MousePointerClick className="w-5 h-5 text-primary" />
+                    <div className="p-2 rounded-xl bg-accent/20">
+                      <MousePointerClick className="w-5 h-5 text-accent" />
                     </div>
                     <div>
                       <span className="text-xs text-gray-400">Celkom kliknutí</span>
@@ -315,8 +315,8 @@ export default function MonitoringPage() {
                 </div>
                 <div className="card p-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-blue-500/20">
-                      <User className="w-5 h-5 text-blue-400" />
+                    <div className="p-2 rounded-xl bg-accent/20">
+                      <User className="w-5 h-5 text-accent" />
                     </div>
                     <div>
                       <span className="text-xs text-gray-400">Muži</span>
@@ -492,7 +492,7 @@ export default function MonitoringPage() {
                     key={p}
                     onClick={() => setBreakdownPeriod(p)}
                     className={`px-2.5 py-1.5 rounded-xl text-xs font-medium transition-colors ${
-                      breakdownPeriod === p ? 'bg-primary text-gray-100' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
+                      breakdownPeriod === p ? 'bg-accent text-gray-100' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                     }`}
                   >
                     {breakdownPeriodLabel[p]}
@@ -505,7 +505,7 @@ export default function MonitoringPage() {
                     onClick={() => setBreakdownFilter(f)}
                     className={`px-3 py-1.5 rounded-xl text-sm font-medium transition-colors ${
                       breakdownFilter === f
-                        ? 'bg-primary text-gray-100'
+                        ? 'bg-accent text-gray-100'
                         : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                     }`}
                   >
@@ -523,8 +523,8 @@ export default function MonitoringPage() {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="card p-4 flex items-center gap-4">
-                    <div className="p-2 rounded-xl bg-emerald-500/20">
-                      <FolderTree className="w-5 h-5 text-emerald-400" />
+                    <div className="p-2 rounded-xl bg-accent/20">
+                      <FolderTree className="w-5 h-5 text-accent" />
                     </div>
                     <div>
                       <span className="text-xs text-gray-400">Kliknutia na kategórie</span>

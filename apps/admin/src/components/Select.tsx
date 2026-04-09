@@ -58,7 +58,7 @@ export default function Select({
           bg-white/[0.06] border border-white/[0.06] rounded-xl
           px-3 py-2 text-sm transition-all cursor-pointer
           hover:border-white/[0.12] hover:bg-white/[0.06]
-          ${open ? 'border-primary/50 bg-white/[0.06] shadow-[0_0_0_3px_rgba(36,99,235,0.1)]' : ''}
+          ${open ? 'border-accent/50 bg-white/[0.06] shadow-[0_0_0_3px_rgba(201,169,110,0.1)]' : ''}
           ${selected ? 'text-white' : 'text-gray-500'}
         `}
       >
@@ -91,7 +91,7 @@ export default function Select({
                   w-full text-left px-3 py-2 text-sm flex items-center justify-between gap-2
                   transition-colors duration-100
                   ${isActive
-                    ? 'bg-primary/10 text-primary'
+                    ? 'bg-accent/10 text-accent'
                     : 'text-gray-300 hover:bg-white/[0.06] hover:text-white'
                   }
                 `}

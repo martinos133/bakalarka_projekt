@@ -130,13 +130,13 @@ export default function DevAdvertisementsPage() {
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-colors ${
-                  showFilters ? 'bg-primary text-white' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
+                  showFilters ? 'bg-accent text-dark' : 'bg-white/[0.06] border border-white/[0.06] text-gray-300 hover:bg-cardHover'
                 }`}
               >
                 <FilterIcon className="w-4 h-4" />
                 Filtre
                 {Object.values(filters).some((v) => v !== '') && (
-                  <span className="ml-1 px-2 py-0.5 bg-primary/20 text-primary rounded-full text-xs">
+                  <span className="ml-1 px-2 py-0.5 bg-accent/20 text-accent rounded-full text-xs">
                     {Object.values(filters).filter((v) => v !== '').length}
                   </span>
                 )}
@@ -151,7 +151,7 @@ export default function DevAdvertisementsPage() {
               <button
                 type="button"
                 onClick={openNewAdvertisement}
-                className="bg-primary hover:opacity-90 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-colors"
+                className="bg-accent hover:opacity-90 text-dark px-4 py-2 rounded-xl flex items-center gap-2 transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 Nový inzerát
@@ -192,7 +192,7 @@ export default function DevAdvertisementsPage() {
                       value={filters.search}
                       onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                       placeholder="Názov, popis, lokalita..."
-                      className="input pl-10 pr-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40"
+                      className="input pl-10 pr-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-accent/40"
                     />
                   </div>
                 </div>
@@ -235,7 +235,7 @@ export default function DevAdvertisementsPage() {
                     value={filters.location}
                     onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                     placeholder="Mesto, región..."
-                    className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40"
+                    className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-accent/40"
                   />
                 </div>
                 <div className="lg:col-span-2">
@@ -247,7 +247,7 @@ export default function DevAdvertisementsPage() {
                       value={filters.minPrice}
                       onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
                       placeholder="Min"
-                      className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40"
+                      className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-accent/40"
                     />
                     <span className="text-gray-400 self-center">–</span>
                     <input
@@ -256,7 +256,7 @@ export default function DevAdvertisementsPage() {
                       value={filters.maxPrice}
                       onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
                       placeholder="Max"
-                      className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-primary/40"
+                      className="input px-4 py-2 text-white text-sm placeholder-white/70 focus:outline-none focus:border-accent/40"
                     />
                   </div>
                 </div>
@@ -267,14 +267,14 @@ export default function DevAdvertisementsPage() {
                       type="date"
                       value={filters.dateFrom}
                       onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                      className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-primary/40"
+                      className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-accent/40"
                     />
                     <span className="text-gray-400 self-center">–</span>
                     <input
                       type="date"
                       value={filters.dateTo}
                       onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                      className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-primary/40"
+                      className="input px-4 py-2 text-white text-sm focus:outline-none focus:border-accent/40"
                     />
                   </div>
                 </div>
@@ -352,7 +352,7 @@ export default function DevAdvertisementsPage() {
                         <td className="px-6 py-4 text-right">
                           <button
                             onClick={() => handleEdit(ad)}
-                            className="p-2 text-blue-400 hover:bg-cardHover rounded"
+                            className="p-2 text-accent hover:bg-cardHover rounded"
                             title="Upraviť"
                           >
                             <Edit className="w-4 h-4" />
