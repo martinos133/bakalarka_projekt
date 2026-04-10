@@ -124,6 +124,7 @@ export default function AuditPage() {
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+  const [successFilter, setSuccessFilter] = useState('')
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null)
   const [refreshing, setRefreshing] = useState(false)
 
@@ -132,10 +133,21 @@ export default function AuditPage() {
   const loadData = useCallback(async () => {
     try {
       const params: Record<string, string> = { page: String(page), limit: '40' }
-      if (tab === 'errors') params.success = 'false'
+
+      if (tab === 'logins' && !actionFilter) {
+        params.action = LOGIN_ACTIONS.join(',')
+      } else if (tab === 'errors') {
+        params.action = 'SYSTEM_ERROR,API_ERROR'
+      } else if (tab === 'actions' && !actionFilter) {
+        const exclude = [...LOGIN_ACTIONS, 'SYSTEM_ERROR', 'API_ERROR']
+        const actionKeys = Object.keys(ACTION_LABELS).filter(k => !exclude.includes(k))
+        params.action = actionKeys.join(',')
+      }
+
       if (search) params.search = search
       if (actionFilter) params.action = actionFilter
       if (severityFilter) params.severity = severityFilter
+      if (successFilter) params.success = successFilter
       if (dateFrom) params.dateFrom = dateFrom
       if (dateTo) params.dateTo = dateTo
 
@@ -144,11 +156,7 @@ export default function AuditPage() {
         page === 1 ? api.getAuditStats().catch(() => null) : Promise.resolve(null),
       ])
 
-      let filtered = logsRes.data || []
-      if (tab === 'logins' && !actionFilter) filtered = filtered.filter((l: AuditLog) => LOGIN_ACTIONS.includes(l.action))
-      if (tab === 'actions' && !actionFilter) filtered = filtered.filter((l: AuditLog) => !LOGIN_ACTIONS.includes(l.action) && !['SYSTEM_ERROR', 'API_ERROR'].includes(l.action))
-
-      setLogs(filtered)
+      setLogs(logsRes.data || [])
       setTotal(logsRes.total || 0)
       setTotalPages(logsRes.totalPages || 1)
       if (statsRes) setStats(statsRes)
@@ -157,14 +165,14 @@ export default function AuditPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, tab, search, actionFilter, severityFilter, dateFrom, dateTo])
+  }, [page, tab, search, actionFilter, severityFilter, successFilter, dateFrom, dateTo])
 
   useEffect(() => { setLoading(true); loadData() }, [loadData])
   useEffect(() => { const t = setInterval(loadData, 15000); return () => clearInterval(t) }, [loadData])
 
   const handleRefresh = async () => { setRefreshing(true); await loadData(); setTimeout(() => setRefreshing(false), 500) }
-  const resetFilters = () => { setSearch(''); setActionFilter(''); setSeverityFilter(''); setDateFrom(''); setDateTo(''); setPage(1) }
-  const hasFilters = search || actionFilter || severityFilter || dateFrom || dateTo
+  const resetFilters = () => { setSearch(''); setActionFilter(''); setSeverityFilter(''); setSuccessFilter(''); setDateFrom(''); setDateTo(''); setPage(1) }
+  const hasFilters = search || actionFilter || severityFilter || successFilter || dateFrom || dateTo
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'all', label: 'Všetky', icon: <Activity className="w-3.5 h-3.5" /> },
@@ -224,22 +232,22 @@ export default function AuditPage() {
 
         {/* ═══ Recent errors ═══ */}
         {stats && stats.recentErrors.length > 0 && (
-          <div className="bg-red-500/[0.04] border border-red-500/10 rounded-2xl p-3 overflow-hidden">
-            <div className="flex items-center gap-2 mb-2">
-              <FileWarning className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
-              <h3 className="text-xs font-semibold text-red-400">Posledné chyby</h3>
-              <span className="text-[9px] text-red-400/60 ml-auto">Klikni pre detail</span>
+          <div className="bg-red-500/[0.04] border border-red-500/10 rounded-2xl p-4 overflow-hidden">
+            <div className="flex items-center gap-2 mb-3">
+              <FileWarning className="w-4 h-4 text-red-400 flex-shrink-0" />
+              <h3 className="text-sm font-semibold text-red-400">Posledné chyby</h3>
+              <span className="text-xs text-red-400/50 ml-auto">Klikni pre detail</span>
             </div>
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               {stats.recentErrors.slice(0, 3).map((err) => (
                 <button
                   key={err.id}
                   onClick={() => setSelectedLog(err)}
-                  className="w-full flex items-center gap-2 text-left px-2 py-1 rounded-lg hover:bg-red-500/[0.06] transition-colors group overflow-hidden"
+                  className="w-full flex items-center gap-3 text-left px-3 py-2 rounded-xl hover:bg-red-500/[0.06] transition-colors group overflow-hidden"
                 >
-                  <AlertTriangle className="w-3 h-3 text-red-400/60 flex-shrink-0" />
-                  <span className="text-[10px] text-gray-400 flex-1 group-hover:text-gray-200 overflow-hidden text-ellipsis whitespace-nowrap">{(err.errorMessage || err.action).substring(0, 80)}…</span>
-                  <span className="text-[9px] text-gray-600 flex-shrink-0 whitespace-nowrap ml-2">{fmtShort(err.createdAt)}</span>
+                  <AlertTriangle className="w-3.5 h-3.5 text-red-400/60 flex-shrink-0" />
+                  <span className="text-xs text-gray-400 flex-1 group-hover:text-gray-200 overflow-hidden text-ellipsis whitespace-nowrap">{(err.errorMessage || err.action).substring(0, 80)}…</span>
+                  <span className="text-xs text-gray-600 flex-shrink-0 whitespace-nowrap ml-2">{fmtShort(err.createdAt)}</span>
                 </button>
               ))}
             </div>
@@ -250,28 +258,28 @@ export default function AuditPage() {
         <div className="bg-card rounded-2xl border border-white/[0.06] overflow-hidden">
 
           {/* Tab bar */}
-          <div className="flex items-center justify-between px-3 pt-3 pb-0 border-b border-white/[0.06]">
-            <div className="flex gap-0.5 overflow-x-auto no-scrollbar -mb-px">
+          <div className="flex items-center justify-between px-4 pt-3 pb-0 border-b border-white/[0.06]">
+            <div className="flex gap-1 overflow-x-auto no-scrollbar -mb-px">
               {tabs.map(t => (
                 <button
                   key={t.key}
                   onClick={() => { setTab(t.key); setPage(1) }}
-                  className={`flex items-center gap-1.5 px-3 py-2 text-[11px] font-medium rounded-t-lg whitespace-nowrap transition-colors
+                  className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium rounded-t-lg whitespace-nowrap transition-colors
                     ${tab === t.key ? 'bg-white/[0.06] text-white border-b-2 border-accent' : 'text-gray-500 hover:text-gray-300'}`}
                 >
                   {t.icon}{t.label}
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-1 pb-1.5 flex-shrink-0">
-              <button onClick={handleRefresh} className={`p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-white/[0.06] transition-all ${refreshing ? 'animate-spin' : ''}`} title="Obnoviť">
-                <RefreshCw className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-1.5 pb-2 flex-shrink-0">
+              <button onClick={handleRefresh} className={`p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/[0.06] transition-all ${refreshing ? 'animate-spin' : ''}`} title="Obnoviť">
+                <RefreshCw className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] transition-colors ${showFilters || hasFilters ? 'bg-accent/10 text-accent' : 'text-gray-500 hover:text-white hover:bg-white/[0.06]'}`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${showFilters || hasFilters ? 'bg-accent/10 text-accent' : 'text-gray-400 hover:text-white hover:bg-white/[0.06]'}`}
               >
-                <Filter className="w-3 h-3" />
+                <Filter className="w-3.5 h-3.5" />
                 Filtre
                 {hasFilters && <span className="w-1.5 h-1.5 rounded-full bg-accent" />}
               </button>
@@ -280,41 +288,49 @@ export default function AuditPage() {
 
           {/* Filters */}
           {showFilters && (
-            <div className="px-3 py-2.5 bg-white/[0.015] border-b border-white/[0.06]">
-              <div className="flex flex-wrap gap-2 items-end">
-                <div className="w-full sm:w-auto sm:flex-1 sm:min-w-[160px] sm:max-w-[240px]">
-                  <label className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5 block">Hľadať</label>
+            <div className="px-4 py-3 bg-white/[0.015] border-b border-white/[0.06]">
+              <div className="flex flex-wrap gap-3 items-end">
+                <div className="w-full sm:w-auto sm:flex-1 sm:min-w-[180px] sm:max-w-[260px]">
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Hľadať</label>
                   <div className="relative">
-                    <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} placeholder="Email, IP..."
-                      className="w-full bg-white/[0.06] border border-white/[0.08] rounded-lg py-1.5 pr-2 text-[11px] text-white focus:outline-none focus:border-accent/40" style={{ paddingLeft: '1.75rem' }} />
-                    <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-500 pointer-events-none" />
+                    <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} placeholder="Email, IP, chyba..."
+                      className="w-full bg-white/[0.06] border border-white/[0.08] rounded-lg py-2 pr-3 text-sm text-white focus:outline-none focus:border-accent/40" style={{ paddingLeft: '2.25rem' }} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
                   </div>
                 </div>
                 <div>
-                  <label className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5 block">Akcia</label>
-                  <select value={actionFilter} onChange={(e) => { setActionFilter(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-accent/40">
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Akcia</label>
+                  <select value={actionFilter} onChange={(e) => { setActionFilter(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40">
                     <option value="">Všetky</option>
                     {Object.entries(ACTION_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5 block">Závažnosť</label>
-                  <select value={severityFilter} onChange={(e) => { setSeverityFilter(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-accent/40">
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Závažnosť</label>
+                  <select value={severityFilter} onChange={(e) => { setSeverityFilter(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40">
                     <option value="">Všetky</option>
                     <option value="INFO">Info</option><option value="WARNING">Varovanie</option><option value="ERROR">Chyba</option><option value="CRITICAL">Kritická</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5 block">Od</label>
-                  <input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-accent/40" />
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Stav</label>
+                  <select value={successFilter} onChange={(e) => { setSuccessFilter(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40">
+                    <option value="">Všetky</option>
+                    <option value="true">Úspešné</option>
+                    <option value="false">Neúspešné</option>
+                  </select>
                 </div>
                 <div>
-                  <label className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5 block">Do</label>
-                  <input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-accent/40" />
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Od</label>
+                  <input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Do</label>
+                  <input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40" />
                 </div>
                 {hasFilters && (
-                  <button onClick={resetFilters} className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] text-red-400 hover:bg-red-500/10 transition-colors">
-                    <X className="w-3 h-3" />Zrušiť
+                  <button onClick={resetFilters} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-500/10 transition-colors">
+                    <X className="w-3.5 h-3.5" />Zrušiť
                   </button>
                 )}
               </div>
@@ -322,11 +338,98 @@ export default function AuditPage() {
           )}
 
           {/* ─── Log rows ─── */}
+
+          {/* Inline filtre pre Prihlásenia */}
+          {tab === 'logins' && (
+            <div className="px-4 py-3 bg-white/[0.015] border-b border-white/[0.06]">
+              <div className="flex flex-wrap gap-3 items-end">
+                <div className="w-full sm:w-auto sm:flex-1 sm:min-w-[160px] sm:max-w-[240px]">
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Hľadať</label>
+                  <div className="relative">
+                    <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} placeholder="Email, IP..."
+                      className="w-full bg-white/[0.06] border border-white/[0.08] rounded-lg py-2 pr-3 text-sm text-white focus:outline-none focus:border-accent/40" style={{ paddingLeft: '2.25rem' }} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Stav</label>
+                  <select value={successFilter} onChange={(e) => { setSuccessFilter(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40">
+                    <option value="">Všetky</option>
+                    <option value="true">Úspešné</option>
+                    <option value="false">Neúspešné</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Od</label>
+                  <input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Do</label>
+                  <input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40" />
+                </div>
+                {hasFilters && (
+                  <button onClick={resetFilters} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-500/10 transition-colors">
+                    <X className="w-3.5 h-3.5" />Zrušiť
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {loading ? (
             <div className="text-center py-16 text-gray-500 text-sm">Načítavam...</div>
           ) : logs.length === 0 ? (
             <div className="text-center py-16 text-gray-500 text-sm">Žiadne záznamy</div>
+          ) : tab === 'logins' ? (
+            /* ── Prihlásenia: tabuľkový layout ── */
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[700px]">
+                <thead>
+                  <tr className="border-b border-white/[0.06]">
+                    <th className="text-left text-[10px] text-gray-500 uppercase tracking-wider font-medium pl-4 pr-2 py-3">Dátum</th>
+                    <th className="text-left text-[10px] text-gray-500 uppercase tracking-wider font-medium px-2 py-3">E-mail</th>
+                    <th className="text-left text-[10px] text-gray-500 uppercase tracking-wider font-medium px-2 py-3">Úspech</th>
+                    <th className="text-left text-[10px] text-gray-500 uppercase tracking-wider font-medium px-2 py-3">Dôvod zlyhania</th>
+                    <th className="text-left text-[10px] text-gray-500 uppercase tracking-wider font-medium px-2 py-3">IP</th>
+                    <th className="text-left text-[10px] text-gray-500 uppercase tracking-wider font-medium px-2 pr-4 py-3">User-Agent</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {logs.map((log) => (
+                    <tr
+                      key={log.id}
+                      onClick={() => setSelectedLog(log)}
+                      className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors cursor-pointer"
+                    >
+                      <td className="pl-4 pr-2 py-3">
+                        <span className="text-sm text-gray-300 whitespace-nowrap">{fmtFull(log.createdAt)}</span>
+                      </td>
+                      <td className="px-2 py-3">
+                        <span className="text-sm text-white">{log.userEmail || '–'}</span>
+                      </td>
+                      <td className="px-2 py-3">
+                        {log.success ? (
+                          <span className="text-sm text-green-400">Áno</span>
+                        ) : (
+                          <span className="text-sm text-red-400">Nie</span>
+                        )}
+                      </td>
+                      <td className="px-2 py-3">
+                        <span className="text-sm text-gray-500">{log.errorMessage || '—'}</span>
+                      </td>
+                      <td className="px-2 py-3">
+                        <span className="text-sm text-gray-400 font-mono">{log.ip || '–'}</span>
+                      </td>
+                      <td className="px-2 pr-4 py-3">
+                        <span className="text-sm text-gray-500 block truncate max-w-[280px]">{parseUA(log.userAgent)}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
+            /* ── Ostatné záložky: kartový layout ── */
             <div className="divide-y divide-white/[0.04]">
               {logs.map((log) => {
                 const sev = SEVERITY_STYLES[log.severity] || SEVERITY_STYLES.INFO
@@ -334,38 +437,31 @@ export default function AuditPage() {
                   <button
                     key={log.id}
                     onClick={() => setSelectedLog(log)}
-                    className="w-full text-left px-3 py-2 hover:bg-white/[0.025] transition-colors group flex items-center gap-2 overflow-hidden"
+                    className="w-full text-left px-4 py-3 hover:bg-white/[0.025] transition-colors group flex items-center gap-3 overflow-hidden"
                   >
-                    {/* Icon */}
                     <div className="flex-shrink-0">
-                      {getActionIcon(log.action)}
+                      {getActionIcon(log.action, 'w-4 h-4')}
                     </div>
-
-                    {/* Col 1: action + email */}
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] text-white font-medium truncate">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-white font-medium truncate">
                           {ACTION_LABELS[log.action] || log.action}
                         </span>
                         {!log.success && (
-                          <span className="text-[8px] text-red-400 bg-red-500/10 px-1 py-px rounded font-bold leading-none flex-shrink-0">FAIL</span>
+                          <span className="text-[10px] text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded font-semibold leading-none flex-shrink-0">FAIL</span>
                         )}
-                        <span className={`text-[8px] font-bold px-1 py-px rounded leading-none flex-shrink-0 ${sev.bg} ${sev.text}`}>
+                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded leading-none flex-shrink-0 ${sev.bg} ${sev.text}`}>
                           {log.severity}
                         </span>
                       </div>
-                      <p className="text-[10px] text-gray-500 truncate mt-px">
+                      <p className="text-xs text-gray-500 truncate mt-0.5">
                         {log.userEmail || '–'}
                         {log.ip && <span className="text-gray-600"> · {log.ip}</span>}
-                        {log.errorMessage && <span className="text-red-400/50"> — {log.errorMessage.substring(0, 60)}</span>}
+                        {log.errorMessage && <span className="text-red-400/60"> — {log.errorMessage.substring(0, 60)}</span>}
                       </p>
                     </div>
-
-                    {/* Col 2: time */}
-                    <span className="text-[10px] text-gray-600 whitespace-nowrap flex-shrink-0">{fmtShort(log.createdAt)}</span>
-
-                    {/* Col 3: eye */}
-                    <Eye className="w-3 h-3 text-gray-700 group-hover:text-gray-400 transition-colors flex-shrink-0" />
+                    <span className="text-xs text-gray-600 whitespace-nowrap flex-shrink-0">{fmtShort(log.createdAt)}</span>
+                    <Eye className="w-4 h-4 text-gray-700 group-hover:text-gray-400 transition-colors flex-shrink-0" />
                   </button>
                 )
               })}
@@ -374,12 +470,12 @@ export default function AuditPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-3 py-2.5 border-t border-white/[0.06]">
-              <p className="text-[11px] text-gray-600">
-                {page}/{totalPages} · {total} záznamov
+            <div className="flex items-center justify-between px-4 py-3 border-t border-white/[0.06]">
+              <p className="text-xs text-gray-500">
+                Strana {page} z {totalPages} · {total} záznamov
               </p>
               <div className="flex items-center gap-0.5">
-                <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page <= 1} className="p-1 rounded text-gray-500 hover:text-white disabled:opacity-30"><ChevronLeft className="w-4 h-4" /></button>
+                <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page <= 1} className="p-1.5 rounded-lg text-gray-500 hover:text-white disabled:opacity-30"><ChevronLeft className="w-4 h-4" /></button>
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   let p: number
                   if (totalPages <= 5) p = i + 1
@@ -387,10 +483,10 @@ export default function AuditPage() {
                   else if (page >= totalPages - 2) p = totalPages - 4 + i
                   else p = page - 2 + i
                   return (
-                    <button key={p} onClick={() => setPage(p)} className={`min-w-[26px] h-6 rounded text-[11px] font-medium ${p === page ? 'bg-accent/20 text-accent' : 'text-gray-500 hover:text-white'}`}>{p}</button>
+                    <button key={p} onClick={() => setPage(p)} className={`min-w-[30px] h-7 rounded-lg text-xs font-medium ${p === page ? 'bg-accent/20 text-accent' : 'text-gray-500 hover:text-white hover:bg-white/[0.06]'}`}>{p}</button>
                   )
                 })}
-                <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page >= totalPages} className="p-1 rounded text-gray-500 hover:text-white disabled:opacity-30"><ChevronRight className="w-4 h-4" /></button>
+                <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page >= totalPages} className="p-1.5 rounded-lg text-gray-500 hover:text-white disabled:opacity-30"><ChevronRight className="w-4 h-4" /></button>
               </div>
             </div>
           )}
@@ -456,13 +552,13 @@ export default function AuditPage() {
 
 function StatCard({ icon, bg, label, value, sub }: { icon: React.ReactNode; bg: string; label: string; value: React.ReactNode; sub: React.ReactNode }) {
   return (
-    <div className="bg-card rounded-xl p-3 border border-white/[0.06]">
-      <div className="flex items-center gap-2 mb-2">
-        <div className={`w-7 h-7 rounded-lg ${bg} flex items-center justify-center flex-shrink-0`}>{icon}</div>
-        <p className="text-[9px] text-gray-400 uppercase tracking-wider leading-tight">{label}</p>
+    <div className="bg-card rounded-xl p-4 border border-white/[0.06]">
+      <div className="flex items-center gap-2.5 mb-2">
+        <div className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center flex-shrink-0`}>{icon}</div>
+        <p className="text-xs text-gray-400 uppercase tracking-wider leading-tight">{label}</p>
       </div>
-      <p className="text-xl font-bold text-white leading-none">{value}</p>
-      <p className="text-[10px] text-gray-500 mt-1">{sub}</p>
+      <p className="text-2xl font-bold text-white">{value}</p>
+      <p className="text-xs text-gray-500 mt-1">{sub}</p>
     </div>
   )
 }
@@ -470,8 +566,8 @@ function StatCard({ icon, bg, label, value, sub }: { icon: React.ReactNode; bg: 
 function DField({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="min-w-0">
-      <p className="text-[9px] text-gray-500 uppercase tracking-wider">{label}</p>
-      <p className={`text-xs text-white truncate ${mono ? 'font-mono' : ''}`}>{value}</p>
+      <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">{label}</p>
+      <p className={`text-sm text-white truncate ${mono ? 'font-mono text-xs' : ''}`}>{value}</p>
     </div>
   )
 }

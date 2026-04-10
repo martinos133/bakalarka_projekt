@@ -18,9 +18,17 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: 'Prihlásenie používateľa' })
   async login(@Body() loginDto: LoginDto, @Req() req: any) {
-    const ip = req.headers['x-forwarded-for'] || req.ip || req.connection?.remoteAddress;
+    const ip = this.resolveIp(req);
     const userAgent = req.headers['user-agent'];
     return this.authService.login(loginDto, ip, userAgent);
+  }
+
+  private resolveIp(req: any): string {
+    let raw = req.headers['x-forwarded-for'] || req.ip || req.connection?.remoteAddress || '';
+    if (typeof raw === 'string' && raw.includes(',')) raw = raw.split(',')[0].trim();
+    if (raw === '::1' || raw === '::ffff:127.0.0.1') raw = '127.0.0.1';
+    if (raw.startsWith('::ffff:')) raw = raw.replace('::ffff:', '');
+    return raw;
   }
 
   @Get('me')

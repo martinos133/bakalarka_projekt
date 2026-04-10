@@ -57,7 +57,13 @@ export class AuditService {
 
     const where: Prisma.AuditLogWhereInput = {};
 
-    if (params.action) where.action = params.action;
+    if (params.action) {
+      if (params.action.includes(',')) {
+        where.action = { in: params.action.split(',') as AuditAction[] };
+      } else {
+        where.action = params.action;
+      }
+    }
     if (params.severity) where.severity = params.severity;
     if (params.userId) where.userId = params.userId;
     if (params.success !== undefined) where.success = params.success;

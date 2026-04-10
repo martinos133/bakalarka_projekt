@@ -23,7 +23,7 @@ export class AuditErrorInterceptor implements NestInterceptor {
         const statusCode = error instanceof HttpException ? error.getStatus() : 500;
 
         if (statusCode >= 500) {
-          const ip = req.headers?.['x-forwarded-for'] || req.ip || req.connection?.remoteAddress;
+          const ip = this.resolveIp(req);
           const userAgent = req.headers?.['user-agent'];
 
           this.auditService.log({
@@ -47,6 +47,14 @@ export class AuditErrorInterceptor implements NestInterceptor {
         return throwError(() => error);
       }),
     );
+  }
+
+  private resolveIp(req: any): string {
+    let raw = req.headers?.['x-forwarded-for'] || req.ip || req.connection?.remoteAddress || '';
+    if (typeof raw === 'string' && raw.includes(',')) raw = raw.split(',')[0].trim();
+    if (raw === '::1' || raw === '::ffff:127.0.0.1') raw = '127.0.0.1';
+    if (raw.startsWith('::ffff:')) raw = raw.replace('::ffff:', '');
+    return raw;
   }
 
   private sanitizeBody(body: any): any {
