@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated, isOwnerAdmin } from '@/lib/auth'
 import { api } from '@/lib/api'
@@ -95,10 +95,15 @@ export default function StaffPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  const [filterQuery, setFilterQuery] = useState('')
+  const [filterMemberType, setFilterMemberType] = useState<'all' | 'owner' | 'member'>('all')
+  const [filterStatus, setFilterStatus] = useState<'all' | 'online' | 'offline'>('all')
+
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showPermsModal, setShowPermsModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [selectedMember, setSelectedMember] = useState<StaffMember | null>(null)
+  const [confirmRemoveMember, setConfirmRemoveMember] = useState<StaffMember | null>(null)
 
   const [createForm, setCreateForm] = useState({
     email: '',
@@ -203,12 +208,18 @@ export default function StaffPage() {
   }
 
   const handleRemove = async (member: StaffMember) => {
-    if (!confirm(`Naozaj chcete odstrániť ${member.firstName || member.email} z admin tímu?`)) return
+    setConfirmRemoveMember(member)
+  }
+
+  const confirmRemove = async () => {
+    if (!confirmRemoveMember) return
     try {
-      await api.removeStaffMember(member.id)
+      await api.removeStaffMember(confirmRemoveMember.id)
       loadStaff()
     } catch (e: any) {
       setError(e.message || 'Nepodarilo sa odstrániť člena')
+    } finally {
+      setConfirmRemoveMember(null)
     }
   }
 
@@ -227,6 +238,34 @@ export default function StaffPage() {
   const isMemberOwner = (member: StaffMember) => {
     return !member.adminPermissions || !Array.isArray(member.adminPermissions) || member.adminPermissions.length === 0
   }
+
+  const isOnline = useCallback(
+    (member: StaffMember) => {
+      if (!member.lastLoginAt) return false
+      const diff = now - new Date(member.lastLoginAt).getTime()
+      return diff < 5 * 60 * 1000
+    },
+    [now],
+  )
+
+  const filteredStaff = useMemo(() => {
+    const q = filterQuery.trim().toLowerCase()
+    return staff.filter((m) => {
+      const ownerMember = isMemberOwner(m)
+      if (filterMemberType === 'owner' && !ownerMember) return false
+      if (filterMemberType === 'member' && ownerMember) return false
+
+      const online = isOnline(m)
+      if (filterStatus === 'online' && !online) return false
+      if (filterStatus === 'offline' && online) return false
+
+      if (q) {
+        const hay = `${m.firstName || ''} ${m.lastName || ''} ${m.email}`.toLowerCase()
+        if (!hay.includes(q)) return false
+      }
+      return true
+    })
+  }, [staff, filterQuery, filterMemberType, filterStatus, isOnline])
 
   return (
     <DashboardLayout>
@@ -252,6 +291,110 @@ export default function StaffPage() {
           )}
         </div>
 
+        {/* Filters */}
+        <div className="mb-5 bg-card rounded-2xl border border-white/[0.06] p-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex-1 min-w-[260px]">
+              <input
+                type="search"
+                value={filterQuery}
+                onChange={(e) => setFilterQuery(e.target.value)}
+                placeholder="Vyhľadávanie..."
+                className="w-full bg-white/[0.06] border border-white/[0.06] rounded-xl px-4 py-2 text-sm text-white
+                  placeholder:text-white/30 focus:outline-none focus:border-accent/50 focus:shadow-[0_0_0_3px_rgba(201,169,110,0.1)]"
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setFilterMemberType('all')}
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors border ${
+                  filterMemberType === 'all'
+                    ? 'bg-accent/10 text-accent border-accent/30'
+                    : 'bg-white/[0.04] text-white/50 border-white/[0.06] hover:border-white/10'
+                }`}
+              >
+                Všetci
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterMemberType('owner')}
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors border ${
+                  filterMemberType === 'owner'
+                    ? 'bg-accent/10 text-accent border-accent/30'
+                    : 'bg-white/[0.04] text-white/50 border-white/[0.06] hover:border-white/10'
+                }`}
+              >
+                Vlastník
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterMemberType('member')}
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors border ${
+                  filterMemberType === 'member'
+                    ? 'bg-accent/10 text-accent border-accent/30'
+                    : 'bg-white/[0.04] text-white/50 border-white/[0.06] hover:border-white/10'
+                }`}
+              >
+                Člen tímu
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setFilterStatus('all')}
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors border ${
+                  filterStatus === 'all'
+                    ? 'bg-accent/10 text-accent border-accent/30'
+                    : 'bg-white/[0.04] text-white/50 border-white/[0.06] hover:border-white/10'
+                }`}
+              >
+                Všetky stavy
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterStatus('online')}
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors border ${
+                  filterStatus === 'online'
+                    ? 'bg-green-500/10 text-green-400 border-green-500/20'
+                    : 'bg-white/[0.04] text-white/50 border-white/[0.06] hover:border-white/10'
+                }`}
+              >
+                Online
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterStatus('offline')}
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors border ${
+                  filterStatus === 'offline'
+                    ? 'bg-white/[0.06] text-white/70 border-white/[0.12]'
+                    : 'bg-white/[0.04] text-white/50 border-white/[0.06] hover:border-white/10'
+                }`}
+              >
+                Offline
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setFilterQuery('')
+                setFilterMemberType('all')
+                setFilterStatus('all')
+              }}
+              className="px-4 py-2 text-sm rounded-xl border border-white/10 text-white/60 hover:bg-white/5 transition-colors"
+            >
+              Vymazať filtre
+            </button>
+
+            <div className="ml-auto text-xs text-white/35">
+              Zobrazené: <span className="text-white/60 font-semibold">{filteredStaff.length}</span>
+            </div>
+          </div>
+        </div>
+
         {error && (
           <div className="mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
             {error}
@@ -264,7 +407,7 @@ export default function StaffPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {staff.map((member) => {
+            {filteredStaff.map((member) => {
               const memberIsOwner = isMemberOwner(member)
               const permCount = Array.isArray(member.adminPermissions) ? member.adminPermissions.length : 0
 
@@ -375,15 +518,66 @@ export default function StaffPage() {
               )
             })}
 
-            {staff.length === 0 && (
+            {filteredStaff.length === 0 && (
               <div className="text-center py-16">
                 <UserCog className="w-12 h-12 text-white/10 mx-auto mb-3" />
-                <p className="text-muted text-sm">Zatiaľ žiadni členovia tímu</p>
+                <p className="text-muted text-sm">Žiadne výsledky</p>
               </div>
             )}
           </div>
         )}
       </div>
+
+      {/* Remove confirm modal */}
+      {confirmRemoveMember && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setConfirmRemoveMember(null)} />
+          <div className="relative w-full max-w-md bg-card rounded-2xl border border-white/[0.08] shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+              <div>
+                <h3 className="text-lg font-semibold text-white">Odstrániť člena</h3>
+                <p className="text-xs text-muted mt-0.5">
+                  {confirmRemoveMember.firstName || confirmRemoveMember.email}
+                </p>
+              </div>
+              <button
+                onClick={() => setConfirmRemoveMember(null)}
+                className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <p className="text-sm text-white/70 leading-relaxed">
+                Naozaj chcete odstrániť{' '}
+                <span className="text-white font-semibold">
+                  {confirmRemoveMember.firstName || confirmRemoveMember.email}
+                </span>{' '}
+                z admin tímu?
+              </p>
+              <div className="mt-4 rounded-xl border border-white/[0.06] bg-dark-100 px-4 py-3 text-xs text-white/50">
+                Účet zostane v platforme ako bežný používateľ (USER), iba stratí prístup do admin panelu.
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/[0.06]">
+              <button
+                onClick={() => setConfirmRemoveMember(null)}
+                className="px-4 py-2 text-sm rounded-xl border border-white/10 text-white/60 hover:bg-white/5 transition-colors"
+              >
+                Zrušiť
+              </button>
+              <button
+                onClick={confirmRemove}
+                className="px-5 py-2 bg-red-500/90 text-white font-semibold rounded-xl hover:bg-red-500 transition-colors text-sm"
+              >
+                Odstrániť
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Create modal */}
       {showCreateModal && (
