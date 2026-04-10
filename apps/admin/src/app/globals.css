@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: dark;
+  }
+
   * {
     border-color: rgba(255, 255, 255, 0.06);
   }
@@ -103,9 +107,15 @@
   }
 
   option {
-    background-color: rgb(28, 28, 28);
-    color: white;
+    background-color: #141414 !important;
+    color: rgba(255, 255, 255, 0.92) !important;
     padding: 8px 12px;
+  }
+
+  option:hover,
+  option:checked {
+    background-color: #252525 !important;
+    color: white !important;
   }
 
   input[type="checkbox"],

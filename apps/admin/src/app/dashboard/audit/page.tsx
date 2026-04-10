@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
 import api from '@/lib/api'
@@ -9,7 +9,7 @@ import {
   Shield, LogIn, LogOut, AlertTriangle, XCircle, Search,
   ChevronLeft, ChevronRight, Eye, UserCheck,
   Activity, Server, FileWarning, CheckCircle2, Ban,
-  RefreshCw, Filter, X,
+  RefreshCw, Filter, X, ChevronDown,
 } from 'lucide-react'
 
 type Tab = 'all' | 'logins' | 'errors' | 'actions'
@@ -300,25 +300,15 @@ export default function AuditPage() {
                 </div>
                 <div>
                   <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Akcia</label>
-                  <select value={actionFilter} onChange={(e) => { setActionFilter(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40">
-                    <option value="">Všetky</option>
-                    {Object.entries(ACTION_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                  </select>
+                  <DarkSelect value={actionFilter} onChange={(v) => { setActionFilter(v); setPage(1) }} options={Object.entries(ACTION_LABELS).map(([k, v]) => ({ value: k, label: v }))} />
                 </div>
                 <div>
                   <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Závažnosť</label>
-                  <select value={severityFilter} onChange={(e) => { setSeverityFilter(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40">
-                    <option value="">Všetky</option>
-                    <option value="INFO">Info</option><option value="WARNING">Varovanie</option><option value="ERROR">Chyba</option><option value="CRITICAL">Kritická</option>
-                  </select>
+                  <DarkSelect value={severityFilter} onChange={(v) => { setSeverityFilter(v); setPage(1) }} options={[{ value: 'INFO', label: 'Info' }, { value: 'WARNING', label: 'Varovanie' }, { value: 'ERROR', label: 'Chyba' }, { value: 'CRITICAL', label: 'Kritická' }]} />
                 </div>
                 <div>
                   <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Stav</label>
-                  <select value={successFilter} onChange={(e) => { setSuccessFilter(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40">
-                    <option value="">Všetky</option>
-                    <option value="true">Úspešné</option>
-                    <option value="false">Neúspešné</option>
-                  </select>
+                  <DarkSelect value={successFilter} onChange={(v) => { setSuccessFilter(v); setPage(1) }} options={[{ value: 'true', label: 'Úspešné' }, { value: 'false', label: 'Neúspešné' }]} />
                 </div>
                 <div>
                   <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Od</label>
@@ -353,11 +343,77 @@ export default function AuditPage() {
                 </div>
                 <div>
                   <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Stav</label>
-                  <select value={successFilter} onChange={(e) => { setSuccessFilter(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40">
-                    <option value="">Všetky</option>
-                    <option value="true">Úspešné</option>
-                    <option value="false">Neúspešné</option>
-                  </select>
+                  <DarkSelect value={successFilter} onChange={(v) => { setSuccessFilter(v); setPage(1) }} options={[{ value: 'true', label: 'Úspešné' }, { value: 'false', label: 'Neúspešné' }]} />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Od</label>
+                  <input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Do</label>
+                  <input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40" />
+                </div>
+                {hasFilters && (
+                  <button onClick={resetFilters} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-500/10 transition-colors">
+                    <X className="w-3.5 h-3.5" />Zrušiť
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Inline filtre pre Akcie */}
+          {tab === 'actions' && (
+            <div className="px-4 py-3 bg-white/[0.015] border-b border-white/[0.06]">
+              <div className="flex flex-wrap gap-3 items-end">
+                <div className="w-full sm:w-auto sm:flex-1 sm:min-w-[160px] sm:max-w-[240px]">
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Hľadať</label>
+                  <div className="relative">
+                    <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} placeholder="Email, resource..."
+                      className="w-full bg-white/[0.06] border border-white/[0.08] rounded-lg py-2 pr-3 text-sm text-white focus:outline-none focus:border-accent/40" style={{ paddingLeft: '2.25rem' }} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Akcia</label>
+                  <DarkSelect value={actionFilter} onChange={(v) => { setActionFilter(v); setPage(1) }} options={Object.entries(ACTION_LABELS).filter(([k]) => !LOGIN_ACTIONS.includes(k) && k !== 'SYSTEM_ERROR' && k !== 'API_ERROR').map(([k, v]) => ({ value: k, label: v }))} />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Od</label>
+                  <input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Do</label>
+                  <input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(1) }} className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/40" />
+                </div>
+                {hasFilters && (
+                  <button onClick={resetFilters} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-500/10 transition-colors">
+                    <X className="w-3.5 h-3.5" />Zrušiť
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Inline filtre pre Chyby */}
+          {tab === 'errors' && (
+            <div className="px-4 py-3 bg-white/[0.015] border-b border-white/[0.06]">
+              <div className="flex flex-wrap gap-3 items-end">
+                <div className="w-full sm:w-auto sm:flex-1 sm:min-w-[160px] sm:max-w-[240px]">
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Hľadať</label>
+                  <div className="relative">
+                    <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} placeholder="Chybová správa, URL..."
+                      className="w-full bg-white/[0.06] border border-white/[0.08] rounded-lg py-2 pr-3 text-sm text-white focus:outline-none focus:border-accent/40" style={{ paddingLeft: '2.25rem' }} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Závažnosť</label>
+                  <DarkSelect value={severityFilter} onChange={(v) => { setSeverityFilter(v); setPage(1) }} options={[{ value: 'ERROR', label: 'Chyba' }, { value: 'CRITICAL', label: 'Kritická' }, { value: 'WARNING', label: 'Varovanie' }]} />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Typ</label>
+                  <DarkSelect value={actionFilter} onChange={(v) => { setActionFilter(v); setPage(1) }} options={[{ value: 'API_ERROR', label: 'API chyba' }, { value: 'SYSTEM_ERROR', label: 'Systémová chyba' }]} />
                 </div>
                 <div>
                   <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Od</label>
@@ -568,6 +624,62 @@ function DField({ label, value, mono }: { label: string; value: string; mono?: b
     <div className="min-w-0">
       <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">{label}</p>
       <p className={`text-sm text-white truncate ${mono ? 'font-mono text-xs' : ''}`}>{value}</p>
+    </div>
+  )
+}
+
+function DarkSelect({ value, onChange, options, placeholder = 'Všetky' }: {
+  value: string
+  onChange: (v: string) => void
+  options: { value: string; label: string }[]
+  placeholder?: string
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const selected = options.find(o => o.value === value)
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white hover:border-white/[0.15] focus:outline-none focus:border-accent/40 transition-colors min-w-[120px]"
+      >
+        <span className={`flex-1 text-left truncate ${!selected ? 'text-gray-400' : ''}`}>
+          {selected ? selected.label : placeholder}
+        </span>
+        <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform flex-shrink-0 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="absolute z-50 top-full mt-1 left-0 min-w-full w-max max-h-60 overflow-y-auto bg-[#1a1a1a] border border-white/[0.1] rounded-lg shadow-xl py-1" style={{ animation: 'slideDown 0.12s ease-out' }}>
+          <button
+            type="button"
+            onClick={() => { onChange(''); setOpen(false) }}
+            className={`w-full text-left px-3 py-2 text-sm transition-colors ${value === '' ? 'bg-accent/10 text-accent' : 'text-gray-300 hover:bg-white/[0.06] hover:text-white'}`}
+          >
+            {placeholder}
+          </button>
+          {options.filter(o => o.value !== '').map(o => (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => { onChange(o.value); setOpen(false) }}
+              className={`w-full text-left px-3 py-2 text-sm transition-colors ${value === o.value ? 'bg-accent/10 text-accent' : 'text-gray-300 hover:bg-white/[0.06] hover:text-white'}`}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
