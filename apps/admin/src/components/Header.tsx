@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { Search, Bell } from 'lucide-react'
+import { Search, Bell, LogOut, ChevronDown } from 'lucide-react'
+import { getAuthUser, logout } from '@/lib/auth'
 
 const shortcuts = [
   { label: 'Inzeráty', path: '/dashboard/advertisements' },
@@ -14,10 +15,32 @@ const shortcuts = [
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
   const router = useRouter()
   const pathname = usePathname()
+  const userMenuRef = useRef<HTMLDivElement>(null)
 
   const pageTitle = getPageTitle(pathname)
+
+  useEffect(() => {
+    setUser(getAuthUser())
+  }, [])
+
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (!userMenuOpen) return
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [userMenuOpen])
+
+  const initials =
+    ((user?.firstName?.[0] || '') + (user?.lastName?.[0] || '')).toUpperCase() ||
+    (user?.email?.[0] || 'A').toUpperCase()
 
   return (
     <header className="sticky top-0 z-30 bg-dark/80 backdrop-blur-xl border-b border-white/[0.06]">
@@ -65,6 +88,53 @@ export default function Header() {
             <Bell className="w-[18px] h-[18px]" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full" />
           </button>
+
+          {/* User menu */}
+          <div ref={userMenuRef} className="relative ml-1">
+            <button
+              type="button"
+              onClick={() => setUserMenuOpen((v) => !v)}
+              className={`
+                flex items-center gap-3 pl-2 pr-3 py-1.5 rounded-2xl transition-colors
+                ${userMenuOpen ? 'bg-white/[0.06]' : 'hover:bg-white/[0.06]'}
+              `}
+            >
+              <div className="w-9 h-9 rounded-full bg-accent/20 flex items-center justify-center text-accent font-semibold text-xs flex-shrink-0">
+                {initials}
+              </div>
+              <div className="hidden md:block text-left">
+                <p className="text-sm font-semibold text-white leading-tight">
+                  {user?.firstName || 'Admin'} {user?.lastName || 'User'}
+                </p>
+                <p className="text-[11px] text-muted leading-tight">Administrátor</p>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-white/35 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {userMenuOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-[rgb(30,30,30)] border border-white/[0.08] rounded-2xl shadow-xl shadow-black/40 overflow-hidden">
+                <div className="px-4 py-3 border-b border-white/[0.06]">
+                  <p className="text-sm font-semibold text-white truncate">
+                    {user?.firstName || 'Admin'} {user?.lastName || 'User'}
+                  </p>
+                  <p className="text-xs text-muted truncate">{user?.email || ''}</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUserMenuOpen(false)
+                    logout()
+                    router.push('/login')
+                  }}
+                  className="w-full flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:bg-white/[0.06] hover:text-white transition-colors"
+                >
+                  <LogOut className="w-4 h-4 text-red-400" />
+                  Odhlásiť sa
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
