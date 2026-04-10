@@ -58,6 +58,34 @@ const MONTHS_SK = [
   'Júl', 'August', 'September', 'Október', 'November', 'December',
 ]
 
+const FILTER_TYPE_OPTIONS = [
+  { value: 'all', label: 'Všetky typy' },
+  { value: 'EVENT', label: 'Udalosť' },
+  { value: 'REMINDER', label: 'Pripomienka' },
+  { value: 'TASK', label: 'Úloha' },
+]
+
+const FILTER_STATUS_OPTIONS = [
+  { value: 'all', label: 'Všetky stavy' },
+  { value: 'open', label: 'Aktívne' },
+  { value: 'done', label: 'Dokončené' },
+]
+
+const MONTH_OPTIONS = [
+  { value: '0', label: 'Január' },
+  { value: '1', label: 'Február' },
+  { value: '2', label: 'Marec' },
+  { value: '3', label: 'Apríl' },
+  { value: '4', label: 'Máj' },
+  { value: '5', label: 'Jún' },
+  { value: '6', label: 'Júl' },
+  { value: '7', label: 'August' },
+  { value: '8', label: 'September' },
+  { value: '9', label: 'Október' },
+  { value: '10', label: 'November' },
+  { value: '11', label: 'December' },
+]
+
 const TIME_OPTIONS = (() => {
   const opts: Array<{ value: string; label: string }> = [
     { value: '', label: '—' },
@@ -97,6 +125,17 @@ function formatTime(dateStr: string) {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
+function parseDateInput(value: string): Date {
+  const [y, m, d] = value.split('-').map((x) => Number(x))
+  return new Date(y, (m || 1) - 1, d || 1)
+}
+
+function clampMonthYear(year: number, month: number) {
+  if (month < 0) return { year: year - 1, month: 11 }
+  if (month > 11) return { year: year + 1, month: 0 }
+  return { year, month }
+}
+
 export default function OrganizerPage() {
   const router = useRouter()
   const today = new Date()
@@ -107,9 +146,20 @@ export default function OrganizerPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  const [query, setQuery] = useState('')
+  const [filterType, setFilterType] = useState<'all' | CalendarEvent['type']>('all')
+  const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'done'>('all')
+  const [filterDate, setFilterDate] = useState('') // YYYY-MM-DD alebo ''
+  const [filterDateOpen, setFilterDateOpen] = useState(false)
+  const [fdpYear, setFdpYear] = useState(today.getFullYear())
+  const [fdpMonth, setFdpMonth] = useState(today.getMonth())
+
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null)
+  const [datePickerOpen, setDatePickerOpen] = useState<null | 'start' | 'end'>(null)
+  const [dpYear, setDpYear] = useState(today.getFullYear())
+  const [dpMonth, setDpMonth] = useState(today.getMonth())
 
   const [form, setForm] = useState({
     title: '',
@@ -204,17 +254,43 @@ export default function OrganizerPage() {
 
   const eventsByDate = useMemo(() => {
     const map: Record<string, CalendarEvent[]> = {}
-    events.forEach((ev) => {
+    const q = query.trim().toLowerCase()
+    const filtered = events.filter((ev) => {
+      if (filterType !== 'all' && ev.type !== filterType) return false
+      if (filterStatus !== 'all') {
+        const done = !!ev.completed
+        if (filterStatus === 'done' && !done) return false
+        if (filterStatus === 'open' && done) return false
+      }
+      if (filterDate) {
+        const d = formatDate(new Date(ev.date))
+        if (d !== filterDate) return false
+      }
+      if (q) {
+        const hay = `${ev.title} ${ev.description || ''}`.toLowerCase()
+        if (!hay.includes(q)) return false
+      }
+      return true
+    })
+
+    filtered.forEach((ev) => {
       const key = formatDate(new Date(ev.date))
       if (!map[key]) map[key] = []
       map[key].push(ev)
     })
     return map
-  }, [events])
+  }, [events, query, filterType, filterStatus])
+
+  const filteredCount = useMemo(() => {
+    return Object.values(eventsByDate).reduce((sum, arr) => sum + arr.length, 0)
+  }, [eventsByDate])
 
   const openCreateModal = (date?: Date) => {
     const d = date || new Date()
     setEditingEvent(null)
+    setDatePickerOpen(null)
+    setDpYear(d.getFullYear())
+    setDpMonth(d.getMonth())
     setForm({
       title: '',
       description: '',
@@ -231,7 +307,10 @@ export default function OrganizerPage() {
 
   const openEditModal = (ev: CalendarEvent) => {
     setEditingEvent(ev)
+    setDatePickerOpen(null)
     const d = new Date(ev.date)
+    setDpYear(d.getFullYear())
+    setDpMonth(d.getMonth())
     setForm({
       title: ev.title,
       description: ev.description || '',
@@ -244,6 +323,98 @@ export default function OrganizerPage() {
       color: ev.color || '#c9a96e',
     })
     setShowModal(true)
+  }
+
+  const openDatePicker = (which: 'start' | 'end') => {
+    const current = which === 'start' ? form.date : form.endDate || form.date
+    const base = current ? parseDateInput(current) : new Date()
+    setDpYear(base.getFullYear())
+    setDpMonth(base.getMonth())
+    setDatePickerOpen(which)
+  }
+
+  const dpCells = useMemo(() => {
+    const first = getFirstDayOfMonth(dpYear, dpMonth)
+    const dim = getDaysInMonth(dpYear, dpMonth)
+    const prevDim = getDaysInMonth(dpYear, dpMonth - 1)
+    const cells: Array<{ date: Date; inMonth: boolean }> = []
+
+    for (let i = first - 1; i >= 0; i--) {
+      cells.push({
+        date: new Date(dpYear, dpMonth - 1, prevDim - i),
+        inMonth: false,
+      })
+    }
+    for (let i = 1; i <= dim; i++) {
+      cells.push({ date: new Date(dpYear, dpMonth, i), inMonth: true })
+    }
+    while (cells.length < 42) {
+      const nextDay = cells.length - (first + dim) + 1
+      cells.push({ date: new Date(dpYear, dpMonth + 1, nextDay), inMonth: false })
+    }
+    return cells
+  }, [dpYear, dpMonth])
+
+  const fdpCells = useMemo(() => {
+    const first = getFirstDayOfMonth(fdpYear, fdpMonth)
+    const dim = getDaysInMonth(fdpYear, fdpMonth)
+    const prevDim = getDaysInMonth(fdpYear, fdpMonth - 1)
+    const cells: Array<{ date: Date; inMonth: boolean }> = []
+
+    for (let i = first - 1; i >= 0; i--) {
+      cells.push({
+        date: new Date(fdpYear, fdpMonth - 1, prevDim - i),
+        inMonth: false,
+      })
+    }
+    for (let i = 1; i <= dim; i++) {
+      cells.push({ date: new Date(fdpYear, fdpMonth, i), inMonth: true })
+    }
+    while (cells.length < 42) {
+      const nextDay = cells.length - (first + dim) + 1
+      cells.push({ date: new Date(fdpYear, fdpMonth + 1, nextDay), inMonth: false })
+    }
+    return cells
+  }, [fdpYear, fdpMonth])
+
+  const selectDateFromPicker = (d: Date) => {
+    const value = formatDate(d)
+    if (datePickerOpen === 'start') {
+      setForm((prev) => ({
+        ...prev,
+        date: value,
+        ...(prev.endDate && parseDateInput(prev.endDate) < d ? { endDate: value } : {}),
+      }))
+    } else if (datePickerOpen === 'end') {
+      setForm((prev) => ({ ...prev, endDate: value }))
+    }
+    setDatePickerOpen(null)
+  }
+
+  const yearOptions = useMemo(() => {
+    const start = today.getFullYear() - 5
+    const end = today.getFullYear() + 5
+    const opts: Array<{ value: string; label: string }> = []
+    for (let y = start; y <= end; y++) {
+      opts.push({ value: String(y), label: String(y) })
+    }
+    return opts
+  }, [today])
+
+  const openFilterDatePicker = () => {
+    const base = filterDate ? parseDateInput(filterDate) : new Date(currentYear, currentMonth, 1)
+    setFdpYear(base.getFullYear())
+    setFdpMonth(base.getMonth())
+    setFilterDateOpen(true)
+  }
+
+  const selectFilterDate = (d: Date) => {
+    const value = formatDate(d)
+    setFilterDate(value)
+    setSelectedDate(d)
+    setCurrentYear(d.getFullYear())
+    setCurrentMonth(d.getMonth())
+    setFilterDateOpen(false)
   }
 
   const handleSave = async () => {
@@ -320,7 +491,7 @@ export default function OrganizerPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1400px] mx-auto">
+      <div className="max-w-[1680px] mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -346,25 +517,203 @@ export default function OrganizerPage() {
           </div>
         </div>
 
+        {/* Filters */}
+        <div className="mb-6 bg-card rounded-2xl border border-white/[0.06] p-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex-1 min-w-[260px]">
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Vyhľadávanie..."
+                className="w-full bg-white/[0.06] border border-white/[0.06] rounded-xl px-4 py-2 text-sm text-white
+                  placeholder:text-white/30 focus:outline-none focus:border-accent/50 focus:shadow-[0_0_0_3px_rgba(201,169,110,0.1)]"
+              />
+            </div>
+
+            <Select
+              value={String(currentYear)}
+              onChange={(v) => {
+                setCurrentYear(Number(v))
+                setSelectedDate(null)
+                setFilterDate('')
+              }}
+              options={yearOptions}
+              className="min-w-[140px]"
+              placeholder="Rok"
+            />
+
+            <Select
+              value={String(currentMonth)}
+              onChange={(v) => {
+                setCurrentMonth(Number(v))
+                setSelectedDate(null)
+                setFilterDate('')
+              }}
+              options={MONTH_OPTIONS}
+              className="min-w-[180px]"
+              placeholder="Mesiac"
+            />
+
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => (filterDateOpen ? setFilterDateOpen(false) : openFilterDatePicker())}
+                className={`
+                  min-w-[160px] px-4 py-2 text-sm rounded-xl border transition-colors text-left
+                  bg-white/[0.06] border-white/[0.06] text-white
+                  hover:border-white/[0.12]
+                  ${filterDateOpen ? 'border-accent/50 shadow-[0_0_0_3px_rgba(201,169,110,0.1)]' : ''}
+                `}
+              >
+                {filterDate || 'Dátum'}
+              </button>
+
+              {filterDateOpen && (
+                <div className="absolute z-50 mt-2 w-[320px] bg-[rgb(30,30,30)] border border-white/[0.08] rounded-2xl shadow-xl shadow-black/40 overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = clampMonthYear(fdpYear, fdpMonth - 1)
+                        setFdpYear(next.year)
+                        setFdpMonth(next.month)
+                      }}
+                      className="p-2 rounded-xl hover:bg-white/[0.06] text-white/60 hover:text-white transition-colors"
+                      aria-label="Predchádzajúci mesiac"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <div className="text-sm font-semibold text-white">
+                      {MONTHS_SK[fdpMonth]} {fdpYear}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = clampMonthYear(fdpYear, fdpMonth + 1)
+                        setFdpYear(next.year)
+                        setFdpMonth(next.month)
+                      }}
+                      className="p-2 rounded-xl hover:bg-white/[0.06] text-white/60 hover:text-white transition-colors"
+                      aria-label="Nasledujúci mesiac"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-7 px-3 py-2 border-b border-white/[0.06]">
+                    {DAYS_SK.map((d) => (
+                      <div key={d} className="text-[10px] font-semibold text-muted uppercase tracking-wider text-center py-1">
+                        {d}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-7 p-3 gap-1">
+                    {fdpCells.map((c, i) => {
+                      const val = formatDate(c.date)
+                      const isSelected = filterDate === val
+                      const isToday = isSameDay(c.date, today)
+                      return (
+                        <button
+                          key={`${val}-${i}`}
+                          type="button"
+                          onClick={() => selectFilterDate(c.date)}
+                          className={`
+                            h-9 rounded-xl text-sm font-medium transition-colors
+                            ${c.inMonth ? 'text-white/80' : 'text-white/25'}
+                            ${isSelected ? 'bg-accent text-dark font-bold' : 'hover:bg-white/[0.06]'}
+                            ${!isSelected && isToday ? 'ring-1 ring-inset ring-accent/30 text-accent' : ''}
+                          `}
+                        >
+                          {c.date.getDate()}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  <div className="flex items-center justify-between px-4 py-3 border-t border-white/[0.06]">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFilterDate('')
+                        setFilterDateOpen(false)
+                        setSelectedDate(null)
+                      }}
+                      className="text-sm text-white/50 hover:text-white transition-colors"
+                    >
+                      Vymazať
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const d = new Date()
+                        selectFilterDate(d)
+                      }}
+                      className="text-sm text-accent hover:underline"
+                    >
+                      Dnes
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <Select
+              value={filterType}
+              onChange={(v) => setFilterType(v as any)}
+              options={FILTER_TYPE_OPTIONS}
+              className="min-w-[190px]"
+              placeholder="Typ"
+            />
+
+            <Select
+              value={filterStatus}
+              onChange={(v) => setFilterStatus(v as any)}
+              options={FILTER_STATUS_OPTIONS}
+              className="min-w-[190px]"
+              placeholder="Stav"
+            />
+
+            <button
+              type="button"
+              onClick={() => {
+                setQuery('')
+                setFilterType('all')
+                setFilterStatus('all')
+                setFilterDate('')
+                setSelectedDate(null)
+              }}
+              className="px-4 py-2 text-sm rounded-xl border border-white/10 text-white/60 hover:bg-white/5 transition-colors"
+            >
+              Vymazať filtre
+            </button>
+
+            <div className="ml-auto text-xs text-white/35">
+              Zobrazené: <span className="text-white/60 font-semibold">{filteredCount}</span>
+            </div>
+          </div>
+        </div>
+
         {error && (
           <div className="mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
             {error}
           </div>
         )}
 
-        <div className="flex gap-6">
+        <div className="flex gap-8">
           {/* Calendar grid */}
           <div className="flex-1">
             <div className="bg-card rounded-2xl border border-white/[0.06] overflow-hidden">
               {/* Month navigation */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+              <div className="flex items-center justify-between px-7 py-5 border-b border-white/[0.06]">
                 <button
                   onClick={prevMonth}
                   className="p-2 rounded-xl hover:bg-white/5 text-white/60 hover:text-white transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
-                <h2 className="text-lg font-semibold text-white">
+                <h2 className="text-xl font-semibold text-white">
                   {MONTHS_SK[currentMonth]} {currentYear}
                 </h2>
                 <button
@@ -380,7 +729,7 @@ export default function OrganizerPage() {
                 {DAYS_SK.map((day) => (
                   <div
                     key={day}
-                    className="px-3 py-3 text-center text-xs font-semibold text-muted uppercase tracking-wider"
+                    className="px-3 py-3.5 text-center text-xs font-semibold text-muted uppercase tracking-wider"
                   >
                     {day}
                   </div>
@@ -401,7 +750,7 @@ export default function OrganizerPage() {
                       onClick={() => setSelectedDate(cell.date)}
                       onDoubleClick={() => openCreateModal(cell.date)}
                       className={`
-                        relative min-h-[100px] p-2 border-b border-r border-white/[0.04] text-left
+                        relative min-h-[132px] p-3 border-b border-r border-white/[0.04] text-left
                         transition-colors group
                         ${!cell.isCurrentMonth ? 'opacity-30' : ''}
                         ${isSelected ? 'bg-accent/5 ring-1 ring-inset ring-accent/30' : 'hover:bg-white/[0.02]'}
@@ -409,7 +758,7 @@ export default function OrganizerPage() {
                     >
                       <span
                         className={`
-                          inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-medium
+                          inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium
                           ${isToday ? 'bg-accent text-dark font-bold' : 'text-white/70'}
                           ${isSelected && !isToday ? 'text-accent' : ''}
                         `}
@@ -423,7 +772,7 @@ export default function OrganizerPage() {
                           <div
                             key={ev.id}
                             className={`
-                              text-[10px] leading-tight px-1.5 py-0.5 rounded truncate font-medium
+                              text-[11px] leading-tight px-2 py-0.5 rounded truncate font-medium
                               ${ev.completed ? 'line-through opacity-50' : ''}
                             `}
                             style={{
@@ -448,10 +797,10 @@ export default function OrganizerPage() {
                             e.stopPropagation()
                             openCreateModal(cell.date)
                           }}
-                          className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-accent/10 text-accent
+                          className="absolute top-2 right-2 w-6 h-6 rounded-full bg-accent/10 text-accent
                             flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-3.5 h-3.5" />
                         </div>
                       )}
                     </button>
@@ -462,7 +811,7 @@ export default function OrganizerPage() {
           </div>
 
           {/* Sidebar - selected day detail */}
-          <div className="w-[340px] flex-shrink-0">
+          <div className="w-[380px] flex-shrink-0">
             <div className="bg-card rounded-2xl border border-white/[0.06] sticky top-8">
               <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
                 <h3 className="font-semibold text-white text-sm">
@@ -480,7 +829,7 @@ export default function OrganizerPage() {
                 )}
               </div>
 
-              <div className="p-4 max-h-[600px] overflow-y-auto">
+              <div className="p-4 max-h-[700px] overflow-y-auto">
                 {!selectedDate ? (
                   <p className="text-muted text-sm text-center py-8">
                     Kliknite na deň v kalendári
@@ -675,27 +1024,131 @@ export default function OrganizerPage() {
                   <label className="block text-xs font-medium text-muted mb-1.5">
                     Dátum začiatku
                   </label>
-                  <input
-                    type="date"
-                    value={form.date}
-                    onChange={(e) => setForm({ ...form, date: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-dark-100 border border-white/[0.08] rounded-xl text-white text-sm
-                      focus:outline-none focus:border-accent/40 transition-colors"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => openDatePicker('start')}
+                    className={`
+                      w-full px-4 py-2.5 text-left rounded-xl border transition-colors text-sm
+                      bg-dark-100 border-white/[0.08] text-white
+                      hover:border-white/[0.12]
+                      ${datePickerOpen === 'start' ? 'border-accent/40 shadow-[0_0_0_3px_rgba(201,169,110,0.1)]' : ''}
+                    `}
+                  >
+                    {form.date || 'Vybrať dátum'}
+                  </button>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-muted mb-1.5">
                     Dátum konca
                   </label>
-                  <input
-                    type="date"
-                    value={form.endDate}
-                    onChange={(e) => setForm({ ...form, endDate: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-dark-100 border border-white/[0.08] rounded-xl text-white text-sm
-                      focus:outline-none focus:border-accent/40 transition-colors"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => openDatePicker('end')}
+                    className={`
+                      w-full px-4 py-2.5 text-left rounded-xl border transition-colors text-sm
+                      bg-dark-100 border-white/[0.08] text-white
+                      hover:border-white/[0.12]
+                      ${datePickerOpen === 'end' ? 'border-accent/40 shadow-[0_0_0_3px_rgba(201,169,110,0.1)]' : ''}
+                    `}
+                  >
+                    {form.endDate || '—'}
+                  </button>
                 </div>
               </div>
+
+              {/* Date picker popover */}
+              {datePickerOpen && (
+                <div className="relative">
+                  <div className="absolute z-50 mt-2 w-full bg-[rgb(30,30,30)] border border-white/[0.08] rounded-2xl shadow-xl shadow-black/40 overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = clampMonthYear(dpYear, dpMonth - 1)
+                          setDpYear(next.year)
+                          setDpMonth(next.month)
+                        }}
+                        className="p-2 rounded-xl hover:bg-white/[0.06] text-white/60 hover:text-white transition-colors"
+                        aria-label="Predchádzajúci mesiac"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <div className="text-sm font-semibold text-white">
+                        {MONTHS_SK[dpMonth]} {dpYear}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = clampMonthYear(dpYear, dpMonth + 1)
+                          setDpYear(next.year)
+                          setDpMonth(next.month)
+                        }}
+                        className="p-2 rounded-xl hover:bg-white/[0.06] text-white/60 hover:text-white transition-colors"
+                        aria-label="Nasledujúci mesiac"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-7 px-3 py-2 border-b border-white/[0.06]">
+                      {DAYS_SK.map((d) => (
+                        <div key={d} className="text-[10px] font-semibold text-muted uppercase tracking-wider text-center py-1">
+                          {d}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="grid grid-cols-7 p-3 gap-1">
+                      {dpCells.map((c, i) => {
+                        const val = formatDate(c.date)
+                        const selectedVal = datePickerOpen === 'start' ? form.date : (form.endDate || '')
+                        const isSelected = selectedVal === val
+                        const isToday = isSameDay(c.date, today)
+                        return (
+                          <button
+                            key={`${val}-${i}`}
+                            type="button"
+                            onClick={() => selectDateFromPicker(c.date)}
+                            className={`
+                              h-9 rounded-xl text-sm font-medium transition-colors
+                              ${c.inMonth ? 'text-white/80' : 'text-white/25'}
+                              ${isSelected ? 'bg-accent text-dark font-bold' : 'hover:bg-white/[0.06]'}
+                              ${!isSelected && isToday ? 'ring-1 ring-inset ring-accent/30 text-accent' : ''}
+                            `}
+                          >
+                            {c.date.getDate()}
+                          </button>
+                        )
+                      })}
+                    </div>
+
+                    <div className="flex items-center justify-between px-4 py-3 border-t border-white/[0.06]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (datePickerOpen === 'end') setForm((p) => ({ ...p, endDate: '' }))
+                          setDatePickerOpen(null)
+                        }}
+                        className="text-sm text-white/50 hover:text-white transition-colors"
+                      >
+                        Vymazať
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const d = new Date()
+                          setDpYear(d.getFullYear())
+                          setDpMonth(d.getMonth())
+                          selectDateFromPicker(d)
+                        }}
+                        className="text-sm text-accent hover:underline"
+                      >
+                        Dnes
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* All day toggle + time */}
               <div>
