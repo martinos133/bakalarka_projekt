@@ -20,6 +20,7 @@ export const ALL_PERMISSIONS = [
   'static_pages',
   'blog',
   'organizer',
+  'team_chat',
   'settings',
   'staff',
   'dev_categories',

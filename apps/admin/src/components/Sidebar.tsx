@@ -24,6 +24,7 @@ import {
   LogOut,
   CalendarDays,
   UserCog,
+  MessageCircle,
 } from 'lucide-react'
 
 interface NavItem {
@@ -54,6 +55,7 @@ const navigation: NavSection[] = [
   {
     title: 'Komunikácia',
     items: [
+      { label: 'Tímový chat', path: '/dashboard/team-chat', icon: MessageCircle, permission: 'team_chat' },
       { label: 'Kontaktné formuláre', path: '/dashboard/contact-forms', icon: Mail, permission: 'contact_forms' },
     ],
   },

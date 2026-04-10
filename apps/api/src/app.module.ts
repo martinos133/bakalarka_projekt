@@ -18,6 +18,7 @@ import { BlogModule } from './blog/blog.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { StaffModule } from './staff/staff.module';
+import { TeamChatModule } from './team-chat/team-chat.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { StaffModule } from './staff/staff.module';
     ReviewsModule,
     CalendarModule,
     StaffModule,
+    TeamChatModule,
   ],
 })
 export class AppModule {}

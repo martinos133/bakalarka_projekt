@@ -306,6 +306,29 @@ export const api = {
     fetchWithAuth(`/calendar/${id}`, {
       method: 'DELETE',
     }),
+
+  getChatConversations: () => fetchWithAuth('/team-chat/conversations'),
+  getChatUnread: () => fetchWithAuth('/team-chat/unread'),
+  getChatMembers: () => fetchWithAuth('/team-chat/members'),
+  createChatConversation: (partnerId: string) =>
+    fetchWithAuth('/team-chat/conversations', {
+      method: 'POST',
+      body: JSON.stringify({ partnerId }),
+    }),
+  getChatMessages: (conversationId: string, cursor?: string) => {
+    const params = new URLSearchParams()
+    if (cursor) params.set('cursor', cursor)
+    return fetchWithAuth(`/team-chat/conversations/${conversationId}/messages?${params.toString()}`)
+  },
+  sendChatMessage: (conversationId: string, content: string) =>
+    fetchWithAuth(`/team-chat/conversations/${conversationId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    }),
+  markChatRead: (conversationId: string) =>
+    fetchWithAuth(`/team-chat/conversations/${conversationId}/read`, {
+      method: 'POST',
+    }),
 }
 
 export default api

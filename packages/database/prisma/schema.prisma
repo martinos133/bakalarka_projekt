@@ -91,6 +91,9 @@ model User {
   favorites            Favorite[]
   reviews              Review[]
   calendarEvents       CalendarEvent[]
+  conversationsA       TeamConversation[] @relation("ConvParticipantA")
+  conversationsB       TeamConversation[] @relation("ConvParticipantB")
+  teamMessages         TeamMessage[]      @relation("TeamMessageSender")
 
   @@index([banned])
   @@index([bannedUntil])
@@ -416,6 +419,38 @@ model ClickEvent {
   @@index([isCompany])
   @@index([createdAt])
   @@index([eventType])
+}
+
+model TeamConversation {
+  id            String        @id @default(uuid())
+  participantA  String
+  participantB  String
+  userA         User          @relation("ConvParticipantA", fields: [participantA], references: [id], onDelete: Cascade)
+  userB         User          @relation("ConvParticipantB", fields: [participantB], references: [id], onDelete: Cascade)
+  lastMessageAt DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  messages      TeamMessage[]
+
+  @@unique([participantA, participantB])
+  @@index([participantA])
+  @@index([participantB])
+  @@index([lastMessageAt])
+}
+
+model TeamMessage {
+  id             String           @id @default(uuid())
+  content        String           @db.Text
+  senderId       String
+  sender         User             @relation("TeamMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  conversationId String
+  conversation   TeamConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  readAt         DateTime?
+  createdAt      DateTime         @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
 }
 
 enum CalendarEventType {
