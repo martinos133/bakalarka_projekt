@@ -2,9 +2,20 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { Search, Bell, LogOut, ChevronDown, MessageCircle, Send, ArrowRight, X } from 'lucide-react'
+import { Search, Bell, LogOut, ChevronDown, MessageCircle, Send, ArrowRight, X, Clock, Flag, FileText, AlertTriangle } from 'lucide-react'
 import { getAuthUser, logout } from '@/lib/auth'
 import api from '@/lib/api'
+
+interface NotifItem {
+  id: string
+  icon: React.ComponentType<{ className?: string }>
+  iconBg: string
+  iconColor: string
+  title: string
+  description: string
+  path: string
+  count: number
+}
 
 const shortcuts = [
   { label: 'Inzeráty', path: '/dashboard/advertisements' },
@@ -64,6 +75,9 @@ export default function Header() {
   const [searchFocused, setSearchFocused] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [chatOpen, setChatOpen] = useState(false)
+  const [notifsOpen, setNotifsOpen] = useState(false)
+  const [notifications, setNotifications] = useState<NotifItem[]>([])
+  const [notifsTotal, setNotifsTotal] = useState(0)
   const [user, setUser] = useState<any>(null)
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [unreadTotal, setUnreadTotal] = useState(0)
@@ -76,6 +90,7 @@ export default function Header() {
   const pathname = usePathname()
   const userMenuRef = useRef<HTMLDivElement>(null)
   const chatRef = useRef<HTMLDivElement>(null)
+  const notifsRef = useRef<HTMLDivElement>(null)
   const replyInputRef = useRef<HTMLInputElement>(null)
 
   const pageTitle = getPageTitle(pathname)
@@ -96,11 +111,88 @@ export default function Header() {
     } catch {}
   }, [])
 
+  const loadNotifications = useCallback(async () => {
+    try {
+      const items: NotifItem[] = []
+
+      const [pendingAds, pendingReports, chatUnread, adminMsgs] = await Promise.all([
+        api.getPendingAdvertisements().catch(() => []),
+        api.getPendingReports().catch(() => []),
+        api.getChatUnread().catch(() => ({ total: 0 })),
+        api.getAdminMessages('unread').catch(() => []),
+      ])
+
+      const pendingCount = Array.isArray(pendingAds) ? pendingAds.length : 0
+      if (pendingCount > 0) {
+        items.push({
+          id: 'pending-ads',
+          icon: Clock,
+          iconBg: 'bg-amber-500/10',
+          iconColor: 'text-amber-400',
+          title: 'Čakajúce inzeráty',
+          description: `${pendingCount} ${pendingCount === 1 ? 'inzerát čaká' : pendingCount < 5 ? 'inzeráty čakajú' : 'inzerátov čaká'} na schválenie`,
+          path: '/dashboard/advertisements?status=pending',
+          count: pendingCount,
+        })
+      }
+
+      const reportsCount = Array.isArray(pendingReports) ? pendingReports.length : 0
+      if (reportsCount > 0) {
+        items.push({
+          id: 'pending-reports',
+          icon: Flag,
+          iconBg: 'bg-red-500/10',
+          iconColor: 'text-red-400',
+          title: 'Nahlásenia',
+          description: `${reportsCount} ${reportsCount === 1 ? 'nahlásenie čaká' : reportsCount < 5 ? 'nahlásenia čakajú' : 'nahlásení čaká'} na riešenie`,
+          path: '/dashboard/reports',
+          count: reportsCount,
+        })
+      }
+
+      const chatCount = chatUnread?.total || 0
+      if (chatCount > 0) {
+        items.push({
+          id: 'unread-chat',
+          icon: MessageCircle,
+          iconBg: 'bg-blue-500/10',
+          iconColor: 'text-blue-400',
+          title: 'Neprečítané správy',
+          description: `${chatCount} ${chatCount === 1 ? 'neprečítaná správa' : chatCount < 5 ? 'neprečítané správy' : 'neprečítaných správ'}`,
+          path: '/dashboard/team-chat',
+          count: chatCount,
+        })
+      }
+
+      const msgsCount = Array.isArray(adminMsgs) ? adminMsgs.length : 0
+      if (msgsCount > 0) {
+        items.push({
+          id: 'admin-msgs',
+          icon: FileText,
+          iconBg: 'bg-purple-500/10',
+          iconColor: 'text-purple-400',
+          title: 'Správy od používateľov',
+          description: `${msgsCount} ${msgsCount === 1 ? 'neprečítaná správa' : msgsCount < 5 ? 'neprečítané správy' : 'neprečítaných správ'}`,
+          path: '/dashboard/messages',
+          count: msgsCount,
+        })
+      }
+
+      setNotifications(items)
+      setNotifsTotal(items.reduce((s, i) => s + i.count, 0))
+    } catch {}
+  }, [])
+
   useEffect(() => {
     loadChatData()
-    const interval = setInterval(loadChatData, 8000)
-    return () => clearInterval(interval)
-  }, [loadChatData])
+    loadNotifications()
+    const chatInterval = setInterval(loadChatData, 8000)
+    const notifInterval = setInterval(loadNotifications, 15000)
+    return () => {
+      clearInterval(chatInterval)
+      clearInterval(notifInterval)
+    }
+  }, [loadChatData, loadNotifications])
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
@@ -111,10 +203,13 @@ export default function Header() {
         setChatOpen(false)
         setReplyTo(null)
       }
+      if (notifsOpen && notifsRef.current && !notifsRef.current.contains(e.target as Node)) {
+        setNotifsOpen(false)
+      }
     }
     document.addEventListener('mousedown', onDown)
     return () => document.removeEventListener('mousedown', onDown)
-  }, [userMenuOpen, chatOpen])
+  }, [userMenuOpen, chatOpen, notifsOpen])
 
   useEffect(() => {
     if (replyTo && replyInputRef.current) {
@@ -186,16 +281,23 @@ export default function Header() {
               className={`relative p-2 rounded-xl transition-colors ${
                 chatOpen ? 'bg-accent/10 text-accent' : 'text-gray-400 hover:text-white hover:bg-white/[0.06]'
               }`}
+              aria-label={unreadTotal > 0 ? `Správy, ${unreadTotal} neprečítaných` : 'Správy'}
             >
-              <MessageCircle className="w-[18px] h-[18px]" />
-              {unreadTotal > 0 && (
-                <>
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-accent animate-ping opacity-40" />
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-accent text-dark text-[10px] font-bold flex items-center justify-center px-1 shadow-lg shadow-accent/30">
-                    {unreadTotal > 9 ? '9+' : unreadTotal}
-                  </span>
-                </>
-              )}
+              {/* Wrapper keeps the bubble icon fully visible; badge sits outside the icon bounds */}
+              <span className="relative inline-flex h-[22px] w-[22px] items-center justify-center">
+                <MessageCircle className="h-[18px] w-[18px]" strokeWidth={2} />
+                {unreadTotal > 0 && (
+                  <>
+                    <span
+                      className="pointer-events-none absolute -right-2 -top-1.5 h-4 min-w-4 rounded-full bg-red-500 animate-ping opacity-35"
+                      aria-hidden
+                    />
+                    <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-0.5 text-[8px] font-bold leading-none text-white shadow-md shadow-red-500/40 ring-2 ring-dark">
+                      {unreadTotal > 9 ? '9+' : unreadTotal}
+                    </span>
+                  </>
+                )}
+              </span>
             </button>
 
             {chatOpen && (
@@ -330,10 +432,82 @@ export default function Header() {
           </div>
 
           {/* Notifications */}
-          <button className="relative p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/[0.06] transition-colors">
-            <Bell className="w-[18px] h-[18px]" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full" />
-          </button>
+          <div ref={notifsRef} className="relative">
+            <button
+              onClick={() => { setNotifsOpen(!notifsOpen); if (!notifsOpen) loadNotifications() }}
+              className="relative p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+            >
+              <Bell className="w-[18px] h-[18px]" />
+              {notifsTotal > 0 && (
+                <>
+                  <span className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500 animate-ping opacity-30" />
+                  <span className="absolute top-1 right-1 min-w-[20px] h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1 shadow-lg shadow-red-500/40">
+                    {notifsTotal > 99 ? '99+' : notifsTotal}
+                  </span>
+                </>
+              )}
+            </button>
+
+            {notifsOpen && (
+              <div className="absolute right-0 top-full mt-2 w-96 bg-dark-lighter border border-white/[0.06] rounded-2xl shadow-2xl z-50 overflow-hidden">
+                <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-white">Notifikácie</h3>
+                    {notifsTotal > 0 && (
+                      <span className="text-[10px] font-bold text-white bg-red-500 px-2 py-0.5 rounded-full">
+                        {notifsTotal}
+                      </span>
+                    )}
+                  </div>
+                  <button onClick={() => setNotifsOpen(false)} className="text-gray-500 hover:text-white transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="max-h-80 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="py-10 text-center">
+                      <Bell className="w-8 h-8 text-gray-600 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">Žiadne nové notifikácie</p>
+                    </div>
+                  ) : (
+                    notifications.map((notif) => {
+                      const Icon = notif.icon
+                      return (
+                        <button
+                          key={notif.id}
+                          onClick={() => { setNotifsOpen(false); router.push(notif.path) }}
+                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white/[0.04] transition-colors text-left border-b border-white/[0.04] last:border-0"
+                        >
+                          <div className={`w-9 h-9 rounded-xl ${notif.iconBg} flex items-center justify-center flex-shrink-0`}>
+                            <Icon className={`w-4.5 h-4.5 ${notif.iconColor}`} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-white">{notif.title}</p>
+                            <p className="text-xs text-gray-400 mt-0.5">{notif.description}</p>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <span className="min-w-[22px] h-[22px] rounded-full bg-red-500/15 text-red-400 text-[11px] font-bold flex items-center justify-center px-1.5">
+                              {notif.count}
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-gray-600" />
+                          </div>
+                        </button>
+                      )
+                    })
+                  )}
+                </div>
+
+                {notifications.length > 0 && (
+                  <div className="px-4 py-2.5 border-t border-white/[0.06] flex items-center justify-center">
+                    <p className="text-[11px] text-gray-500">
+                      Kliknutím prejdete na detail
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* User menu */}
           <div ref={userMenuRef} className="relative ml-1">

@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { getAuthUser, hasPermission, isOwnerAdmin } from '@/lib/auth'
+import api from '@/lib/api'
 import {
   LayoutDashboard,
   FileText,
@@ -101,10 +102,27 @@ export default function Sidebar() {
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
   const [user, setUser] = useState<any>(null)
+  const [chatUnread, setChatUnread] = useState(0)
 
   useEffect(() => {
     setUser(getAuthUser())
   }, [])
+
+  const loadChatUnread = useCallback(async () => {
+    if (!hasPermission('team_chat')) return
+    try {
+      const u = await api.getChatUnread()
+      setChatUnread(u?.total ?? 0)
+    } catch {
+      setChatUnread(0)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadChatUnread()
+    const t = setInterval(loadChatUnread, 12000)
+    return () => clearInterval(t)
+  }, [loadChatUnread])
 
   const owner = isOwnerAdmin()
 
@@ -169,6 +187,7 @@ export default function Sidebar() {
               {section.items.map((item) => {
                 const isActive = pathname === item.path
                 const Icon = item.icon
+                const showChatBadge = item.path === '/dashboard/team-chat' && chatUnread > 0
                 return (
                   <button
                     key={item.path}
@@ -184,7 +203,14 @@ export default function Sidebar() {
                       }
                     `}
                   >
-                    <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? 'text-accent' : ''}`} />
+                    <span className="relative inline-flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center">
+                      <Icon className={`h-[18px] w-[18px] ${isActive ? 'text-accent' : ''}`} strokeWidth={2} />
+                      {showChatBadge && (
+                        <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-0.5 text-[8px] font-bold leading-none text-white shadow-md shadow-red-500/35 ring-2 ring-card">
+                          {chatUnread > 9 ? '9+' : chatUnread}
+                        </span>
+                      )}
+                    </span>
                     {!collapsed && <span className="text-sm">{item.label}</span>}
                   </button>
                 )
