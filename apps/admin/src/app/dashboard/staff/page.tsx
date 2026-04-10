@@ -111,8 +111,14 @@ export default function StaffPage() {
   const [newPassword, setNewPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [now, setNow] = useState(Date.now())
 
   const owner = isOwnerAdmin()
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 60_000)
+    return () => clearInterval(interval)
+  }, [])
 
   const loadStaff = useCallback(async () => {
     try {
@@ -298,20 +304,45 @@ export default function StaffPage() {
                     )}
                   </div>
 
-                  {/* Posledné prihlásenie */}
+                  {/* Posledné prihlásenie / Online status */}
                   <div className="text-right flex-shrink-0 hidden md:block">
-                    <p className="text-[10px] text-muted uppercase tracking-wider">Posledné prihlásenie</p>
-                    <p className="text-xs text-white/60 mt-0.5">
-                      {member.lastLoginAt
-                        ? new Date(member.lastLoginAt).toLocaleDateString('sk-SK', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
-                        : '—'}
-                    </p>
+                    {(() => {
+                      if (!member.lastLoginAt) {
+                        return (
+                          <>
+                            <p className="text-[10px] text-muted uppercase tracking-wider">Posledné prihlásenie</p>
+                            <p className="text-xs text-white/60 mt-0.5">—</p>
+                          </>
+                        )
+                      }
+                      const diff = now - new Date(member.lastLoginAt).getTime()
+                      const isOnline = diff < 5 * 60 * 1000
+                      if (isOnline) {
+                        return (
+                          <div className="flex items-center gap-2 justify-end">
+                            <span className="relative flex h-2.5 w-2.5">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+                            </span>
+                            <span className="text-xs font-semibold text-green-400">Online</span>
+                          </div>
+                        )
+                      }
+                      return (
+                        <>
+                          <p className="text-[10px] text-muted uppercase tracking-wider">Posledné prihlásenie</p>
+                          <p className="text-xs text-white/60 mt-0.5">
+                            {new Date(member.lastLoginAt).toLocaleDateString('sk-SK', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                        </>
+                      )
+                    })()}
                   </div>
 
                   {/* Actions */}

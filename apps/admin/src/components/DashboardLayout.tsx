@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
+import { api } from '@/lib/api'
 import Sidebar from './Sidebar'
 import Header from './Header'
 
@@ -13,12 +14,23 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter()
   const [authed, setAuthed] = useState(false)
+  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push('/login')
     } else {
       setAuthed(true)
+
+      api.heartbeat().catch(() => {})
+
+      heartbeatRef.current = setInterval(() => {
+        api.heartbeat().catch(() => {})
+      }, 60_000)
+    }
+
+    return () => {
+      if (heartbeatRef.current) clearInterval(heartbeatRef.current)
     }
   }, [router])
 

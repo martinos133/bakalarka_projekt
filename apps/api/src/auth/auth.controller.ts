@@ -28,4 +28,12 @@ export class AuthController {
   async getMe(@Request() req) {
     return this.authService.validateUser(req.user.userId);
   }
+
+  @Post('heartbeat')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Aktualizovať stav online aktivity' })
+  async heartbeat(@Request() req) {
+    return this.authService.updateLastLogin(req.user.userId);
+  }
 }

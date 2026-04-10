@@ -137,6 +137,14 @@ export class AuthService {
     };
   }
 
+  async updateLastLogin(userId: string) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { lastLoginAt: new Date() },
+    });
+    return { success: true };
+  }
+
   async validateUser(userId: string) {
     const user = await prisma.user.findUnique({
       where: { id: userId },

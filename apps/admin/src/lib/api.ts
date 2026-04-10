@@ -260,6 +260,8 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
+  heartbeat: () => fetchWithAuth('/auth/heartbeat', { method: 'POST' }),
+
   getStaff: () => fetchWithAuth('/staff'),
   getStaffMember: (id: string) => fetchWithAuth(`/staff/${id}`),
   getStaffPermissions: () => fetchWithAuth('/staff/permissions'),
