@@ -73,6 +73,7 @@ model User {
   postalCode           String?
   country              String?
   role                 UserRole        @default(USER)
+  adminPermissions     Json?
   sellerPlan           SellerPlan      @default(STANDARD)
   sellerPlanValidUntil DateTime?
   banned               Boolean         @default(false)

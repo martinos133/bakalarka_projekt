@@ -4,6 +4,7 @@ export interface User {
   firstName?: string
   lastName?: string
   role: string
+  adminPermissions?: string[] | null
 }
 
 export function getAuthToken(): string | null {
@@ -28,6 +29,19 @@ export function isAuthenticated(): boolean {
   return !!token && !!user && user.role === 'ADMIN'
 }
 
+export function hasPermission(permission: string): boolean {
+  const user = getAuthUser()
+  if (!user || user.role !== 'ADMIN') return false
+  if (!user.adminPermissions || !Array.isArray(user.adminPermissions)) return true
+  return user.adminPermissions.includes(permission)
+}
+
+export function isOwnerAdmin(): boolean {
+  const user = getAuthUser()
+  if (!user || user.role !== 'ADMIN') return false
+  return !user.adminPermissions || !Array.isArray(user.adminPermissions) || user.adminPermissions.length === 0
+}
+
 export function logout() {
   if (typeof window === 'undefined') return
   localStorage.removeItem('admin_token')
@@ -37,7 +51,7 @@ export function logout() {
 export async function verifyToken(token: string): Promise<boolean> {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-    const response = await fetch(`${apiUrl}/api/auth/me`, {
+    const response = await fetch(`${apiUrl}/auth/me`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

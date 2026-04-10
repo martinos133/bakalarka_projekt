@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { getAuthUser } from '@/lib/auth'
+import { getAuthUser, hasPermission, isOwnerAdmin } from '@/lib/auth'
 import {
   LayoutDashboard,
   FileText,
@@ -23,12 +23,14 @@ import {
   ChevronLeft,
   LogOut,
   CalendarDays,
+  UserCog,
 } from 'lucide-react'
 
 interface NavItem {
   label: string
   path: string
   icon: React.ComponentType<{ className?: string }>
+  permission?: string
 }
 
 interface NavSection {
@@ -40,48 +42,54 @@ const navigation: NavSection[] = [
   {
     title: 'Nástenky',
     items: [
-      { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-      { label: 'Organizér', path: '/dashboard/organizer', icon: CalendarDays },
-      { label: 'Inzeráty', path: '/dashboard/advertisements', icon: FileText },
-      { label: 'Používatelia', path: '/dashboard/users', icon: Users },
-      { label: 'Kategórie', path: '/dashboard/categories', icon: FolderTree },
-      { label: 'Špecifikácie', path: '/dashboard/specifications', icon: ListChecks },
-      { label: 'Monitoring', path: '/dashboard/monitoring', icon: MousePointerClick },
+      { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, permission: 'dashboard' },
+      { label: 'Organizér', path: '/dashboard/organizer', icon: CalendarDays, permission: 'organizer' },
+      { label: 'Inzeráty', path: '/dashboard/advertisements', icon: FileText, permission: 'advertisements' },
+      { label: 'Používatelia', path: '/dashboard/users', icon: Users, permission: 'users' },
+      { label: 'Kategórie', path: '/dashboard/categories', icon: FolderTree, permission: 'categories' },
+      { label: 'Špecifikácie', path: '/dashboard/specifications', icon: ListChecks, permission: 'specifications' },
+      { label: 'Monitoring', path: '/dashboard/monitoring', icon: MousePointerClick, permission: 'monitoring' },
     ],
   },
   {
     title: 'Komunikácia',
     items: [
-      { label: 'Kontaktné formuláre', path: '/dashboard/contact-forms', icon: Mail },
+      { label: 'Kontaktné formuláre', path: '/dashboard/contact-forms', icon: Mail, permission: 'contact_forms' },
     ],
   },
   {
     title: 'Moderácia',
     items: [
-      { label: 'Čakajúce inzeráty', path: '/dashboard/pending', icon: Clock },
-      { label: 'Nahlásené inzeráty', path: '/dashboard/reported', icon: Flag },
+      { label: 'Čakajúce inzeráty', path: '/dashboard/pending', icon: Clock, permission: 'pending' },
+      { label: 'Nahlásené inzeráty', path: '/dashboard/reported', icon: Flag, permission: 'reported' },
+    ],
+  },
+  {
+    title: 'Správa',
+    items: [
+      { label: 'Tím', path: '/dashboard/staff', icon: UserCog, permission: 'staff' },
     ],
   },
   {
     title: 'Obsah',
     items: [
-      { label: 'Statické stránky', path: '/dashboard/dev/static-pages', icon: FileCode },
-      { label: 'Blog', path: '/dashboard/dev/blog', icon: BookOpen },
+      { label: 'Statické stránky', path: '/dashboard/dev/static-pages', icon: FileCode, permission: 'static_pages' },
+      { label: 'Blog', path: '/dashboard/dev/blog', icon: BookOpen, permission: 'blog' },
     ],
   },
   {
     title: 'Development',
     items: [
-      { label: 'Kategórie', path: '/dashboard/dev/categories', icon: FolderTree },
-      { label: 'Inzeráty', path: '/dashboard/dev/advertisements', icon: FileText },
-      { label: 'Menu', path: '/dashboard/dev/menu', icon: Navigation },
-      { label: 'Komponenty', path: '/dashboard/dev/components', icon: Boxes },
-      { label: 'Konfigurácia', path: '/dashboard/dev/config', icon: Sliders },
+      { label: 'Kategórie', path: '/dashboard/dev/categories', icon: FolderTree, permission: 'dev_categories' },
+      { label: 'Inzeráty', path: '/dashboard/dev/advertisements', icon: FileText, permission: 'dev_advertisements' },
+      { label: 'Menu', path: '/dashboard/dev/menu', icon: Navigation, permission: 'dev_menu' },
+      { label: 'Komponenty', path: '/dashboard/dev/components', icon: Boxes, permission: 'dev_components' },
+      { label: 'Konfigurácia', path: '/dashboard/dev/config', icon: Sliders, permission: 'dev_config' },
     ],
   },
   {
     items: [
-      { label: 'Nastavenia', path: '/dashboard/settings', icon: Settings },
+      { label: 'Nastavenia', path: '/dashboard/settings', icon: Settings, permission: 'settings' },
     ],
   },
 ]
@@ -95,6 +103,19 @@ export default function Sidebar() {
   useEffect(() => {
     setUser(getAuthUser())
   }, [])
+
+  const owner = isOwnerAdmin()
+
+  const filteredNavigation = useMemo(() => {
+    return navigation
+      .map((section) => ({
+        ...section,
+        items: section.items.filter((item) =>
+          !item.permission || hasPermission(item.permission)
+        ),
+      }))
+      .filter((section) => section.items.length > 0)
+  }, [user])
 
   const getInitials = (firstName?: string, lastName?: string) => {
     const first = firstName?.charAt(0) || ''
@@ -120,7 +141,9 @@ export default function Sidebar() {
               <p className="text-sm font-semibold text-white truncate">
                 {user?.firstName || 'Admin'} {user?.lastName || ''}
               </p>
-              <p className="text-xs text-muted truncate">Administrátor</p>
+              <p className="text-xs text-muted truncate">
+                {owner ? 'Administrátor' : 'Člen tímu'}
+              </p>
             </div>
           )}
         </div>
@@ -130,7 +153,7 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className={`flex-1 overflow-y-auto py-4 ${collapsed ? 'px-2' : 'px-3'}`}>
-        {navigation.map((section, sectionIndex) => (
+        {filteredNavigation.map((section, sectionIndex) => (
           <div key={sectionIndex} className="mb-5">
             {section.title && !collapsed && (
               <h2 className="text-[10px] font-semibold text-muted uppercase tracking-widest mb-2 px-3">

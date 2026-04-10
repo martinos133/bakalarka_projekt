@@ -17,6 +17,7 @@ import { StaticPagesModule } from './static-pages/static-pages.module';
 import { BlogModule } from './blog/blog.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { CalendarModule } from './calendar/calendar.module';
+import { StaffModule } from './staff/staff.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { CalendarModule } from './calendar/calendar.module';
     BlogModule,
     ReviewsModule,
     CalendarModule,
+    StaffModule,
   ],
 })
 export class AppModule {}

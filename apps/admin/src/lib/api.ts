@@ -260,6 +260,29 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
+  getStaff: () => fetchWithAuth('/staff'),
+  getStaffMember: (id: string) => fetchWithAuth(`/staff/${id}`),
+  getStaffPermissions: () => fetchWithAuth('/staff/permissions'),
+  createStaffMember: (data: any) =>
+    fetchWithAuth('/staff', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateStaffPermissions: (id: string, permissions: string[]) =>
+    fetchWithAuth(`/staff/${id}/permissions`, {
+      method: 'PATCH',
+      body: JSON.stringify({ permissions }),
+    }),
+  resetStaffPassword: (id: string, password: string) =>
+    fetchWithAuth(`/staff/${id}/password`, {
+      method: 'PATCH',
+      body: JSON.stringify({ password }),
+    }),
+  removeStaffMember: (id: string) =>
+    fetchWithAuth(`/staff/${id}`, {
+      method: 'DELETE',
+    }),
+
   getCalendarEvents: (from?: string, to?: string) => {
     const params = new URLSearchParams()
     if (from) params.set('from', from)
