@@ -454,6 +454,63 @@ model TeamMessage {
   @@index([createdAt])
 }
 
+// ─── AUDIT LOG ────────────────────────────────────────
+enum AuditAction {
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LOGOUT
+  REGISTER
+  PASSWORD_CHANGE
+  AD_CREATE
+  AD_UPDATE
+  AD_DELETE
+  AD_APPROVE
+  AD_REJECT
+  USER_BAN
+  USER_UNBAN
+  USER_DELETE
+  REPORT_RESOLVE
+  REPORT_DISMISS
+  STAFF_CREATE
+  STAFF_UPDATE
+  STAFF_DELETE
+  SETTINGS_UPDATE
+  CATEGORY_CREATE
+  CATEGORY_UPDATE
+  CATEGORY_DELETE
+  SYSTEM_ERROR
+  API_ERROR
+}
+
+enum AuditSeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+model AuditLog {
+  id          String        @id @default(uuid())
+  action      AuditAction
+  severity    AuditSeverity @default(INFO)
+  userId      String?
+  userEmail   String?
+  ip          String?
+  userAgent   String?
+  resource    String?
+  resourceId  String?
+  details     Json?
+  success     Boolean       @default(true)
+  errorMessage String?      @db.Text
+  createdAt   DateTime      @default(now())
+
+  @@index([action])
+  @@index([severity])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([success])
+}
+
 enum CalendarEventType {
   EVENT
   REMINDER

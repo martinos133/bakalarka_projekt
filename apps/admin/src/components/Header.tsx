@@ -115,11 +115,12 @@ export default function Header() {
     try {
       const items: NotifItem[] = []
 
-      const [pendingAds, pendingReports, chatUnread, adminMsgs] = await Promise.all([
+      const [pendingAds, pendingReports, chatUnread, adminMsgs, auditStats] = await Promise.all([
         api.getPendingAdvertisements().catch(() => []),
         api.getPendingReports().catch(() => []),
         api.getChatUnread().catch(() => ({ total: 0 })),
         api.getAdminMessages('unread').catch(() => []),
+        api.getAuditStats().catch(() => null),
       ])
 
       const pendingCount = Array.isArray(pendingAds) ? pendingAds.length : 0
@@ -175,6 +176,20 @@ export default function Header() {
           description: `${msgsCount} ${msgsCount === 1 ? 'neprečítaná správa' : msgsCount < 5 ? 'neprečítané správy' : 'neprečítaných správ'}`,
           path: '/dashboard/messages',
           count: msgsCount,
+        })
+      }
+
+      const errorsToday = auditStats?.today?.errors || 0
+      if (errorsToday > 0) {
+        items.push({
+          id: 'audit-errors',
+          icon: AlertTriangle,
+          iconBg: 'bg-orange-500/10',
+          iconColor: 'text-orange-400',
+          title: 'Systémové chyby',
+          description: `${errorsToday} ${errorsToday === 1 ? 'chyba dnes' : errorsToday < 5 ? 'chyby dnes' : 'chýb dnes'}`,
+          path: '/dashboard/audit',
+          count: errorsToday,
         })
       }
 
@@ -575,6 +590,7 @@ function getPageTitle(pathname: string): string {
     '/dashboard/settings': 'Nastavenia',
     '/dashboard/team-chat': 'Tímový chat',
     '/dashboard/staff': 'Tím',
+    '/dashboard/audit': 'Audit & Logy',
     '/dashboard/organizer': 'Organizér',
     '/dashboard/dev/static-pages': 'Statické stránky',
     '/dashboard/dev/blog': 'Blog',

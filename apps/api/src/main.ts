@@ -15,12 +15,16 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { AuditErrorInterceptor } from './audit/audit-error.interceptor';
+import { AuditService } from './audit/audit.service';
 import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Zvýšenie limitu pre veľkosť request body (pre obrázky v base64)
+  const auditService = app.get(AuditService);
+  app.useGlobalInterceptors(new AuditErrorInterceptor(auditService));
+
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
 

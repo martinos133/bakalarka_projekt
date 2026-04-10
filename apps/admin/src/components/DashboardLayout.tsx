@@ -48,7 +48,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-dark text-white flex">
       <Sidebar />
-      <div className="flex-1 ml-64 transition-all duration-300">
+      <div className="flex-1 ml-64 min-w-0 transition-all duration-300">
         <Header />
         <main className="p-8">
           {children}

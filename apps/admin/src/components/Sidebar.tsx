@@ -26,6 +26,7 @@ import {
   CalendarDays,
   UserCog,
   MessageCircle,
+  Shield,
 } from 'lucide-react'
 
 interface NavItem {
@@ -71,6 +72,7 @@ const navigation: NavSection[] = [
     title: 'Správa',
     items: [
       { label: 'Tím', path: '/dashboard/staff', icon: UserCog, permission: 'staff' },
+      { label: 'Audit & Logy', path: '/dashboard/audit', icon: Shield, permission: 'audit' },
     ],
   },
   {

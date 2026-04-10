@@ -19,12 +19,14 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { StaffModule } from './staff/staff.module';
 import { TeamChatModule } from './team-chat/team-chat.module';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    AuditModule,
     AuthModule,
     UsersModule,
     AdvertisementsModule,

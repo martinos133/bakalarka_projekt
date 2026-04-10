@@ -22,6 +22,7 @@ export const ALL_PERMISSIONS = [
   'organizer',
   'team_chat',
   'settings',
+  'audit',
   'staff',
   'dev_categories',
   'dev_advertisements',

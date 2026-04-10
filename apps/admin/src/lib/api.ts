@@ -329,6 +329,14 @@ export const api = {
     fetchWithAuth(`/team-chat/conversations/${conversationId}/read`, {
       method: 'POST',
     }),
+
+  // Audit
+  getAuditLogs: (params?: Record<string, string>) => {
+    const q = new URLSearchParams(params || {})
+    return fetchWithAuth(`/audit?${q.toString()}`)
+  },
+  getAuditStats: () => fetchWithAuth('/audit/stats'),
+  getAuditLog: (id: string) => fetchWithAuth(`/audit/${id}`),
 }
 
 export default api

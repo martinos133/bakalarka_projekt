@@ -4,10 +4,14 @@ import * as bcrypt from 'bcrypt';
 import { prisma } from '@inzertna-platforma/database';
 import { UserRole } from '@inzertna-platforma/shared';
 import { LoginDto, CreateUserDto } from '@inzertna-platforma/shared';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private auditService: AuditService,
+  ) {}
 
   async register(createUserDto: CreateUserDto) {
     const existingUser = await prisma.user.findUnique({
@@ -64,31 +68,49 @@ export class AuthService {
     };
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto, ip?: string, userAgent?: string) {
     const user = await prisma.user.findUnique({
       where: { email: loginDto.email },
     });
 
     if (!user) {
-      console.error(`[Auth] User not found: ${loginDto.email}`);
+      await this.auditService.log({
+        action: 'LOGIN_FAILED',
+        severity: 'WARNING',
+        userEmail: loginDto.email,
+        ip, userAgent,
+        success: false,
+        errorMessage: 'Používateľ neexistuje',
+      });
       throw new UnauthorizedException('Neplatné prihlasovacie údaje');
     }
 
-    // Kontrola banu
     if (user.banned) {
       const now = new Date();
       if (user.bannedUntil && user.bannedUntil > now) {
         const daysLeft = Math.ceil((user.bannedUntil.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        await this.auditService.log({
+          action: 'LOGIN_FAILED',
+          severity: 'WARNING',
+          userId: user.id, userEmail: user.email, ip, userAgent,
+          success: false,
+          errorMessage: `Účet zablokovaný (${daysLeft} dní)`,
+        });
         throw new UnauthorizedException(
           `Váš účet je zablokovaný do ${user.bannedUntil.toLocaleDateString('sk-SK')} (${daysLeft} ${daysLeft === 1 ? 'deň' : 'dní'}). Dôvod: ${user.banReason || 'Porušenie podmienok'}`
         );
       } else if (!user.bannedUntil) {
-        // Trvalý ban
+        await this.auditService.log({
+          action: 'LOGIN_FAILED',
+          severity: 'WARNING',
+          userId: user.id, userEmail: user.email, ip, userAgent,
+          success: false,
+          errorMessage: 'Účet trvalo zablokovaný',
+        });
         throw new UnauthorizedException(
           `Váš účet je trvalo zablokovaný. Dôvod: ${user.banReason || 'Porušenie podmienok'}`
         );
       } else {
-        // Ban vypršal, odblokuj používateľa
         await prisma.user.update({
           where: { id: user.id },
           data: { banned: false, bannedUntil: null, banReason: null },
@@ -99,13 +121,16 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
 
     if (!isPasswordValid) {
-      console.error(`[Auth] Invalid password for user: ${loginDto.email}`);
+      await this.auditService.log({
+        action: 'LOGIN_FAILED',
+        severity: 'WARNING',
+        userId: user.id, userEmail: user.email, ip, userAgent,
+        success: false,
+        errorMessage: 'Nesprávne heslo',
+      });
       throw new UnauthorizedException('Neplatné prihlasovacie údaje');
     }
 
-    console.log(`[Auth] Successful login for user: ${user.email}`);
-
-    // Aktualizuj čas posledného prihlásenia
     await prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
@@ -115,6 +140,14 @@ export class AuthService {
       userId: user.id,
       email: user.email,
       role: user.role as UserRole,
+    });
+
+    await this.auditService.log({
+      action: 'LOGIN_SUCCESS',
+      userId: user.id,
+      userEmail: user.email,
+      ip, userAgent,
+      details: { role: user.role },
     });
 
     return {
