@@ -16,6 +16,7 @@ import { SearchModule } from './search/search.module';
 import { StaticPagesModule } from './static-pages/static-pages.module';
 import { BlogModule } from './blog/blog.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { CalendarModule } from './calendar/calendar.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     StaticPagesModule,
     BlogModule,
     ReviewsModule,
+    CalendarModule,
   ],
 })
 export class AppModule {}

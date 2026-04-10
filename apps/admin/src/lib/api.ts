@@ -259,6 +259,28 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
+
+  getCalendarEvents: (from?: string, to?: string) => {
+    const params = new URLSearchParams()
+    if (from) params.set('from', from)
+    if (to) params.set('to', to)
+    return fetchWithAuth(`/calendar?${params.toString()}`)
+  },
+  getCalendarEvent: (id: string) => fetchWithAuth(`/calendar/${id}`),
+  createCalendarEvent: (data: any) =>
+    fetchWithAuth('/calendar', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateCalendarEvent: (id: string, data: any) =>
+    fetchWithAuth(`/calendar/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  deleteCalendarEvent: (id: string) =>
+    fetchWithAuth(`/calendar/${id}`, {
+      method: 'DELETE',
+    }),
 }
 
 export default api

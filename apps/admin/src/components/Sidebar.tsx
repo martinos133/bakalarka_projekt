@@ -22,6 +22,7 @@ import {
   ListChecks,
   ChevronLeft,
   LogOut,
+  CalendarDays,
 } from 'lucide-react'
 
 interface NavItem {
@@ -40,6 +41,7 @@ const navigation: NavSection[] = [
     title: 'Nástenky',
     items: [
       { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+      { label: 'Organizér', path: '/dashboard/organizer', icon: CalendarDays },
       { label: 'Inzeráty', path: '/dashboard/advertisements', icon: FileText },
       { label: 'Používatelia', path: '/dashboard/users', icon: Users },
       { label: 'Kategórie', path: '/dashboard/categories', icon: FolderTree },
