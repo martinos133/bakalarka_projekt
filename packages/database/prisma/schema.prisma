@@ -441,6 +441,7 @@ model TeamConversation {
 model TeamMessage {
   id             String           @id @default(uuid())
   content        String           @db.Text
+  attachments    Json?
   senderId       String
   sender         User             @relation("TeamMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
   conversationId String

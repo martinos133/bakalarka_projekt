@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { isAuthenticated } from '@/lib/auth'
+import { isAuthenticated, getAuthUser } from '@/lib/auth'
 import { api } from '@/lib/api'
 import DashboardLayout from '@/components/DashboardLayout'
 import MetricCard from '@/components/MetricCard'
 import QuickActions from '@/components/QuickActions'
 import Chart from '@/components/Chart'
-import { Users, UserCheck, FileText, Zap, Calendar, Bell, CheckSquare, ArrowRight } from 'lucide-react'
+import { Users, UserCheck, FileText, Zap, Calendar, Bell, CheckSquare, ArrowRight, MessageCircle, Send } from 'lucide-react'
 
 interface Stats {
   users: number
@@ -31,6 +31,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<Stats | null>(null)
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([])
+  const [chatConversations, setChatConversations] = useState<any[]>([])
+  const [chatUnread, setChatUnread] = useState<{ total: number; counts: Record<string, number> }>({ total: 0, counts: {} })
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -40,15 +42,19 @@ export default function DashboardPage() {
 
     const loadStats = async () => {
       try {
-        const [data, events] = await Promise.all([
+        const [data, events, convs, unread] = await Promise.all([
           api.getStats(),
           api.getCalendarEvents(
             new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
             new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0, 23, 59, 59).toISOString(),
           ),
+          api.getChatConversations().catch(() => []),
+          api.getChatUnread().catch(() => ({ total: 0, counts: {} })),
         ])
         setStats(data)
         setCalendarEvents(events)
+        setChatConversations(convs)
+        setChatUnread(unread)
       } catch (error) {
         console.error('Error loading stats:', error)
       } finally {
@@ -125,6 +131,13 @@ export default function DashboardPage() {
           onButtonClick={() => router.push('/dashboard/advertisements?status=ACTIVE')}
         />
       </div>
+
+      {/* Chat overview */}
+      <ChatOverview
+        conversations={chatConversations}
+        unread={chatUnread}
+        onNavigate={() => router.push('/dashboard/team-chat')}
+      />
 
       {/* Organizer overview */}
       <OrganizerOverview events={calendarEvents} onNavigate={() => router.push('/dashboard/organizer')} />
@@ -298,6 +311,160 @@ function OrganizerOverview({ events, onNavigate }: { events: CalendarEvent[]; on
               >
                 + {openTasks.length - 5} ďalších
               </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ChatOverview({
+  conversations,
+  unread,
+  onNavigate,
+}: {
+  conversations: any[]
+  unread: { total: number; counts: Record<string, number> }
+  onNavigate: () => void
+}) {
+  const user = getAuthUser()
+
+  function getName(p: any) {
+    if (p?.firstName || p?.lastName) return `${p.firstName || ''} ${p.lastName || ''}`.trim()
+    return p?.email || '–'
+  }
+
+  function getInitials(p: any) {
+    const f = p?.firstName?.charAt(0) || ''
+    const l = p?.lastName?.charAt(0) || ''
+    return (f + l).toUpperCase() || p?.email?.charAt(0).toUpperCase() || '?'
+  }
+
+  function isOnlineCheck(lastLoginAt?: string | null) {
+    if (!lastLoginAt) return false
+    return Date.now() - new Date(lastLoginAt).getTime() < 5 * 60 * 1000
+  }
+
+  function timeAgo(date: string) {
+    const diff = Date.now() - new Date(date).getTime()
+    const mins = Math.floor(diff / 60000)
+    if (mins < 1) return 'teraz'
+    if (mins < 60) return `${mins} min`
+    const hours = Math.floor(mins / 60)
+    if (hours < 24) return `${hours} hod`
+    return `${Math.floor(hours / 24)} d`
+  }
+
+  const unreadConvs = conversations.filter((c) => (unread.counts[c.id] || 0) > 0)
+  const recentConvs = conversations.filter((c) => c.lastMessage).slice(0, 5)
+
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div>
+            <h2 className="text-base font-semibold text-white">Správy</h2>
+            <p className="text-xs text-muted mt-0.5">{conversations.length} konverzácií</p>
+          </div>
+          {unread.total > 0 && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-accent" />
+              <span className="text-xs font-semibold text-accent">{unread.total} neprečítaných</span>
+            </span>
+          )}
+        </div>
+        <button
+          onClick={onNavigate}
+          className="flex items-center gap-1.5 text-sm text-accent hover:text-accent-light transition-colors"
+        >
+          Otvoriť chat
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Unread */}
+        <div className="bg-card rounded-2xl border border-white/[0.06] overflow-hidden">
+          <div className="px-5 py-3 border-b border-white/[0.06] flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-white">Neprečítané</h3>
+            {unread.total > 0 && (
+              <span className="min-w-[22px] h-[22px] rounded-full bg-accent text-dark text-xs font-bold flex items-center justify-center px-1.5">
+                {unread.total}
+              </span>
+            )}
+          </div>
+          <div className="p-2">
+            {unreadConvs.length > 0 ? (
+              unreadConvs.slice(0, 4).map((conv) => {
+                const cnt = unread.counts[conv.id] || 0
+                const online = isOnlineCheck(conv.partner?.lastLoginAt)
+                return (
+                  <div key={conv.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.03] cursor-pointer transition-colors" onClick={onNavigate}>
+                    <div className="relative flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-[10px] font-semibold text-accent">
+                        {getInitials(conv.partner)}
+                      </div>
+                      {online && <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-[1.5px] border-card" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-white font-medium truncate">{getName(conv.partner)}</p>
+                      <p className="text-xs text-white/40 truncate">{conv.lastMessage?.content || '📎 Príloha'}</p>
+                    </div>
+                    <span className="min-w-[18px] h-[18px] rounded-full bg-accent text-dark text-[10px] font-bold flex items-center justify-center px-1">{cnt}</span>
+                  </div>
+                )
+              })
+            ) : (
+              <div className="text-center py-6">
+                <CheckSquare className="w-6 h-6 text-green-500/30 mx-auto mb-1.5" />
+                <p className="text-xs text-green-400/60">Všetky správy prečítané</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Recent */}
+        <div className="lg:col-span-2 bg-card rounded-2xl border border-white/[0.06] overflow-hidden">
+          <div className="px-5 py-3 border-b border-white/[0.06] flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-white">Posledné konverzácie</h3>
+            <span className="text-xs text-muted">{conversations.length} celkom</span>
+          </div>
+          <div className="p-2">
+            {recentConvs.length > 0 ? (
+              recentConvs.map((conv) => {
+                const online = isOnlineCheck(conv.partner?.lastLoginAt)
+                const cnt = unread.counts[conv.id] || 0
+                const isMine = conv.lastMessage?.senderId === user?.id
+                return (
+                  <div key={conv.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.03] cursor-pointer transition-colors" onClick={onNavigate}>
+                    <div className="relative flex-shrink-0">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-semibold ${cnt > 0 ? 'bg-accent/20 text-accent' : 'bg-white/[0.08] text-white/50'}`}>
+                        {getInitials(conv.partner)}
+                      </div>
+                      {online && <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-[1.5px] border-card" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm truncate ${cnt > 0 ? 'font-semibold text-white' : 'text-white/70'}`}>{getName(conv.partner)}</span>
+                        <span className="text-[10px] text-muted ml-2 flex-shrink-0">{timeAgo(conv.lastMessage.createdAt)}</span>
+                      </div>
+                      <p className={`text-xs truncate mt-0.5 ${cnt > 0 ? 'text-white/60' : 'text-white/30'}`}>
+                        {isMine ? 'Vy: ' : ''}{conv.lastMessage?.content || '📎 Príloha'}
+                      </p>
+                    </div>
+                    {cnt > 0 && (
+                      <span className="min-w-[18px] h-[18px] rounded-full bg-accent text-dark text-[10px] font-bold flex items-center justify-center px-1 flex-shrink-0">{cnt}</span>
+                    )}
+                  </div>
+                )
+              })
+            ) : (
+              <div className="text-center py-6">
+                <MessageCircle className="w-6 h-6 text-white/10 mx-auto mb-1.5" />
+                <p className="text-xs text-white/25">Zatiaľ žiadne konverzácie</p>
+                <button onClick={onNavigate} className="text-xs text-accent hover:text-accent-light mt-2 transition-colors">Začať chatovať</button>
+              </div>
             )}
           </div>
         </div>

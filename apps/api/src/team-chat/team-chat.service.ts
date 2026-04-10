@@ -77,6 +77,9 @@ export class TeamChatService {
   }
 
   async getOrCreateConversation(userId: string, partnerId: string) {
+    if (!partnerId || !userId) {
+      throw new ForbiddenException('Chýba userId alebo partnerId');
+    }
     if (userId === partnerId) {
       throw new ForbiddenException('Nemôžete chatovať sám so sebou');
     }
@@ -146,7 +149,12 @@ export class TeamChatService {
     };
   }
 
-  async sendMessage(userId: string, conversationId: string, content: string) {
+  async sendMessage(
+    userId: string,
+    conversationId: string,
+    content: string,
+    attachments?: any[],
+  ) {
     const conv = await prisma.teamConversation.findUnique({
       where: { id: conversationId },
     });
@@ -158,9 +166,10 @@ export class TeamChatService {
     const [message] = await prisma.$transaction([
       prisma.teamMessage.create({
         data: {
-          content: content.trim(),
+          content: (content || '').trim(),
           senderId: userId,
           conversationId,
+          ...(attachments?.length ? { attachments } : {}),
         },
         include: {
           sender: { select: userSelect },

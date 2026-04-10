@@ -13,6 +13,13 @@ import {
   CheckCheck,
   ArrowLeft,
   Users,
+  Paperclip,
+  FileText,
+  Image as ImageIcon,
+  Film,
+  File,
+  X,
+  Download,
 } from 'lucide-react'
 
 interface Partner {
@@ -35,14 +42,35 @@ interface Conversation {
   createdAt: string
 }
 
+interface Attachment {
+  name: string
+  type: string
+  size: number
+  data: string
+}
+
 interface ChatMessage {
   id: string
   content: string
+  attachments?: Attachment[] | null
   senderId: string
   sender: Partner
   conversationId: string
   readAt: string | null
   createdAt: string
+}
+
+function formatFileSize(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function getFileIcon(type: string) {
+  if (type.startsWith('image/')) return ImageIcon
+  if (type.startsWith('video/')) return Film
+  if (type.includes('pdf') || type.includes('document') || type.includes('text')) return FileText
+  return File
 }
 
 function isOnline(lastLoginAt?: string | null) {
@@ -119,7 +147,9 @@ export default function TeamChatPage() {
   const [teamMembers, setTeamMembers] = useState<Partner[]>([])
   const [memberSearch, setMemberSearch] = useState('')
   const [mobileShowChat, setMobileShowChat] = useState(false)
+  const [pendingFiles, setPendingFiles] = useState<Attachment[]>([])
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -198,18 +228,51 @@ export default function TeamChatPage() {
     }
   }, [messages])
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+
+    Array.from(files).forEach((file) => {
+      if (file.size > 10 * 1024 * 1024) {
+        alert(`Súbor "${file.name}" je príliš veľký (max 10 MB)`)
+        return
+      }
+      const reader = new FileReader()
+      reader.onload = () => {
+        setPendingFiles((prev) => [
+          ...prev,
+          { name: file.name, type: file.type, size: file.size, data: reader.result as string },
+        ])
+      }
+      reader.readAsDataURL(file)
+    })
+
+    e.target.value = ''
+  }
+
+  const removePendingFile = (index: number) => {
+    setPendingFiles((prev) => prev.filter((_, i) => i !== index))
+  }
+
   const handleSend = async () => {
-    if (!input.trim() || !activeConvId || sending) return
+    if ((!input.trim() && pendingFiles.length === 0) || !activeConvId || sending) return
     const text = input.trim()
+    const files = [...pendingFiles]
     setInput('')
+    setPendingFiles([])
     setSending(true)
 
     try {
-      const newMsg = await api.sendChatMessage(activeConvId, text)
+      const newMsg = await api.sendChatMessage(
+        activeConvId,
+        text,
+        files.length > 0 ? files : undefined,
+      )
       setMessages((prev) => [...prev, newMsg])
       loadConversations()
     } catch {
       setInput(text)
+      setPendingFiles(files)
     } finally {
       setSending(false)
       inputRef.current?.focus()
@@ -228,8 +291,10 @@ export default function TeamChatPage() {
       const conv = await api.createChatConversation(partnerId)
       setShowNewChat(false)
       await loadConversations()
-      selectConversation(conv.id)
-    } catch {}
+      await selectConversation(conv.id)
+    } catch (err) {
+      console.error('startNewChat error', err)
+    }
   }
 
   const openNewChatModal = async () => {
@@ -449,7 +514,40 @@ export default function TeamChatPage() {
                               : 'bg-white/[0.08] text-white/90 rounded-bl-md'
                           }`}
                         >
-                          <span className="whitespace-pre-wrap break-words">{msg.content}</span>
+                          {msg.attachments && Array.isArray(msg.attachments) && msg.attachments.length > 0 && (
+                            <div className="space-y-1.5 mb-1">
+                              {(msg.attachments as Attachment[]).map((att, ai) => {
+                                const isImage = att.type?.startsWith('image/')
+                                const FileIcon = getFileIcon(att.type)
+                                return isImage ? (
+                                  <a key={ai} href={att.data} target="_blank" rel="noopener noreferrer" className="block">
+                                    <img
+                                      src={att.data}
+                                      alt={att.name}
+                                      className="max-w-[240px] max-h-[200px] rounded-lg object-cover cursor-pointer"
+                                    />
+                                  </a>
+                                ) : (
+                                  <a
+                                    key={ai}
+                                    href={att.data}
+                                    download={att.name}
+                                    className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${
+                                      isMine ? 'bg-dark/10 hover:bg-dark/15' : 'bg-white/[0.06] hover:bg-white/[0.1]'
+                                    }`}
+                                  >
+                                    <FileIcon className={`w-5 h-5 flex-shrink-0 ${isMine ? 'text-dark/60' : 'text-accent'}`} />
+                                    <div className="flex-1 min-w-0">
+                                      <p className={`text-xs font-medium truncate ${isMine ? 'text-dark/80' : 'text-white/80'}`}>{att.name}</p>
+                                      <p className={`text-[10px] ${isMine ? 'text-dark/40' : 'text-white/30'}`}>{formatFileSize(att.size)}</p>
+                                    </div>
+                                    <Download className={`w-3.5 h-3.5 flex-shrink-0 ${isMine ? 'text-dark/40' : 'text-white/30'}`} />
+                                  </a>
+                                )
+                              })}
+                            </div>
+                          )}
+                          {msg.content && <span className="whitespace-pre-wrap break-words">{msg.content}</span>}
                           <span className={`text-[10px] float-right mt-1 ml-2 ${isMine ? 'text-dark/50' : 'text-white/30'}`}>
                             {formatTime(msg.createdAt)}
                             {isMine && (
@@ -470,8 +568,54 @@ export default function TeamChatPage() {
             </div>
 
             {/* Input */}
-            <div className="px-4 py-3 border-t border-white/[0.06] bg-card/50 backdrop-blur-sm">
-              <div className="flex items-end gap-2">
+            <div className="border-t border-white/[0.06] bg-card/50 backdrop-blur-sm">
+              {/* Pending files preview */}
+              {pendingFiles.length > 0 && (
+                <div className="px-4 pt-3 flex gap-2 flex-wrap">
+                  {pendingFiles.map((f, i) => {
+                    const isImage = f.type?.startsWith('image/')
+                    const FileIcon = getFileIcon(f.type)
+                    return (
+                      <div
+                        key={i}
+                        className="relative group rounded-xl bg-white/[0.06] border border-white/[0.08] overflow-hidden"
+                      >
+                        {isImage ? (
+                          <img src={f.data} alt={f.name} className="h-16 w-16 object-cover" />
+                        ) : (
+                          <div className="h-16 w-16 flex flex-col items-center justify-center px-1">
+                            <FileIcon className="w-5 h-5 text-accent mb-1" />
+                            <p className="text-[8px] text-white/50 truncate w-full text-center">{f.name}</p>
+                          </div>
+                        )}
+                        <button
+                          onClick={() => removePendingFile(i)}
+                          className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              <div className="flex items-end gap-2 px-4 py-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={handleFileSelect}
+                  accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-[42px] h-[42px] rounded-2xl flex items-center justify-center flex-shrink-0 bg-white/[0.06] hover:bg-white/[0.1] text-white/50 hover:text-white/80 transition-colors"
+                  title="Priložiť súbor"
+                >
+                  <Paperclip className="w-4.5 h-4.5" />
+                </button>
                 <textarea
                   ref={inputRef}
                   value={input}
@@ -489,9 +633,9 @@ export default function TeamChatPage() {
                 />
                 <button
                   onClick={handleSend}
-                  disabled={!input.trim() || sending}
+                  disabled={(!input.trim() && pendingFiles.length === 0) || sending}
                   className={`w-[42px] h-[42px] rounded-2xl flex items-center justify-center flex-shrink-0 transition-all ${
-                    input.trim()
+                    input.trim() || pendingFiles.length > 0
                       ? 'bg-accent hover:bg-accent-light text-dark'
                       : 'bg-white/[0.06] text-white/20'
                   }`}

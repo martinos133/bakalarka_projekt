@@ -320,10 +320,10 @@ export const api = {
     if (cursor) params.set('cursor', cursor)
     return fetchWithAuth(`/team-chat/conversations/${conversationId}/messages?${params.toString()}`)
   },
-  sendChatMessage: (conversationId: string, content: string) =>
+  sendChatMessage: (conversationId: string, content: string, attachments?: any[]) =>
     fetchWithAuth(`/team-chat/conversations/${conversationId}/messages`, {
       method: 'POST',
-      body: JSON.stringify({ content }),
+      body: JSON.stringify({ content, attachments }),
     }),
   markChatRead: (conversationId: string) =>
     fetchWithAuth(`/team-chat/conversations/${conversationId}/read`, {
