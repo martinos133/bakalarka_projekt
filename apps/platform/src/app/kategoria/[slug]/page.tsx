@@ -21,6 +21,7 @@ export default function CategoryPage() {
   const [advertisements, setAdvertisements] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [subcategories, setSubcategories] = useState<any[]>([])
+  const [ratings, setRatings] = useState<Record<string, { count: number; average: number }>>({})
 
   useEffect(() => {
     if (slug) {
@@ -48,6 +49,19 @@ export default function CategoryPage() {
     try {
       const data = await api.getAdvertisementsByCategory(slug)
       setAdvertisements(data)
+      if (data?.length) {
+        const entries = await Promise.all(
+          data.map(async (ad: any) => {
+            try {
+              const stats = await api.getReviewStats(ad.id)
+              return [ad.id, stats] as const
+            } catch {
+              return [ad.id, { count: 0, average: 0 }] as const
+            }
+          })
+        )
+        setRatings(Object.fromEntries(entries))
+      }
     } catch (error) {
       console.error('Chyba pri načítaní inzerátov:', error)
     }
@@ -287,6 +301,15 @@ export default function CategoryPage() {
                         {ad.description}
                       </p>
                     )}
+                    <div className="flex items-center gap-1 mb-2">
+                      <svg className="w-4 h-4 text-accent fill-current" viewBox="0 0 20 20">
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                      </svg>
+                      <span className="text-sm font-semibold text-white">
+                        {(ratings[ad.id]?.count ?? 0) > 0 ? ratings[ad.id].average.toFixed(1) : '–'}
+                      </span>
+                      <span className="text-xs text-gray-500">({ratings[ad.id]?.count ?? 0})</span>
+                    </div>
                     <div className="flex items-center justify-between">
                       {ad.price && (
                         <span className="text-lg font-bold text-accent">

@@ -122,19 +122,19 @@ export class AnalyticsService {
       }
 
       const [total, byGenderRows, byCompanyRows, clickUserIds] = await Promise.all([
-        prisma.clickEvent.count({ where }),
-        prisma.clickEvent.groupBy({
+        prisma.clickEvent.count({ where: where as any }),
+        (prisma.clickEvent.groupBy as any)({
           by: ['gender'],
           where,
           _count: { id: true },
         }),
-        prisma.clickEvent.groupBy({
+        (prisma.clickEvent.groupBy as any)({
           by: ['isCompany'],
           where: { ...where, isCompany: { not: null } },
           _count: { id: true },
         }),
         prisma.clickEvent.findMany({
-          where: { ...where, userId: { not: null } },
+          where: { ...where, userId: { not: null } } as any,
           select: { userId: true },
         }),
       ]);

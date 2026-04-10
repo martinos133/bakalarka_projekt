@@ -195,27 +195,27 @@ export class MenuService {
 
   async getNavbar(): Promise<NavbarData> {
     const menu = await this.getOrCreate('navbar', DEFAULT_NAVBAR);
-    return menu.data as NavbarData;
+    return menu.data as unknown as NavbarData;
   }
 
   async getFooter(): Promise<FooterData> {
     const menu = await this.getOrCreate('footer', DEFAULT_FOOTER);
-    return menu.data as FooterData;
+    return menu.data as unknown as FooterData;
   }
 
   async getCategoryNav(): Promise<CategoryNavData> {
     const menu = await this.getOrCreate('categoryNav', DEFAULT_CATEGORY_NAV);
-    return menu.data as CategoryNavData;
+    return menu.data as unknown as CategoryNavData;
   }
 
   async getMadeOnRentMe(): Promise<MadeOnRentMeData> {
     const menu = await this.getOrCreate('madeOnRentMe', DEFAULT_MADE_ON_RENT_ME);
-    return menu.data as MadeOnRentMeData;
+    return menu.data as unknown as MadeOnRentMeData;
   }
 
   async getPopularCategories(): Promise<PopularCategoriesData> {
     const menu = await this.getOrCreate('popularCategories', DEFAULT_POPULAR_CATEGORIES);
-    return menu.data as PopularCategoriesData;
+    return menu.data as unknown as PopularCategoriesData;
   }
 
   async getMenu(
@@ -292,7 +292,7 @@ export class MenuService {
       update: { data: data as object },
     });
 
-    return menu.data as
+    return menu.data as unknown as
       | NavbarData
       | FooterData
       | CategoryNavData

@@ -396,3 +396,31 @@ export interface CreateInquiryDto {
   subject: string;
   content: string;
 }
+
+export interface Review {
+  id: string;
+  rating: number;
+  comment?: string;
+  ownerReply?: string;
+  ownerReplyAt?: Date;
+  advertisementId: string;
+  authorId: string;
+  author?: { id: string; firstName?: string; lastName?: string; email: string };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateReviewDto {
+  advertisementId: string;
+  rating: number;
+  comment?: string;
+}
+
+export interface UpdateReviewDto {
+  rating?: number;
+  comment?: string;
+}
+
+export interface ReplyToReviewDto {
+  reply: string;
+}

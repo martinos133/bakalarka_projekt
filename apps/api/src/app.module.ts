@@ -15,6 +15,7 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { SearchModule } from './search/search.module';
 import { StaticPagesModule } from './static-pages/static-pages.module';
 import { BlogModule } from './blog/blog.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { BlogModule } from './blog/blog.module';
     SearchModule,
     StaticPagesModule,
     BlogModule,
+    ReviewsModule,
   ],
 })
 export class AppModule {}

@@ -10,10 +10,10 @@ import ImageCarousel from '@/components/ImageCarousel'
 import DatePicker from '@/components/DatePicker'
 import { api } from '@/lib/api'
 import { useCmsOverride } from '@/lib/useCmsOverride'
-import { isAuthenticated } from '@/lib/auth'
+import { isAuthenticated, getAuthUser } from '@/lib/auth'
 import { isProSellerBadge } from '@/lib/sellerPlan'
 import type { Filter } from '@inzertna-platforma/shared'
-import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone, Heart } from 'lucide-react'
+import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone, Heart, Star, Trash2, Edit3, Reply } from 'lucide-react'
 import CustomSelect from '@/components/CustomSelect'
 import type { DateRange } from 'react-day-picker'
 
@@ -121,6 +121,7 @@ export default function AdvertisementDetailPage({
   const [continueSubmitting, setContinueSubmitting] = useState(false)
   const [continueSuccess, setContinueSuccess] = useState(false)
   const [categorySpecFilters, setCategorySpecFilters] = useState<Filter[]>([])
+  const [sellerRating, setSellerRating] = useState<{ count: number; average: number }>({ count: 0, average: 0 })
 
   useEffect(() => {
     loadAdvertisement()
@@ -151,6 +152,9 @@ export default function AdvertisementDetailPage({
       setLoading(true)
       const data = await api.getAdvertisement(id)
       setAdvertisement(data)
+      if (data?.userId) {
+        api.getUserReviewStats(data.userId).then(setSellerRating).catch(() => {})
+      }
       if (isAuthenticated()) {
         try {
           const { isFavorite: fav } = await api.checkFavorite(id)
@@ -457,17 +461,12 @@ export default function AdvertisementDetailPage({
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     <div className="flex items-center gap-1">
-                      <svg
-                        className="w-4 h-4 text-yellow-400 fill-current"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                      </svg>
+                      <Star className="w-4 h-4 text-accent fill-accent" />
                       <span className="text-sm font-semibold text-white">
-                        5.0
+                        {sellerRating.count > 0 ? sellerRating.average.toFixed(1) : '–'}
                       </span>
                     </div>
-                    <span className="text-sm text-gray-500">(0 recenzií)</span>
+                    <span className="text-sm text-gray-500">({sellerRating.count} {sellerRating.count === 1 ? 'recenzia' : sellerRating.count >= 2 && sellerRating.count <= 4 ? 'recenzie' : 'recenzií'})</span>
                   </div>
                 </div>
               </div>
@@ -623,14 +622,7 @@ export default function AdvertisementDetailPage({
             )}
 
             {/* Reviews Section */}
-            <div className="border-t border-white/[0.08] pt-8">
-              <h2 className="text-2xl font-bold text-white mb-6">
-                Recenzie (0)
-              </h2>
-              <div className="text-center text-gray-500 py-8">
-                Zatiaľ žiadne recenzie
-              </div>
-            </div>
+            <ReviewsSection advertisementId={advertisement.id} ownerId={advertisement.userId} />
           </div>
 
           {/* Sidebar */}
@@ -722,14 +714,9 @@ export default function AdvertisementDetailPage({
                         {sellerName}
                       </h3>
                       <div className="flex items-center gap-1 mt-1">
-                        <svg
-                          className="w-4 h-4 text-yellow-400 fill-current"
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                        </svg>
+                        <Star className="w-4 h-4 text-accent fill-accent" />
                         <span className="text-sm font-semibold text-white">
-                          5.0
+                          {sellerRating.count > 0 ? sellerRating.average.toFixed(1) : '–'}
                         </span>
                       </div>
                     </div>
@@ -1141,6 +1128,379 @@ export default function AdvertisementDetailPage({
       )}
 
       <Footer />
+    </div>
+  )
+}
+
+function StarRating({ rating, onRate, interactive = false, size = 'md' }: {
+  rating: number
+  onRate?: (r: number) => void
+  interactive?: boolean
+  size?: 'sm' | 'md'
+}) {
+  const [hover, setHover] = useState(0)
+  const px = size === 'sm' ? 'w-4 h-4' : 'w-5 h-5'
+
+  return (
+    <div className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          disabled={!interactive}
+          onClick={() => onRate?.(star)}
+          onMouseEnter={() => interactive && setHover(star)}
+          onMouseLeave={() => interactive && setHover(0)}
+          className={`${interactive ? 'cursor-pointer hover:scale-110' : 'cursor-default'} transition-transform`}
+        >
+          <Star
+            className={`${px} ${
+              star <= (hover || rating)
+                ? 'text-accent fill-accent'
+                : 'text-white/20'
+            } transition-colors`}
+          />
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function ReviewsSection({ advertisementId, ownerId }: { advertisementId: string; ownerId: string }) {
+  const [reviews, setReviews] = useState<any[]>([])
+  const [stats, setStats] = useState<{ count: number; average: number }>({ count: 0, average: 0 })
+  const [loading, setLoading] = useState(true)
+  const [newRating, setNewRating] = useState(0)
+  const [newComment, setNewComment] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editRating, setEditRating] = useState(0)
+  const [editComment, setEditComment] = useState('')
+  const [replyingId, setReplyingId] = useState<string | null>(null)
+  const [replyText, setReplyText] = useState('')
+
+  const user = getAuthUser()
+  const isLoggedIn = isAuthenticated()
+  const isOwner = user?.id === ownerId
+  const hasReviewed = reviews.some((r) => r.authorId === user?.id)
+
+  useEffect(() => {
+    loadReviews()
+  }, [advertisementId])
+
+  async function loadReviews() {
+    try {
+      const [reviewsData, statsData] = await Promise.all([
+        api.getReviews(advertisementId),
+        api.getReviewStats(advertisementId),
+      ])
+      setReviews(reviewsData)
+      setStats(statsData)
+    } catch {
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleSubmit() {
+    if (newRating === 0) {
+      setError('Vyberte hodnotenie')
+      return
+    }
+    setSubmitting(true)
+    setError('')
+    try {
+      await api.createReview({
+        advertisementId,
+        rating: newRating,
+        comment: newComment.trim() || undefined,
+      })
+      setNewRating(0)
+      setNewComment('')
+      await loadReviews()
+    } catch (e: any) {
+      setError(e?.message || 'Nepodarilo sa pridať recenziu')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function handleUpdate(id: string) {
+    setSubmitting(true)
+    try {
+      await api.updateReview(id, {
+        rating: editRating,
+        comment: editComment.trim() || undefined,
+      })
+      setEditingId(null)
+      await loadReviews()
+    } catch {
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function handleReply(reviewId: string) {
+    if (!replyText.trim()) return
+    setSubmitting(true)
+    try {
+      await api.replyToReview(reviewId, replyText.trim())
+      setReplyingId(null)
+      setReplyText('')
+      await loadReviews()
+    } catch {
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function handleDeleteReply(reviewId: string) {
+    if (!confirm('Naozaj chcete zmazať túto odpoveď?')) return
+    try {
+      await api.deleteReviewReply(reviewId)
+      await loadReviews()
+    } catch {
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Naozaj chcete zmazať túto recenziu?')) return
+    try {
+      await api.deleteReview(id)
+      await loadReviews()
+    } catch {
+    }
+  }
+
+  function getInitials(firstName?: string, lastName?: string) {
+    return ((firstName?.[0] || '') + (lastName?.[0] || '')).toUpperCase() || '?'
+  }
+
+  function formatDate(d: string) {
+    return new Date(d).toLocaleDateString('sk-SK', { day: 'numeric', month: 'long', year: 'numeric' })
+  }
+
+  return (
+    <div className="border-t border-white/[0.08] pt-8">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-white">Recenzie</h2>
+          {stats.count > 0 && (
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10">
+              <Star className="w-4 h-4 text-accent fill-accent" />
+              <span className="text-sm font-semibold text-accent">{stats.average}</span>
+              <span className="text-sm text-white/40">({stats.count})</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Write Review Form */}
+      {!isLoggedIn ? (
+        <div className="bg-dark-100 border border-white/[0.06] rounded-xl p-5 mb-6 text-center">
+          <p className="text-white/50 text-sm mb-3">Pre pridanie recenzie sa musíte prihlásiť.</p>
+          <a href="/signin" className="inline-block px-5 py-2 bg-accent text-dark rounded-lg font-semibold text-sm hover:bg-accent-light transition-colors">
+            Prihlásiť sa
+          </a>
+        </div>
+      ) : isOwner ? (
+        <div className="bg-dark-100 border border-white/[0.06] rounded-xl p-5 mb-6 text-center">
+          <p className="text-white/40 text-sm">Nemôžete hodnotiť vlastný inzerát.</p>
+        </div>
+      ) : hasReviewed ? (
+        <div className="bg-dark-100 border border-white/[0.06] rounded-xl p-5 mb-6 text-center">
+          <p className="text-white/40 text-sm">Ďakujeme za vašu recenziu! Môžete ju upraviť nižšie.</p>
+        </div>
+      ) : (
+        <div className="bg-dark-100 border border-white/[0.06] rounded-xl p-5 mb-6">
+          <h3 className="text-sm font-semibold text-white mb-3">Napísať recenziu</h3>
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-sm text-white/50">Vaše hodnotenie:</span>
+            <StarRating rating={newRating} onRate={setNewRating} interactive />
+          </div>
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Napíšte svoju skúsenosť... (voliteľné)"
+            rows={3}
+            className="w-full bg-dark-200 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/40 resize-none text-sm mb-3"
+          />
+          {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
+          <button
+            onClick={handleSubmit}
+            disabled={submitting || newRating === 0}
+            className="px-5 py-2 bg-accent text-dark rounded-lg font-semibold text-sm hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {submitting ? 'Odosielam...' : 'Odoslať recenziu'}
+          </button>
+        </div>
+      )}
+
+      {/* Reviews List */}
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="w-6 h-6 border-2 border-accent/30 border-t-accent rounded-full animate-spin mx-auto" />
+        </div>
+      ) : reviews.length === 0 ? (
+        <div className="text-center text-white/40 py-8">
+          Zatiaľ žiadne recenzie
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {reviews.map((review) => {
+            const isAuthor = user?.id === review.authorId
+            const isEditing = editingId === review.id
+
+            return (
+              <div key={review.id} className="bg-dark-100 border border-white/[0.06] rounded-xl p-5">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-accent/15 flex items-center justify-center text-accent text-xs font-semibold">
+                      {getInitials(review.author?.firstName, review.author?.lastName)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">
+                        {review.author?.firstName || ''} {review.author?.lastName || 'Používateľ'}
+                      </p>
+                      <p className="text-xs text-white/30">{formatDate(review.createdAt)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {!isEditing && <StarRating rating={review.rating} size="sm" />}
+                    {isAuthor && !isEditing && (
+                      <div className="flex gap-1 ml-2">
+                        <button
+                          onClick={() => {
+                            setEditingId(review.id)
+                            setEditRating(review.rating)
+                            setEditComment(review.comment || '')
+                          }}
+                          className="p-1.5 rounded-lg text-white/30 hover:text-white hover:bg-white/[0.06] transition-colors"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(review.id)}
+                          className="p-1.5 rounded-lg text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {isEditing ? (
+                  <div className="mt-3">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-xs text-white/50">Hodnotenie:</span>
+                      <StarRating rating={editRating} onRate={setEditRating} interactive size="sm" />
+                    </div>
+                    <textarea
+                      value={editComment}
+                      onChange={(e) => setEditComment(e.target.value)}
+                      rows={2}
+                      className="w-full bg-dark-200 border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/40 resize-none text-sm mb-2"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleUpdate(review.id)}
+                        disabled={submitting}
+                        className="px-3 py-1.5 bg-accent text-dark rounded-lg text-xs font-semibold hover:bg-accent-light transition-colors"
+                      >
+                        Uložiť
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="px-3 py-1.5 border border-white/10 text-white/60 rounded-lg text-xs hover:text-white transition-colors"
+                      >
+                        Zrušiť
+                      </button>
+                    </div>
+                  </div>
+                ) : review.comment ? (
+                  <p className="text-sm text-white/70 mt-1 leading-relaxed">{review.comment}</p>
+                ) : null}
+
+                {/* Owner Reply */}
+                {review.ownerReply && (
+                  <div className="mt-3 ml-6 pl-4 border-l-2 border-accent/20">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <Reply className="w-3.5 h-3.5 text-accent/60" />
+                        <span className="text-xs font-semibold text-accent/80">Odpoveď majiteľa</span>
+                        {review.ownerReplyAt && (
+                          <span className="text-xs text-white/20">{formatDate(review.ownerReplyAt)}</span>
+                        )}
+                      </div>
+                      {isOwner && (
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => {
+                              setReplyingId(review.id)
+                              setReplyText(review.ownerReply || '')
+                            }}
+                            className="p-1 rounded text-white/25 hover:text-white hover:bg-white/[0.06] transition-colors"
+                          >
+                            <Edit3 className="w-3 h-3" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteReply(review.id)}
+                            className="p-1 rounded text-white/25 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-sm text-white/60 leading-relaxed">{review.ownerReply}</p>
+                  </div>
+                )}
+
+                {/* Reply Form for Owner */}
+                {isOwner && replyingId === review.id && (
+                  <div className="mt-3 ml-6 pl-4 border-l-2 border-accent/30">
+                    <textarea
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      placeholder="Napíšte odpoveď na túto recenziu..."
+                      rows={2}
+                      className="w-full bg-dark-200 border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/40 resize-none text-sm mb-2"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleReply(review.id)}
+                        disabled={submitting || !replyText.trim()}
+                        className="px-3 py-1.5 bg-accent text-dark rounded-lg text-xs font-semibold hover:bg-accent-light disabled:opacity-50 transition-colors"
+                      >
+                        {submitting ? 'Odosielam...' : 'Odpovedať'}
+                      </button>
+                      <button
+                        onClick={() => { setReplyingId(null); setReplyText('') }}
+                        className="px-3 py-1.5 border border-white/10 text-white/60 rounded-lg text-xs hover:text-white transition-colors"
+                      >
+                        Zrušiť
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Reply Button for Owner (when no reply yet and not currently replying) */}
+                {isOwner && !review.ownerReply && replyingId !== review.id && (
+                  <button
+                    onClick={() => { setReplyingId(review.id); setReplyText('') }}
+                    className="mt-2 flex items-center gap-1.5 text-xs text-white/30 hover:text-accent transition-colors"
+                  >
+                    <Reply className="w-3.5 h-3.5" />
+                    Odpovedať
+                  </button>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

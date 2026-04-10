@@ -88,6 +88,7 @@ model User {
   messagesReceived     Message[]       @relation("MessageRecipient")
   messagesSent         Message[]       @relation("MessageSender")
   favorites            Favorite[]
+  reviews              Review[]
 
   @@index([banned])
   @@index([bannedUntil])
@@ -198,12 +199,31 @@ model Advertisement {
   reports         Report[]
   messages        Message[]
   favorites       Favorite[]
+  reviews         Review[]
 
   @@index([userId])
   @@index([status])
   @@index([categoryId])
   @@index([type])
   @@index([priorityBoosted])
+}
+
+model Review {
+  id              String        @id @default(uuid())
+  rating          Int
+  comment         String?       @db.Text
+  ownerReply      String?       @db.Text
+  ownerReplyAt    DateTime?
+  advertisementId String
+  advertisement   Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+  authorId        String
+  author          User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([advertisementId, authorId])
+  @@index([advertisementId])
+  @@index([authorId])
 }
 
 model Payment {

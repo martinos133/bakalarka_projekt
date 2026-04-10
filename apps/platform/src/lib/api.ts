@@ -199,6 +199,21 @@ export const api = {
     method: 'DELETE',
   }),
 
+  // Reviews
+  getReviews: (advertisementId: string) => fetchAPI(`/reviews/advertisement/${advertisementId}`),
+  getReviewStats: (advertisementId: string) => fetchAPI(`/reviews/advertisement/${advertisementId}/stats`),
+  getUserReviewStats: (userId: string) => fetchAPI(`/reviews/user/${userId}/stats`),
+  createReview: (data: { advertisementId: string; rating: number; comment?: string }) =>
+    fetchWithAuth('/reviews', { method: 'POST', body: JSON.stringify(data) }),
+  updateReview: (id: string, data: { rating?: number; comment?: string }) =>
+    fetchWithAuth(`/reviews/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteReview: (id: string) =>
+    fetchWithAuth(`/reviews/${id}`, { method: 'DELETE' }),
+  replyToReview: (id: string, reply: string) =>
+    fetchWithAuth(`/reviews/${id}/reply`, { method: 'POST', body: JSON.stringify({ reply }) }),
+  deleteReviewReply: (id: string) =>
+    fetchWithAuth(`/reviews/${id}/reply`, { method: 'DELETE' }),
+
   // Monitoring kliknutí (verejné – bez auth)
   recordClick: (data: {
     eventType?: string
