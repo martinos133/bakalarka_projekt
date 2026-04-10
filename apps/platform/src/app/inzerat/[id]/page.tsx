@@ -593,24 +593,39 @@ export default function AdvertisementDetailPage({
                       {advertisement.faq.map((faq, idx) => (
                         <div 
                           key={idx} 
-                          className="border border-white/[0.08] rounded-lg overflow-hidden bg-dark hover:shadow-md transition-shadow"
+                          className={`rounded-2xl overflow-hidden transition-all ${
+                            expandedFAQ === idx
+                              ? 'border border-accent/30 bg-dark shadow-[0_0_0_1px_rgba(201,169,110,0.10),0_22px_80px_-60px_rgba(201,169,110,0.45)]'
+                              : 'border border-white/[0.08] bg-dark hover:border-white/15 hover:shadow-md'
+                          }`}
                         >
                           <button
                             onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
-                            className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-dark-200/[0.04] transition-colors"
+                            className={`w-full px-6 py-4 flex items-center justify-between text-left transition-colors ${
+                              expandedFAQ === idx ? 'bg-accent/10' : 'hover:bg-dark-200/[0.04]'
+                            }`}
                           >
                             <h3 className="font-semibold text-white pr-4">{faq.question}</h3>
                             <div className="flex-shrink-0">
                               {expandedFAQ === idx ? (
-                                <ChevronUp className="w-5 h-5 text-gray-500" />
+                                <ChevronUp className="w-5 h-5 text-accent/80" />
                               ) : (
-                                <ChevronDown className="w-5 h-5 text-gray-500" />
+                                <ChevronDown className="w-5 h-5 text-white/30" />
                               )}
                             </div>
                           </button>
                           {expandedFAQ === idx && (
-                            <div className="px-6 pb-4 pt-0">
-                              <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
+                            <div className="px-6 pb-5 pt-0">
+                              <div className="relative mt-1 pl-4">
+                                <div className="absolute left-0 top-1 bottom-1 w-1 rounded-full bg-gradient-to-b from-accent via-accent/60 to-accent/10" />
+                                <div className="inline-flex items-center gap-2 text-[11px] font-extrabold tracking-[0.18em] text-accent/90 mb-2">
+                                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-accent" />
+                                  ODPOVEĎ
+                                </div>
+                                <div className="rounded-xl bg-dark-200/60 border border-white/[0.08] px-4 py-3">
+                                  <p className="text-white/75 leading-relaxed">{faq.answer}</p>
+                                </div>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -1425,15 +1440,33 @@ function ReviewsSection({ advertisementId, ownerId }: { advertisementId: string;
 
                 {/* Owner Reply */}
                 {review.ownerReply && (
-                  <div className="mt-3 ml-6 pl-4 border-l-2 border-accent/20">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2">
-                        <Reply className="w-3.5 h-3.5 text-accent/60" />
-                        <span className="text-xs font-semibold text-accent/80">Odpoveď majiteľa</span>
-                        {review.ownerReplyAt && (
-                          <span className="text-xs text-white/20">{formatDate(review.ownerReplyAt)}</span>
-                        )}
-                      </div>
+                  <div className="mt-4 ml-6 relative">
+                    {/* connector from review to reply */}
+                    <div className="absolute -left-3 top-0 bottom-0 w-px bg-gradient-to-b from-accent/40 via-accent/15 to-transparent" />
+
+                    <div className="relative p-4 rounded-2xl bg-dark-100 border border-accent/30 shadow-[0_0_0_1px_rgba(201,169,110,0.10),0_22px_80px_-60px_rgba(201,169,110,0.55)]">
+                      {/* left accent bar */}
+                      <div className="absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl bg-gradient-to-b from-accent via-accent/60 to-accent/10" />
+
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-start gap-3">
+                          <div className="mt-0.5 w-9 h-9 rounded-full bg-accent/15 border border-accent/25 flex items-center justify-center text-accent font-semibold text-xs">
+                            <Reply className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[11px] font-extrabold tracking-[0.18em] text-accent">
+                                ODPOVEĎ
+                              </span>
+                              <span className="text-[11px] font-semibold text-white/60">
+                                Majiteľ inzerátu
+                              </span>
+                            </div>
+                            {review.ownerReplyAt && (
+                              <div className="text-xs text-white/30 mt-0.5">{formatDate(review.ownerReplyAt)}</div>
+                            )}
+                          </div>
+                        </div>
                       {isOwner && (
                         <div className="flex gap-1">
                           <button
@@ -1441,26 +1474,35 @@ function ReviewsSection({ advertisementId, ownerId }: { advertisementId: string;
                               setReplyingId(review.id)
                               setReplyText(review.ownerReply || '')
                             }}
-                            className="p-1 rounded text-white/25 hover:text-white hover:bg-white/[0.06] transition-colors"
+                            className="p-1.5 rounded-lg text-white/25 hover:text-white hover:bg-white/[0.06] transition-colors"
                           >
                             <Edit3 className="w-3 h-3" />
                           </button>
                           <button
                             onClick={() => handleDeleteReply(review.id)}
-                            className="p-1 rounded text-white/25 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                            className="p-1.5 rounded-lg text-white/25 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                           >
                             <Trash2 className="w-3 h-3" />
                           </button>
                         </div>
                       )}
                     </div>
-                    <p className="text-sm text-white/60 leading-relaxed">{review.ownerReply}</p>
+
+                      <div className="mt-1 rounded-xl bg-dark-200/60 border border-white/[0.06] px-4 py-3">
+                        <p className="text-sm text-white/80 leading-relaxed">{review.ownerReply}</p>
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {/* Reply Form for Owner */}
                 {isOwner && replyingId === review.id && (
-                  <div className="mt-3 ml-6 pl-4 border-l-2 border-accent/30">
+                  <div className="mt-4 ml-6 p-4 rounded-2xl bg-dark-100 border border-accent/30 shadow-[0_0_0_1px_rgba(201,169,110,0.08)]">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Reply className="w-4 h-4 text-accent/80" />
+                      <span className="text-[11px] font-extrabold tracking-[0.18em] text-accent">ODPOVEĎ</span>
+                      <span className="text-xs text-white/40">napíšte reakciu na recenziu</span>
+                    </div>
                     <textarea
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
