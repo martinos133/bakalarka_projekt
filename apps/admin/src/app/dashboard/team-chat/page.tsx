@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated, getAuthUser } from '@/lib/auth'
 import api from '@/lib/api'
+import DashboardLayout from '@/components/DashboardLayout'
 import {
   Search,
   Send,
@@ -256,7 +257,8 @@ export default function TeamChatPage() {
   const messageGroups = groupByDate(messages)
 
   return (
-    <div className="h-[calc(100vh-2rem)] flex rounded-2xl overflow-hidden border border-white/[0.06] bg-dark">
+    <DashboardLayout>
+    <div className="h-[calc(100vh-10rem)] flex rounded-2xl overflow-hidden border border-white/[0.06] bg-dark">
       {/* Left panel - Conversations */}
       <div className={`w-full md:w-[360px] flex-shrink-0 flex flex-col bg-card border-r border-white/[0.06] ${mobileShowChat ? 'hidden md:flex' : 'flex'}`}>
         {/* Header */}
@@ -272,13 +274,14 @@ export default function TeamChatPage() {
             </button>
           </div>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
             <input
               type="text"
               placeholder="Hľadať konverzáciu..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm"
+              className="w-full pl-14 pr-3 py-2 text-sm"
+              style={{ paddingLeft: '3.75rem' }}
             />
           </div>
         </div>
@@ -529,13 +532,14 @@ export default function TeamChatPage() {
 
             <div className="p-4">
               <div className="relative mb-3">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
                 <input
                   type="text"
                   placeholder="Hľadať..."
                   value={memberSearch}
                   onChange={(e) => setMemberSearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm"
+                  className="w-full pl-14 pr-3 py-2 text-sm"
+                  style={{ paddingLeft: '3.75rem' }}
                   autoFocus
                 />
               </div>
@@ -583,5 +587,6 @@ export default function TeamChatPage() {
         </div>
       )}
     </div>
+    </DashboardLayout>
   )
 }
