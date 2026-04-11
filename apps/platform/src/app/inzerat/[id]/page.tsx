@@ -13,7 +13,7 @@ import { useCmsOverride } from '@/lib/useCmsOverride'
 import { isAuthenticated, getAuthUser } from '@/lib/auth'
 import { isProSellerBadge } from '@/lib/sellerPlan'
 import type { Filter } from '@inzertna-platforma/shared'
-import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone, Heart, Star, Trash2, Edit3, Reply, RefreshCw } from 'lucide-react'
+import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone, Heart, Star, Trash2, Edit3, Reply, RefreshCw, Calendar, Clock } from 'lucide-react'
 import CustomSelect from '@/components/CustomSelect'
 import type { DateRange } from 'react-day-picker'
 
@@ -592,47 +592,51 @@ export default function AdvertisementDetailPage({
                   </div>
                 )}
 
-                {/* FAQ */}
+                {/* FAQ — admin card + popup farby */}
                 {advertisement.faq && advertisement.faq.length > 0 && (
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-accent mb-6">
+                  <div className="card mb-8 overflow-hidden p-6 shadow-lg shadow-black/20">
+                    <div className="mb-5 h-0.5 w-full rounded-full bg-gradient-to-r from-card via-accent/80 to-card" aria-hidden />
+                    <h2 className="mb-6 text-2xl font-bold text-accent">
                       Často kladené otázky
                     </h2>
                     <div className="space-y-3">
                       {advertisement.faq.map((faq, idx) => (
-                        <div 
-                          key={idx} 
-                          className={`rounded-2xl overflow-hidden transition-all ${
+                        <div
+                          key={idx}
+                          className={`overflow-hidden rounded-xl border transition-all duration-200 ${
                             expandedFAQ === idx
-                              ? 'border border-accent/30 bg-dark shadow-[0_0_0_1px_rgba(201,169,110,0.10),0_22px_80px_-60px_rgba(201,169,110,0.45)]'
-                              : 'border border-white/[0.08] bg-dark hover:border-white/15 hover:shadow-md'
+                              ? 'border-accent/40 bg-card shadow-[0_0_0_1px_rgba(201,169,110,0.12),0_12px_40px_-20px_rgba(201,169,110,0.18)]'
+                              : 'border-white/[0.08] bg-surface hover:border-accent/20 hover:bg-white/[0.03]'
                           }`}
                         >
                           <button
+                            type="button"
                             onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
-                            className={`w-full px-6 py-4 flex items-center justify-between text-left transition-colors ${
-                              expandedFAQ === idx ? 'bg-accent/10' : 'hover:bg-dark-200/[0.04]'
+                            className={`flex w-full items-center justify-between px-5 py-4 text-left transition-colors duration-200 ${
+                              expandedFAQ === idx
+                                ? 'border-b border-accent/15 bg-accent/[0.07] text-white'
+                                : 'text-white hover:bg-white/[0.04]'
                             }`}
                           >
-                            <h3 className="font-semibold text-white pr-4">{faq.question}</h3>
-                            <div className="flex-shrink-0">
+                            <h3 className="pr-4 text-[15px] font-semibold tracking-tight text-white">
+                              {faq.question}
+                            </h3>
+                            <div className="shrink-0 rounded-lg border border-white/[0.08] bg-black/20 p-1">
                               {expandedFAQ === idx ? (
-                                <ChevronUp className="w-5 h-5 text-accent/80" />
+                                <ChevronUp className="h-4 w-4 text-accent" />
                               ) : (
-                                <ChevronDown className="w-5 h-5 text-white/30" />
+                                <ChevronDown className="h-4 w-4 text-gray-400" />
                               )}
                             </div>
                           </button>
                           {expandedFAQ === idx && (
-                            <div className="px-6 pb-5 pt-0">
-                              <div className="relative mt-1 pl-4">
-                                <div className="absolute left-0 top-1 bottom-1 w-1 rounded-full bg-gradient-to-b from-accent via-accent/60 to-accent/10" />
-                                <div className="inline-flex items-center gap-2 text-[11px] font-extrabold tracking-[0.18em] text-accent/90 mb-2">
-                                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-accent" />
-                                  ODPOVEĎ
-                                </div>
-                                <div className="rounded-xl bg-dark-200/60 border border-white/[0.08] px-4 py-3">
-                                  <p className="text-white/75 leading-relaxed">{faq.answer}</p>
+                            <div className="bg-black/15 px-5 pb-5 pt-4">
+                              <div className="border-l-2 border-accent/60 pl-4">
+                                <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">
+                                  Odpoveď
+                                </p>
+                                <div className="rounded-xl border border-white/[0.1] bg-white/[0.06] px-4 py-3.5 backdrop-blur-[2px]">
+                                  <p className="text-[15px] leading-relaxed text-white/90">{faq.answer}</p>
                                 </div>
                               </div>
                             </div>
@@ -652,20 +656,22 @@ export default function AdvertisementDetailPage({
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-24">
-              {/* Price Card */}
-              <div className="border border-white/[0.08] rounded-lg p-6 mb-6">
-                <div className="mb-4">
+              {/* Price Card — admin card + tlačidlá */}
+              <div className="card mb-6 overflow-hidden p-6 shadow-2xl shadow-black/20">
+                <div className="mb-1 h-0.5 w-full rounded-full bg-gradient-to-r from-card via-accent/80 to-card" aria-hidden />
+                <div className="mb-5 mt-5">
                   {advertisement.type === 'SERVICE' && advertisement.pricingType === 'HOURLY' && advertisement.hourlyRate ? (
                     <div>
                       <div className="flex items-baseline gap-2">
                         <span className="text-3xl font-bold text-white">
                           {advertisement.hourlyRate.toFixed(2)}€
                         </span>
-                        <span className="text-gray-500">/ hodina</span>
+                        <span className="text-sm text-gray-500">/ hodina</span>
                       </div>
                       {advertisement.deliveryTime && (
-                        <div className="text-sm text-gray-500 mt-2">
-                          ⏱ Dodanie: {advertisement.deliveryTime}
+                        <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-400">
+                          <Clock className="h-3.5 w-3.5 shrink-0 text-accent/80" />
+                          Dodanie: {advertisement.deliveryTime}
                         </div>
                       )}
                     </div>
@@ -675,11 +681,12 @@ export default function AdvertisementDetailPage({
                         <span className="text-3xl font-bold text-white">
                           {advertisement.dailyRate.toFixed(2)}€
                         </span>
-                        <span className="text-gray-500">/ deň</span>
+                        <span className="text-sm text-gray-500">/ deň</span>
                       </div>
                       {advertisement.deliveryTime && (
-                        <div className="text-sm text-gray-500 mt-2">
-                          ⏱ Dodanie: {advertisement.deliveryTime}
+                        <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-400">
+                          <Clock className="h-3.5 w-3.5 shrink-0 text-accent/80" />
+                          Dodanie: {advertisement.deliveryTime}
                         </div>
                       )}
                     </div>
@@ -689,89 +696,92 @@ export default function AdvertisementDetailPage({
                         {advertisement.price ? `${advertisement.price.toFixed(2)}€` : 'Na dohodu'}
                       </span>
                       {advertisement.price && (
-                        <span className="text-gray-500">Začínajúc od</span>
+                        <span className="text-sm text-gray-500">Začínajúc od</span>
                       )}
                     </div>
                   )}
                   {advertisement.type === 'SERVICE' && advertisement.revisions && (
-                    <div className="text-sm text-gray-500 mt-2 flex items-center gap-1.5">
-                      <RefreshCw className="w-3.5 h-3.5" />
+                    <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-400">
+                      <RefreshCw className="h-3.5 w-3.5 shrink-0 text-accent/80" />
                       Revízie: {advertisement.revisions}
                     </div>
                   )}
                 </div>
                 <button
+                  type="button"
                   onClick={handleContinueClick}
-                  className="w-full bg-accent text-white py-3 rounded-md font-semibold hover:bg-accent-light transition-colors mb-4"
+                  className="mb-3 w-full rounded-xl bg-accent py-3 text-sm font-semibold text-dark transition-colors hover:bg-accent-light active:scale-[0.98]"
                 >
                   Pokračovať
                 </button>
-                  <button
-                    onClick={handleToggleFavorite}
-                    disabled={favoriteLoading}
-                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-md font-semibold transition-colors mb-4 ${
-                      isFavorite
-                        ? 'border-2 border-accent bg-accent/10 text-accent hover:bg-[#c9a96e]/20'
-                        : 'border-2 border-white/10 text-white hover:border-white/20'
-                    }`}
-                  >
-                    <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
-                    {isFavorite ? 'V obľúbených' : 'Uložiť do obľúbených'}
-                  </button>
-                  <button
-                    onClick={() => setShowReportModal(true)}
-                    className="w-full flex items-center justify-center gap-2 border-2 border-red-300 text-red-400 py-3 rounded-md font-semibold hover:border-red-400 hover:bg-red-900/20 transition-colors"
-                  >
-                    <Flag className="w-4 h-4" />
-                    Nahlásiť inzerát
-                  </button>
+                <button
+                  type="button"
+                  onClick={handleToggleFavorite}
+                  disabled={favoriteLoading}
+                  className={`mb-3 flex w-full items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium transition-colors active:scale-[0.98] disabled:opacity-50 ${
+                    isFavorite
+                      ? 'border-accent/40 bg-accent/10 text-accent hover:bg-accent/15'
+                      : 'border-white/[0.08] bg-transparent text-white hover:border-white/[0.14] hover:bg-white/[0.06]'
+                  }`}
+                >
+                  <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
+                  {isFavorite ? 'V obľúbených' : 'Uložiť do obľúbených'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowReportModal(true)}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-500/35 bg-red-500/5 py-3 text-sm font-semibold text-red-300 transition-colors hover:border-red-400/50 hover:bg-red-500/10"
+                >
+                  <Flag className="h-4 w-4" />
+                  Nahlásiť inzerát
+                </button>
               </div>
 
               {/* Seller Card */}
               {advertisement.user && (
-                <div className="border border-white/[0.08] rounded-lg p-6">
-                  <div className="flex items-center gap-4 mb-4">
+                <div className="card overflow-hidden p-6 shadow-2xl shadow-black/20">
+                  <div className="mb-1 h-0.5 w-full rounded-full bg-gradient-to-r from-card via-accent/80 to-card" aria-hidden />
+                  <div className="mb-4 mt-5 flex items-center gap-4">
                     {advertisement.user && (advertisement.user as { avatarUrl?: string | null }).avatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={(advertisement.user as { avatarUrl: string }).avatarUrl}
                         alt=""
-                        className="h-16 w-16 rounded-full border border-white/10 object-cover"
+                        className="h-16 w-16 rounded-full border border-white/[0.1] object-cover ring-1 ring-accent/15"
                       />
                     ) : (
-                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-dark-300 text-xl font-semibold text-gray-500">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/[0.08] bg-dark-100 text-xl font-semibold text-gray-400 ring-1 ring-accent/10">
                         {sellerName.charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <div>
-                      <h3 className="font-semibold text-white">
-                        {sellerName}
-                      </h3>
-                      <div className="flex items-center gap-1 mt-1">
-                        <Star className="w-4 h-4 text-accent fill-accent" />
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-white">{sellerName}</h3>
+                      <div className="mt-1 flex items-center gap-1">
+                        <Star className="h-4 w-4 fill-accent text-accent" />
                         <span className="text-sm font-semibold text-white">
                           {sellerRating.count > 0 ? sellerRating.average.toFixed(1) : '–'}
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-2 text-sm text-gray-500">
+                  <div className="space-y-2 rounded-xl border border-white/[0.06] bg-dark-100/40 px-3 py-3 text-sm">
                     {advertisement.location && (
-                      <div className="flex justify-between">
-                        <span>Lokalita:</span>
-                        <span className="font-medium">{advertisement.location}</span>
+                      <div className="flex justify-between gap-3 text-gray-500">
+                        <span>Lokalita</span>
+                        <span className="font-medium text-white">{advertisement.location}</span>
                       </div>
                     )}
-                    <div className="flex justify-between">
-                      <span>Člen od:</span>
-                      <span className="font-medium">
+                    <div className="flex justify-between gap-3 text-gray-500">
+                      <span>Člen od</span>
+                      <span className="font-medium text-white">
                         {new Date(advertisement.createdAt).getFullYear()}
                       </span>
                     </div>
                   </div>
                   <button
+                    type="button"
                     onClick={handleContactClick}
-                    className="w-full mt-4 border border-white/10 text-white py-2 rounded-md font-medium hover:border-white/20 transition-colors"
+                    className="mt-4 w-full rounded-xl border border-white/[0.08] bg-transparent py-2.5 text-sm font-medium text-white transition-colors hover:border-white/[0.14] hover:bg-white/[0.06] active:scale-[0.98]"
                   >
                     Kontaktovať predajcu
                   </button>
@@ -782,24 +792,45 @@ export default function AdvertisementDetailPage({
         </div>
       </div>
 
-      {/* Contact Modal */}
+      {/* Contact Modal — admin štýl + priehľadný overlay */}
       {showContactModal && advertisement?.user && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark rounded-lg max-w-md w-full shadow-xl shadow-black/30">
-            <div className="p-6 border-b border-white/[0.08]">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Zavrieť"
+            className="absolute inset-0 bg-black/45 backdrop-blur-sm"
+            onClick={() => {
+              setShowContactModal(false)
+              setContactMode('choice')
+              setInquirySuccess(false)
+            }}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="contact-modal-title"
+            className="relative w-full max-w-md overflow-hidden rounded-2xl border border-white/[0.08] bg-card shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="h-0.5 w-full bg-gradient-to-r from-card via-accent to-card" aria-hidden />
+            <div className="border-b border-white/[0.06] px-6 py-4">
+              <div className="flex items-center justify-between gap-3">
+                <h2 id="contact-modal-title" className="flex items-center gap-3 text-lg font-semibold text-white">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 ring-1 ring-accent/20">
+                    <MessageSquare className="h-5 w-5 text-accent" />
+                  </span>
                   Kontaktovať predajcu
                 </h2>
                 <button
+                  type="button"
                   onClick={() => {
                     setShowContactModal(false)
                     setContactMode('choice')
                     setInquirySuccess(false)
                   }}
-                  className="p-2 hover:bg-dark-200/[0.06] rounded-lg transition-colors"
+                  className="rounded-lg p-1.5 text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="h-5 w-5" />
                 </button>
               </div>
             </div>
@@ -807,19 +838,18 @@ export default function AdvertisementDetailPage({
             <div className="p-6">
               {contactMode === 'choice' && (
                 <div className="space-y-4">
-                  <p className="text-gray-500 text-sm">
-                    Vyberte spôsob kontaktu s predajcom {sellerName}:
+                  <p className="text-sm text-gray-400">
+                    Vyberte spôsob kontaktu s predajcom <span className="font-medium text-white">{sellerName}</span>:
                   </p>
                   <button
+                    type="button"
                     onClick={handleContactChat}
-                    className="w-full flex items-center gap-3 p-4 border-2 border-white/[0.08] rounded-lg hover:border-accent hover:bg-[#c9a96e]/5 transition-colors text-left"
+                    className="flex w-full items-center gap-3 rounded-xl border border-white/[0.08] bg-dark-100/40 p-4 text-left transition-colors hover:border-accent/40 hover:bg-popupRowHover"
                   >
-                    <MessageSquare className="w-6 h-6 text-accent" />
-                    <div>
-                      <span className="font-semibold text-white block">
-                        Napísať cez chat
-                      </span>
-                      <span className="text-sm text-gray-500">
+                    <MessageSquare className="h-6 w-6 shrink-0 text-accent" />
+                    <div className="min-w-0">
+                      <span className="block font-semibold text-white">Napísať cez chat</span>
+                      <span className="mt-0.5 block text-sm text-gray-500">
                         {isAuthenticated()
                           ? 'Obe strany musia byť zaregistrované. Odosielate správu predajcovi.'
                           : 'Pre chat sa musíte prihlásiť. Obe strany musia byť zaregistrované.'}
@@ -827,15 +857,14 @@ export default function AdvertisementDetailPage({
                     </div>
                   </button>
                   <button
+                    type="button"
                     onClick={handleContactPhone}
-                    className="w-full flex items-center gap-3 p-4 border-2 border-white/[0.08] rounded-lg hover:border-accent hover:bg-[#c9a96e]/5 transition-colors text-left"
+                    className="flex w-full items-center gap-3 rounded-xl border border-white/[0.08] bg-dark-100/40 p-4 text-left transition-colors hover:border-accent/40 hover:bg-popupRowHover"
                   >
-                    <Phone className="w-6 h-6 text-accent" />
-                    <div>
-                      <span className="font-semibold text-white block">
-                        Zobraziť telefón
-                      </span>
-                      <span className="text-sm text-gray-500">
+                    <Phone className="h-6 w-6 shrink-0 text-accent" />
+                    <div className="min-w-0">
+                      <span className="block font-semibold text-white">Zobraziť telefón</span>
+                      <span className="mt-0.5 block text-sm text-gray-500">
                         {advertisement.user && advertisement.user.phone
                           ? 'Zobrazí telefónne číslo predajcu'
                           : 'Predajca nemá zverejnený telefón'}
@@ -846,67 +875,67 @@ export default function AdvertisementDetailPage({
               )}
 
               {contactMode === 'chat' && inquirySuccess ? (
-                <div className="text-center py-6">
-                  <div className="w-16 h-16 bg-accent/15 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Check className="w-8 h-8 text-accent" />
+                <div className="py-6 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/15 ring-1 ring-accent/25">
+                    <Check className="h-8 w-8 text-accent" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    Správa bola odoslaná
-                  </h3>
-                  <p className="text-gray-500 text-sm">
+                  <h3 className="mb-2 text-lg font-semibold text-white">Správa bola odoslaná</h3>
+                  <p className="text-sm text-gray-400">
                     Predajca dostane vašu správu a môže vám odpovedať v sekcii Správy vo svojom profile.
                   </p>
                 </div>
               ) : contactMode === 'chat' && (
                 <div className="space-y-4">
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-sm text-gray-400">
                     Napíšte správu predajcovi. Budete si môcť písať cez sekciu Správy vo vašom profile.
                   </p>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-500">
                       Predmet
                     </label>
                     <input
                       type="text"
                       value={inquirySubject}
                       onChange={(e) => setInquirySubject(e.target.value)}
-                      className="w-full bg-dark-100 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/40"
+                      className="w-full rounded-xl border border-white/[0.12] bg-white/[0.08] px-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/25"
                       placeholder="Predmet správy"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-500">
                       Správa
                     </label>
                     <textarea
                       value={inquiryContent}
                       onChange={(e) => setInquiryContent(e.target.value)}
                       rows={4}
-                      className="w-full bg-dark-100 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/40 resize-none"
+                      className="w-full resize-none rounded-xl border border-white/[0.12] bg-white/[0.08] px-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/25"
                       placeholder="Napíšte svoju správu..."
                     />
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-white/50 bg-accent/10 p-3 rounded-lg">
-                    <AlertCircle className="w-5 h-5 text-accent/60 flex-shrink-0" />
+                  <div className="flex items-start gap-3 rounded-xl border border-accent/25 bg-popup p-4 text-sm leading-relaxed text-gray-300">
+                    <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
                     <p>
                       Pre písanie cez chat musia byť obaja používatelia zaregistrovaní. Správa sa odošle predajcovi a môžete pokračovať v komunikácii v sekcii Správy.
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 pt-2">
+                  <div className="flex items-center gap-2.5 border-t border-white/[0.06] pt-5">
                     <button
+                      type="button"
                       onClick={() => setContactMode('choice')}
-                      className="px-4 py-2.5 border border-white/10 text-white/70 rounded-lg font-medium hover:bg-white/[0.06] hover:text-white transition-colors"
+                      className="inline-flex items-center justify-center rounded-xl border border-white/[0.08] bg-transparent px-4 py-2.5 text-sm font-medium text-gray-300 transition-colors hover:border-white/[0.15] hover:bg-white/[0.06] hover:text-white"
                     >
                       Späť
                     </button>
                     <button
+                      type="button"
                       onClick={handleInquirySubmit}
                       disabled={
                         !inquirySubject.trim() ||
                         !inquiryContent.trim() ||
                         inquirySubmitting
                       }
-                      className="flex-1 px-4 py-2.5 bg-accent text-dark rounded-lg font-semibold hover:bg-accent-light disabled:bg-dark-300 disabled:text-white/30 disabled:cursor-not-allowed transition-colors"
+                      className="inline-flex flex-1 items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-dark transition-colors hover:bg-accent-light disabled:cursor-not-allowed disabled:opacity-45"
                     >
                       {inquirySubmitting ? 'Odosielam...' : 'Odoslať správu'}
                     </button>
@@ -918,33 +947,28 @@ export default function AdvertisementDetailPage({
                 <div className="space-y-4">
                   {advertisement.user.phone ? (
                     <>
-                      <p className="text-gray-500 text-sm">
-                        Telefónne číslo predajcu {sellerName}:
+                      <p className="text-sm text-gray-400">
+                        Telefónne číslo predajcu <span className="font-medium text-white">{sellerName}</span>:
                       </p>
                       <a
                         href={`tel:${advertisement.user.phone}`}
-                        className="block text-xl font-semibold text-accent hover:underline"
+                        className="block text-xl font-semibold text-accent hover:text-accent-light hover:underline"
                       >
                         {advertisement.user.phone}
                       </a>
-                      <p className="text-sm text-gray-500">
-                        Kliknutím na číslo môžete zavolať.
-                      </p>
+                      <p className="text-sm text-gray-500">Kliknutím na číslo môžete zavolať.</p>
                     </>
                   ) : (
-                    <div className="text-center py-4">
-                      <Phone className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                      <p className="text-gray-500 text-sm">
-                        Predajca nemá zverejnený telefón.
-                      </p>
-                      <p className="text-gray-500 text-sm mt-1">
-                        Skúste napísať cez chat.
-                      </p>
+                    <div className="py-4 text-center">
+                      <Phone className="mx-auto mb-3 h-12 w-12 text-gray-500" />
+                      <p className="text-sm text-gray-400">Predajca nemá zverejnený telefón.</p>
+                      <p className="mt-1 text-sm text-gray-500">Skúste napísať cez chat.</p>
                     </div>
                   )}
                   <button
+                    type="button"
                     onClick={() => setContactMode('choice')}
-                    className="w-full px-4 py-2 border border-white/10 text-gray-300 rounded-lg font-medium hover:bg-dark-200/[0.04] transition-colors"
+                    className="w-full rounded-xl border border-white/[0.08] bg-transparent px-4 py-2.5 text-sm font-medium text-gray-300 transition-colors hover:border-white/[0.15] hover:bg-white/[0.06] hover:text-white"
                   >
                     Späť
                   </button>
@@ -955,41 +979,59 @@ export default function AdvertisementDetailPage({
         </div>
       )}
 
-      {/* Continue Modal - Konzultácia (služby) alebo Rezervácia (inzeráty) */}
+      {/* Continue Modal — admin štýl + priehľadný overlay */}
       {showContinueModal && advertisement && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark rounded-lg max-w-lg w-full shadow-xl shadow-black/30">
-            <div className="p-6 border-b border-white/[0.08]">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-white">
-                  {advertisement.type === 'SERVICE'
-                    ? 'Dohodnúť konzultáciu'
-                    : 'Rezervovať inzerát'}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Zavrieť"
+            className="absolute inset-0 bg-black/45 backdrop-blur-sm"
+            onClick={() => {
+              setShowContinueModal(false)
+              setContinueSuccess(false)
+              setContinueServiceDate(undefined)
+              setContinueRentalRange(undefined)
+            }}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="continue-modal-title"
+            className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/[0.08] bg-card shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="h-0.5 w-full bg-gradient-to-r from-card via-accent to-card" aria-hidden />
+            <div className="border-b border-white/[0.06] px-6 py-4">
+              <div className="flex items-center justify-between gap-3">
+                <h2 id="continue-modal-title" className="flex items-center gap-3 text-lg font-semibold text-white">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 ring-1 ring-accent/20">
+                    <Calendar className="h-5 w-5 text-accent" />
+                  </span>
+                  {advertisement.type === 'SERVICE' ? 'Dohodnúť konzultáciu' : 'Rezervovať inzerát'}
                 </h2>
                 <button
+                  type="button"
                   onClick={() => {
                     setShowContinueModal(false)
                     setContinueSuccess(false)
                     setContinueServiceDate(undefined)
                     setContinueRentalRange(undefined)
                   }}
-                  className="p-2 hover:bg-dark-200/[0.06] rounded-lg transition-colors"
+                  className="rounded-lg p-1.5 text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="h-5 w-5" />
                 </button>
               </div>
             </div>
 
             <div className="p-6">
               {continueSuccess ? (
-                <div className="text-center py-6">
-                  <div className="w-16 h-16 bg-accent/15 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Check className="w-8 h-8 text-accent" />
+                <div className="py-6 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/15 ring-1 ring-accent/25">
+                    <Check className="h-8 w-8 text-accent" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    Žiadosť odoslaná
-                  </h3>
-                  <p className="text-gray-500 text-sm">
+                  <h3 className="mb-2 text-lg font-semibold text-white">Žiadosť odoslaná</h3>
+                  <p className="text-sm text-gray-400">
                     {advertisement.type === 'SERVICE'
                       ? 'Predajca vám čoskoro odpíše s návrhom termínu konzultácie. Sledujte sekciu Správy.'
                       : 'Predajca vám čoskoro odpíše k rezervácii. Sledujte sekciu Správy.'}
@@ -997,7 +1039,7 @@ export default function AdvertisementDetailPage({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-sm text-gray-400">
                     {advertisement.type === 'SERVICE'
                       ? 'Vyberte dátum a popíšte, čo potrebujete. Predajca vám odpíše cez Správy.'
                       : 'Vyberte termín rezervácie a doplňte správu. Predajca dostane všetky potrebné informácie.'}
@@ -1022,14 +1064,14 @@ export default function AdvertisementDetailPage({
                   )}
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Doplňujúca správa pre predajcu <span className="text-red-500">*</span>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-500">
+                      Doplňujúca správa pre predajcu <span className="text-red-400">*</span>
                     </label>
                     <textarea
                       value={continueContent}
                       onChange={(e) => setContinueContent(e.target.value)}
                       rows={3}
-                      className="w-full bg-dark-100 border border-white/10 rounded-lg px-4 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
+                      className="w-full resize-none rounded-xl border border-white/[0.12] bg-white/[0.08] px-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/25"
                       placeholder={
                         advertisement.type === 'SERVICE'
                           ? 'Čo potrebujete vyriešiť, preferovaný čas, kontakt...'
@@ -1038,14 +1080,16 @@ export default function AdvertisementDetailPage({
                     />
                   </div>
 
-                  <div className="flex items-center gap-3 pt-2">
+                  <div className="flex items-center gap-2.5 border-t border-white/[0.06] pt-5">
                     <button
+                      type="button"
                       onClick={() => setShowContinueModal(false)}
-                      className="px-4 py-2 border border-white/10 text-gray-300 rounded-lg font-medium hover:bg-dark-200/[0.04] transition-colors"
+                      className="inline-flex items-center justify-center rounded-xl border border-white/[0.08] bg-transparent px-4 py-2.5 text-sm font-medium text-gray-300 transition-colors hover:border-white/[0.15] hover:bg-white/[0.06] hover:text-white"
                     >
                       Zrušiť
                     </button>
                     <button
+                      type="button"
                       onClick={handleContinueSubmit}
                       disabled={
                         !continueContent.trim() ||
@@ -1054,7 +1098,7 @@ export default function AdvertisementDetailPage({
                           : !continueRentalRange?.from || !continueRentalRange?.to) ||
                         continueSubmitting
                       }
-                      className="flex-1 px-4 py-2.5 bg-accent text-dark rounded-lg font-semibold hover:bg-accent-light disabled:bg-dark-300 disabled:text-white/30 disabled:cursor-not-allowed transition-colors"
+                      className="inline-flex flex-1 items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-dark transition-colors hover:bg-accent-light disabled:cursor-not-allowed disabled:opacity-45"
                     >
                       {continueSubmitting ? 'Odosielam...' : 'Odoslať žiadosť'}
                     </button>
