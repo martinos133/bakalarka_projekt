@@ -32,20 +32,20 @@ export default function CategorySpecificationsForm({
   const u = {
     empty:
       'rounded-xl border border-dashed px-4 py-6 text-center text-sm ' +
-      (a ? 'border-card bg-dark/60 text-gray-500' : 'border-white/[0.08] bg-dark-50/80 text-gray-500'),
+      (a ? 'border-card bg-dark/60 text-gray-500' : 'border-white/[0.08] bg-dark-200 text-gray-500'),
     emptyHint: 'mt-2 text-xs ' + (a ? 'text-gray-500' : 'text-gray-500'),
     label: 'mb-1.5 block text-sm font-medium ' + (a ? 'text-gray-200' : 'text-white/90'),
     desc: 'mb-1.5 text-xs ' + (a ? 'text-gray-500' : 'text-gray-500'),
     field:
-      'w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ' +
+      'w-full rounded-lg border px-3 py-2 focus:outline-none ' +
       (a
-        ? 'border-card bg-dark text-white placeholder:text-gray-500 focus:border-accent/40 focus:ring-primary/30'
-        : 'border-white/10 text-white placeholder:text-gray-400 focus:border-accent focus:ring-accent/30'),
+        ? 'border-card bg-dark text-white placeholder:text-gray-500 focus:border-accent/40 focus:ring-2 focus:ring-primary/30'
+        : 'border-white/10 bg-dark-100 text-white placeholder:text-gray-500 focus:border-accent/40'),
     fieldNum:
-      'min-w-0 flex-1 rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ' +
+      'min-w-0 flex-1 rounded-lg border px-3 py-2 focus:outline-none ' +
       (a
-        ? 'border-card bg-dark text-white focus:border-accent/40 focus:ring-primary/30'
-        : 'border-white/10 text-white focus:border-accent focus:ring-accent/30'),
+        ? 'border-card bg-dark text-white focus:border-accent/40 focus:ring-2 focus:ring-primary/30'
+        : 'border-white/10 bg-dark-100 text-white focus:border-accent/40'),
     spanOdDo: 'text-xs ' + (a ? 'text-gray-500' : 'text-gray-500'),
     multiOn:
       'inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ' +
@@ -56,7 +56,7 @@ export default function CategorySpecificationsForm({
       'inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ' +
       (a
         ? 'border-card bg-card text-gray-300 hover:border-primary/40'
-        : 'border-white/[0.08] bg-dark text-gray-300 hover:border-white/15'),
+        : 'border-white/[0.08] bg-dark-100 text-gray-300 hover:border-accent/40'),
   }
 
   if (filters.length === 0) {
