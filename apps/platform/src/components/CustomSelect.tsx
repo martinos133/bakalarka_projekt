@@ -18,6 +18,8 @@ interface CustomSelectProps {
   options: SelectOption[]
   placeholder?: string
   className?: string
+  /** Pre spojenie s `<label htmlFor>` */
+  id?: string
 }
 
 type PanelPos = { top: number; left: number; width: number }
@@ -28,6 +30,7 @@ export default function CustomSelect({
   options,
   placeholder = 'Vybrať...',
   className = '',
+  id,
 }: CustomSelectProps) {
   const [open, setOpen] = useState(false)
   const [panelPos, setPanelPos] = useState<PanelPos | null>(null)
@@ -136,6 +139,7 @@ export default function CustomSelect({
   return (
     <div ref={ref} className={`relative ${className}`}>
       <button
+        id={id}
         type="button"
         onClick={() => setOpen(!open)}
         className={`

@@ -1,6 +1,7 @@
 'use client'
 
 import type { Filter } from '@inzertna-platforma/shared'
+import CustomSelect from '@/components/CustomSelect'
 
 type SpecValues = Record<string, unknown>
 
@@ -133,20 +134,20 @@ export default function CategorySpecificationsForm({
             <div key={f.id}>
               {commonLabel}
               {f.description ? <p className={u.desc}>{f.description}</p> : null}
-              <select
+              <CustomSelect
                 id={id}
                 value={sel}
-                onChange={(e) => {
-                  const x = e.target.value
+                onChange={(x) => {
                   if (x === '') onChange(f.slug, undefined)
                   else onChange(f.slug, x === 'true')
                 }}
-                className={u.field}
-              >
-                {!f.isRequired ? <option value="">— zvoliť —</option> : null}
-                <option value="true">Áno</option>
-                <option value="false">Nie</option>
-              </select>
+                placeholder={f.isRequired ? '— vyberte —' : '— zvoliť —'}
+                options={[
+                  ...(!f.isRequired ? [{ value: '', label: '— zvoliť —' }] : []),
+                  { value: 'true', label: 'Áno' },
+                  { value: 'false', label: 'Nie' },
+                ]}
+              />
             </div>
           )
         }
@@ -172,19 +173,16 @@ export default function CategorySpecificationsForm({
             <div key={f.id}>
               {commonLabel}
               {f.description ? <p className={u.desc}>{f.description}</p> : null}
-              <select
+              <CustomSelect
                 id={id}
                 value={values[f.slug] != null ? String(values[f.slug]) : ''}
-                onChange={(e) => onChange(f.slug, e.target.value || undefined)}
-                className={u.field}
-              >
-                <option value="">{f.isRequired ? '— vyberte —' : '— voliteľné —'}</option>
-                {f.options.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
+                onChange={(v) => onChange(f.slug, v || undefined)}
+                placeholder={f.isRequired ? '— vyberte —' : '— voliteľné —'}
+                options={[
+                  { value: '', label: f.isRequired ? '— vyberte —' : '— voliteľné —' },
+                  ...f.options.map((opt) => ({ value: opt, label: opt })),
+                ]}
+              />
             </div>
           )
         }

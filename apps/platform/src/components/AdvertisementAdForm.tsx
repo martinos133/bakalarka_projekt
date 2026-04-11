@@ -2,6 +2,7 @@
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import { Plus, Save, X, Trash2, Image as ImageIcon } from 'lucide-react'
+import CustomSelect from '@/components/CustomSelect'
 
 export type AdFormDataState = {
   title: string
@@ -162,14 +163,14 @@ export default function AdvertisementAdForm({
     <label className={c.label}>
       Typ *
     </label>
-    <select
+    <CustomSelect
       value={adFormData.type}
-      onChange={(e) => setAdFormData({ ...adFormData, type: e.target.value })}
-      className={c.input}
-    >
-      <option value="SERVICE">Služba</option>
-      <option value="RENTAL">Prenájom</option>
-    </select>
+      onChange={(v) => setAdFormData({ ...adFormData, type: v })}
+      options={[
+        { value: 'SERVICE', label: 'Služba' },
+        { value: 'RENTAL', label: 'Prenájom' },
+      ]}
+    />
   </div>
 
   <div className="grid grid-cols-2 gap-4">
@@ -212,17 +213,16 @@ export default function AdvertisementAdForm({
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label className={c.label}>Typ sadzby *</label>
-            <select
-              required
+            <CustomSelect
               value={adFormData.pricingType}
-              onChange={(e) => setAdFormData({ ...adFormData, pricingType: e.target.value })}
-              className={c.inpFocus}
-            >
-              <option value="FIXED">Fixná cena</option>
-              <option value="HOURLY">Hodinová sadzba</option>
-              <option value="DAILY">Denná sadzba</option>
-              <option value="PACKAGE">Balíčky</option>
-            </select>
+              onChange={(v) => setAdFormData({ ...adFormData, pricingType: v })}
+              options={[
+                { value: 'FIXED', label: 'Fixná cena' },
+                { value: 'HOURLY', label: 'Hodinová sadzba' },
+                { value: 'DAILY', label: 'Denná sadzba' },
+                { value: 'PACKAGE', label: 'Balíčky' },
+              ]}
+            />
           </div>
 
           {adFormData.pricingType === 'FIXED' && (

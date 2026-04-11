@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { CmsGate } from '@/components/CmsGate'
+import CustomSelect from '@/components/CustomSelect'
 import { User, Building2, Eye, EyeOff } from 'lucide-react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
@@ -459,17 +460,18 @@ export default function JoinPage() {
                           <label htmlFor="gender" className="block text-sm font-medium text-gray-300 mb-2">
                             Pohlavie
                           </label>
-                          <select
+                          <CustomSelect
                             id="gender"
                             value={formData.gender}
-                            onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                            className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-                          >
-                            <option value="">-- Vybrať --</option>
-                            <option value="MALE">Muž</option>
-                            <option value="FEMALE">Žena</option>
-                            <option value="OTHER">Iné</option>
-                          </select>
+                            onChange={(v) => setFormData({ ...formData, gender: v })}
+                            placeholder="— Vybrať —"
+                            options={[
+                              { value: '', label: '— Vybrať —' },
+                              { value: 'MALE', label: 'Muž' },
+                              { value: 'FEMALE', label: 'Žena' },
+                              { value: 'OTHER', label: 'Iné' },
+                            ]}
+                          />
                         </div>
                       </div>
                     </>
@@ -522,19 +524,19 @@ export default function JoinPage() {
                       <label htmlFor="country" className="block text-sm font-medium text-gray-300 mb-2">
                         Krajina
                       </label>
-                      <select
+                      <CustomSelect
                         id="country"
                         value={formData.country}
-                        onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                        className="w-full px-4 py-3 bg-dark-100 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-                      >
-                        <option value="Slovensko">Slovensko</option>
-                        <option value="Česko">Česko</option>
-                        <option value="Poľsko">Poľsko</option>
-                        <option value="Maďarsko">Maďarsko</option>
-                        <option value="Rakúsko">Rakúsko</option>
-                        <option value="Nemecko">Nemecko</option>
-                      </select>
+                        onChange={(v) => setFormData({ ...formData, country: v })}
+                        options={[
+                          { value: 'Slovensko', label: 'Slovensko' },
+                          { value: 'Česko', label: 'Česko' },
+                          { value: 'Poľsko', label: 'Poľsko' },
+                          { value: 'Maďarsko', label: 'Maďarsko' },
+                          { value: 'Rakúsko', label: 'Rakúsko' },
+                          { value: 'Nemecko', label: 'Nemecko' },
+                        ]}
+                      />
                     </div>
                   </div>
 
