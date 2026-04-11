@@ -12,18 +12,13 @@ function formatPriceSk(price: number): string {
   })} €`
 }
 
-/** Špendlík s voliteľnou cenou – vybraný stav je výraznejší */
-function createPinIcon(isSelected: boolean, price: number | null) {
-  const fill = isSelected ? '#0f9d5c' : '#c9a96e'
-  const priceBlock =
-    price != null
-      ? `<span class="ad-map-pin-label">${escapeHtml(formatPriceSk(price))}</span>`
-      : ''
+/** Špendlík bez štítka (cena je v popup) – vybraný stav je tmavší accent, stále v značke */
+function createPinIcon(isSelected: boolean) {
+  const fill = isSelected ? '#a8884e' : '#c9a96e'
   return L.divIcon({
     className: 'ad-map-pin-root',
     html: `
       <div class="ad-map-pin ${isSelected ? 'ad-map-pin--selected' : ''}">
-        ${priceBlock}
         <svg class="ad-map-pin-svg" viewBox="0 0 32 42" width="34" height="44" aria-hidden="true">
           <path fill="${fill}" stroke="#ffffff" stroke-width="2"
             d="M16 2C9.4 2 4 7.2 4 13.5c0 8.2 12 24.5 12 24.5s12-16.3 12-24.5C28 7.2 22.6 2 16 2z"/>
@@ -31,9 +26,9 @@ function createPinIcon(isSelected: boolean, price: number | null) {
         </svg>
       </div>
     `,
-    iconSize: [40, 52],
-    iconAnchor: [20, 48],
-    popupAnchor: [0, -46],
+    iconSize: [34, 44],
+    iconAnchor: [17, 42],
+    popupAnchor: [1, -40],
   })
 }
 
@@ -128,7 +123,7 @@ export default function AdMap({ points, selectedPointId, onMarkerClick }: AdMapP
     markersRef.current.forEach((m) => m.remove())
     markersRef.current = []
     points.forEach((ad) => {
-      const icon = createPinIcon(ad.id === selectedPointId, ad.price)
+      const icon = createPinIcon(ad.id === selectedPointId)
       const marker = L.marker([ad.lat, ad.lng], { icon })
       marker.bindPopup(popupContent(ad), {
         className: 'ad-map-popup',

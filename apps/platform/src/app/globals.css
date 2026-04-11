@@ -110,20 +110,6 @@ option:hover {
 .ad-map-pin--selected {
   transform: scale(1.08);
 }
-.ad-map-pin-label {
-  font-size: 10px;
-  font-weight: 700;
-  color: #fff;
-  background: #1a1a1a;
-  padding: 2px 6px;
-  border-radius: 6px;
-  margin-bottom: 2px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  white-space: nowrap;
-  max-width: 72px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 .ad-map-pin-svg {
   display: block;
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
