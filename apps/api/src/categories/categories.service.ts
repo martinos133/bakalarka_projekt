@@ -271,30 +271,14 @@ export class CategoriesService {
   async remove(id: string) {
     const category = await prisma.category.findUnique({
       where: { id },
-      include: {
-        _count: {
-          select: {
-            advertisements: true,
-          },
-        },
-      },
     });
 
     if (!category) {
       throw new NotFoundException('Kategória nebola nájdená');
     }
 
-    // Ak má kategória inzeráty, len ju deaktivujeme
-    if (category._count.advertisements > 0) {
-      return prisma.category.update({
-        where: { id },
-        data: {
-          status: 'INACTIVE',
-        },
-      });
-    }
-
-    // Ak nemá inzeráty, môžeme ju odstrániť
+    // Natrvalo odstrániť kategóriu. Inzeráty majú categoryId optional + FK onDelete: SetNull,
+    // podkategórie a filtre rieši schéma (Cascade). Admin očakáva, že riadok zo zoznamu zmizne.
     return prisma.category.delete({
       where: { id },
     });

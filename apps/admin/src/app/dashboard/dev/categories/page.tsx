@@ -8,6 +8,7 @@ import { Category } from '@inzertna-platforma/shared'
 import { Plus, Edit, Trash2, X, Save, FolderTree, Image as ImageIcon, FolderPlus, ChevronDown, ChevronRight, GripVertical, Filter, Search } from 'lucide-react'
 import DashboardLayout from '@/components/DashboardLayout'
 import Select from '@/components/Select'
+import ConfirmDialog from '@/components/ConfirmDialog'
 
 type CategoryStatus = 'ACTIVE' | 'DRAFT' | 'INACTIVE'
 
@@ -21,6 +22,7 @@ export default function DevCategoriesPage() {
   const [showSubcategoryForm, setShowSubcategoryForm] = useState<string | null>(null)
   const [draggedCategoryId, setDraggedCategoryId] = useState<string | null>(null)
   const [draggedOverCategoryId, setDraggedOverCategoryId] = useState<string | null>(null)
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [filterData, setFilterData] = useState({
     search: '',
     status: '' as '' | 'active' | 'inactive',
@@ -315,9 +317,14 @@ export default function DevCategoriesPage() {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Naozaj chcete odstrániť túto kategóriu?')) return
-    
+  const handleDelete = (id: string) => {
+    setDeleteConfirmId(id)
+  }
+
+  const confirmDeleteCategory = async () => {
+    if (!deleteConfirmId) return
+    const id = deleteConfirmId
+    setDeleteConfirmId(null)
     try {
       await api.deleteCategory(id)
       await loadCategories()
@@ -326,6 +333,18 @@ export default function DevCategoriesPage() {
       alert('Chyba pri odstraňovaní kategórie')
     }
   }
+
+  const deleteConfirmCategory: Category | undefined = deleteConfirmId
+    ? (() => {
+        for (const c of categories) {
+          if (c.id === deleteConfirmId) return c
+          const ch = ((c as unknown as { children?: Category[] }).children ?? []).filter(Boolean)
+          const sub = ch.find((x) => x.id === deleteConfirmId)
+          if (sub) return sub
+        }
+        return undefined
+      })()
+    : undefined
 
   const resetForm = () => {
     setFormData({
@@ -1132,7 +1151,7 @@ export default function DevCategoriesPage() {
                       >
                         {/* Hlavná kategória */}
                         <div className="p-4 hover:bg-cardHover transition-colors bg-card">
-                          <div className="flex items-center gap-4">
+                          <div className="flex min-w-0 items-center gap-4">
                             {/* Drag handle vľavo */}
                             <div className="cursor-move flex-shrink-0">
                               <GripVertical className="w-5 h-5 text-gray-500 hover:text-gray-300" />
@@ -1201,52 +1220,52 @@ export default function DevCategoriesPage() {
                             {category.description && (
                               <>
                                 <div className="flex-shrink-0 text-gray-600">•</div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs text-gray-400 truncate">{category.description}</p>
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate text-xs text-gray-400">{category.description}</p>
                                 </div>
                               </>
                             )}
-                            
-                            {/* Expand/Collapse tlačidlo */}
-                            {children.length > 0 && (
-                              <div className="flex-shrink-0 ml-auto">
+
+                            {/* Chevron + akcie vždy vpravo (ml-auto aj bez podkategórií) */}
+                            <div className="ml-auto flex flex-shrink-0 items-center gap-1 sm:gap-2">
+                              {children.length > 0 && (
                                 <button
+                                  type="button"
                                   onClick={() => toggleCategory(category.id)}
-                                  className="p-2 hover:bg-cardHover rounded transition-colors"
+                                  className="rounded p-2 transition-colors hover:bg-cardHover"
                                   title={isExpanded ? 'Zbaliť' : 'Rozbaliť'}
                                 >
                                   {isExpanded ? (
-                                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                                    <ChevronDown className="h-5 w-5 text-gray-400" />
                                   ) : (
-                                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                                    <ChevronRight className="h-5 w-5 text-gray-400" />
                                   )}
                                 </button>
-                              </div>
-                            )}
-                            
-                            {/* Akcie vpravo */}
-                            <div className="flex items-center gap-2 flex-shrink-0">
+                              )}
                               <button
+                                type="button"
                                 onClick={() => handleAddSubcategory(category)}
-                                className="px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl text-sm flex items-center gap-1.5 transition-colors whitespace-nowrap"
+                                className="flex items-center gap-1.5 whitespace-nowrap rounded-xl bg-green-500/20 px-3 py-1.5 text-sm text-green-400 transition-colors hover:bg-green-500/30"
                                 title="Pridať podkategóriu"
                               >
-                                <FolderPlus className="w-4 h-4" />
+                                <FolderPlus className="h-4 w-4" />
                                 <span>Pridať</span>
                               </button>
                               <button
+                                type="button"
                                 onClick={() => handleEdit(category)}
-                                className="p-2 text-accent hover:text-accent-light hover:bg-cardHover rounded transition-colors"
+                                className="rounded p-2 text-accent transition-colors hover:bg-cardHover hover:text-accent-light"
                                 title="Upraviť"
                               >
-                                <Edit className="w-4 h-4" />
+                                <Edit className="h-4 w-4" />
                               </button>
-                                <button
+                              <button
+                                type="button"
                                 onClick={() => handleDelete(category.id)}
-                                className="p-2 text-red-400 hover:text-red-300 hover:bg-cardHover rounded transition-colors"
+                                className="rounded p-2 text-red-400 transition-colors hover:bg-cardHover hover:text-red-300"
                                 title="Odstrániť"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="h-4 w-4" />
                               </button>
                             </div>
                           </div>
@@ -1380,7 +1399,7 @@ export default function DevCategoriesPage() {
                                 {[...children].sort((a: any, b: any) => (a.order || 0) - (b.order || 0)).map((child: Category) => (
                                   <div
                                     key={child.id}
-                                    className={`flex items-center gap-3 p-3 rounded-xl transition-all cursor-move ${
+                                    className={`flex min-w-0 items-center gap-3 p-3 rounded-xl transition-all cursor-move ${
                                       draggedCategoryId === child.id 
                                         ? 'bg-accent/20 opacity-50 border-2 border-accent scale-95' 
                                         : draggedOverCategoryId === child.id
@@ -1463,6 +1482,21 @@ export default function DevCategoriesPage() {
               </div>
             )}
           </div>
+
+          <ConfirmDialog
+            open={!!deleteConfirmId}
+            title="Odstránenie kategórie"
+            message={
+              deleteConfirmCategory
+                ? `Naozaj chcete natrvalo odstrániť kategóriu „${deleteConfirmCategory.name}“? Podkategórie a filtre tejto vetvy sa odstránia. Inzeráty ostanú v systéme, ale stratia priradenie k tejto kategórii. Akcia je nezvratná.`
+                : 'Naozaj chcete natrvalo odstrániť túto kategóriu? Akcia je nezvratná.'
+            }
+            confirmLabel="Odstrániť"
+            cancelLabel="Zrušiť"
+            variant="danger"
+            onConfirm={confirmDeleteCategory}
+            onCancel={() => setDeleteConfirmId(null)}
+          />
         </DashboardLayout>
   )
 }

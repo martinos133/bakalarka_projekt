@@ -50,14 +50,21 @@ export default function ConfirmDialog({
   const Icon = cfg.icon
 
   return (
-    <div className="modal-overlay" onClick={onCancel}>
-      <div
-        className="modal-panel-sm"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="confirm-dialog-title"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="fixed inset-0 z-[60]" role="presentation">
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+        aria-label={cancelLabel}
+        onClick={onCancel}
+      />
+      <div className="pointer-events-none absolute inset-0 flex items-end justify-center p-4 pb-8 sm:items-center sm:pb-4">
+        <div
+          className="modal-panel-sm pointer-events-auto w-full max-w-md"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-dialog-title"
+          onClick={(e) => e.stopPropagation()}
+        >
         <div className="p-6">
           <div className="flex items-start gap-4">
             <div className={`w-10 h-10 rounded-xl ${cfg.iconBg} flex items-center justify-center flex-shrink-0`}>
@@ -71,13 +78,18 @@ export default function ConfirmDialog({
             </div>
           </div>
         </div>
-        <div className="flex justify-end gap-2.5 px-6 pb-5 pt-2">
-          <button type="button" onClick={onCancel} className="btn-ghost">
+        <div className="flex flex-wrap justify-end gap-2.5 px-6 pb-5 pt-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="btn-ghost !rounded-full border border-white/[0.1] bg-white/[0.06] px-5 hover:border-white/[0.14] hover:bg-white/[0.08]"
+          >
             {cancelLabel}
           </button>
-          <button type="button" onClick={onConfirm} className={cfg.btnClass}>
+          <button type="button" onClick={onConfirm} className={`${cfg.btnClass} !rounded-full px-5 font-semibold`}>
             {confirmLabel}
           </button>
+        </div>
         </div>
       </div>
     </div>

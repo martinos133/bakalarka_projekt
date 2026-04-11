@@ -6,9 +6,9 @@ import { api } from '@/lib/api'
 import { useCmsOverride } from '@/lib/useCmsOverride'
 import Link from 'next/link'
 import TrackedLink from '@/components/TrackedLink'
-import Image from 'next/image'
 import { isProSellerBadge } from '@/lib/sellerPlan'
 import Header from '@/components/Header'
+import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
 import { CmsArticleView, CmsLoadingView } from '@/components/CmsGate'
 
@@ -83,10 +83,11 @@ export default function CategoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark-50">
+      <div className="min-h-screen bg-surface">
         <Header />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center text-gray-500">Načítavam...</div>
+        <CategoryNav />
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="text-center text-muted">Načítavam...</div>
         </div>
         <Footer />
       </div>
@@ -95,12 +96,13 @@ export default function CategoryPage() {
 
   if (!category) {
     return (
-      <div className="min-h-screen bg-dark-50">
+      <div className="min-h-screen bg-surface">
         <Header />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <CategoryNav />
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-white mb-4">Kategória nebola nájdená</h1>
-            <Link href="/" className="text-accent hover:text-accent-dark">
+            <h1 className="mb-4 font-serif text-2xl text-accent sm:text-3xl">Kategória nebola nájdená</h1>
+            <Link href="/" className="font-semibold text-accent transition hover:text-accent-light">
               Späť na domov
             </Link>
           </div>
@@ -111,12 +113,13 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-50">
+    <div className="min-h-screen bg-surface">
       <Header />
+      <CategoryNav />
       
       {/* Banner */}
       {category.banner ? (
-        <div className="w-full flex justify-center px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        <div className="flex w-full justify-center border-b border-white/[0.06] bg-surface px-4 py-6 sm:px-6 md:py-8 lg:px-8">
           {/* Banner kontajner s presnými rozmermi 1200×400px (pomer 3:1) */}
           <div 
             className="relative w-full max-w-[1200px] rounded-xl overflow-hidden shadow-2xl shadow-black/40"
@@ -139,91 +142,98 @@ export default function CategoryPage() {
             
             {/* Content overlay - text v strede */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center px-6 md:px-12">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-4 leading-tight">
-                  {category.name}
-                </h1>
-                {category.description && (
-                  <p className="text-lg md:text-xl lg:text-2xl text-white/95 max-w-2xl mx-auto leading-relaxed">
-                    {category.description}
-                  </p>
-                )}
+              <div className="w-full max-w-4xl px-4 text-center sm:px-6 md:px-10">
+                <div className="rounded-2xl border border-white/[0.1] bg-black/55 px-5 py-4 shadow-2xl shadow-black/40 backdrop-blur-md md:px-10 md:py-6">
+                  <h1 className="text-4xl font-bold leading-tight text-white md:text-5xl lg:text-6xl">
+                    {category.name}
+                  </h1>
+                  {category.description && (
+                    <p className="mx-auto mt-3 max-w-2xl border-t border-white/[0.12] pt-3 text-base leading-relaxed text-white/90 md:mt-4 md:pt-4 md:text-lg lg:text-xl">
+                      {category.description}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
       ) : (
         /* Fallback ak nie je banner */
-        <div className="w-full bg-gradient-to-r from-gray-800 to-gray-900 py-16 md:py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+        <section className="border-b border-white/[0.06] bg-surface py-14 md:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <h1 className="mb-4 font-serif text-4xl font-bold tracking-tight text-accent md:text-5xl lg:text-6xl">
               {category.name}
             </h1>
             {category.description && (
-              <p className="text-lg md:text-xl text-gray-300 max-w-2xl">
+              <p className="max-w-2xl text-lg leading-relaxed text-muted md:text-xl">
                 {category.description}
               </p>
             )}
           </div>
-        </div>
+        </section>
       )}
 
       {/* Obsah */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="border-t border-white/[0.06] bg-surface">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Breadcrumbs */}
-        <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-gray-500">
+        <nav className="mb-8">
+          <ol className="flex flex-wrap items-center gap-2 text-sm text-muted">
             <li>
-              <Link href="/" className="hover:text-white">
+              <Link href="/" className="transition hover:text-white">
                 Domov
               </Link>
             </li>
-            <li>/</li>
+            <li className="text-white/30">/</li>
             {category.parent && (
               <>
                 <li>
-                  <Link href={`/kategoria/${category.parent.slug}`} className="hover:text-white">
+                  <Link href={`/kategoria/${category.parent.slug}`} className="transition hover:text-white">
                     {category.parent.name}
                   </Link>
                 </li>
-                <li>/</li>
+                <li className="text-white/30">/</li>
               </>
             )}
-            <li className="text-white font-medium">{category.name}</li>
+            <li className="font-medium text-white">{category.name}</li>
           </ol>
         </nav>
 
         {/* Podkategórie */}
         {subcategories.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Podkategórie</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="mb-12">
+            <h2 className="mb-4 font-serif text-2xl text-accent sm:text-3xl">Podkategórie</h2>
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
               {subcategories.map((subcategory) => (
                 <TrackedLink
                   key={subcategory.id}
                   href={`/kategoria/${subcategory.slug}`}
                   targetType="CATEGORY"
                   targetId={subcategory.id}
-                  className="bg-dark rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 border border-white/[0.08] block"
+                  className="group block"
                 >
+                  <div className="card card-hover flex h-full flex-col p-4 shadow-lg shadow-black/15 transition-all duration-200">
                   {subcategory.image && (
                     <img
                       src={subcategory.image}
                       alt={subcategory.imageAlt || subcategory.name}
-                      className="w-full h-32 object-cover rounded-lg mb-3"
+                      className="mb-3 h-32 w-full rounded-lg object-cover ring-1 ring-white/[0.06]"
                     />
                   )}
-                  <h3 className="font-semibold text-white">{subcategory.name}</h3>
+                  <h3 className="font-semibold text-white transition-colors group-hover:text-accent-light">
+                    {subcategory.name}
+                  </h3>
                   {subcategory.description && (
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                    <p className="mt-1 line-clamp-2 text-sm text-muted">
                       {subcategory.description}
                     </p>
                   )}
                   {subcategory._count?.advertisements > 0 && (
-                    <p className="text-xs text-gray-500 mt-2">
+                    <p className="mt-2 text-xs text-muted">
                       {subcategory._count.advertisements} {subcategory._count.advertisements === 1 ? 'inzerát' : 'inzerátov'}
                     </p>
                   )}
+                  </div>
                 </TrackedLink>
               ))}
             </div>
@@ -232,101 +242,109 @@ export default function CategoryPage() {
 
         {/* Inzeráty */}
         <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">
-              Inzeráty ({advertisements.length})
+          <div className="mb-6 flex items-baseline justify-between gap-4">
+            <h2 className="font-serif text-2xl text-accent sm:text-3xl">
+              Inzeráty
+              <span className="ml-2 font-sans text-lg font-semibold tabular-nums text-white/90">
+                ({advertisements.length})
+              </span>
             </h2>
           </div>
 
           {advertisements.length === 0 ? (
-            <div className="bg-dark rounded-lg shadow-sm p-12 text-center">
-              <p className="text-gray-500 mb-4">V tejto kategórii zatiaľ nie sú žiadne inzeráty.</p>
+            <div className="card card-hover p-10 text-center shadow-lg shadow-black/15 md:p-12">
+              <p className="mb-6 text-muted">
+                V tejto kategórii zatiaľ nie sú žiadne inzeráty.
+              </p>
               <Link
                 href={`/podat-inzerat?kategoria=${encodeURIComponent(slug)}`}
-                className="inline-block bg-accent hover:bg-accent-dark text-white px-6 py-2 rounded-lg transition-colors"
+                className="inline-flex items-center justify-center rounded-xl border border-transparent bg-accent px-6 py-3 font-semibold text-dark shadow-lg shadow-black/20 transition hover:bg-accent-light"
               >
                 Pridať inzerát
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
               {advertisements.map((ad) => (
                 <TrackedLink
                   key={ad.id}
                   href={`/inzerat/${ad.id}`}
                   targetType="AD"
                   targetId={ad.id}
-                  className="bg-dark rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden group block"
+                  className="group block"
                 >
+                  <article className="card card-hover flex h-full flex-col overflow-hidden shadow-lg shadow-black/15 transition-all duration-200">
                   {ad.images && ad.images.length > 0 && (
-                    <div className="relative w-full h-48 overflow-hidden">
+                    <div className="relative h-48 w-full shrink-0 overflow-hidden border-b border-white/[0.06] bg-dark-100">
                       <img
                         src={ad.images[0]}
                         alt={ad.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                       />
-                      <div className="absolute top-2 left-2 flex flex-wrap gap-1.5">
+                      <div className="absolute left-2 top-2 flex flex-wrap gap-1.5">
                         {ad.priorityBoosted && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-accent text-white shadow">
+                          <span className="rounded-md bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-dark shadow">
                             Priorita
                           </span>
                         )}
                         {isProSellerBadge(ad.user?.sellerPlan, ad.user?.sellerPlanValidUntil) && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-dark-100 text-white shadow">
+                          <span className="rounded-md bg-dark-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow">
                             Pro predajca
                           </span>
                         )}
                       </div>
                     </div>
                   )}
-                  <div className="p-4">
-                    <div className="flex flex-wrap gap-1.5 mb-2">
+                  <div className="flex flex-1 flex-col p-4">
+                    <div className="mb-2 flex flex-wrap gap-1.5">
                       {(!ad.images || ad.images.length === 0) && ad.priorityBoosted && (
-                        <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-accent text-white">
+                        <span className="rounded-md bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-dark">
                           Priorita
                         </span>
                       )}
                       {(!ad.images || ad.images.length === 0) &&
                         isProSellerBadge(ad.user?.sellerPlan, ad.user?.sellerPlanValidUntil) && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-dark-100 text-white">
+                          <span className="rounded-md bg-dark-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                             Pro predajca
                           </span>
                         )}
                     </div>
-                    <h3 className="font-semibold text-white mb-2 line-clamp-2">
+                    <h3 className="mb-2 line-clamp-2 font-serif text-base font-semibold leading-snug text-white transition-colors group-hover:text-accent-light">
                       {ad.title}
                     </h3>
                     {ad.description && (
-                      <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+                      <p className="mb-3 line-clamp-2 text-sm text-muted">
                         {ad.description}
                       </p>
                     )}
-                    <div className="flex items-center gap-1 mb-2">
-                      <svg className="w-4 h-4 text-accent fill-current" viewBox="0 0 20 20">
+                    <div className="mb-2 flex items-center gap-1">
+                      <svg className="h-4 w-4 fill-current text-accent" viewBox="0 0 20 20" aria-hidden>
                         <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
                       </svg>
                       <span className="text-sm font-semibold text-white">
                         {(ratings[ad.id]?.count ?? 0) > 0 ? ratings[ad.id].average.toFixed(1) : '–'}
                       </span>
-                      <span className="text-xs text-gray-500">({ratings[ad.id]?.count ?? 0})</span>
+                      <span className="text-xs text-muted">({ratings[ad.id]?.count ?? 0})</span>
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div className="mt-auto flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3">
                       {ad.price && (
-                        <span className="text-lg font-bold text-accent">
+                        <span className="text-lg font-bold tabular-nums text-accent">
                           {ad.price.toLocaleString('sk-SK')} €
                         </span>
                       )}
                       {ad.location && (
-                        <span className="text-sm text-gray-500">
-                          📍 {ad.location}
+                        <span className="truncate text-sm text-muted">
+                          {ad.location}
                         </span>
                       )}
                     </div>
                   </div>
+                  </article>
                 </TrackedLink>
               ))}
             </div>
           )}
+        </div>
         </div>
       </div>
 
