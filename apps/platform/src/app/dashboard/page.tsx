@@ -13,6 +13,7 @@ import Link from 'next/link'
 import { sellerPlanLabel } from '@/lib/sellerPlan'
 import { fileToResizedAvatarDataUrl } from '@/lib/avatarResize'
 import { useCmsOverride } from '@/lib/useCmsOverride'
+import CustomSelect from '@/components/CustomSelect'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -508,13 +509,17 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500">Pohlavie</label>
-                    <select value={profileData.gender || ''} onChange={(e) => setProfileData({ ...profileData, gender: e.target.value || undefined })}
-                      className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none">
-                      <option value="">— Neurčené —</option>
-                      <option value="MALE">Muž</option>
-                      <option value="FEMALE">Žena</option>
-                      <option value="OTHER">Iné</option>
-                    </select>
+                    <CustomSelect
+                      value={profileData.gender || ''}
+                      onChange={(v) => setProfileData({ ...profileData, gender: v || undefined })}
+                      placeholder="— Neurčené —"
+                      options={[
+                        { value: '', label: '— Neurčené —' },
+                        { value: 'MALE', label: 'Muž' },
+                        { value: 'FEMALE', label: 'Žena' },
+                        { value: 'OTHER', label: 'Iné' },
+                      ]}
+                    />
                   </div>
                 </div>
               </section>
@@ -813,16 +818,17 @@ export default function DashboardPage() {
               <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-white">Správy</h2>
                 <div className="flex gap-2">
-                  <select
+                  <CustomSelect
                     value={messageFilter}
-                    onChange={(e) => setMessageFilter(e.target.value as any)}
-                    className="px-3 py-1.5 border border-white/10 rounded-lg text-sm text-gray-300 bg-dark-100 focus:outline-none focus:border-accent/40 [color-scheme:dark]"
-                  >
-                    <option value="all">Všetky</option>
-                    <option value="unread">Neprečítané</option>
-                    <option value="inquiry">Dotazy</option>
-                    <option value="system">Systémové</option>
-                  </select>
+                    onChange={(v) => setMessageFilter(v as 'all' | 'unread' | 'inquiry' | 'system')}
+                    className="min-w-[200px]"
+                    options={[
+                      { value: 'all', label: 'Všetky' },
+                      { value: 'unread', label: 'Neprečítané' },
+                      { value: 'inquiry', label: 'Dotazy' },
+                      { value: 'system', label: 'Systémové' },
+                    ]}
+                  />
                 </div>
               </div>
               <div className="divide-y divide-white/[0.06] max-h-[600px] overflow-y-auto">

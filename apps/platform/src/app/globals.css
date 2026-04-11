@@ -21,6 +21,24 @@ input:-webkit-autofill:focus {
   transition: background-color 5000s ease-in-out 0s;
 }
 
+select {
+  color-scheme: dark;
+}
+
+option {
+  background-color: #2D2421;
+  color: #fff;
+}
+
+option:checked {
+  background-color: #44382d;
+  color: #c9a96e;
+}
+
+option:hover {
+  background-color: #3a322d;
+}
+
 @layer base {
   body {
     @apply bg-dark text-white/90;
