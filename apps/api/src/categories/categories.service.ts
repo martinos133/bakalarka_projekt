@@ -169,7 +169,17 @@ export class CategoriesService {
     const category = await prisma.category.findUnique({
       where: { slug },
       include: {
-        parent: true,
+        parent: {
+          include: {
+            children: {
+              where: { status: 'ACTIVE' },
+              include: {
+                _count: { select: { advertisements: true } },
+              },
+              orderBy: { order: 'asc' },
+            },
+          },
+        },
         children: {
           where: {
             status: 'ACTIVE',

@@ -44,12 +44,12 @@ export default function Categories() {
   return (
     <section className="border-t border-white/[0.06] bg-surface py-14 md:py-16">
       <div className="mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 md:mb-9">
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">Kategórie</p>
-          <h2 className="font-serif text-2xl font-bold tracking-tight text-accent md:text-3xl">
-            Preskúmajte <span className="text-white">trh</span>
+        <div className="mb-10 text-center md:mb-12">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-accent">Kategórie</p>
+          <h2 className="mb-4 text-4xl font-bold text-white md:text-5xl">
+            Preskúmajte <span className="font-serif italic">trh</span>
           </h2>
-          <p className="mt-2 max-w-xl text-xs leading-relaxed text-muted md:text-sm">
+          <p className="mx-auto max-w-xl text-sm leading-relaxed text-muted">
             Vyberte oblasť a prejdite priamo do podkategórií alebo na prehľad ponuky.
           </p>
         </div>
