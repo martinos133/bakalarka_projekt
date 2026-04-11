@@ -7,7 +7,7 @@ import Footer from '@/components/Footer'
 import { CmsArticleView, CmsLoadingView } from '@/components/CmsGate'
 import { api } from '@/lib/api'
 import { isAuthenticated, getAuthUser, setAuthUser } from '@/lib/auth'
-import { User, Building2, Trash2, X, Lock, Mail, Phone, MapPin, Calendar, Crown, Save, MessageSquare, Archive, CheckCircle, Paperclip, FileText, Download, Heart, Image as ImageIcon } from 'lucide-react'
+import { User, Building2, Trash2, X, Lock, Mail, Phone, MapPin, Calendar, Crown, Save, Eye, Edit, MessageSquare, Archive, CheckCircle, Paperclip, FileText, Download, Heart, Image as ImageIcon } from 'lucide-react'
 import CreateAdvertisementWizard from '@/components/CreateAdvertisementWizard'
 import Link from 'next/link'
 import { sellerPlanLabel } from '@/lib/sellerPlan'
@@ -608,7 +608,7 @@ export default function DashboardPage() {
                   placeholder="Potvrdenie nového hesla" className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-accent/40 focus:outline-none [color-scheme:dark]" />
               </div>
               <button type="button" disabled={saving} onClick={handleChangePassword}
-                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-dark-100 px-4 py-2 text-sm font-medium text-white hover:bg-dark-200 disabled:opacity-50">
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-dark-100 px-4 py-2 text-sm font-medium text-white hover:bg-popupHover disabled:opacity-50">
                 {saving ? 'Mením…' : 'Zmeniť heslo'}
               </button>
             </section>
@@ -617,8 +617,8 @@ export default function DashboardPage() {
 
         {/* Advertisements Tab */}
         {activeTab === 'advertisements' && (
-          <div className="bg-dark rounded-lg shadow-sm border border-white/[0.08]">
-            <div className="p-6 border-b border-white/[0.08]">
+          <div className="card">
+            <div className="p-6 border-b border-white/[0.06]">
               <h2 className="text-xl font-semibold text-white">Moje inzeráty</h2>
             </div>
             <div className="divide-y divide-white/[0.06]">
@@ -638,7 +638,7 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 advertisements.map((ad) => (
-                  <div key={ad.id} className="p-6 hover:bg-dark-200/[0.04] transition-colors">
+                  <div key={ad.id} className="p-6 hover:bg-cardHover transition-colors">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
@@ -677,7 +677,7 @@ export default function DashboardPage() {
                         </Link>
                         <button
                           onClick={() => handleEditAdvertisement(ad)}
-                          className="p-2 text-gray-500 hover:bg-dark-200/[0.06] rounded-lg transition-colors"
+                          className="p-2 text-gray-500 hover:bg-cardHover rounded-lg transition-colors"
                           title="Upraviť"
                         >
                           <Edit className="w-4 h-4" />
@@ -700,8 +700,8 @@ export default function DashboardPage() {
 
         {/* Favorites Tab */}
         {activeTab === 'favorites' && (
-          <div className="bg-dark rounded-lg shadow-sm border border-white/[0.08]">
-            <div className="p-6 border-b border-white/[0.08]">
+          <div className="card">
+            <div className="p-6 border-b border-white/[0.06]">
               <h2 className="text-xl font-semibold text-white">Obľúbené inzeráty</h2>
             </div>
             <div className="divide-y divide-white/[0.06]">
@@ -722,7 +722,7 @@ export default function DashboardPage() {
                   const ad = fav.advertisement
                   if (!ad) return null
                   return (
-                    <div key={fav.id} className="p-6 hover:bg-dark-200/[0.04] transition-colors">
+                    <div key={fav.id} className="p-6 hover:bg-cardHover transition-colors">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
@@ -809,14 +809,14 @@ export default function DashboardPage() {
         {activeTab === 'messages' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Messages List */}
-            <div className="lg:col-span-2 bg-dark rounded-lg shadow-sm border border-white/[0.08]">
-              <div className="p-4 border-b border-white/[0.08] flex items-center justify-between">
+            <div className="lg:col-span-2 card">
+              <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-white">Správy</h2>
                 <div className="flex gap-2">
                   <select
                     value={messageFilter}
                     onChange={(e) => setMessageFilter(e.target.value as any)}
-                    className="px-3 py-1.5 border border-white/10 rounded-lg text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-accent"
+                    className="px-3 py-1.5 border border-white/10 rounded-lg text-sm text-gray-300 bg-dark-100 focus:outline-none focus:border-accent/40 [color-scheme:dark]"
                   >
                     <option value="all">Všetky</option>
                     <option value="unread">Neprečítané</option>
@@ -836,7 +836,7 @@ export default function DashboardPage() {
                     <div
                       key={message.id}
                       onClick={() => handleMessageClick(message)}
-                      className={`p-4 cursor-pointer hover:bg-dark-200/[0.04] transition-colors ${
+                      className={`p-4 cursor-pointer hover:bg-cardHover transition-colors ${
                         message.status === 'UNREAD' ? 'bg-accent/10' : ''
                       } ${selectedMessage?.id === message.id ? 'bg-accent/10' : ''}`}
                     >
@@ -899,7 +899,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Message Detail */}
-            <div className="lg:col-span-1 bg-dark rounded-lg shadow-sm border border-white/[0.08] p-6 flex flex-col">
+            <div className="lg:col-span-1 card p-6 flex flex-col">
               {selectedMessage ? (
                 selectedMessage.type === 'INQUIRY' && conversationMessages.length > 0 ? (
                   /* Chat view pre Dotaz na inzerát */
@@ -1065,7 +1065,7 @@ export default function DashboardPage() {
                         </div>
                       )}
                       <div className="flex gap-2 mb-2">
-                        <label className="flex items-center justify-center w-10 h-10 border border-white/10 rounded-lg cursor-pointer hover:bg-dark-200/[0.04] transition-colors flex-shrink-0">
+                        <label className="flex items-center justify-center w-10 h-10 border border-white/10 rounded-lg cursor-pointer hover:bg-cardHover transition-colors flex-shrink-0">
                           <Paperclip className="w-5 h-5 text-gray-500" />
                           <input
                             type="file"
@@ -1184,7 +1184,7 @@ export default function DashboardPage() {
                       )}
                       <button
                         onClick={() => handleMarkAsArchived(selectedMessage.id)}
-                        className="flex-1 px-4 py-2 border border-white/10 text-gray-300 rounded-lg text-sm hover:bg-dark-200/[0.04]"
+                        className="flex-1 px-4 py-2 border border-white/10 text-gray-300 rounded-lg text-sm hover:bg-cardHover"
                       >
                         Archivovať
                       </button>
