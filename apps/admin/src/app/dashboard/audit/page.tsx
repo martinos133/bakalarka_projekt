@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useLayoutEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
 import api from '@/lib/api'
@@ -9,7 +10,7 @@ import {
   Shield, LogIn, LogOut, AlertTriangle, XCircle, Search,
   ChevronLeft, ChevronRight, Eye, UserCheck,
   Activity, Server, FileWarning, CheckCircle2, Ban,
-  RefreshCw, Filter, X, ChevronDown,
+  RefreshCw, Filter, X, ChevronDown, Check,
 } from 'lucide-react'
 
 type Tab = 'all' | 'logins' | 'errors' | 'actions'
@@ -628,6 +629,8 @@ function DField({ label, value, mono }: { label: string; value: string; mono?: b
   )
 }
 
+const DARK_SELECT_SURFACE = '#2D2421'
+
 function DarkSelect({ value, onChange, options, placeholder = 'Všetky' }: {
   value: string
   onChange: (v: string) => void
@@ -635,11 +638,39 @@ function DarkSelect({ value, onChange, options, placeholder = 'Všetky' }: {
   placeholder?: string
 }) {
   const [open, setOpen] = useState(false)
+  const [panelPos, setPanelPos] = useState<{ top: number; left: number; width: number } | null>(null)
   const ref = useRef<HTMLDivElement>(null)
+  const portalRef = useRef<HTMLDivElement>(null)
+
+  const measurePanel = useCallback(() => {
+    if (!ref.current) return
+    const r = ref.current.getBoundingClientRect()
+    setPanelPos({
+      top: r.bottom + 6,
+      left: r.left,
+      width: Math.max(r.width, 120),
+    })
+  }, [])
+
+  useLayoutEffect(() => {
+    if (!open) {
+      setPanelPos(null)
+      return
+    }
+    measurePanel()
+    window.addEventListener('scroll', measurePanel, true)
+    window.addEventListener('resize', measurePanel)
+    return () => {
+      window.removeEventListener('scroll', measurePanel, true)
+      window.removeEventListener('resize', measurePanel)
+    }
+  }, [open, measurePanel])
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      const t = e.target as Node
+      if (ref.current?.contains(t) || portalRef.current?.contains(t)) return
+      setOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -647,39 +678,69 @@ function DarkSelect({ value, onChange, options, placeholder = 'Všetky' }: {
 
   const selected = options.find(o => o.value === value)
 
-  return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 bg-white/[0.06] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white hover:border-white/[0.15] focus:outline-none focus:border-accent/40 transition-colors min-w-[120px]"
+  const panel =
+    open &&
+    panelPos &&
+    typeof document !== 'undefined' &&
+    createPortal(
+      <div
+        ref={portalRef}
+        className="z-[200] overflow-hidden rounded-lg border border-accent/25 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.85),0_0_0_1px_rgba(201,169,110,0.12)] ring-1 ring-[#0a0a0a]"
+        style={{
+          position: 'fixed',
+          top: panelPos.top,
+          left: panelPos.left,
+          minWidth: panelPos.width,
+          width: 'max-content',
+          backgroundColor: DARK_SELECT_SURFACE,
+          animation: 'slideDown 0.12s ease-out',
+        }}
       >
-        <span className={`flex-1 text-left truncate ${!selected ? 'text-gray-400' : ''}`}>
-          {selected ? selected.label : placeholder}
-        </span>
-        <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform flex-shrink-0 ${open ? 'rotate-180' : ''}`} />
-      </button>
-      {open && (
-        <div className="absolute z-50 top-full mt-1 left-0 min-w-full w-max max-h-60 overflow-y-auto bg-[#1a1a1a] border border-white/[0.1] rounded-lg shadow-xl py-1" style={{ animation: 'slideDown 0.12s ease-out' }}>
+        <div className="h-0.5 w-full bg-gradient-to-r from-[#2D2421] via-accent to-[#2D2421]" aria-hidden />
+        <div className="max-h-60 overflow-y-auto py-1" style={{ backgroundColor: DARK_SELECT_SURFACE }}>
           <button
             type="button"
             onClick={() => { onChange(''); setOpen(false) }}
-            className={`w-full text-left px-3 py-2 text-sm transition-colors ${value === '' ? 'bg-accent/10 text-accent' : 'text-gray-300 hover:bg-white/[0.06] hover:text-white'}`}
+            className={`w-full text-left px-3 py-2.5 text-sm flex items-center justify-between gap-2 border-l-2 transition-colors ${
+              value === '' ? 'border-accent bg-popupRowActive text-accent font-medium' : 'border-transparent text-gray-300 hover:border-accent/25 hover:bg-popupRowHover hover:text-white'
+            }`}
           >
-            {placeholder}
+            <span className="truncate">{placeholder}</span>
+            {value === '' && <Check className="w-4 h-4 flex-shrink-0 text-accent" strokeWidth={2.5} />}
           </button>
           {options.filter(o => o.value !== '').map(o => (
             <button
               key={o.value}
               type="button"
               onClick={() => { onChange(o.value); setOpen(false) }}
-              className={`w-full text-left px-3 py-2 text-sm transition-colors ${value === o.value ? 'bg-accent/10 text-accent' : 'text-gray-300 hover:bg-white/[0.06] hover:text-white'}`}
+              className={`w-full text-left px-3 py-2.5 text-sm flex items-center justify-between gap-2 border-l-2 transition-colors ${
+                value === o.value ? 'border-accent bg-popupRowActive text-accent font-medium' : 'border-transparent text-gray-300 hover:border-accent/25 hover:bg-popupRowHover hover:text-white'
+              }`}
             >
-              {o.label}
+              <span className="truncate">{o.label}</span>
+              {value === o.value && <Check className="w-4 h-4 flex-shrink-0 text-accent" strokeWidth={2.5} />}
             </button>
           ))}
         </div>
-      )}
+      </div>,
+      document.body,
+    )
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className={`flex items-center gap-2 bg-popup border rounded-lg px-3 py-2 text-sm text-white hover:bg-popupHover focus:outline-none focus:border-accent/40 transition-all min-w-[120px] ${
+          open ? 'border-accent/55 shadow-[0_0_0_3px_rgba(201,169,110,0.14)]' : 'border-white/10 hover:border-white/[0.14]'
+        } ${selected && !open ? 'ring-1 ring-accent/15' : ''}`}
+      >
+        <span className={`flex-1 text-left truncate ${selected ? 'text-white' : 'text-gray-400'}`}>
+          {selected ? selected.label : placeholder}
+        </span>
+        <ChevronDown className={`w-3.5 h-3.5 flex-shrink-0 transition-transform ${open ? 'rotate-180 text-accent' : 'text-gray-400'}`} />
+      </button>
+      {panel}
     </div>
   )
 }

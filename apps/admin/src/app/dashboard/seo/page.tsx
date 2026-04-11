@@ -17,6 +17,7 @@ import {
   BarChart3,
 } from 'lucide-react'
 import DashboardLayout from '@/components/DashboardLayout'
+import Select from '@/components/Select'
 import { isAuthenticated } from '@/lib/auth'
 import api from '@/lib/api'
 
@@ -85,6 +86,23 @@ const AD_STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: 'INACTIVE', label: 'Neaktívny' },
   { value: 'ARCHIVED', label: 'Archivovaný' },
 ]
+
+const BLOG_SCOPE_OPTIONS = [
+  { value: 'published', label: 'Publikované' },
+  { value: 'draft', label: 'Draft' },
+  { value: 'both', label: 'Všetky' },
+] as const
+
+const STATIC_SCOPE_OPTIONS = [
+  { value: 'published', label: 'Publikované' },
+  { value: 'draft', label: 'Draft / neaktívne' },
+  { value: 'both', label: 'Všetky' },
+] as const
+
+const DATE_FIELD_OPTIONS = [
+  { value: 'updatedAt', label: 'Posledná úprava' },
+  { value: 'createdAt', label: 'Vytvorenie' },
+] as const
 
 interface CategoryOpt {
   id: string
@@ -216,6 +234,11 @@ export default function SeoPage() {
       })
       .catch(() => setCategories([]))
   }, [])
+
+  const categorySelectOptions = useMemo(
+    () => [{ value: '', label: 'Všetky kategórie' }, ...categories.map((c) => ({ value: c.id, label: c.name }))],
+    [categories],
+  )
 
   const load = useCallback(async () => {
     setError('')
@@ -398,56 +421,42 @@ export default function SeoPage() {
               </div>
               <div>
                 <p className="text-[10px] font-medium uppercase tracking-wider text-gray-500 mb-2">Blog (stav)</p>
-                <select
+                <Select
                   value={form.blogScope}
-                  onChange={(e) => setForm((p) => ({ ...p, blogScope: e.target.value as FilterForm['blogScope'] }))}
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.06] px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none"
-                >
-                  <option value="published">Publikované</option>
-                  <option value="draft">Draft</option>
-                  <option value="both">Všetky</option>
-                </select>
+                  onChange={(v) => setForm((p) => ({ ...p, blogScope: v as FilterForm['blogScope'] }))}
+                  options={[...BLOG_SCOPE_OPTIONS]}
+                  placeholder="Vyber stav"
+                />
               </div>
               <div>
                 <p className="text-[10px] font-medium uppercase tracking-wider text-gray-500 mb-2">Statické stránky</p>
-                <select
+                <Select
                   value={form.staticScope}
-                  onChange={(e) => setForm((p) => ({ ...p, staticScope: e.target.value as FilterForm['staticScope'] }))}
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.06] px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none"
-                >
-                  <option value="published">Publikované</option>
-                  <option value="draft">Draft / neaktívne</option>
-                  <option value="both">Všetky</option>
-                </select>
+                  onChange={(v) => setForm((p) => ({ ...p, staticScope: v as FilterForm['staticScope'] }))}
+                  options={[...STATIC_SCOPE_OPTIONS]}
+                  placeholder="Vyber stav"
+                />
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div>
                 <p className="text-[10px] font-medium uppercase tracking-wider text-gray-500 mb-1">Inzeráty len v kategórii</p>
-                <select
+                <Select
                   value={form.adsCategoryId}
-                  onChange={(e) => setForm((p) => ({ ...p, adsCategoryId: e.target.value }))}
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.06] px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none"
-                >
-                  <option value="">Všetky kategórie</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(v) => setForm((p) => ({ ...p, adsCategoryId: v }))}
+                  options={categorySelectOptions}
+                  placeholder="Všetky kategórie"
+                />
               </div>
               <div>
                 <p className="text-[10px] font-medium uppercase tracking-wider text-gray-500 mb-1">Časové pole</p>
-                <select
+                <Select
                   value={form.dateField}
-                  onChange={(e) => setForm((p) => ({ ...p, dateField: e.target.value as 'createdAt' | 'updatedAt' }))}
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.06] px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none"
-                >
-                  <option value="updatedAt">Posledná úprava</option>
-                  <option value="createdAt">Vytvorenie</option>
-                </select>
+                  onChange={(v) => setForm((p) => ({ ...p, dateField: v as 'createdAt' | 'updatedAt' }))}
+                  options={[...DATE_FIELD_OPTIONS]}
+                  placeholder="Vyber pole"
+                />
               </div>
               <div>
                 <p className="text-[10px] font-medium uppercase tracking-wider text-gray-500 mb-1">Od</p>

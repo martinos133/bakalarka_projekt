@@ -157,7 +157,7 @@ export default function Sidebar() {
       {/* User profile */}
       <div className={`p-4 ${collapsed ? 'px-3' : 'px-5'} pt-6 pb-4`}>
         <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
-          <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-semibold text-sm flex-shrink-0">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-popupRowActive text-sm font-semibold text-accent">
             {getInitials(user?.firstName, user?.lastName)}
           </div>
           {!collapsed && (
@@ -173,7 +173,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <div className="h-px bg-white/[0.06] mx-4" />
+      <div className="mx-4 h-px bg-dark-200" />
 
       {/* Navigation */}
       <nav className={`flex-1 overflow-y-auto py-4 ${collapsed ? 'px-2' : 'px-3'}`}>
@@ -185,7 +185,7 @@ export default function Sidebar() {
               </h2>
             )}
             {collapsed && section.title && (
-              <div className="h-px bg-white/[0.06] mx-2 mb-2" />
+              <div className="mx-2 mb-2 h-px bg-dark-200" />
             )}
             <div className="space-y-0.5">
               {section.items.map((item) => {
@@ -202,8 +202,8 @@ export default function Sidebar() {
                       flex items-center
                       ${collapsed ? 'justify-center px-0 py-2.5' : 'px-3 py-2 gap-3'}
                       ${isActive
-                        ? 'bg-accent/10 text-accent font-medium'
-                        : 'text-gray-400 hover:bg-white/[0.06] hover:text-white'
+                        ? 'bg-popupRowActive font-medium text-accent'
+                        : 'text-gray-400 hover:bg-popupHover hover:text-white'
                       }
                     `}
                   >
@@ -228,7 +228,7 @@ export default function Sidebar() {
       <div className={`border-t border-white/[0.06] p-3 ${collapsed ? 'px-2' : ''}`}>
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-gray-400 hover:bg-white/[0.06] hover:text-white transition-colors"
+          className="flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-gray-400 transition-colors hover:bg-popupHover hover:text-white"
         >
           <ChevronLeft className={`w-4 h-4 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
           {!collapsed && <span className="text-sm">Zbaliť</span>}

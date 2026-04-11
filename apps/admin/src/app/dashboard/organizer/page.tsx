@@ -570,7 +570,7 @@ export default function OrganizerPage() {
               </button>
 
               {filterDateOpen && (
-                <div className="absolute z-50 mt-2 w-[320px] bg-[rgb(30,30,30)] border border-white/[0.08] rounded-2xl shadow-xl shadow-black/40 overflow-hidden">
+                <div className="absolute z-50 mt-2 w-[320px] bg-popup border border-white/10 rounded-2xl shadow-xl shadow-black/40 overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
                     <button
                       type="button"
@@ -947,7 +947,7 @@ export default function OrganizerPage() {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+          <div className="absolute inset-0 bg-[#0a0a0a]" onClick={() => setShowModal(false)} />
           <div className="relative w-full max-w-lg bg-card rounded-2xl border border-white/[0.08] shadow-2xl">
             {/* Modal header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
@@ -1059,7 +1059,7 @@ export default function OrganizerPage() {
               {/* Date picker popover */}
               {datePickerOpen && (
                 <div className="relative">
-                  <div className="absolute z-50 mt-2 w-full bg-[rgb(30,30,30)] border border-white/[0.08] rounded-2xl shadow-xl shadow-black/40 overflow-hidden">
+                  <div className="absolute z-50 mt-2 w-full bg-popup border border-white/10 rounded-2xl shadow-xl shadow-black/40 overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
                       <button
                         type="button"

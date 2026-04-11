@@ -249,7 +249,7 @@ export default function Header() {
     (user?.email?.[0] || 'A').toUpperCase()
 
   return (
-    <header className="sticky top-0 z-30 bg-dark/80 backdrop-blur-xl border-b border-white/[0.06]">
+    <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-dark">
       <div className="flex items-center justify-between px-8 h-16">
         <h1 className="text-lg font-semibold text-white">{pageTitle}</h1>
 
@@ -262,8 +262,8 @@ export default function Header() {
                 onClick={() => router.push(s.path)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
                   ${pathname === s.path
-                    ? 'bg-accent/10 text-accent'
-                    : 'text-gray-400 hover:text-white hover:bg-white/[0.06]'
+                    ? 'bg-popupRowActive text-accent'
+                    : 'text-gray-400 hover:text-white hover:bg-popupHover'
                   }
                 `}
               >
@@ -272,7 +272,7 @@ export default function Header() {
             ))}
           </nav>
 
-          <div className="h-5 w-px bg-white/[0.08] hidden lg:block" />
+          <div className="hidden h-5 w-px bg-dark-200 lg:block" />
 
           {/* Search */}
           <div className={`relative transition-all duration-200 ${searchFocused ? 'w-64' : 'w-48'}`}>
@@ -284,7 +284,7 @@ export default function Header() {
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
               style={{ paddingLeft: '2.25rem' }}
-              className="w-full bg-white/[0.08] border border-white/[0.10] rounded-xl pr-4 py-2 text-sm text-white transition-all focus:outline-none focus:border-accent/40 focus:bg-white/[0.12]"
+              className="w-full rounded-xl border border-white/10 bg-dark-50 pr-4 py-2 text-sm text-white transition-all focus:border-accent/40 focus:outline-none focus:bg-dark-100"
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50 pointer-events-none" />
           </div>
@@ -293,8 +293,8 @@ export default function Header() {
           <div ref={chatRef} className="relative">
             <button
               onClick={() => { setChatOpen((v) => !v); setReplyTo(null) }}
-              className={`relative p-2 rounded-xl transition-colors ${
-                chatOpen ? 'bg-accent/10 text-accent' : 'text-gray-400 hover:text-white hover:bg-white/[0.06]'
+              className={`relative rounded-xl p-2 transition-colors ${
+                chatOpen ? 'bg-popupRowActive text-accent' : 'text-gray-400 hover:bg-popupHover hover:text-white'
               }`}
               aria-label={unreadTotal > 0 ? `Správy, ${unreadTotal} neprečítaných` : 'Správy'}
             >
@@ -317,8 +317,8 @@ export default function Header() {
 
             {chatOpen && (
               <div
-                className="absolute right-0 mt-2 w-[360px] bg-[rgb(28,28,28)] border border-white/[0.08] rounded-2xl shadow-xl shadow-black/50 overflow-hidden"
-                style={{ animation: 'slideDown 0.15s ease-out' }}
+                className="absolute right-0 z-50 mt-2 w-[360px] overflow-hidden rounded-2xl border border-white/10 bg-popup shadow-xl shadow-black/50"
+                style={{ animation: 'slideDown 0.15s ease-out', backgroundColor: 'var(--popup-surface)' }}
               >
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
@@ -362,12 +362,12 @@ export default function Header() {
                               }
                             }}
                             className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left ${
-                              isReplying ? 'bg-accent/5' : 'hover:bg-white/[0.04]'
+                              isReplying ? 'bg-popupRowHover' : 'hover:bg-popupRowHover'
                             }`}
                           >
                             <div className="relative flex-shrink-0">
-                              <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold ${
-                                unread > 0 ? 'bg-accent/20 text-accent' : 'bg-white/[0.08] text-white/50'
+                              <div className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold ${
+                                unread > 0 ? 'bg-popupRowActive text-accent' : 'bg-dark-200 text-white/50'
                               }`}>
                                 {getInitials(conv.partner)}
                               </div>
@@ -419,8 +419,8 @@ export default function Header() {
                               <button
                                 onClick={() => handleQuickReply(conv.id)}
                                 disabled={!replyText.trim() || sendingReply}
-                                className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
-                                  replyText.trim() ? 'bg-accent text-dark' : 'bg-white/[0.06] text-white/20'
+                                className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl transition-all ${
+                                  replyText.trim() ? 'bg-accent text-dark' : 'bg-popupHover text-white/20'
                                 }`}
                               >
                                 <Send className="w-3.5 h-3.5" />
@@ -450,7 +450,7 @@ export default function Header() {
           <div ref={notifsRef} className="relative">
             <button
               onClick={() => { setNotifsOpen(!notifsOpen); if (!notifsOpen) loadNotifications() }}
-              className="relative p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+              className="relative rounded-xl p-2 text-gray-400 transition-colors hover:bg-popupHover hover:text-white"
             >
               <Bell className="w-[18px] h-[18px]" />
               {notifsTotal > 0 && (
@@ -464,7 +464,10 @@ export default function Header() {
             </button>
 
             {notifsOpen && (
-              <div className="absolute right-0 top-full mt-2 w-96 bg-dark-lighter border border-white/[0.06] rounded-2xl shadow-2xl z-50 overflow-hidden">
+              <div
+                className="absolute right-0 top-full z-50 mt-2 w-96 overflow-hidden rounded-2xl border border-white/10 bg-popup shadow-2xl"
+                style={{ backgroundColor: 'var(--popup-surface)' }}
+              >
                 <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-semibold text-white">Notifikácie</h3>
@@ -492,7 +495,7 @@ export default function Header() {
                         <button
                           key={notif.id}
                           onClick={() => { setNotifsOpen(false); router.push(notif.path) }}
-                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white/[0.04] transition-colors text-left border-b border-white/[0.04] last:border-0"
+                          className="flex w-full items-center gap-3 border-b border-white/[0.06] px-4 py-3 text-left transition-colors last:border-0 hover:bg-popupRowHover"
                         >
                           <div className={`w-9 h-9 rounded-xl ${notif.iconBg} flex items-center justify-center flex-shrink-0`}>
                             <Icon className={`w-4.5 h-4.5 ${notif.iconColor}`} />
@@ -502,7 +505,7 @@ export default function Header() {
                             <p className="text-xs text-gray-400 mt-0.5">{notif.description}</p>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
-                            <span className="min-w-[22px] h-[22px] rounded-full bg-red-500/15 text-red-400 text-[11px] font-bold flex items-center justify-center px-1.5">
+                            <span className="flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-[#3d2224] px-1.5 text-[11px] font-bold text-red-400">
                               {notif.count}
                             </span>
                             <ArrowRight className="w-3.5 h-3.5 text-gray-600" />
@@ -530,11 +533,11 @@ export default function Header() {
               type="button"
               onClick={() => setUserMenuOpen((v) => !v)}
               className={`
-                flex items-center gap-3 pl-2 pr-3 py-1.5 rounded-2xl transition-colors
-                ${userMenuOpen ? 'bg-white/[0.06]' : 'hover:bg-white/[0.06]'}
+                flex items-center gap-3 rounded-2xl py-1.5 pl-2 pr-3 transition-colors
+                ${userMenuOpen ? 'bg-popupHover' : 'hover:bg-popupHover'}
               `}
             >
-              <div className="w-9 h-9 rounded-full bg-accent/20 flex items-center justify-center text-accent font-semibold text-xs flex-shrink-0">
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-popupRowActive text-xs font-semibold text-accent">
                 {initials}
               </div>
               <div className="hidden md:block text-left">
@@ -547,7 +550,10 @@ export default function Header() {
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-[rgb(30,30,30)] border border-white/[0.08] rounded-2xl shadow-xl shadow-black/40 overflow-hidden">
+              <div
+                className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-white/10 bg-popup shadow-xl shadow-black/40"
+                style={{ backgroundColor: 'var(--popup-surface)' }}
+              >
                 <div className="px-4 py-3 border-b border-white/[0.06]">
                   <p className="text-sm font-semibold text-white truncate">
                     {user?.firstName || 'Admin'} {user?.lastName || 'User'}
@@ -562,7 +568,7 @@ export default function Header() {
                     logout()
                     router.push('/login')
                   }}
-                  className="w-full flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:bg-white/[0.06] hover:text-white transition-colors"
+                  className="flex w-full items-center gap-2 px-4 py-3 text-sm text-gray-300 transition-colors hover:bg-popupRowHover hover:text-white"
                 >
                   <LogOut className="w-4 h-4 text-red-400" />
                   Odhlásiť sa

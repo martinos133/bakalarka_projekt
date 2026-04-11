@@ -22,6 +22,12 @@ const config: Config = {
         },
         card: 'rgb(28,28,28)',
         cardHover: 'rgb(38,38,38)',
+        /** Výbery a popup menu – jednotná teplá plocha (natívny select + vlastné zoznamy) */
+        popup: '#2D2421',
+        popupHover: '#3a322d',
+        /** Nepriehľadné zvýraznenie riadkov vo vlastných výberoch (namiesto bg-accent/xx) */
+        popupRowActive: '#44382d',
+        popupRowHover: '#352a25',
         accent: {
           DEFAULT: '#c9a96e',
           light: '#dfc9a0',

@@ -440,7 +440,7 @@ export default function TeamChatPage() {
         {activeConv ? (
           <>
             {/* Chat header */}
-            <div className="flex items-center gap-3 px-5 py-3 border-b border-white/[0.06] bg-card/50 backdrop-blur-sm">
+            <div className="flex items-center gap-3 border-b border-white/[0.06] bg-card px-5 py-3">
               <button
                 onClick={() => { setMobileShowChat(false); setActiveConvId(null) }}
                 className="md:hidden w-8 h-8 rounded-lg hover:bg-white/[0.06] flex items-center justify-center"
@@ -568,7 +568,7 @@ export default function TeamChatPage() {
             </div>
 
             {/* Input */}
-            <div className="border-t border-white/[0.06] bg-card/50 backdrop-blur-sm">
+            <div className="border-t border-white/[0.06] bg-card">
               {/* Pending files preview */}
               {pendingFiles.length > 0 && (
                 <div className="px-4 pt-3 flex gap-2 flex-wrap">

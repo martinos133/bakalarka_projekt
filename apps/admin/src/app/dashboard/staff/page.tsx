@@ -533,7 +533,7 @@ export default function StaffPage() {
       {/* Remove confirm modal */}
       {confirmRemoveMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setConfirmRemoveMember(null)} />
+          <div className="absolute inset-0 bg-[#0a0a0a]" onClick={() => setConfirmRemoveMember(null)} />
           <div className="relative w-full max-w-md bg-card rounded-2xl border border-white/[0.08] shadow-2xl">
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
               <div>
@@ -584,7 +584,7 @@ export default function StaffPage() {
       {/* Create modal */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowCreateModal(false)} />
+          <div className="absolute inset-0 bg-[#0a0a0a]" onClick={() => setShowCreateModal(false)} />
           <div className="relative w-full max-w-2xl bg-card rounded-2xl border border-white/[0.08] shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
               <h3 className="text-lg font-semibold text-white">Nový člen tímu</h3>
@@ -733,7 +733,7 @@ export default function StaffPage() {
       {/* Permissions modal */}
       {showPermsModal && selectedMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowPermsModal(false)} />
+          <div className="absolute inset-0 bg-[#0a0a0a]" onClick={() => setShowPermsModal(false)} />
           <div className="relative w-full max-w-2xl bg-card rounded-2xl border border-white/[0.08] shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
               <div>
@@ -846,7 +846,7 @@ export default function StaffPage() {
       {/* Password modal */}
       {showPasswordModal && selectedMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowPasswordModal(false)} />
+          <div className="absolute inset-0 bg-[#0a0a0a]" onClick={() => setShowPasswordModal(false)} />
           <div className="relative w-full max-w-md bg-card rounded-2xl border border-white/[0.08] shadow-2xl">
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
               <div>

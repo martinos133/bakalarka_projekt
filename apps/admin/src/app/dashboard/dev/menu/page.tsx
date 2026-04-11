@@ -577,7 +577,7 @@ export default function DevMenuPage() {
                     </button>
                     {showCategoryPicker === 'navbar' && (
                       <div
-                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.06] border border-white/[0.06] rounded-xl shadow-lg z-20"
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-popup border border-white/10 rounded-xl shadow-lg z-20"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {categories.length === 0 ? (
@@ -681,7 +681,7 @@ export default function DevMenuPage() {
                     </button>
                     {showCategoryPicker === 'categoryNav' && (
                       <div
-                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.06] border border-white/[0.06] rounded-xl shadow-lg z-20"
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-popup border border-white/10 rounded-xl shadow-lg z-20"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {categories.length === 0 ? (
@@ -821,7 +821,7 @@ export default function DevMenuPage() {
                     </button>
                     {showCategoryPicker === 'madeOnRentMe' && (
                       <div
-                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.06] border border-white/[0.06] rounded-xl shadow-lg z-20"
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-popup border border-white/10 rounded-xl shadow-lg z-20"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {categories.length === 0 ? (
@@ -971,7 +971,7 @@ export default function DevMenuPage() {
                     </button>
                     {showCategoryPicker === 'popularCategories' && (
                       <div
-                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.06] border border-white/[0.06] rounded-xl shadow-lg z-20"
+                        className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-popup border border-white/10 rounded-xl shadow-lg z-20"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {categories.length === 0 ? (
@@ -1166,7 +1166,7 @@ export default function DevMenuPage() {
                             </button>
                             {showCategoryPicker === section.id && (
                               <div
-                                className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-white/[0.06] border border-white/[0.06] rounded-xl shadow-lg z-20"
+                                className="absolute top-full left-0 mt-1 w-72 max-h-64 overflow-y-auto bg-popup border border-white/10 rounded-xl shadow-lg z-20"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {categories.length === 0 ? (
