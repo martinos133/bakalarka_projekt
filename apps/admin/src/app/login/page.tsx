@@ -35,6 +35,7 @@ export default function LoginPage() {
       if (data.token) {
         localStorage.setItem('admin_token', data.token)
         localStorage.setItem('admin_user', JSON.stringify(data.user))
+        window.dispatchEvent(new Event('admin-auth-sync'))
       }
 
       if (data.user.role !== 'ADMIN') {

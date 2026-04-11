@@ -5,17 +5,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
-/// Entitno-relačný diagram: po `npm run db:generate` otvor súbor `prisma/database-erd.svg` v prehliadači.
-generator erd {
-  provider = "prisma-erd-generator"
-  output   = "./database-erd.svg"
-  theme    = "neutral"
-}
-
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  /// Pri pooled spojení (PgBouncer) pridaj do .env aj DIRECT_DATABASE_URL a odkomentuj riadok nižšie.
+  // directUrl = env("DIRECT_DATABASE_URL")
 }
 
 enum UserRole {
@@ -61,6 +55,8 @@ model User {
   password             String
   firstName            String?
   lastName             String?
+  /// Profilovka: https URL alebo data URL (JPEG/PNG/WebP); zdieľané admin + platforma
+  avatarUrl            String?            @db.Text
   phone                String?
   dateOfBirth          DateTime?
   gender               Gender?

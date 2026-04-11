@@ -1,11 +1,49 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import TrackedLink from '@/components/TrackedLink'
 import { api } from '@/lib/api'
 
 function formatNumber(num: number): string {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+}
+
+const AVATAR_FALLBACK_SVG = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect fill="#222" width="64" height="64"/><circle cx="32" cy="24" r="10" fill="#555"/><path fill="#555" d="M16 56c0-12 8-20 16-20s16 8 16 20"/></svg>',
+)}`
+
+function FreelancerAvatar({
+  image,
+  avatarUrl,
+}: {
+  image: string
+  avatarUrl?: string | null
+}) {
+  const primary = (avatarUrl?.trim() || image).trim() || image
+  const [src, setSrc] = useState(primary)
+
+  useEffect(() => {
+    setSrc((avatarUrl?.trim() || image).trim() || image)
+  }, [avatarUrl, image])
+
+  const onError = useCallback(() => {
+    setSrc((prev) => {
+      if (prev !== image && image) return image
+      if (prev !== AVATAR_FALLBACK_SVG) return AVATAR_FALLBACK_SVG
+      return prev
+    })
+  }, [image])
+
+  return (
+    <img
+      src={src}
+      alt=""
+      className="h-16 w-16 rounded-full border-2 border-dark-200 object-cover"
+      loading="lazy"
+      decoding="async"
+      onError={onError}
+    />
+  )
 }
 
 interface TopFreelancer {
@@ -14,6 +52,7 @@ interface TopFreelancer {
   name: string
   title: string
   image: string
+  avatarUrl?: string | null
   adsCount: number
   price: number
 }
@@ -88,15 +127,14 @@ export default function TopFreelancers() {
             >
               <div className="flex items-center gap-4 mb-4">
                 <div className="relative">
-                  <img
-                    src={freelancer.image}
-                    alt={freelancer.name}
-                    className="w-16 h-16 rounded-full object-cover"
+                  <FreelancerAvatar image={freelancer.image} avatarUrl={freelancer.avatarUrl} />
+                  <div
+                    className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-2 border-dark-200 bg-accent"
+                    aria-hidden
                   />
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-accent rounded-full border-2 border-white"></div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-white group-hover:text-[#c9a96e] transition-colors">
+                  <h3 className="font-semibold text-white transition-colors group-hover:text-accent">
                     {freelancer.name}
                   </h3>
                   <p className="text-sm text-gray-500">{freelancer.title}</p>
@@ -118,7 +156,7 @@ export default function TopFreelancers() {
                 </div>
               </div>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs px-2 py-1 bg-accent/15 text-accent rounded">
+                <span className="rounded border border-accent-dark bg-dark-200 px-2 py-1 text-xs text-accent">
                   Predajca
                 </span>
                 {freelancer.price > 0 && (

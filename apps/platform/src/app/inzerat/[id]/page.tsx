@@ -721,9 +721,18 @@ export default function AdvertisementDetailPage({
               {advertisement.user && (
                 <div className="border border-white/[0.08] rounded-lg p-6">
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-16 h-16 rounded-full bg-dark-300 flex items-center justify-center text-gray-500 font-semibold text-xl">
-                      {sellerName.charAt(0).toUpperCase()}
-                    </div>
+                    {advertisement.user && (advertisement.user as { avatarUrl?: string | null }).avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={(advertisement.user as { avatarUrl: string }).avatarUrl}
+                        alt=""
+                        className="h-16 w-16 rounded-full border border-white/10 object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-dark-300 text-xl font-semibold text-gray-500">
+                        {sellerName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
                     <div>
                       <h3 className="font-semibold text-white">
                         {sellerName}

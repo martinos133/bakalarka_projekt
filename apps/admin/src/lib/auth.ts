@@ -3,8 +3,18 @@ export interface User {
   email: string
   firstName?: string
   lastName?: string
+  avatarUrl?: string | null
   role: string
   adminPermissions?: string[] | null
+}
+
+/** Zlúči údaje do `admin_user` (napr. po úprave profilu alebo /auth/me). */
+export function setAuthUser(partial: Partial<User>) {
+  if (typeof window === 'undefined') return
+  const current = getAuthUser()
+  if (!current) return
+  localStorage.setItem('admin_user', JSON.stringify({ ...current, ...partial }))
+  window.dispatchEvent(new Event('admin-auth-sync'))
 }
 
 export function getAuthToken(): string | null {

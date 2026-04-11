@@ -25,6 +25,7 @@ import {
   LogOut,
   CalendarDays,
   UserCog,
+  UserCircle,
   MessageCircle,
   Shield,
   TrendingUp,
@@ -96,6 +97,7 @@ const navigation: NavSection[] = [
   },
   {
     items: [
+      { label: 'Môj účet', path: '/dashboard/moj-profil', icon: UserCircle },
       { label: 'Nastavenia', path: '/dashboard/settings', icon: Settings, permission: 'settings' },
     ],
   },
@@ -109,7 +111,10 @@ export default function Sidebar() {
   const [chatUnread, setChatUnread] = useState(0)
 
   useEffect(() => {
-    setUser(getAuthUser())
+    const sync = () => setUser(getAuthUser())
+    sync()
+    window.addEventListener('admin-auth-sync', sync)
+    return () => window.removeEventListener('admin-auth-sync', sync)
   }, [])
 
   const loadChatUnread = useCallback(async () => {
@@ -157,9 +162,18 @@ export default function Sidebar() {
       {/* User profile */}
       <div className={`p-4 ${collapsed ? 'px-3' : 'px-5'} pt-6 pb-4`}>
         <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-popupRowActive text-sm font-semibold text-accent">
-            {getInitials(user?.firstName, user?.lastName)}
-          </div>
+          {user?.avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={user.avatarUrl}
+              alt=""
+              className="h-10 w-10 flex-shrink-0 rounded-full border border-white/10 object-cover"
+            />
+          ) : (
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-popupRowActive text-sm font-semibold text-accent">
+              {getInitials(user?.firstName, user?.lastName)}
+            </div>
+          )}
           {!collapsed && (
             <div className="min-w-0">
               <p className="text-sm font-semibold text-white truncate">

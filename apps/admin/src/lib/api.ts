@@ -343,6 +343,20 @@ export const api = {
     const s = q.toString()
     return fetchWithAuth(s ? `/seo/overview?${s}` : '/seo/overview')
   },
+
+  /** Aktuálny používateľ (JWT) — doplní napr. avatarUrl do lokálnej cache */
+  getAuthMe: () => fetchWithAuth('/auth/me'),
+  getMyUserProfile: () => fetchWithAuth('/users/me/profile'),
+  updateMyUserProfile: (data: Record<string, unknown>) =>
+    fetchWithAuth('/users/me/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  changeMyPassword: (oldPassword: string, newPassword: string) =>
+    fetchWithAuth('/users/me/password', {
+      method: 'PATCH',
+      body: JSON.stringify({ oldPassword, newPassword }),
+    }),
 }
 
 export default api

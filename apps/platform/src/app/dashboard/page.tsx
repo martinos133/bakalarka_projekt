@@ -1,16 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { CmsArticleView, CmsLoadingView } from '@/components/CmsGate'
 import { api } from '@/lib/api'
 import { isAuthenticated, getAuthUser, setAuthUser } from '@/lib/auth'
-import { User, Building2, Eye, EyeOff, Edit, Trash2, X, Lock, Mail, Phone, MapPin, Calendar, Briefcase, MessageSquare, Archive, CheckCircle, Paperclip, FileText, Download, Heart } from 'lucide-react'
+import { User, Building2, Eye, EyeOff, Edit, Trash2, X, Lock, Mail, Phone, MapPin, Calendar, Briefcase, MessageSquare, Archive, CheckCircle, Paperclip, FileText, Download, Heart, Image as ImageIcon, Link2 } from 'lucide-react'
 import CreateAdvertisementWizard from '@/components/CreateAdvertisementWizard'
 import Link from 'next/link'
 import { sellerPlanLabel } from '@/lib/sellerPlan'
+import { fileToResizedAvatarDataUrl } from '@/lib/avatarResize'
 import { useCmsOverride } from '@/lib/useCmsOverride'
 
 export default function DashboardPage() {
@@ -49,6 +50,8 @@ export default function DashboardPage() {
   const [createWizardNonce, setCreateWizardNonce] = useState(0)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const avatarFileRef = useRef<HTMLInputElement>(null)
+  const [avatarUrlDraft, setAvatarUrlDraft] = useState('')
 
   useEffect(() => {
     setMounted(true)
@@ -426,6 +429,93 @@ export default function DashboardPage() {
               Prémiové balíky
             </Link>
           </div>
+          <div className="mb-6 rounded-lg border border-white/[0.08] bg-dark p-6 shadow-sm">
+            <h2 className="mb-1 text-xl font-semibold text-white">Profilovka</h2>
+            <p className="mb-4 text-sm text-gray-500">
+              Rovnaký obrázok sa zobrazí na celom webe aj v admine (jeden účet).
+            </p>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              {profileData.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={profileData.avatarUrl}
+                  alt=""
+                  className="h-20 w-20 shrink-0 rounded-full border border-white/10 object-cover"
+                />
+              ) : (
+                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-accent text-xl font-semibold text-white">
+                  {(profileData.firstName?.[0] || profileData.email?.[0] || '?').toUpperCase()}
+                </div>
+              )}
+              {editing && (
+                <div className="min-w-0 flex-1 space-y-3">
+                  <input
+                    ref={avatarFileRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const f = e.target.files?.[0]
+                      e.target.value = ''
+                      if (!f) return
+                      try {
+                        const dataUrl = await fileToResizedAvatarDataUrl(f)
+                        setProfileData((p: Record<string, unknown>) => ({ ...p, avatarUrl: dataUrl }))
+                        setAvatarUrlDraft('')
+                      } catch (err: unknown) {
+                        setError(err instanceof Error ? err.message : 'Chyba pri obrázku')
+                      }
+                    }}
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => avatarFileRef.current?.click()}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-xs text-white hover:bg-dark-200"
+                    >
+                      <ImageIcon className="h-3.5 w-3.5" />
+                      Nahrať súbor
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfileData((p: Record<string, unknown>) => ({ ...p, avatarUrl: null }))
+                        setAvatarUrlDraft('')
+                      }}
+                      className="rounded-lg border border-red-500/30 px-3 py-2 text-xs text-red-300 hover:bg-red-950/40"
+                    >
+                      Odstrániť
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <input
+                      type="url"
+                      value={avatarUrlDraft}
+                      onChange={(e) => setAvatarUrlDraft(e.target.value)}
+                      placeholder="https://… obrázok"
+                      className="min-w-[200px] flex-1 rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white placeholder:text-gray-600"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const u = avatarUrlDraft.trim()
+                        if (!u) {
+                          setError('Zadajte platnú http(s) URL.')
+                          return
+                        }
+                        setProfileData((p: Record<string, unknown>) => ({ ...p, avatarUrl: u }))
+                        setError('')
+                      }}
+                      className="inline-flex items-center gap-1 rounded-lg border border-accent/40 bg-dark-100 px-3 py-2 text-xs font-medium text-accent"
+                    >
+                      <Link2 className="h-3.5 w-3.5" />
+                      Použiť URL
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
           <div className="bg-dark rounded-lg shadow-sm border border-white/[0.08] p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-white">Kontaktné údaje</h2>
@@ -443,6 +533,7 @@ export default function DashboardPage() {
                     onClick={() => {
                       setEditing(false)
                       setProfileData(user)
+                      setAvatarUrlDraft('')
                     }}
                     className="px-4 py-2 border border-white/10 text-gray-300 rounded-lg hover:bg-dark-200/[0.04] transition-colors"
                   >

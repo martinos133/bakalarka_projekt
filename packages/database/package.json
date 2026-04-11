@@ -5,6 +5,7 @@
   "types": "./src/index.ts",
   "scripts": {
     "db:generate": "dotenv -e ../../.env -- prisma generate",
+    "db:push": "dotenv -e ../../.env -- prisma db push",
     "db:migrate": "dotenv -e ../../.env -- prisma migrate dev",
     "db:migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
     "db:studio": "dotenv -e ../../.env -- prisma studio",
@@ -21,7 +22,6 @@
     "@types/bcrypt": "^5.0.2",
     "dotenv-cli": "^11.0.0",
     "prisma": "^5.7.1",
-    "prisma-erd-generator": "^2.0.4",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   }

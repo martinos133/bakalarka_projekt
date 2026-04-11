@@ -38,7 +38,7 @@ Ak má tvoja **knižná práca v obsahu inú doménu** (napr. sklad), štruktúr
 - **Frontend**: [Next.js](https://nextjs.org/) (App Router), React, TypeScript, Tailwind CSS; na mape [Leaflet](https://leafletjs.com/) / `react-leaflet`.
 - **Admin CMS**: napr. vizuálny editor (GrapesJS), textový editor (React Quill), grafy (Recharts).
 - **Backend**: [NestJS](https://nestjs.com/), TypeScript, Swagger (`@nestjs/swagger`).
-- **Databáza**: PostgreSQL (napr. Neon) s [Prisma](https://www.prisma.io/) (`DATABASE_URL`, `DIRECT_DATABASE_URL`).
+- **Databáza**: PostgreSQL s [Prisma](https://www.prisma.io/) — v koreňovom `.env` stačí `DATABASE_URL` (pri PgBouncerovi vieš doplniť `directUrl` v `schema.prisma`).
 - **Autentifikácia**: JWT (`@nestjs/jwt`, Passport JWT); heslá cez `bcrypt`.
 - **Validácia API**: `class-transformer` + `class-validator` (na fronte môžeš v práci spomenúť doplnkovú schémovú validáciu ako rozšírenie, ak ju pridáš).
 - **Identifikátory**: UUID primárne kľúče v Prisma modeloch.
@@ -70,22 +70,26 @@ Detailné polia a väzby sú v `packages/database/prisma/schema.prisma`.
 
 - Node.js ≥ 18, npm ≥ 9  
 - Docker a Docker Compose (pre lokálny stack v `docker/`)  
-- Premenné prostredia pre API a databázu (napr. `.env` v `apps/api` a v `packages/database` podľa tvojej konfigurácie)
+- Koreňový súbor **`.env`** (rovnaký koreň ako `package.json`) s **`DATABASE_URL`** — Prisma skripty ho načítavajú cez `dotenv-cli` z `packages/database`
 
 ### Inštalácia
 
 ```bash
 npm install
-npm run db:generate
+npm run db:generate   # Prisma Client (vyžaduje koreňový .env s DATABASE_URL)
 ```
 
 ### Databáza
 
 ```bash
-npm run db:migrate      # migrácie
-npm run db:studio       # Prisma Studio
-npm run db:seed         # seed (ak je pripravený)
+npm run db:push       # synchronizácia schémy bez migr. súborov (vývoj)
+npm run db:migrate    # migrácie (dev)
+npm run db:deploy     # migrácie (produkcia / CI)
+npm run db:studio     # Prisma Studio
+npm run db:seed       # seed (ak je pripravený)
 ```
+
+**Poznámka:** Nepoužívaj `npx prisma generate` priamo z koreňa bez `--schema` — vždy `npm run db:generate` alebo `cd packages/database && npm run db:generate`. Entitný diagram sa dá do práce priložiť ako export z [dbdiagram.io](https://dbdiagram.io) alebo screenshot z Prisma Studio; pri generovaní klienta už nie je potrebný Chrome.
 
 ### Vývojové servery
 

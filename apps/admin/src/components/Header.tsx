@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { Search, Bell, LogOut, ChevronDown, MessageCircle, Send, ArrowRight, X, Clock, Flag, FileText, AlertTriangle } from 'lucide-react'
-import { getAuthUser, logout } from '@/lib/auth'
+import { getAuthUser, logout, setAuthUser } from '@/lib/auth'
 import api from '@/lib/api'
 
 interface NotifItem {
@@ -96,7 +96,33 @@ export default function Header() {
   const pageTitle = getPageTitle(pathname)
 
   useEffect(() => {
-    setUser(getAuthUser())
+    const sync = () => setUser(getAuthUser())
+    sync()
+    window.addEventListener('admin-auth-sync', sync)
+    return () => window.removeEventListener('admin-auth-sync', sync)
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const me = await api.getAuthMe()
+        if (cancelled || !me || typeof me !== 'object') return
+        const cur = getAuthUser()
+        if (!cur) return
+        setAuthUser({
+          avatarUrl: (me as { avatarUrl?: string | null }).avatarUrl ?? cur.avatarUrl ?? null,
+          firstName: (me as { firstName?: string }).firstName ?? cur.firstName,
+          lastName: (me as { lastName?: string }).lastName ?? cur.lastName,
+        })
+        setUser(getAuthUser())
+      } catch {
+        /* ticho */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const loadChatData = useCallback(async () => {
@@ -537,9 +563,18 @@ export default function Header() {
                 ${userMenuOpen ? 'bg-popupHover' : 'hover:bg-popupHover'}
               `}
             >
-              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-popupRowActive text-xs font-semibold text-accent">
-                {initials}
-              </div>
+              {user?.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={user.avatarUrl}
+                  alt=""
+                  className="h-9 w-9 flex-shrink-0 rounded-full border border-white/10 object-cover"
+                />
+              ) : (
+                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-popupRowActive text-xs font-semibold text-accent">
+                  {initials}
+                </div>
+              )}
               <div className="hidden md:block text-left">
                 <p className="text-sm font-semibold text-white leading-tight">
                   {user?.firstName || 'Admin'} {user?.lastName || 'User'}
@@ -598,6 +633,7 @@ function getPageTitle(pathname: string): string {
     '/dashboard/staff': 'Tím',
     '/dashboard/audit': 'Audit & Logy',
     '/dashboard/seo': 'SEO prehľad',
+    '/dashboard/moj-profil': 'Môj účet',
     '/dashboard/organizer': 'Organizér',
     '/dashboard/dev/static-pages': 'Statické stránky',
     '/dashboard/dev/blog': 'Blog',

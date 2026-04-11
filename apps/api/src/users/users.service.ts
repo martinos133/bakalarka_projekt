@@ -2,33 +2,51 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { prisma } from '@inzertna-platforma/database';
 import { BanUserDto } from '@inzertna-platforma/shared';
+import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { normalizeAvatarUrl } from './avatar-url.util';
 
 @Injectable()
 export class UsersService {
+  /** P2022 = stĺpec v schéme Prisma chýba v DB (nezbehnutá migrácia). */
+  private rethrowIfSchemaOutOfSync(e: unknown): never {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2022') {
+      throw new ServiceUnavailableException(
+        'Databáza nie je zosúladená so schémou (Prisma P2022). V priečinku packages/database spustite: npx prisma migrate deploy — alebo: npx prisma db push. Potom reštartujte API.',
+      );
+    }
+    throw e;
+  }
+
   async findOne(id: string) {
-    await this.expireSubscriptionIfNeeded(id);
-    const user = await prisma.user.findUnique({
-      where: { id },
-      include: {
-        _count: {
-          select: {
-            advertisements: true,
+    try {
+      await this.expireSubscriptionIfNeeded(id);
+      const user = await prisma.user.findUnique({
+        where: { id },
+        include: {
+          _count: {
+            select: {
+              advertisements: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (!user) {
-      throw new NotFoundException('Používateľ nebol nájdený');
+      if (!user) {
+        throw new NotFoundException('Používateľ nebol nájdený');
+      }
+
+      const { password, ...userWithoutPassword } = user;
+      return userWithoutPassword;
+    } catch (e) {
+      if (e instanceof NotFoundException) throw e;
+      this.rethrowIfSchemaOutOfSync(e);
     }
-
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
   }
 
   async findAll() {
@@ -147,28 +165,35 @@ export class UsersService {
       throw new NotFoundException('Používateľ nebol nájdený');
     }
 
+    try {
+    const data: Record<string, unknown> = {
+      firstName: updateData.firstName,
+      lastName: updateData.lastName,
+      phone: updateData.phone,
+      dateOfBirth: updateData.dateOfBirth ? new Date(updateData.dateOfBirth) : null,
+      gender: updateData.gender && ['MALE', 'FEMALE', 'OTHER'].includes(updateData.gender) ? updateData.gender : null,
+      isCompany: updateData.hasOwnProperty('isCompany') ? Boolean(updateData.isCompany) : user.isCompany,
+      companyName: updateData.companyName,
+      companyId: updateData.companyId,
+      companyTaxId: updateData.companyTaxId,
+      address: updateData.address,
+      city: updateData.city,
+      postalCode: updateData.postalCode,
+      country: updateData.country,
+    };
+    if (Object.prototype.hasOwnProperty.call(updateData, 'avatarUrl')) {
+      data.avatarUrl = normalizeAvatarUrl(updateData.avatarUrl);
+    }
+
     const updated = await prisma.user.update({
       where: { id: userId },
-      data: {
-        firstName: updateData.firstName,
-        lastName: updateData.lastName,
-        phone: updateData.phone,
-        dateOfBirth: updateData.dateOfBirth ? new Date(updateData.dateOfBirth) : null,
-        gender: updateData.gender && ['MALE', 'FEMALE', 'OTHER'].includes(updateData.gender) ? updateData.gender : null,
-        isCompany: updateData.hasOwnProperty('isCompany') ? Boolean(updateData.isCompany) : user.isCompany,
-        companyName: updateData.companyName,
-        companyId: updateData.companyId,
-        companyTaxId: updateData.companyTaxId,
-        address: updateData.address,
-        city: updateData.city,
-        postalCode: updateData.postalCode,
-        country: updateData.country,
-      },
+      data: data as any,
       select: {
         id: true,
         email: true,
         firstName: true,
         lastName: true,
+        avatarUrl: true,
         phone: true,
         dateOfBirth: true,
         gender: true,
@@ -189,6 +214,10 @@ export class UsersService {
     });
 
     return updated;
+    } catch (e) {
+      if (e instanceof BadRequestException || e instanceof NotFoundException) throw e;
+      this.rethrowIfSchemaOutOfSync(e);
+    }
   }
 
   /** Po „platbe“ (demo checkout) nastaví balík, platnosť a zvýrazní inzeráty podľa limitu. */
@@ -295,6 +324,10 @@ export class UsersService {
     const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Pôvodné heslo je nesprávne');
+    }
+
+    if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 8) {
+      throw new BadRequestException('Nové heslo musí mať aspoň 8 znakov');
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);

@@ -14,12 +14,7 @@ import { BanUserDto } from '@inzertna-platforma/shared';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Získanie všetkých používateľov' })
-  findAll() {
-    return this.usersService.findAll();
-  }
-
+  /** Statické `me/*` a `:id/*` musia byť pred všeobecným `@Get(':id')`, aby sa nechytili zle. */
   @Get('me/profile')
   @ApiOperation({ summary: 'Získanie vlastného profilu' })
   getMyProfile(@Request() req) {
@@ -44,10 +39,16 @@ export class UsersController {
     return this.usersService.activateDemoCheckout(req.user.userId, body?.plan);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Získanie používateľa podľa ID' })
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  @Get()
+  @ApiOperation({ summary: 'Získanie všetkých používateľov' })
+  findAll() {
+    return this.usersService.findAll();
+  }
+
+  @Get(':id/stats')
+  @ApiOperation({ summary: 'Získanie štatistík používateľa' })
+  getUserStats(@Param('id') id: string) {
+    return this.usersService.getUserStats(id);
   }
 
   @Patch(':id/ban')
@@ -58,9 +59,9 @@ export class UsersController {
     return this.usersService.banUser(id, banDto);
   }
 
-  @Get(':id/stats')
-  @ApiOperation({ summary: 'Získanie štatistík používateľa' })
-  getUserStats(@Param('id') id: string) {
-    return this.usersService.getUserStats(id);
+  @Get(':id')
+  @ApiOperation({ summary: 'Získanie používateľa podľa ID' })
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(id);
   }
 }
