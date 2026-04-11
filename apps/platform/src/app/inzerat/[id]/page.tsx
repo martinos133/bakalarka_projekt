@@ -13,7 +13,7 @@ import { useCmsOverride } from '@/lib/useCmsOverride'
 import { isAuthenticated, getAuthUser } from '@/lib/auth'
 import { isProSellerBadge } from '@/lib/sellerPlan'
 import type { Filter } from '@inzertna-platforma/shared'
-import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone, Heart, Star, Trash2, Edit3, Reply } from 'lucide-react'
+import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone, Heart, Star, Trash2, Edit3, Reply, RefreshCw } from 'lucide-react'
 import CustomSelect from '@/components/CustomSelect'
 import type { DateRange } from 'react-day-picker'
 
@@ -694,8 +694,9 @@ export default function AdvertisementDetailPage({
                     </div>
                   )}
                   {advertisement.type === 'SERVICE' && advertisement.revisions && (
-                    <div className="text-sm text-gray-500 mt-2">
-                      🔄 Revízie: {advertisement.revisions}
+                    <div className="text-sm text-gray-500 mt-2 flex items-center gap-1.5">
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      Revízie: {advertisement.revisions}
                     </div>
                   )}
                 </div>
