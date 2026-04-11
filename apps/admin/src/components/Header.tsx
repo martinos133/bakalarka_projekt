@@ -591,6 +591,7 @@ function getPageTitle(pathname: string): string {
     '/dashboard/team-chat': 'Tímový chat',
     '/dashboard/staff': 'Tím',
     '/dashboard/audit': 'Audit & Logy',
+    '/dashboard/seo': 'SEO prehľad',
     '/dashboard/organizer': 'Organizér',
     '/dashboard/dev/static-pages': 'Statické stránky',
     '/dashboard/dev/blog': 'Blog',

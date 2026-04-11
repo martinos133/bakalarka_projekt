@@ -20,6 +20,7 @@ import { CalendarModule } from './calendar/calendar.module';
 import { StaffModule } from './staff/staff.module';
 import { TeamChatModule } from './team-chat/team-chat.module';
 import { AuditModule } from './audit/audit.module';
+import { SeoModule } from './seo/seo.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AuditModule } from './audit/audit.module';
       isGlobal: true,
     }),
     AuditModule,
+    SeoModule,
     AuthModule,
     UsersModule,
     AdvertisementsModule,

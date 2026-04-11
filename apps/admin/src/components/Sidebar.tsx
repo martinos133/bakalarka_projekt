@@ -27,6 +27,7 @@ import {
   UserCog,
   MessageCircle,
   Shield,
+  TrendingUp,
 } from 'lucide-react'
 
 interface NavItem {
@@ -73,6 +74,7 @@ const navigation: NavSection[] = [
     items: [
       { label: 'Tím', path: '/dashboard/staff', icon: UserCog, permission: 'staff' },
       { label: 'Audit & Logy', path: '/dashboard/audit', icon: Shield, permission: 'audit' },
+      { label: 'SEO prehľad', path: '/dashboard/seo', icon: TrendingUp, permission: 'seo' },
     ],
   },
   {

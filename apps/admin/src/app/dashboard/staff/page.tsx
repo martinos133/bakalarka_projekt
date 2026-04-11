@@ -60,6 +60,8 @@ const PERMISSION_GROUPS: { title: string; permissions: { key: string; label: str
     title: 'Správa',
     permissions: [
       { key: 'staff', label: 'Správa tímu' },
+      { key: 'audit', label: 'Audit & Logy' },
+      { key: 'seo', label: 'SEO prehľad' },
     ],
   },
   {

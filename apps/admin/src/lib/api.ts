@@ -337,6 +337,8 @@ export const api = {
   },
   getAuditStats: () => fetchWithAuth('/audit/stats'),
   getAuditLog: (id: string) => fetchWithAuth(`/audit/${id}`),
+
+  getSeoOverview: () => fetchWithAuth('/seo/overview'),
 }
 
 export default api
