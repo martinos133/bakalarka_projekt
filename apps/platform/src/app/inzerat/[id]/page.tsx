@@ -1066,47 +1066,68 @@ export default function AdvertisementDetailPage({
         </div>
       )}
 
-      {/* Report Modal */}
+      {/* Report Modal — vizuál zladený s admin modal-panel */}
       {showReportModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark rounded-lg max-w-md w-full shadow-xl shadow-black/30">
-            <div className="p-6 border-b border-white/[0.08]">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Flag className="w-5 h-5 text-red-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Zavrieť"
+            className="absolute inset-0 bg-black/45 backdrop-blur-sm"
+            onClick={() => {
+              setShowReportModal(false)
+              setReportReason('')
+              setReportDescription('')
+              setReportSuccess(false)
+            }}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="report-modal-title"
+            className="relative w-full max-w-md overflow-hidden rounded-2xl border border-white/[0.08] bg-card shadow-2xl animate-[slideDown_0.2s_ease-out]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="h-0.5 w-full bg-gradient-to-r from-card via-accent to-card" aria-hidden />
+            <div className="border-b border-white/[0.06] px-6 py-4">
+              <div className="flex items-center justify-between gap-3">
+                <h2 id="report-modal-title" className="text-lg font-semibold text-white flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/10">
+                    <Flag className="h-5 w-5 text-red-400" />
+                  </span>
                   Nahlásiť inzerát
                 </h2>
                 <button
+                  type="button"
                   onClick={() => {
                     setShowReportModal(false)
                     setReportReason('')
                     setReportDescription('')
                     setReportSuccess(false)
                   }}
-                  className="p-2 hover:bg-dark-200/[0.06] rounded-lg transition-colors"
+                  className="rounded-lg p-1.5 text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="h-5 w-5" />
                 </button>
               </div>
             </div>
 
             {reportSuccess ? (
               <div className="p-6 text-center">
-                <div className="w-16 h-16 bg-accent/15 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Check className="w-8 h-8 text-accent" />
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/15 ring-1 ring-accent/25">
+                  <Check className="h-8 w-8 text-accent" />
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2">
+                <h3 className="mb-2 text-lg font-semibold text-white">
                   Ďakujeme za nahlásenie
                 </h3>
-                <p className="text-gray-500 text-sm">
+                <p className="text-sm text-gray-400">
                   Váš report bol úspešne odoslaný. Náš tím to skontroluje.
                 </p>
               </div>
             ) : (
-              <div className="p-6 space-y-4">
+              <div className="space-y-4 p-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Dôvod nahlásenia <span className="text-red-500">*</span>
+                  <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Dôvod nahlásenia <span className="text-red-400">*</span>
                   </label>
                   <CustomSelect
                     value={reportReason}
@@ -1117,7 +1138,7 @@ export default function AdvertisementDetailPage({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-500">
                     Popis problému (voliteľné)
                   </label>
                   <textarea
@@ -1125,32 +1146,34 @@ export default function AdvertisementDetailPage({
                     onChange={(e) => setReportDescription(e.target.value)}
                     placeholder="Poskytnite viac informácií o probléme..."
                     rows={4}
-                    className="w-full bg-dark-100 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/40 resize-none"
+                    className="w-full resize-none rounded-xl border border-white/[0.12] bg-white/[0.08] px-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/25"
                   />
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-white/50 bg-accent/10 p-3 rounded-lg">
-                  <AlertCircle className="w-5 h-5 text-accent/60 flex-shrink-0" />
+                <div className="flex items-start gap-3 rounded-xl border border-accent/25 bg-popup p-4 text-sm leading-relaxed text-gray-300">
+                  <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
                   <p>
                     Nahlásené inzeráty sú kontrolované našim tímom. Inzerát zostane aktívny, pokiaľ ho nerozhodneme odstrániť.
                   </p>
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/[0.08]">
+                <div className="flex items-center justify-end gap-2.5 border-t border-white/[0.06] pt-5">
                   <button
+                    type="button"
                     onClick={() => {
                       setShowReportModal(false)
                       setReportReason('')
                       setReportDescription('')
                     }}
-                    className="px-4 py-2.5 border border-white/10 text-white/70 rounded-lg font-medium hover:bg-white/[0.06] hover:text-white transition-colors"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.08] bg-transparent px-4 py-2.5 text-sm font-medium text-gray-300 transition-colors hover:border-white/[0.15] hover:bg-white/[0.06] hover:text-white"
                   >
                     Zrušiť
                   </button>
                   <button
+                    type="button"
                     onClick={handleReport}
                     disabled={!reportReason || reportSubmitting}
-                    className="px-4 py-2.5 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 disabled:bg-dark-300 disabled:text-white/30 disabled:cursor-not-allowed transition-colors"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-45"
                   >
                     {reportSubmitting ? 'Odosielam...' : 'Nahlásiť'}
                   </button>
