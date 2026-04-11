@@ -1,5 +1,7 @@
 'use client'
 
+import { Star } from 'lucide-react'
+
 export default function Testimonials() {
   const testimonials = [
     {
@@ -26,46 +28,41 @@ export default function Testimonials() {
   ]
 
   return (
-    <section className="py-16 bg-dark">
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <p className="text-accent text-sm font-semibold uppercase tracking-[0.2em] mb-3">Referencie</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Dôvera je našou <span className="font-serif italic">jedinou menou</span>
+    <section className="border-t border-white/[0.06] bg-surface py-16">
+      <div className="mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 text-center">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted">Referencie</p>
+          <h2 className="text-3xl font-bold text-white md:text-4xl">
+            Dôvera je našou <span className="font-serif italic text-accent">jedinou menou</span>
           </h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {testimonials.map((testimonial, index) => (
-            <div
+            <article
               key={index}
-              className="bg-dark-50 p-6 rounded-lg border border-white/[0.08]"
+              className="card card-hover flex h-full flex-col p-6 shadow-lg shadow-black/15 transition-all duration-200"
             >
-              <div className="flex items-center gap-1 mb-4">
+              <div className="mb-4 flex items-center gap-0.5" aria-label={`Hodnotenie ${testimonial.rating} z 5`}>
                 {[...Array(testimonial.rating)].map((_, i) => (
-                  <svg
-                    key={i}
-                    className="w-5 h-5 text-yellow-400 fill-current"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                  </svg>
+                  <Star key={i} className="h-5 w-5 fill-accent text-accent" aria-hidden />
                 ))}
               </div>
-              <p className="text-gray-300 mb-6 italic">"{testimonial.text}"</p>
-              <div className="flex items-center gap-3">
+              <p className="mb-6 flex-1 text-[15px] italic leading-relaxed text-muted">
+                &ldquo;{testimonial.text}&rdquo;
+              </p>
+              <div className="flex items-center gap-3 border-t border-white/[0.06] pt-5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={testimonial.image}
                   alt={testimonial.name}
-                  className="w-12 h-12 rounded-full object-cover"
+                  className="h-12 w-12 shrink-0 rounded-full border-2 border-white/[0.1] object-cover ring-2 ring-card"
                 />
-                <div>
-                  <div className="font-semibold text-white">
-                    {testimonial.name}
-                  </div>
-                  <div className="text-sm text-gray-500">{testimonial.role}</div>
+                <div className="min-w-0">
+                  <div className="font-semibold text-white">{testimonial.name}</div>
+                  <div className="text-sm text-muted">{testimonial.role}</div>
                 </div>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { Star } from 'lucide-react'
 import TrackedLink from '@/components/TrackedLink'
 import { api } from '@/lib/api'
 
@@ -38,7 +39,7 @@ function FreelancerAvatar({
     <img
       src={src}
       alt=""
-      className="h-16 w-16 rounded-full border-2 border-dark-200 object-cover"
+      className="h-16 w-16 rounded-full border-2 border-white/[0.1] object-cover ring-2 ring-card"
       loading="lazy"
       decoding="async"
       onError={onError}
@@ -109,62 +110,54 @@ export default function TopFreelancers() {
   if (freelancers.length === 0) return null
 
   return (
-    <section className="py-16 bg-dark-50">
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            {title}
-          </h2>
+    <section className="border-t border-white/[0.06] bg-surface py-16">
+      <div className="mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-8">
+        <div className="mb-10">
+          <h2 className="font-serif text-3xl font-bold text-accent md:text-4xl">{title}</h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {freelancers.map((freelancer) => (
             <TrackedLink
               key={freelancer.id}
               href={freelancer.adId ? `/inzerat/${freelancer.adId}` : `/dashboard`}
               targetType="AD"
               targetId={freelancer.adId || freelancer.id}
-              className="bg-dark p-6 rounded-lg hover:shadow-lg transition-shadow cursor-pointer group block"
+              className="group block"
             >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="relative">
+              <article className="card card-hover flex h-full flex-col p-5 shadow-lg shadow-black/15 transition-all duration-200">
+                <div className="mb-4 flex items-center gap-4">
                   <FreelancerAvatar image={freelancer.image} avatarUrl={freelancer.avatarUrl} />
-                  <div
-                    className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-2 border-dark-200 bg-accent"
-                    aria-hidden
-                  />
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-serif text-base font-semibold text-white transition-colors group-hover:text-accent-light">
+                      {freelancer.name}
+                    </h3>
+                    <p className="mt-0.5 line-clamp-2 text-sm text-muted">{freelancer.title}</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-white transition-colors group-hover:text-accent">
-                    {freelancer.name}
-                  </h3>
-                  <p className="text-sm text-gray-500">{freelancer.title}</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-gray-500">
-                  {mounted ? formatNumber(freelancer.adsCount) : freelancer.adsCount}{' '}
-                  {freelancer.adsCount === 1 ? 'inzerát' : freelancer.adsCount < 5 ? 'inzeráty' : 'inzerátov'}
-                </span>
-                <div className="flex items-center gap-1">
-                  <svg className="w-4 h-4 text-accent fill-current" viewBox="0 0 20 20">
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                  </svg>
-                  <span className="text-sm font-semibold text-white">
-                    {(ratings[freelancer.id]?.count ?? 0) > 0 ? ratings[freelancer.id].average.toFixed(1) : '–'}
+                <div className="mb-3 flex items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
+                  <span className="text-sm text-muted">
+                    {mounted ? formatNumber(freelancer.adsCount) : freelancer.adsCount}{' '}
+                    {freelancer.adsCount === 1 ? 'inzerát' : freelancer.adsCount < 5 ? 'inzeráty' : 'inzerátov'}
                   </span>
-                  <span className="text-xs text-gray-500">({ratings[freelancer.id]?.count ?? 0})</span>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <Star className="h-4 w-4 fill-accent text-accent" aria-hidden />
+                    <span className="text-sm font-semibold text-white">
+                      {(ratings[freelancer.id]?.count ?? 0) > 0 ? ratings[freelancer.id].average.toFixed(1) : '–'}
+                    </span>
+                    <span className="text-xs text-muted">({ratings[freelancer.id]?.count ?? 0})</span>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="rounded border border-accent-dark bg-dark-200 px-2 py-1 text-xs text-accent">
-                  Predajca
-                </span>
-                {freelancer.price > 0 && (
-                  <span className="text-lg font-bold text-white">
-                    Od {freelancer.price}€
+                <div className="mt-auto flex items-center justify-between gap-2">
+                  <span className="rounded-lg border border-white/[0.1] bg-white/[0.04] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted">
+                    Predajca
                   </span>
-                )}
-              </div>
+                  {freelancer.price > 0 && (
+                    <span className="text-lg font-bold tabular-nums text-accent">
+                      Od {freelancer.price}€
+                    </span>
+                  )}
+                </div>
+              </article>
             </TrackedLink>
           ))}
         </div>

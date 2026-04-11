@@ -100,7 +100,6 @@ export default function CustomSelect({
           animation: 'slideDown 0.15s ease-out',
         }}
       >
-        <div className="h-0.5 w-full bg-gradient-to-r from-[#2D2421] via-accent to-[#2D2421]" aria-hidden />
         <div
           ref={listRef}
           className="max-h-60 overflow-y-auto py-1"

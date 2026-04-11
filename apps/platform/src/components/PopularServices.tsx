@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Star } from 'lucide-react'
 import TrackedLink from '@/components/TrackedLink'
 import { api } from '@/lib/api'
 
@@ -55,14 +56,14 @@ export default function PopularServices() {
 
   if (loading) {
     return (
-      <section className="py-16 bg-dark">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="border-t border-white/[0.06] bg-surface py-16">
+        <div className="mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-8">
           <div className="mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            <h2 className="mb-2 font-serif text-3xl font-bold text-accent md:text-4xl">
               Populárne profesionálne služby
             </h2>
+            <p className="text-sm text-muted">Načítavam…</p>
           </div>
-          <div className="text-center text-gray-500">Načítavam...</div>
         </div>
       </section>
     )
@@ -73,52 +74,66 @@ export default function PopularServices() {
   }
 
   return (
-    <section className="py-16 bg-dark">
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+    <section className="border-t border-white/[0.06] bg-surface py-16">
+      <div className="mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-8">
+        <div className="mb-10">
+          <h2 className="font-serif text-3xl font-bold text-accent md:text-4xl">
             Populárne profesionálne služby
           </h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {services.map((service) => (
             <TrackedLink
               key={service.id}
               href={`/inzerat/${service.id}`}
               targetType="AD"
               targetId={service.id}
-              className="group cursor-pointer hover:shadow-lg transition-shadow duration-300 block"
+              className="group block"
             >
-              <div className="relative overflow-hidden rounded-lg mb-3">
-                <img
-                  src={service.images && service.images.length > 0 ? service.images[0] : 'https://via.placeholder.com/400x300?text=No+Image'}
-                  alt={service.title}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <div>
-                <h3 className="font-semibold text-white mb-1 group-hover:text-accent transition-colors line-clamp-2">
-                  {service.title}
-                </h3>
-                <div className="flex items-center gap-1 mb-1">
-                  <svg
-                    className="w-4 h-4 text-accent fill-current"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                  </svg>
-                  <span className="text-sm font-semibold text-white">
-                    {(ratings[service.id]?.count ?? 0) > 0 ? ratings[service.id].average.toFixed(1) : '–'}
-                  </span>
-                  <span className="text-sm text-gray-500">({ratings[service.id]?.count ?? 0})</span>
+              <article className="card card-hover flex h-full flex-col overflow-hidden shadow-lg shadow-black/15 transition-all duration-200">
+                <div className="relative h-44 shrink-0 overflow-hidden border-b border-white/[0.06] bg-dark-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={
+                      service.images && service.images.length > 0
+                        ? service.images[0]
+                        : 'https://via.placeholder.com/400x300/1a1a1a/c9a96e?text=Bez+obrázka'
+                    }
+                    alt={service.title}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    onError={(e) => {
+                      const el = e.currentTarget
+                      el.onerror = null
+                      el.src =
+                        'https://via.placeholder.com/400x300/1a1a1a/c9a96e?text=Bez+obrázka'
+                    }}
+                  />
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">Začínajúc od</span>
-                  <span className="text-lg font-bold text-white">
-                    {service.price ? `${service.price.toFixed(2)}€` : 'Na dohodu'}
-                  </span>
+                <div className="flex flex-1 flex-col p-4">
+                  <h3 className="mb-2 line-clamp-2 font-serif text-base font-semibold leading-snug text-white transition-colors group-hover:text-accent-light">
+                    {service.title}
+                  </h3>
+                  <div className="mb-3 flex items-center gap-1.5">
+                    <Star className="h-4 w-4 shrink-0 fill-accent text-accent" aria-hidden />
+                    <span className="text-sm font-semibold text-white">
+                      {(ratings[service.id]?.count ?? 0) > 0 ? ratings[service.id].average.toFixed(1) : '–'}
+                    </span>
+                    <span className="text-sm text-muted">({ratings[service.id]?.count ?? 0})</span>
+                  </div>
+                  <div className="mt-auto flex items-end justify-between gap-2 border-t border-white/[0.06] pt-3">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">
+                      Začínajúc od
+                    </span>
+                    <span
+                      className={`text-right text-lg font-bold tabular-nums ${
+                        service.price != null ? 'text-accent' : 'text-gray-300'
+                      }`}
+                    >
+                      {service.price != null ? `${service.price.toFixed(2)}€` : 'Na dohodu'}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              </article>
             </TrackedLink>
           ))}
         </div>

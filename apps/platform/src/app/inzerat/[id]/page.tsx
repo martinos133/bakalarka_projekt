@@ -595,7 +595,6 @@ export default function AdvertisementDetailPage({
                 {/* FAQ — admin card + popup farby */}
                 {advertisement.faq && advertisement.faq.length > 0 && (
                   <div className="card mb-8 overflow-hidden p-6 shadow-lg shadow-black/20">
-                    <div className="mb-5 h-0.5 w-full rounded-full bg-gradient-to-r from-card via-accent/80 to-card" aria-hidden />
                     <h2 className="mb-6 text-2xl font-bold text-accent">
                       Často kladené otázky
                     </h2>
@@ -658,8 +657,7 @@ export default function AdvertisementDetailPage({
             <div className="sticky top-24">
               {/* Price Card — admin card + tlačidlá */}
               <div className="card mb-6 overflow-hidden p-6 shadow-2xl shadow-black/20">
-                <div className="mb-1 h-0.5 w-full rounded-full bg-gradient-to-r from-card via-accent/80 to-card" aria-hidden />
-                <div className="mb-5 mt-5">
+                <div className="mb-5">
                   {advertisement.type === 'SERVICE' && advertisement.pricingType === 'HOURLY' && advertisement.hourlyRate ? (
                     <div>
                       <div className="flex items-baseline gap-2">
@@ -740,8 +738,7 @@ export default function AdvertisementDetailPage({
               {/* Seller Card */}
               {advertisement.user && (
                 <div className="card overflow-hidden p-6 shadow-2xl shadow-black/20">
-                  <div className="mb-1 h-0.5 w-full rounded-full bg-gradient-to-r from-card via-accent/80 to-card" aria-hidden />
-                  <div className="mb-4 mt-5 flex items-center gap-4">
+                  <div className="mb-4 flex items-center gap-4">
                     {advertisement.user && (advertisement.user as { avatarUrl?: string | null }).avatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -812,7 +809,6 @@ export default function AdvertisementDetailPage({
             className="relative w-full max-w-md overflow-hidden rounded-2xl border border-white/[0.08] bg-card shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="h-0.5 w-full bg-gradient-to-r from-card via-accent to-card" aria-hidden />
             <div className="border-b border-white/[0.06] px-6 py-4">
               <div className="flex items-center justify-between gap-3">
                 <h2 id="contact-modal-title" className="flex items-center gap-3 text-lg font-semibold text-white">
@@ -1000,7 +996,6 @@ export default function AdvertisementDetailPage({
             className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/[0.08] bg-card shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="h-0.5 w-full bg-gradient-to-r from-card via-accent to-card" aria-hidden />
             <div className="border-b border-white/[0.06] px-6 py-4">
               <div className="flex items-center justify-between gap-3">
                 <h2 id="continue-modal-title" className="flex items-center gap-3 text-lg font-semibold text-white">
@@ -1131,7 +1126,6 @@ export default function AdvertisementDetailPage({
             className="relative w-full max-w-md overflow-hidden rounded-2xl border border-white/[0.08] bg-card shadow-2xl animate-[slideDown_0.2s_ease-out]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="h-0.5 w-full bg-gradient-to-r from-card via-accent to-card" aria-hidden />
             <div className="border-b border-white/[0.06] px-6 py-4">
               <div className="flex items-center justify-between gap-3">
                 <h2 id="report-modal-title" className="text-lg font-semibold text-white flex items-center gap-3">
