@@ -299,7 +299,7 @@ export default function Header() {
                       onClick={() => setShowUserMenu(false)}
                     >
                       <PlusCircle className="w-4 h-4 text-accent" />
-                      Podať inzerát
+                      Vytvoriť inzerát
                     </Link>
                     <Link
                       href="/dashboard"
@@ -374,7 +374,7 @@ export default function Header() {
                       onClick={() => setShowUserMenu(false)}
                     >
                       <PlusCircle className="w-4 h-4 text-accent" />
-                      Podať inzerát
+                      Vytvoriť inzerát
                     </Link>
                     <Link
                       href="/dashboard"

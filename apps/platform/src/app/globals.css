@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .card {
+    @apply bg-card rounded-2xl border border-white/[0.06] transition-all duration-200;
+  }
+  .card-hover {
+    @apply hover:border-white/[0.12] hover:bg-cardHover;
+  }
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff;
+  -webkit-box-shadow: 0 0 0 1000px #1a1a1a inset;
+  box-shadow: 0 0 0 1000px #1a1a1a inset;
+  caret-color: #fff;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 @layer base {
   body {
     @apply bg-dark text-white/90;

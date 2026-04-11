@@ -7,7 +7,7 @@ import Footer from '@/components/Footer'
 import { CmsArticleView, CmsLoadingView } from '@/components/CmsGate'
 import { api } from '@/lib/api'
 import { isAuthenticated, getAuthUser, setAuthUser } from '@/lib/auth'
-import { User, Building2, Eye, EyeOff, Edit, Trash2, X, Lock, Mail, Phone, MapPin, Calendar, Briefcase, MessageSquare, Archive, CheckCircle, Paperclip, FileText, Download, Heart, Image as ImageIcon, Link2 } from 'lucide-react'
+import { User, Building2, Trash2, X, Lock, Mail, Phone, MapPin, Calendar, Crown, Save, MessageSquare, Archive, CheckCircle, Paperclip, FileText, Download, Heart, Image as ImageIcon } from 'lucide-react'
 import CreateAdvertisementWizard from '@/components/CreateAdvertisementWizard'
 import Link from 'next/link'
 import { sellerPlanLabel } from '@/lib/sellerPlan'
@@ -33,10 +33,7 @@ export default function DashboardPage() {
   const [lightboxImage, setLightboxImage] = useState<string | null>(null)
   const [messageFilter, setMessageFilter] = useState<'all' | 'unread' | 'inquiry' | 'system'>('all')
   const [loading, setLoading] = useState(true)
-  const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [changingPassword, setChangingPassword] = useState(false)
-  const [showPassword, setShowPassword] = useState({ old: false, new: false, confirm: false })
   
   const [profileData, setProfileData] = useState<any>({})
   const [passwordData, setPasswordData] = useState({
@@ -51,7 +48,6 @@ export default function DashboardPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const avatarFileRef = useRef<HTMLInputElement>(null)
-  const [avatarUrlDraft, setAvatarUrlDraft] = useState('')
 
   useEffect(() => {
     setMounted(true)
@@ -402,453 +398,221 @@ export default function DashboardPage() {
 
         {/* Profile Tab */}
         {activeTab === 'profile' && (
-          <>
-          <div className="mb-6 rounded-xl border border-white/[0.08] bg-dark shadow-sm p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Predajcovský balík</p>
-              <p className="text-lg font-bold text-white mt-1">
-                {sellerPlanLabel(profileData?.sellerPlan)}
-              </p>
-              {profileData?.sellerPlanValidUntil ? (
-                <p className="text-sm text-gray-500 mt-1">
-                  Platné do:{' '}
-                  {new Date(profileData.sellerPlanValidUntil).toLocaleDateString('sk-SK', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </p>
-              ) : (
-                <p className="text-sm text-gray-500 mt-1">Žiadny aktívny prémiový balík.</p>
-              )}
-            </div>
-            <Link
-              href="/premium"
-              className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-accent hover:bg-accent-light transition-colors shrink-0"
-            >
-              Prémiové balíky
-            </Link>
-          </div>
-          <div className="mb-6 rounded-lg border border-white/[0.08] bg-dark p-6 shadow-sm">
-            <h2 className="mb-1 text-xl font-semibold text-white">Profilovka</h2>
-            <p className="mb-4 text-sm text-gray-500">
-              Rovnaký obrázok sa zobrazí na celom webe aj v admine (jeden účet).
-            </p>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-              {profileData.avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={profileData.avatarUrl}
-                  alt=""
-                  className="h-20 w-20 shrink-0 rounded-full border border-white/10 object-cover"
-                />
-              ) : (
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-accent text-xl font-semibold text-white">
-                  {(profileData.firstName?.[0] || profileData.email?.[0] || '?').toUpperCase()}
-                </div>
-              )}
-              {editing && (
-                <div className="min-w-0 flex-1 space-y-3">
-                  <input
-                    ref={avatarFileRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    className="hidden"
-                    onChange={async (e) => {
-                      const f = e.target.files?.[0]
-                      e.target.value = ''
-                      if (!f) return
-                      try {
-                        const dataUrl = await fileToResizedAvatarDataUrl(f)
-                        setProfileData((p: Record<string, unknown>) => ({ ...p, avatarUrl: dataUrl }))
-                        setAvatarUrlDraft('')
-                      } catch (err: unknown) {
-                        setError(err instanceof Error ? err.message : 'Chyba pri obrázku')
-                      }
-                    }}
-                  />
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => avatarFileRef.current?.click()}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-xs text-white hover:bg-dark-200"
-                    >
-                      <ImageIcon className="h-3.5 w-3.5" />
-                      Nahrať súbor
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setProfileData((p: Record<string, unknown>) => ({ ...p, avatarUrl: null }))
-                        setAvatarUrlDraft('')
-                      }}
-                      className="rounded-lg border border-red-500/30 px-3 py-2 text-xs text-red-300 hover:bg-red-950/40"
-                    >
-                      Odstrániť
-                    </button>
+          <div className="space-y-6">
+            {/* Header karta s avatárom */}
+            <div className="card p-6 flex flex-col gap-6 sm:flex-row sm:items-center">
+              <div className="flex flex-col items-center gap-2">
+                {profileData.avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={profileData.avatarUrl} alt="" className="h-24 w-24 rounded-full border border-white/10 object-cover" />
+                ) : (
+                  <div className="flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-dark-100 text-2xl font-bold text-gray-500">
+                    {((profileData.firstName?.[0] || '') + (profileData.lastName?.[0] || '') || '?').toUpperCase()}
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    <input
-                      type="url"
-                      value={avatarUrlDraft}
-                      onChange={(e) => setAvatarUrlDraft(e.target.value)}
-                      placeholder="https://… obrázok"
-                      className="min-w-[200px] flex-1 rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white placeholder:text-gray-600"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const u = avatarUrlDraft.trim()
-                        if (!u) {
-                          setError('Zadajte platnú http(s) URL.')
-                          return
-                        }
-                        setProfileData((p: Record<string, unknown>) => ({ ...p, avatarUrl: u }))
-                        setError('')
-                      }}
-                      className="inline-flex items-center gap-1 rounded-lg border border-accent/40 bg-dark-100 px-3 py-2 text-xs font-medium text-accent"
-                    >
-                      <Link2 className="h-3.5 w-3.5" />
-                      Použiť URL
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="bg-dark rounded-lg shadow-sm border border-white/[0.08] p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">Kontaktné údaje</h2>
-              {!editing ? (
-                <button
-                  onClick={() => setEditing(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-light transition-colors"
-                >
-                  <Edit className="w-4 h-4" />
-                  Upraviť
-                </button>
-              ) : (
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setEditing(false)
-                      setProfileData(user)
-                      setAvatarUrlDraft('')
-                    }}
-                    className="px-4 py-2 border border-white/10 text-gray-300 rounded-lg hover:bg-dark-200/[0.04] transition-colors"
-                  >
-                    Zrušiť
-                  </button>
-                  <button
-                    onClick={handleSaveProfile}
-                    disabled={saving}
-                    className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-light transition-colors disabled:opacity-50"
-                  >
-                    <Save className="w-4 h-4" />
-                    {saving ? 'Ukladám...' : 'Uložiť'}
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  <Mail className="w-4 h-4 inline mr-2" />
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={profileData.email || ''}
-                  disabled
-                  className="w-full px-4 py-2 border border-white/10 rounded-lg bg-dark-50 text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  <Phone className="w-4 h-4 inline mr-2" />
-                  Telefónne číslo *
-                </label>
-                <input
-                  type="tel"
-                  value={profileData.phone || ''}
-                  onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
-                  disabled={!editing}
-                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Meno *
-                </label>
-                <input
-                  type="text"
-                  value={profileData.firstName || ''}
-                  onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
-                  disabled={!editing}
-                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Priezvisko *
-                </label>
-                <input
-                  type="text"
-                  value={profileData.lastName || ''}
-                  onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
-                  disabled={!editing}
-                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Pohlavie
-                </label>
-                <select
-                  value={profileData.gender || ''}
-                  onChange={(e) => setProfileData({ ...profileData, gender: e.target.value || undefined })}
-                  disabled={!editing}
-                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
-                >
-                  <option value="">-- Vybrať --</option>
-                  <option value="MALE">Muž</option>
-                  <option value="FEMALE">Žena</option>
-                  <option value="OTHER">Iné</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Typ účtu
-                </label>
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="isCompany"
-                      checked={profileData.isCompany === false}
-                      onChange={() => setProfileData({ ...profileData, isCompany: false })}
-                      disabled={!editing}
-                      className="rounded border-white/10"
-                    />
-                    <span className="text-gray-300">Fyzická osoba</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="isCompany"
-                      checked={profileData.isCompany === true}
-                      onChange={() => setProfileData({ ...profileData, isCompany: true })}
-                      disabled={!editing}
-                      className="rounded border-white/10"
-                    />
-                    <span className="text-gray-300">Firma</span>
-                  </label>
-                </div>
-              </div>
-
-              {profileData.isCompany && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      <Building2 className="w-4 h-4 inline mr-2" />
-                      Názov firmy *
-                    </label>
-                    <input
-                      type="text"
-                      value={profileData.companyName || ''}
-                      onChange={(e) => setProfileData({ ...profileData, companyName: e.target.value })}
-                      disabled={!editing}
-                      className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      <Briefcase className="w-4 h-4 inline mr-2" />
-                      IČO *
-                    </label>
-                    <input
-                      type="text"
-                      value={profileData.companyId || ''}
-                      onChange={(e) => setProfileData({ ...profileData, companyId: e.target.value })}
-                      disabled={!editing}
-                      className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
-                    />
-                  </div>
-                </>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  <MapPin className="w-4 h-4 inline mr-2" />
-                  Adresa
-                </label>
-                <input
-                  type="text"
-                  value={profileData.address || ''}
-                  onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
-                  disabled={!editing}
-                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Mesto
-                </label>
-                <input
-                  type="text"
-                  value={profileData.city || ''}
-                  onChange={(e) => setProfileData({ ...profileData, city: e.target.value })}
-                  disabled={!editing}
-                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  PSČ
-                </label>
-                <input
-                  type="text"
-                  value={profileData.postalCode || ''}
-                  onChange={(e) => setProfileData({ ...profileData, postalCode: e.target.value })}
-                  disabled={!editing}
-                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Krajina
-                </label>
-                <select
-                  value={profileData.country || 'Slovensko'}
-                  onChange={(e) => setProfileData({ ...profileData, country: e.target.value })}
-                  disabled={!editing}
-                  className="w-full px-4 py-2 bg-dark-100 border border-white/10 rounded-lg text-white disabled:bg-dark-50 disabled:text-gray-500"
-                >
-                  <option value="Slovensko">Slovensko</option>
-                  <option value="Česko">Česko</option>
-                  <option value="Poľsko">Poľsko</option>
-                  <option value="Maďarsko">Maďarsko</option>
-                  <option value="Rakúsko">Rakúsko</option>
-                  <option value="Nemecko">Nemecko</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Change Password Section */}
-            <div className="mt-8 pt-8 border-t border-white/[0.08]">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <Lock className="w-5 h-5" />
-                  Zmena hesla
-                </h3>
-                {!changingPassword && (
-                  <button
-                    onClick={() => setChangingPassword(true)}
-                    className="text-accent hover:text-accent font-medium"
-                  >
-                    Zmeniť heslo
-                  </button>
                 )}
+                <input ref={avatarFileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0]; e.target.value = ''
+                    if (!f) return
+                    try {
+                      const dataUrl = await fileToResizedAvatarDataUrl(f)
+                      setSaving(true); setError('')
+                      const updated = await api.updateMyProfile({ ...profileData, avatarUrl: dataUrl })
+                      setUser(updated); setProfileData(updated); setAuthUser(updated)
+                      setSuccess('Profilovka bola uložená.'); setTimeout(() => setSuccess(''), 3000)
+                    } catch (err: unknown) { setError(err instanceof Error ? err.message : 'Chyba pri obrázku') }
+                    finally { setSaving(false) }
+                  }}
+                />
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => avatarFileRef.current?.click()}
+                    className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-dark-100 px-2.5 py-1 text-xs text-white hover:bg-popupHover">
+                    <ImageIcon className="h-3 w-3" /> Nahrať
+                  </button>
+                  {profileData.avatarUrl && (
+                    <button type="button" onClick={async () => {
+                      try {
+                        setSaving(true); setError('')
+                        const updated = await api.updateMyProfile({ ...profileData, avatarUrl: null })
+                        setUser(updated); setProfileData(updated); setAuthUser(updated)
+                        setSuccess('Profilovka bola odstránená.'); setTimeout(() => setSuccess(''), 3000)
+                      } catch (err: unknown) { setError(err instanceof Error ? err.message : 'Chyba') }
+                      finally { setSaving(false) }
+                    }} className="inline-flex items-center gap-1 rounded-lg border border-red-500/30 px-2.5 py-1 text-xs text-red-300 hover:bg-red-950/40">
+                      <Trash2 className="h-3 w-3" /> Odstrániť
+                    </button>
+                  )}
+                </div>
               </div>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-xl font-bold text-white">{profileData.firstName} {profileData.lastName}</h2>
+                <p className="mt-0.5 text-sm text-gray-400">{profileData.email}</p>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-dark-100 px-3 py-1.5 text-xs text-gray-300">
+                    <Crown className="h-3.5 w-3.5 text-accent" />
+                    {sellerPlanLabel(profileData?.sellerPlan)}
+                  </span>
+                  {profileData?.sellerPlanValidUntil && (
+                    <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-dark-100 px-3 py-1.5 text-xs text-gray-300">
+                      <Calendar className="h-3.5 w-3.5 text-accent" />
+                      Platné do {new Date(profileData.sellerPlanValidUntil).toLocaleDateString('sk-SK')}
+                    </span>
+                  )}
+                  {profileData?.createdAt && (
+                    <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-dark-100 px-3 py-1.5 text-xs text-gray-300">
+                      <Calendar className="h-3.5 w-3.5 text-accent" />
+                      Člen od {new Date(profileData.createdAt).toLocaleDateString('sk-SK')}
+                    </span>
+                  )}
+                  <Link href="/premium" className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-dark hover:bg-accent-light">
+                    Prémiové balíky
+                  </Link>
+                </div>
+              </div>
+            </div>
 
-              {changingPassword && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Dvojstĺpcový grid */}
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Osobné údaje */}
+              <section className="card p-6 space-y-5">
+                <h2 className="flex items-center gap-2 text-base font-semibold text-white">
+                  <User className="h-5 w-5 text-accent" /> Osobné údaje
+                </h2>
+                <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Pôvodné heslo
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword.old ? 'text' : 'password'}
-                        value={passwordData.oldPassword}
-                        onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
-                        className="w-full px-4 py-2 pr-10 border border-white/10 rounded-lg text-white"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword({ ...showPassword, old: !showPassword.old })}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                      >
-                        {showPassword.old ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
+                    <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500">Meno</label>
+                    <input value={profileData.firstName || ''} onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
+                      className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none" />
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Nové heslo
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword.new ? 'text' : 'password'}
-                        value={passwordData.newPassword}
-                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                        className="w-full px-4 py-2 pr-10 border border-white/10 rounded-lg text-white"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword({ ...showPassword, new: !showPassword.new })}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                      >
-                        {showPassword.new ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Potvrďte nové heslo
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword.confirm ? 'text' : 'password'}
-                        value={passwordData.confirmPassword}
-                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                        className="w-full px-4 py-2 pr-10 border border-white/10 rounded-lg text-white"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword({ ...showPassword, confirm: !showPassword.confirm })}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                      >
-                        {showPassword.confirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-3 flex gap-2">
-                    <button
-                      onClick={() => {
-                        setChangingPassword(false)
-                        setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' })
-                      }}
-                      className="px-4 py-2 border border-white/10 text-gray-300 rounded-lg hover:bg-dark-200/[0.04]"
-                    >
-                      Zrušiť
-                    </button>
-                    <button
-                      onClick={handleChangePassword}
-                      disabled={saving}
-                      className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-light disabled:opacity-50"
-                    >
-                      {saving ? 'Ukladám...' : 'Zmeniť heslo'}
-                    </button>
+                    <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500">Priezvisko</label>
+                    <input value={profileData.lastName || ''} onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
+                      className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none" />
                   </div>
                 </div>
-              )}
+                <div>
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500">E-mail</label>
+                  <div className="relative">
+                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-600" />
+                    <input value={profileData.email || ''} readOnly className="w-full rounded-lg border border-white/5 bg-dark-100/50 px-3 py-2 pl-8 text-sm text-gray-400 cursor-default" />
+                  </div>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500">Telefón</label>
+                    <div className="relative">
+                      <Phone className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-600" />
+                      <input value={profileData.phone || ''} onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })} placeholder="+421…"
+                        className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 pl-8 text-sm text-white focus:border-accent/40 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500">Pohlavie</label>
+                    <select value={profileData.gender || ''} onChange={(e) => setProfileData({ ...profileData, gender: e.target.value || undefined })}
+                      className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none">
+                      <option value="">— Neurčené —</option>
+                      <option value="MALE">Muž</option>
+                      <option value="FEMALE">Žena</option>
+                      <option value="OTHER">Iné</option>
+                    </select>
+                  </div>
+                </div>
+              </section>
+
+              {/* Adresa + Firma */}
+              <div className="space-y-6">
+                <section className="card p-6 space-y-5">
+                  <h2 className="flex items-center gap-2 text-base font-semibold text-white">
+                    <MapPin className="h-5 w-5 text-accent" /> Adresa
+                  </h2>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500">Ulica a č. domu</label>
+                    <input value={profileData.address || ''} onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
+                      className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none" />
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div className="sm:col-span-1">
+                      <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500">PSČ</label>
+                      <input value={profileData.postalCode || ''} onChange={(e) => setProfileData({ ...profileData, postalCode: e.target.value })} placeholder="010 01"
+                        className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none" />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500">Mesto</label>
+                      <input value={profileData.city || ''} onChange={(e) => setProfileData({ ...profileData, city: e.target.value })}
+                        className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500">Krajina</label>
+                    <input value={profileData.country || ''} onChange={(e) => setProfileData({ ...profileData, country: e.target.value })} placeholder="Slovensko"
+                      className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none" />
+                  </div>
+                </section>
+
+                <section className="card p-6 space-y-5">
+                  <div className="flex items-center justify-between">
+                    <h2 className="flex items-center gap-2 text-base font-semibold text-white">
+                      <Building2 className="h-5 w-5 text-accent" /> Firemné údaje
+                    </h2>
+                    <label className="flex cursor-pointer items-center gap-2 text-xs text-gray-400">
+                      <input type="checkbox" checked={!!profileData.isCompany} onChange={(e) => setProfileData({ ...profileData, isCompany: e.target.checked })}
+                        className="h-4 w-4 rounded border-white/10 bg-dark-100 text-accent focus:ring-accent" />
+                      Som firma / SZČO
+                    </label>
+                  </div>
+                  {profileData.isCompany && (
+                    <>
+                      <div>
+                        <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500">Názov firmy</label>
+                        <input value={profileData.companyName || ''} onChange={(e) => setProfileData({ ...profileData, companyName: e.target.value })}
+                          className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none" />
+                      </div>
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div>
+                          <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500">IČO</label>
+                          <input value={profileData.companyId || ''} onChange={(e) => setProfileData({ ...profileData, companyId: e.target.value })}
+                            className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500">DIČ</label>
+                          <input value={profileData.companyTaxId || ''} onChange={(e) => setProfileData({ ...profileData, companyTaxId: e.target.value })}
+                            className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white focus:border-accent/40 focus:outline-none" />
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </section>
+              </div>
             </div>
+
+            {/* Uložiť */}
+            <div className="flex items-center gap-4">
+              <button type="button" disabled={saving} onClick={handleSaveProfile}
+                className="inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-dark hover:bg-accent-light disabled:opacity-50">
+                <Save className="h-4 w-4" /> {saving ? 'Ukladám…' : 'Uložiť profil'}
+              </button>
+              <p className="text-xs text-gray-500">Zmeny sa prejavia v celom profile aj pri inzerátoch.</p>
+            </div>
+
+            {/* Zmena hesla */}
+            <section className="card p-6 space-y-4">
+              <h2 className="flex items-center gap-2 text-base font-semibold text-white">
+                <Lock className="h-5 w-5 text-accent" /> Zmena hesla
+              </h2>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <input type="password" value={passwordData.oldPassword} onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
+                  placeholder="Súčasné heslo" className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-accent/40 focus:outline-none [color-scheme:dark]" />
+                <input type="password" value={passwordData.newPassword} onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                  placeholder="Nové heslo (min. 8 znakov)" className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-accent/40 focus:outline-none [color-scheme:dark]" />
+                <input type="password" value={passwordData.confirmPassword} onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                  placeholder="Potvrdenie nového hesla" className="w-full rounded-lg border border-white/10 bg-dark-100 px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-accent/40 focus:outline-none [color-scheme:dark]" />
+              </div>
+              <button type="button" disabled={saving} onClick={handleChangePassword}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-dark-100 px-4 py-2 text-sm font-medium text-white hover:bg-dark-200 disabled:opacity-50">
+                {saving ? 'Mením…' : 'Zmeniť heslo'}
+              </button>
+            </section>
           </div>
-          </>
         )}
 
         {/* Advertisements Tab */}
