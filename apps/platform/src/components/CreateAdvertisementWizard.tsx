@@ -440,15 +440,11 @@ export default function CreateAdvertisementWizard({
 
   const shellClass = isAdmin
     ? 'rounded-xl border border-card bg-card p-6 shadow-xl shadow-black/30 shadow-black/20 sm:p-8'
-    : variant === 'page'
-      ? 'rounded-3xl border border-accent/20 bg-dark-200/90 p-6 shadow-lg shadow-black/20 backdrop-blur-sm sm:p-8'
-      : 'card p-6 sm:p-8'
+    : 'card p-6 shadow-lg shadow-black/15 sm:p-8'
 
   const categoryPanelClass = isAdmin
     ? 'rounded-xl border border-dark bg-dark p-6 sm:p-8'
-    : variant === 'page'
-      ? 'rounded-3xl border border-accent/20 bg-dark-50 p-6 sm:p-8'
-      : 'rounded-2xl border border-white/[0.06] bg-dark-100 p-6'
+    : 'rounded-2xl border border-white/[0.06] bg-dark-100 p-6 sm:p-8'
 
   return (
     <div className={shellClass}>
@@ -463,9 +459,9 @@ export default function CreateAdvertisementWizard({
                 : 'Nový inzerát'
               : editingId
                 ? 'Upraviť inzerát'
-                : 'Vytvoriť inzerát'}
+                : 'Pridať inzerát'}
           </h2>
-          <p className={`mt-1 text-sm leading-relaxed ${isAdmin ? 'text-gray-500' : 'text-gray-500'}`}>
+          <p className={`mt-1 text-sm leading-relaxed ${isAdmin ? 'text-gray-500' : 'text-muted'}`}>
             {isAdmin
               ? 'Rovnaký postup ako na webe: kategória → špecifikácie → údaje. Špecifikácie vychádzajú z vášho nastavenia v sekcii Špecifikácie.'
               : 'Vyberte kategóriu podľa toho, čo ponúkate – špecifikácie sa načítajú z nastavení administrátora.'}

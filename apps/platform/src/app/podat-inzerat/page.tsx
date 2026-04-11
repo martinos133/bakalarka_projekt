@@ -45,23 +45,23 @@ function PodatInzeratContent() {
   if (loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-gray-500">Načítavam kategórie…</p>
+        <p className="text-muted">Načítavam kategórie…</p>
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
-      <nav className="mb-6 text-sm text-gray-500">
-        <Link href="/" className="hover:text-accent-light">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <nav className="mb-6 text-sm text-muted" aria-label="Drobečková navigácia">
+        <Link href="/" className="transition-colors hover:text-accent-light">
           Domov
         </Link>
-        <span className="mx-2">/</span>
-        <span className="text-white">Podať inzerát</span>
+        <span className="mx-2 text-white/25">/</span>
+        <span className="font-medium text-white">Pridať inzerát</span>
       </nav>
       <CreateAdvertisementWizard
         categories={categories}
-        variant="page"
+        variant="embed"
         initialCategorySlug={kategoriaSlug}
         onComplete={() => {
           router.push('/dashboard?tab=advertisements')
@@ -74,11 +74,11 @@ function PodatInzeratContent() {
 export default function PodatInzeratPage() {
   return (
     <CmsGate cmsSlug="podat-inzerat" shell="headerFooterOnly">
-    <div className="min-h-screen bg-gradient-to-b from-[#fff5ed] via-[#fffaf6] to-white">
+    <div className="min-h-screen bg-dark-50">
       <Header />
       <Suspense
         fallback={
-          <div className="flex min-h-[50vh] items-center justify-center text-gray-500">Načítavam…</div>
+          <div className="flex min-h-[50vh] items-center justify-center text-muted">Načítavam…</div>
         }
       >
         <PodatInzeratContent />

@@ -377,7 +377,7 @@ export default function DashboardPage() {
                   : 'border-transparent text-gray-500 hover:text-white hover:border-white/15'
               }`}
             >
-              Vytvoriť inzerát
+              Pridať inzerát
             </button>
             <button
               onClick={() => setActiveTab('messages')}
@@ -638,7 +638,7 @@ export default function DashboardPage() {
                     }}
                     className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-light"
                   >
-                    Vytvoriť prvý inzerát
+                    Pridať prvý inzerát
                   </button>
                 </div>
               ) : (

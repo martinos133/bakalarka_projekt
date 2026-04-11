@@ -611,7 +611,7 @@ export default function AdvertisementAdForm({
       ) : (
         <>
           <Plus className="w-5 h-5" />
-          {saving ? 'Vytváram...' : 'Vytvoriť inzerát'}
+          {saving ? 'Pridávam...' : 'Pridať inzerát'}
         </>
       )}
     </button>

@@ -40,7 +40,7 @@ const STEPS = [
       'Inzerát môžete vytvoriť až po prihlásení. Najprv vyberiete kategóriu z ponuky, vyplníte špecifikácie a potom názov, popis, cenu a fotky. Lokalita pomôže zákazníkom nájsť vás na mape.',
     icon: FileEdit,
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
-    cta: 'Vytvoriť inzerát',
+    cta: 'Pridať inzerát',
     href: '/podat-inzerat',
     authRequired: true,
   },

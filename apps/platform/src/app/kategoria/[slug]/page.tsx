@@ -245,7 +245,7 @@ export default function CategoryPage() {
                 href={`/podat-inzerat?kategoria=${encodeURIComponent(slug)}`}
                 className="inline-block bg-accent hover:bg-accent-dark text-white px-6 py-2 rounded-lg transition-colors"
               >
-                Vytvoriť inzerát
+                Pridať inzerát
               </Link>
             </div>
           ) : (
