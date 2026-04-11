@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
-import { FolderOpen, FileText } from 'lucide-react'
+import SearchSuggestionsPanel from '@/components/SearchSuggestionsPanel'
 
 interface PopularCategory {
   id: string
@@ -55,11 +55,11 @@ export default function Hero() {
       return
     }
     const timer = setTimeout(async () => {
+      setShowSuggestions(true)
+      setSuggestionsLoading(true)
       try {
-        setSuggestionsLoading(true)
         const data = await api.getSearchSuggestions(searchQuery.trim())
         setSuggestions(data)
-        setShowSuggestions(true)
       } catch {
         setSuggestions({ categories: [], advertisements: [] })
       } finally {
@@ -78,8 +78,6 @@ export default function Hero() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
-
-  const hasSuggestions = suggestions.categories.length > 0 || suggestions.advertisements.length > 0
 
   return (
     <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
@@ -107,96 +105,50 @@ export default function Hero() {
           </h1>
 
           {/* Search Bar */}
-          <div ref={searchRef} className="relative mb-6">
-            <form onSubmit={handleSearch} className="flex gap-0">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => searchQuery.trim().length >= 3 && hasSuggestions && setShowSuggestions(true)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape') setShowSuggestions(false)
-                }}
-                placeholder="Hľadať akúkoľvek službu..."
-                className="flex-1 px-6 py-4 text-lg rounded-l-xl rounded-r-none border border-white/10 border-r-0 bg-dark-50/80 backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-accent text-white placeholder-white/40"
-              />
-              <button
-                type="submit"
-                className="px-8 py-4 bg-accent text-dark font-semibold rounded-r-xl hover:bg-accent-light transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
-                aria-label="Search"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+          <div ref={searchRef} className="relative z-[60] mb-6">
+            <div className="overflow-hidden rounded-xl border border-white/[0.1] bg-card/95 shadow-xl shadow-black/30 backdrop-blur-md transition-[border-color,box-shadow] focus-within:border-accent/45 focus-within:ring-1 focus-within:ring-accent/20">
+              <form onSubmit={handleSearch} className="flex w-full min-w-0">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => searchQuery.trim().length >= 3 && setShowSuggestions(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') setShowSuggestions(false)
+                  }}
+                  placeholder="Hľadať akúkoľvek službu..."
+                  className="min-w-0 flex-1 border-0 bg-transparent px-5 py-4 text-base text-white placeholder:text-white/35 focus:outline-none focus:ring-0 md:text-lg"
+                />
+                <button
+                  type="submit"
+                  className="shrink-0 border-l border-white/[0.08] bg-accent px-7 py-4 font-semibold text-dark transition-colors hover:bg-accent-light focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+                  aria-label="Hľadať"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </button>
+              </form>
+              {showSuggestions && searchQuery.trim().length >= 3 && (
+                <div className="border-t border-white/[0.06] bg-popup">
+                  <SearchSuggestionsPanel
+                    loading={suggestionsLoading}
+                    suggestions={suggestions}
+                    onPick={() => setShowSuggestions(false)}
                   />
-                </svg>
-              </button>
-            </form>
-
-            {/* Dropdown s návrhmi (ako v navbare) */}
-            {showSuggestions && searchQuery.trim().length >= 3 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-dark border border-white/[0.08] rounded-md shadow-xl shadow-black/30 z-50 overflow-hidden">
-                {suggestionsLoading ? (
-                  <div className="px-4 py-6 text-center text-gray-500 text-sm">Načítavam...</div>
-                ) : hasSuggestions ? (
-                  <div className="py-2 max-h-80 overflow-y-auto">
-                    {suggestions.categories.length > 0 && (
-                      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                        Kategórie
-                      </div>
-                    )}
-                    {suggestions.categories.map((cat) => (
-                      <Link
-                        key={cat.id}
-                        href={`/kategoria/${cat.slug}`}
-                        onClick={() => setShowSuggestions(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-dark-200/[0.04] transition-colors"
-                      >
-                        <FolderOpen className="w-4 h-4 text-accent flex-shrink-0" />
-                        <span className="text-sm font-medium text-white">{cat.name}</span>
-                        <span className="ml-auto text-xs text-gray-500 bg-dark-100 px-2 py-0.5 rounded">Kategória</span>
-                      </Link>
-                    ))}
-                    {suggestions.advertisements.length > 0 && (
-                      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1 border-t border-white/[0.06]">
-                        Inzeráty
-                      </div>
-                    )}
-                    {suggestions.advertisements.map((ad) => (
-                      <Link
-                        key={ad.id}
-                        href={`/inzerat/${ad.id}`}
-                        onClick={() => setShowSuggestions(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-dark-200/[0.04] transition-colors"
-                      >
-                        {ad.images?.[0] ? (
-                          <img src={ad.images[0]} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
-                        ) : (
-                          <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <span className="text-sm font-medium text-white block truncate">{ad.title}</span>
-                          {ad.price != null && (
-                            <span className="text-xs text-accent font-semibold">{ad.price} €</span>
-                          )}
-                        </div>
-                        <span className="text-xs text-gray-500 bg-dark-100 px-2 py-0.5 rounded flex-shrink-0">Inzerát</span>
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="px-4 py-4 text-sm text-gray-500">Žiadne návrhy</div>
-                )}
-              </div>
-            )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Popular Categories */}

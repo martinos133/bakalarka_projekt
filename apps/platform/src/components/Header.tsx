@@ -5,7 +5,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAuthenticated, getAuthUser, setAuthUser, logout } from '@/lib/auth'
 import { api } from '@/lib/api'
-import { User, LogOut, ChevronDown, FolderOpen, FileText, PlusCircle } from 'lucide-react'
+import { User, LogOut, ChevronDown, PlusCircle } from 'lucide-react'
+import SearchSuggestionsPanel from '@/components/SearchSuggestionsPanel'
 
 interface NavbarItem {
   id: string
@@ -89,11 +90,11 @@ export default function Header() {
       return
     }
     const timer = setTimeout(async () => {
+      setShowSuggestions(true)
+      setSuggestionsLoading(true)
       try {
-        setSuggestionsLoading(true)
         const data = await api.getSearchSuggestions(searchQuery.trim())
         setSuggestions(data)
-        setShowSuggestions(true)
       } catch {
         setSuggestions({ categories: [], advertisements: [] })
       } finally {
@@ -114,7 +115,6 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const hasSuggestions = suggestions.categories.length > 0 || suggestions.advertisements.length > 0
   const navbarItemsWithoutMap = navbarItems.filter((item) => item.href !== '/mapa')
 
   return (
@@ -149,27 +149,27 @@ export default function Header() {
           </div>
 
           {/* Center - Search Bar */}
-          <div ref={searchRef} className="hidden md:flex flex-1 max-w-2xl mx-4 relative">
-            <form onSubmit={handleSearch} className="flex w-full">
-              <div className="flex w-full border border-white/10 rounded-md overflow-hidden focus-within:border-accent focus-within:ring-1 focus-within:ring-accent">
+          <div ref={searchRef} className="relative z-[60] mx-4 hidden max-w-2xl flex-1 md:flex">
+            <div className="w-full overflow-hidden rounded-lg border border-white/[0.1] bg-card shadow-lg shadow-black/25 transition-[border-color,box-shadow] focus-within:border-accent/45 focus-within:ring-1 focus-within:ring-accent/20">
+              <form onSubmit={handleSearch} className="flex w-full min-w-0">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => searchQuery.trim().length >= 3 && hasSuggestions && setShowSuggestions(true)}
+                  onFocus={() => searchQuery.trim().length >= 3 && setShowSuggestions(true)}
                   onKeyDown={(e) => {
                     if (e.key === 'Escape') setShowSuggestions(false)
                   }}
                   placeholder="Akú službu hľadáte dnes?"
-                  className="flex-1 px-4 py-2 text-sm focus:outline-none text-white placeholder-white/40 bg-transparent"
+                  className="min-w-0 flex-1 border-0 bg-transparent px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:outline-none focus:ring-0"
                 />
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-accent text-dark hover:bg-accent-light transition-colors"
-                  aria-label="Search"
+                  className="shrink-0 border-l border-white/[0.08] bg-accent px-5 py-2 text-dark transition-colors hover:bg-accent-light focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+                  aria-label="Hľadať"
                 >
                   <svg
-                    className="w-5 h-5"
+                    className="h-5 w-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -182,65 +182,17 @@ export default function Header() {
                     />
                   </svg>
                 </button>
-              </div>
-            </form>
-
-            {/* Dropdown s návrhmi */}
-            {showSuggestions && searchQuery.trim().length >= 3 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-dark border border-white/[0.08] rounded-md shadow-lg shadow-black/20 z-50 overflow-hidden">
-                {suggestionsLoading ? (
-                  <div className="px-4 py-6 text-center text-gray-500 text-sm">Načítavam...</div>
-                ) : hasSuggestions ? (
-                  <div className="py-2 max-h-80 overflow-y-auto">
-                    {suggestions.categories.length > 0 && (
-                      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                        Kategórie
-                      </div>
-                    )}
-                    {suggestions.categories.map((cat) => (
-                      <Link
-                        key={cat.id}
-                        href={`/kategoria/${cat.slug}`}
-                        onClick={() => setShowSuggestions(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-dark-200/[0.04] transition-colors"
-                      >
-                        <FolderOpen className="w-4 h-4 text-accent flex-shrink-0" />
-                        <span className="text-sm font-medium text-white">{cat.name}</span>
-                        <span className="ml-auto text-xs text-gray-500 bg-dark-100 px-2 py-0.5 rounded">Kategória</span>
-                      </Link>
-                    ))}
-                    {suggestions.advertisements.length > 0 && (
-                      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1 border-t border-white/[0.06]">
-                        Inzeráty
-                      </div>
-                    )}
-                    {suggestions.advertisements.map((ad) => (
-                      <Link
-                        key={ad.id}
-                        href={`/inzerat/${ad.id}`}
-                        onClick={() => setShowSuggestions(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-dark-200/[0.04] transition-colors"
-                      >
-                        {ad.images?.[0] ? (
-                          <img src={ad.images[0]} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
-                        ) : (
-                          <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <span className="text-sm font-medium text-white block truncate">{ad.title}</span>
-                          {ad.price != null && (
-                            <span className="text-xs text-accent font-semibold">{ad.price} €</span>
-                          )}
-                        </div>
-                        <span className="text-xs text-gray-500 bg-dark-100 px-2 py-0.5 rounded flex-shrink-0">Inzerát</span>
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="px-4 py-4 text-sm text-gray-500">Žiadne návrhy</div>
-                )}
-              </div>
-            )}
+              </form>
+              {showSuggestions && searchQuery.trim().length >= 3 && (
+                <div className="border-t border-white/[0.06] bg-popup">
+                  <SearchSuggestionsPanel
+                    loading={suggestionsLoading}
+                    suggestions={suggestions}
+                    onPick={() => setShowSuggestions(false)}
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right side - Navigation */}
