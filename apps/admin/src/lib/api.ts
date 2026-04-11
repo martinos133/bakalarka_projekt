@@ -338,7 +338,11 @@ export const api = {
   getAuditStats: () => fetchWithAuth('/audit/stats'),
   getAuditLog: (id: string) => fetchWithAuth(`/audit/${id}`),
 
-  getSeoOverview: () => fetchWithAuth('/seo/overview'),
+  getSeoOverview: (params?: Record<string, string>) => {
+    const q = new URLSearchParams(params || {})
+    const s = q.toString()
+    return fetchWithAuth(s ? `/seo/overview?${s}` : '/seo/overview')
+  },
 }
 
 export default api

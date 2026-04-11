@@ -1,10 +1,11 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '@inzertna-platforma/shared';
 import { SeoService } from './seo.service';
+import { parseSeoOverviewFilters } from './seo-filters.util';
 
 @ApiTags('seo')
 @Controller('seo')
@@ -15,7 +16,7 @@ export class SeoController {
   constructor(private readonly seoService: SeoService) {}
 
   @Get('overview')
-  overview() {
-    return this.seoService.getOverview();
+  overview(@Query() query: Record<string, string | string[] | undefined>) {
+    return this.seoService.getOverview(parseSeoOverviewFilters(query));
   }
 }
