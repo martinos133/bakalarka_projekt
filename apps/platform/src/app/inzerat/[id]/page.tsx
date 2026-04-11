@@ -444,9 +444,18 @@ export default function AdvertisementDetailPage({
             {/* Seller Info */}
             {advertisement.user && (
               <div className="flex items-center gap-4 mb-6 pb-6 border-b border-white/[0.08]">
-                <div className="w-16 h-16 rounded-full bg-dark-300 flex items-center justify-center text-gray-500 font-semibold text-xl">
-                  {sellerName.charAt(0).toUpperCase()}
-                </div>
+                {(advertisement.user as { avatarUrl?: string | null }).avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={(advertisement.user as { avatarUrl: string }).avatarUrl}
+                    alt=""
+                    className="h-16 w-16 rounded-full border border-white/10 object-cover"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-dark-300 flex items-center justify-center text-gray-500 font-semibold text-xl">
+                    {sellerName.charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-semibold text-white">{sellerName}</h3>
@@ -486,7 +495,7 @@ export default function AdvertisementDetailPage({
 
             {/* Description */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-white mb-4">
+              <h2 className="text-2xl font-bold text-accent mb-4">
                 O tejto službe
               </h2>
               <div className="prose max-w-none">
@@ -510,7 +519,7 @@ export default function AdvertisementDetailPage({
                 if (rows.length === 0) return null
                 return (
                   <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-white mb-4">Špecifikácie</h2>
+                    <h2 className="text-2xl font-bold text-accent mb-4">Špecifikácie</h2>
                     <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 rounded-xl border border-white/[0.08] bg-dark-50/50 p-4 sm:p-6">
                       {rows.map(({ f, text }) => (
                         <div key={f.id} className="border-b border-white/[0.06] pb-3 last:border-0 sm:border-0 sm:pb-0">
@@ -529,7 +538,7 @@ export default function AdvertisementDetailPage({
                 {/* Features */}
                 {advertisement.features && advertisement.features.length > 0 && (
                   <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-white mb-4">
+                    <h2 className="text-2xl font-bold text-accent mb-4">
                       Čo je zahrnuté
                     </h2>
                     <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -548,7 +557,7 @@ export default function AdvertisementDetailPage({
                 {/* Packages */}
                 {advertisement.pricingType === 'PACKAGE' && advertisement.packages && advertisement.packages.length > 0 && (
                   <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-white mb-4">
+                    <h2 className="text-2xl font-bold text-accent mb-4">
                       Balíčky služieb
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -586,7 +595,7 @@ export default function AdvertisementDetailPage({
                 {/* FAQ */}
                 {advertisement.faq && advertisement.faq.length > 0 && (
                   <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-white mb-6">
+                    <h2 className="text-2xl font-bold text-accent mb-6">
                       Často kladené otázky
                     </h2>
                     <div className="space-y-3">
@@ -1309,7 +1318,7 @@ function ReviewsSection({ advertisementId, ownerId }: { advertisementId: string;
     <div className="border-t border-white/[0.08] pt-8">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-bold text-white">Recenzie</h2>
+          <h2 className="text-2xl font-bold text-accent">Recenzie</h2>
           {stats.count > 0 && (
             <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10">
               <Star className="w-4 h-4 text-accent fill-accent" />
