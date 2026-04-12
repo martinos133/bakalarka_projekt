@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useParams } from 'next/navigation'
 import { api } from '@/lib/api'
 import { useCmsOverride } from '@/lib/useCmsOverride'
@@ -11,6 +11,11 @@ import Header from '@/components/Header'
 import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
 import { CmsArticleView, CmsLoadingView } from '@/components/CmsGate'
+import SpecificationFilters, {
+  matchesFilters,
+  type FilterValues,
+} from '@/components/SpecificationFilters'
+import type { Filter } from '@inzertna-platforma/shared'
 
 export default function CategoryPage() {
   const params = useParams()
@@ -26,6 +31,8 @@ export default function CategoryPage() {
   const [loading, setLoading] = useState(true)
   const [adsLoading, setAdsLoading] = useState(false)
   const [ratings, setRatings] = useState<Record<string, { count: number; average: number }>>({})
+  const [specFilters, setSpecFilters] = useState<Filter[]>([])
+  const [filterValues, setFilterValues] = useState<FilterValues>({})
 
   useEffect(() => {
     if (slug) {
@@ -90,10 +97,52 @@ export default function CategoryPage() {
     }
   }, [activeSlug, loadAdvertisements])
 
+  useEffect(() => {
+    const catId = activeCategory?.id
+    if (!catId) {
+      setSpecFilters([])
+      return
+    }
+    let cancelled = false
+
+    const categoryIds = [catId, ...subcategories.map((s: any) => s.id)]
+    Promise.all(categoryIds.map((id: string) => api.getActiveFilters(id).catch(() => [])))
+      .then((results) => {
+        if (cancelled) return
+        const seen = new Set<string>()
+        const merged: Filter[] = []
+        for (const rows of results) {
+          for (const f of Array.isArray(rows) ? rows : []) {
+            if (!seen.has(f.slug)) {
+              seen.add(f.slug)
+              merged.push(f)
+            }
+          }
+        }
+        merged.sort((a: Filter, b: Filter) => (a.order ?? 0) - (b.order ?? 0))
+        setSpecFilters(merged)
+      })
+      .catch(() => {
+        if (!cancelled) setSpecFilters([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [activeCategory?.id, subcategories])
+
+  const filteredAdvertisements = useMemo(
+    () =>
+      advertisements.filter((ad: any) =>
+        matchesFilters(ad, specFilters, filterValues),
+      ),
+    [advertisements, specFilters, filterValues],
+  )
+
   const switchSubcategory = (sub: any) => {
     if (sub.slug === activeSlug) return
     setActiveSlug(sub.slug)
     setActiveCategory(sub)
+    setFilterValues({})
     window.history.pushState(null, '', `/kategoria/${sub.slug}`)
   }
 
@@ -101,6 +150,7 @@ export default function CategoryPage() {
     if (!rootCategory || rootCategory.slug === activeSlug) return
     setActiveSlug(rootCategory.slug)
     setActiveCategory(rootCategory)
+    setFilterValues({})
     window.history.pushState(null, '', `/kategoria/${rootCategory.slug}`)
   }
 
@@ -242,55 +292,64 @@ export default function CategoryPage() {
           </nav>
 
           <div className="flex flex-col gap-8 lg:flex-row">
-            {/* Sidebar – podkategórie ako filter */}
-            {subcategories.length > 0 && (
-              <aside className="shrink-0 lg:w-60 xl:w-64">
-                <div className="card sticky top-6 p-4 shadow-md shadow-black/10">
-                  <h2 className="mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
-                    Podkategórie
-                  </h2>
-                  {/* Odkaz "Všetky" na hlavnú kategóriu */}
-                  <button
-                    type="button"
-                    onClick={switchToRoot}
-                    className={`mb-1 flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                      isOnRoot
-                        ? 'bg-accent/10 font-medium text-accent'
-                        : 'text-muted hover:bg-white/[0.06] hover:text-white'
-                    }`}
-                  >
-                    <span>Všetky</span>
-                  </button>
-                  <ul className="space-y-0.5">
-                    {subcategories.map((subcategory) => {
-                      const isActive = subcategory.slug === activeSlug
-                      return (
-                        <li key={subcategory.id}>
-                          <button
-                            type="button"
-                            onClick={() => switchSubcategory(subcategory)}
-                            className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                              isActive
-                                ? 'bg-accent/10 font-medium text-accent'
-                                : 'text-muted hover:bg-white/[0.06] hover:text-white'
-                            }`}
-                          >
-                            <span>{subcategory.name}</span>
-                            {subcategory._count?.advertisements > 0 && (
-                              <span
-                                className={`ml-2 text-xs tabular-nums ${isActive ? 'text-accent/60' : 'text-white/30'}`}
-                              >
-                                {subcategory._count.advertisements}
-                              </span>
-                            )}
-                          </button>
-                        </li>
-                      )
-                    })}
-                  </ul>
-                </div>
-              </aside>
-            )}
+            {/* Sidebar – podkategórie + filtre */}
+            <aside className="shrink-0 lg:w-60 xl:w-64">
+              <div className="card sticky top-6 shadow-md shadow-black/10">
+                {subcategories.length > 0 && (
+                  <div className="p-4">
+                    <h2 className="mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
+                      Podkategórie
+                    </h2>
+                    <button
+                      type="button"
+                      onClick={switchToRoot}
+                      className={`mb-1 flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                        isOnRoot
+                          ? 'bg-accent/10 font-medium text-accent'
+                          : 'text-muted hover:bg-white/[0.06] hover:text-white'
+                      }`}
+                    >
+                      <span>Všetky</span>
+                    </button>
+                    <ul className="space-y-0.5">
+                      {subcategories.map((subcategory) => {
+                        const isActive = subcategory.slug === activeSlug
+                        return (
+                          <li key={subcategory.id}>
+                            <button
+                              type="button"
+                              onClick={() => switchSubcategory(subcategory)}
+                              className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                                isActive
+                                  ? 'bg-accent/10 font-medium text-accent'
+                                  : 'text-muted hover:bg-white/[0.06] hover:text-white'
+                              }`}
+                            >
+                              <span>{subcategory.name}</span>
+                              {subcategory._count?.advertisements > 0 && (
+                                <span
+                                  className={`ml-2 text-xs tabular-nums ${isActive ? 'text-accent/60' : 'text-white/30'}`}
+                                >
+                                  {subcategory._count.advertisements}
+                                </span>
+                              )}
+                            </button>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  </div>
+                )}
+
+                <SpecificationFilters
+                  filters={specFilters}
+                  values={filterValues}
+                  onChange={setFilterValues}
+                  advertisements={advertisements}
+                  embedded
+                />
+              </div>
+            </aside>
 
             {/* Inzeráty */}
             <div className="min-w-0 flex-1">
@@ -298,14 +357,14 @@ export default function CategoryPage() {
                 <h2 className="font-serif text-2xl text-accent sm:text-3xl">
                   Inzeráty
                   <span className="ml-2 font-sans text-lg font-semibold tabular-nums text-white/90">
-                    ({advertisements.length})
+                    ({filteredAdvertisements.length})
                   </span>
                 </h2>
               </div>
 
               {adsLoading ? (
                 <div className="py-12 text-center text-muted">Načítavam inzeráty…</div>
-              ) : advertisements.length === 0 ? (
+              ) : filteredAdvertisements.length === 0 ? (
                 <div className="card card-hover p-10 text-center shadow-lg shadow-black/15 md:p-12">
                   <p className="mb-6 text-muted">
                     V tejto kategórii zatiaľ nie sú žiadne inzeráty.
@@ -319,7 +378,7 @@ export default function CategoryPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6 lg:grid-cols-2 xl:grid-cols-3">
-                  {advertisements.map((ad) => (
+                  {filteredAdvertisements.map((ad: any) => (
                     <TrackedLink
                       key={ad.id}
                       href={`/inzerat/${ad.id}`}
