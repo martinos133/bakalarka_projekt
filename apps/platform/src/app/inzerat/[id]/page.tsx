@@ -15,6 +15,7 @@ import SpecificationFilters, {
   matchesFilters,
   type FilterValues,
 } from '@/components/SpecificationFilters'
+import TrackedLink from '@/components/TrackedLink'
 import { api } from '@/lib/api'
 import { useCmsOverride } from '@/lib/useCmsOverride'
 import { isAuthenticated, getAuthUser } from '@/lib/auth'
@@ -132,7 +133,8 @@ export default function AdvertisementDetailPage({
   const [continueSuccess, setContinueSuccess] = useState(false)
   const [categorySpecFilters, setCategorySpecFilters] = useState<Filter[]>([])
   const [filterValues, setFilterValues] = useState<FilterValues>({})
-  const [categoryAdsForFilters, setCategoryAdsForFilters] = useState<Advertisement[]>([])
+  const [categoryAdsForFilters, setCategoryAdsForFilters] = useState<any[]>([])
+  const [rootCategoryAds, setRootCategoryAds] = useState<any[]>([])
   const [sellerRating, setSellerRating] = useState<{ count: number; average: number }>({ count: 0, average: 0 })
   const [subcategoryNav, setSubcategoryNav] = useState<{
     root: { id: string; name: string; slug: string } | null
@@ -243,6 +245,37 @@ export default function AdvertisementDetailPage({
       cancelled = true
     }
   }, [advertisement?.category?.slug])
+
+  useEffect(() => {
+    const rootSlug = subcategoryNav.root?.slug
+    const catSlug = advertisement?.category?.slug
+    if (!rootSlug || rootSlug === catSlug) {
+      setRootCategoryAds([])
+      return
+    }
+    let cancelled = false
+    api
+      .getAdvertisementsByCategory(rootSlug)
+      .then((data) => {
+        if (!cancelled) setRootCategoryAds(Array.isArray(data) ? data : [])
+      })
+      .catch(() => {
+        if (!cancelled) setRootCategoryAds([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [subcategoryNav.root?.slug, advertisement?.category?.slug])
+
+  const recommendedAds = useMemo(() => {
+    const currentId = id
+    const sameCategory = categoryAdsForFilters.filter((ad: any) => ad.id !== currentId)
+    if (sameCategory.length >= 6) return sameCategory.slice(0, 6)
+    const seen = new Set(sameCategory.map((a: any) => a.id))
+    seen.add(currentId)
+    const fromRoot = rootCategoryAds.filter((ad: any) => !seen.has(ad.id))
+    return [...sameCategory, ...fromRoot].slice(0, 6)
+  }, [id, categoryAdsForFilters, rootCategoryAds])
 
   const loadAdvertisement = async () => {
     try {
@@ -1379,6 +1412,70 @@ export default function AdvertisementDetailPage({
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Odporúčané inzeráty */}
+      {recommendedAds.length > 0 && (
+        <div className="border-t border-white/[0.06] bg-surface">
+          <div className="mx-auto w-full max-w-[1920px] px-4 py-10 sm:px-6 lg:px-8">
+            <h2 className="mb-6 font-serif text-2xl text-accent sm:text-3xl">
+              Podobné inzeráty
+            </h2>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+              {recommendedAds.map((ad: any) => (
+                <TrackedLink
+                  key={ad.id}
+                  href={`/inzerat/${ad.id}`}
+                  targetType="AD"
+                  targetId={ad.id}
+                  className="group block"
+                >
+                  <article className="card card-hover flex h-full flex-col overflow-hidden shadow-lg shadow-black/15 transition-all duration-200">
+                    {ad.images && ad.images.length > 0 && (
+                      <div className="relative h-44 w-full shrink-0 overflow-hidden border-b border-white/[0.06] bg-dark-100">
+                        <img
+                          src={ad.images[0]}
+                          alt={ad.title}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                        />
+                        <div className="absolute left-2 top-2 flex flex-wrap gap-1.5">
+                          {ad.priorityBoosted && (
+                            <span className="rounded-md bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-dark shadow">
+                              Priorita
+                            </span>
+                          )}
+                          {isProSellerBadge(ad.user?.sellerPlan, ad.user?.sellerPlanValidUntil) && (
+                            <span className="rounded-md bg-dark-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow">
+                              Pro predajca
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex flex-1 flex-col p-4">
+                      <h3 className="mb-2 line-clamp-2 font-serif text-base font-semibold leading-snug text-white transition-colors group-hover:text-accent-light">
+                        {ad.title}
+                      </h3>
+                      {ad.description && (
+                        <p className="mb-3 line-clamp-2 text-sm text-muted">{ad.description}</p>
+                      )}
+                      <div className="mt-auto flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3">
+                        {ad.price != null && (
+                          <span className="text-lg font-bold tabular-nums text-accent">
+                            {ad.price.toLocaleString('sk-SK')} €
+                          </span>
+                        )}
+                        {ad.location && (
+                          <span className="truncate text-sm text-muted">{ad.location}</span>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                </TrackedLink>
+              ))}
+            </div>
           </div>
         </div>
       )}
