@@ -1,0 +1,119 @@
+{
+  "version": "1.0",
+  "language": "sk",
+  "description": "Zoznam zakázaných slov pre automatickú moderáciu inzerátov na prenájom a služby",
+  "categories": {
+    "nadavky": {
+      "label": "Nadávky a vulgárne výrazy",
+      "action": "reject",
+      "words": [
+        "kurva", "kurvy", "kurvin", "kurvisko",
+        "piča", "pičus", "picka", "pička",
+        "jebat", "jebem", "jebú", "jebať",
+        "sračka", "srať", "sranda", "sráč",
+        "hovno", "hovnivý", "drd",
+        "kokot", "kokotina", "kokoti",
+        "idiot", "idioti", "idiotka",
+        "debil", "debilný", "debili",
+        "blbec", "blbci", "blbá",
+        "hajzel", "hajzli",
+        "svinja", "sviňa", "sviňský",
+        "bastard", "bastardi",
+        "zmrd", "zmrdi",
+        "chuj", "chuja",
+        "riť", "riti",
+        "prdeľ", "prdel", "prdím"
+      ]
+    },
+    "rasizmus": {
+      "label": "Rasistické a diskriminačné výrazy",
+      "action": "reject",
+      "words": [
+        "cigán", "cigáni", "cigánsky",
+        "cigánska banda",
+        "negr", "neger", "negerský",
+        "žid", "židi", "židovský", "židi von",
+        "áryjský", "árijec",
+        "nacista", "nacisti", "nacizmus",
+        "heil", "heil hitler",
+        "kkk", "ku klux klan",
+        "bieli supremacisti",
+        "rasa von", "cudzinci von",
+        "slovensko slovákom",
+        "Rómovia von", "Romy preč",
+        "islamista", "islamofóbia",
+        "terorizmus", "terorist",
+        "ISIS", "IS bojovník",
+        "čierny opica", "opica",
+        "slniecko"
+      ]
+    },
+    "kradnutie_podvody": {
+      "label": "Krádež, podvody a nelegálne aktivity",
+      "action": "reject",
+      "words": [
+        "ukradnutý", "ukradnuté", "ukradnúť",
+        "krádež", "kradnutý", "kradnuté",
+        "nelegálny", "nelegálne", "nezákonný",
+        "podvod", "podvádzam", "podvádzať",
+        "falošný doklad", "falošný pas", "falošné ID",
+        "falzifikát", "falzifikovať",
+        "peniaze na praní", "pranie peňazí",
+        "drogy", "extáza", "heroín", "kokaín", "pervitin",
+        "marihuana predaj", "tráva predaj",
+        "zbrane predaj", "zbraň",
+        "pistol predaj", "nelegálna zbraň",
+        "hacking", "hackovanie",
+        "phishing",
+        "výkupné",
+        "vydieranie",
+        "prostitúcia", "eskort"
+      ]
+    },
+    "predaj_veci": {
+      "label": "Predaj vecí (platforma je len prenájom a služby)",
+      "action": "reject",
+      "words": [
+        "predám", "predávam", "predaj",
+        "na predaj", "predávame",
+        "kúpim", "kúpa", "kupujem",
+        "výpredaj", "zľava na kúpu",
+        "bazár", "second hand",
+        "nový tovar", "tovar na predaj",
+        "lacno predám",
+        "predám auto", "predám byt", "predám dom",
+        "predám mobil", "predám nábytok",
+        "predám elektroniku",
+        "ponuka na kúpu"
+      ]
+    },
+    "spam_podozrive": {
+      "label": "Spam a podozrivé výrazy",
+      "action": "flag",
+      "words": [
+        "zarob rýchlo",
+        "rýchly zárobok",
+        "práca z domu tisíce",
+        "pasívny príjem zaručený",
+        "klikni sem",
+        "registruj sa teraz",
+        "zadarmo telefón",
+        "vyhral si",
+        "lotéria",
+        "pyramída",
+        "mlm schéma",
+        "network marketing nábor",
+        "100% záruka zisku",
+        "investuj a zarob",
+        "kryptomena zarob"
+      ]
+    }
+  },
+  "rules": {
+    "auto_approve": "Ak inzerát neobsahuje žiadne zakázané slová, automaticky sa schváli",
+    "auto_reject": "Ak inzerát obsahuje slová z kategórií: nadavky, rasizmus, kradnutie_podvody, predaj_veci → automaticky sa zamietne",
+    "flag_for_review": "Ak inzerát obsahuje slová z kategórie: spam_podozrive → ide na manuálnu kontrolu",
+    "case_insensitive": true,
+    "check_partial_match": true
+  }
+}

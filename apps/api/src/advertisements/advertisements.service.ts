@@ -5,6 +5,7 @@ import { MessagesService } from '../messages/messages.service';
 import { UsersService } from '../users/users.service';
 import { validateCategorySpecifications } from './specifications.validation';
 import { getCoordsFromLocationString, haversineKm } from '../lib/sk-location-coords';
+import { moderateContent } from '../lib/content-moderation';
 
 @Injectable()
 export class AdvertisementsService {
@@ -42,6 +43,11 @@ export class AdvertisementsService {
         : (specsRaw as Record<string, unknown>),
     );
 
+    const moderation = moderateContent(
+      createRest.title || '',
+      createRest.description || '',
+    );
+
     const created = await prisma.advertisement.create({
       data: {
         ...createRest,
@@ -52,8 +58,20 @@ export class AdvertisementsService {
         packages: createRest.packages ? JSON.parse(JSON.stringify(createRest.packages)) : null,
         faq: createRest.faq ? JSON.parse(JSON.stringify(createRest.faq)) : null,
         specifications,
+        ...(moderation.autoApprove ? { status: 'ACTIVE' as any } : {}),
       } as any,
     });
+
+    if (moderation.autoApprove) {
+      await this.messagesService.createSystemMessage(
+        userId,
+        'AD_APPROVED' as any,
+        'Váš inzerát bol automaticky schválený',
+        `Váš inzerát "${created.title}" bol automaticky schválený a je teraz aktívny na platforme.`,
+        { advertisementId: created.id },
+      ).catch(() => undefined);
+    }
+
     await this.usersService.syncPriorityBoostsForUser(userId).catch(() => undefined);
     return created;
   }
