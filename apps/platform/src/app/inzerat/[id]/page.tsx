@@ -8,6 +8,9 @@ import Footer from '@/components/Footer'
 import { CmsArticleView, CmsLoadingView } from '@/components/CmsGate'
 import ImageCarousel from '@/components/ImageCarousel'
 import DatePicker from '@/components/DatePicker'
+import CategorySubcategorySidebar, {
+  type SubcategoryItem,
+} from '@/components/CategorySubcategorySidebar'
 import { api } from '@/lib/api'
 import { useCmsOverride } from '@/lib/useCmsOverride'
 import { isAuthenticated, getAuthUser } from '@/lib/auth'
@@ -65,6 +68,7 @@ interface Advertisement {
   category?: {
     id?: string
     name: string
+    slug?: string
   }
   location?: string
   priorityBoosted?: boolean
@@ -124,6 +128,10 @@ export default function AdvertisementDetailPage({
   const [continueSuccess, setContinueSuccess] = useState(false)
   const [categorySpecFilters, setCategorySpecFilters] = useState<Filter[]>([])
   const [sellerRating, setSellerRating] = useState<{ count: number; average: number }>({ count: 0, average: 0 })
+  const [subcategoryNav, setSubcategoryNav] = useState<{
+    root: { id: string; name: string; slug: string } | null
+    subs: SubcategoryItem[]
+  }>({ root: null, subs: [] })
 
   useEffect(() => {
     loadAdvertisement()
@@ -148,6 +156,41 @@ export default function AdvertisementDetailPage({
       cancelled = true
     }
   }, [advertisement?.categoryId, advertisement?.category?.id])
+
+  useEffect(() => {
+    const slug = advertisement?.category?.slug
+    if (!slug) {
+      setSubcategoryNav({ root: null, subs: [] })
+      return
+    }
+    let cancelled = false
+    api
+      .getCategoryBySlug(slug)
+      .then((data: any) => {
+        if (cancelled) return
+        if (data.parent) {
+          setSubcategoryNav({
+            root: {
+              id: data.parent.id,
+              name: data.parent.name,
+              slug: data.parent.slug,
+            },
+            subs: data.parent.children ?? [],
+          })
+        } else {
+          setSubcategoryNav({
+            root: { id: data.id, name: data.name, slug: data.slug },
+            subs: data.children?.filter((child: { status?: string }) => child.status === 'ACTIVE') ?? [],
+          })
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setSubcategoryNav({ root: null, subs: [] })
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [advertisement?.category?.slug])
 
   const loadAdvertisement = async () => {
     try {
@@ -295,7 +338,7 @@ export default function AdvertisementDetailPage({
     const isService = advertisement?.type === 'SERVICE'
     setContinueSubject(
       isService
-        ? `Žiadosť o konzultáciu: ${advertisement?.title || ''}`
+        ? `Žiadosť o objednávku: ${advertisement?.title || ''}`
         : `Žiadosť o rezerváciu: ${advertisement?.title || ''}`
     )
     setContinueContent('')
@@ -406,7 +449,7 @@ export default function AdvertisementDetailPage({
     <div className="min-h-screen bg-dark">
       <Header />
       <CategoryNav />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto w-full max-w-[1920px] px-4 py-8 sm:px-6 lg:px-8 xl:px-10 2xl:px-12">
         {/* Breadcrumb */}
         <nav className="mb-6">
           <ol className="flex items-center gap-2 text-sm text-gray-500">
@@ -418,7 +461,14 @@ export default function AdvertisementDetailPage({
             <li>/</li>
             {advertisement.category && (
               <li>
-                <Link href="/" className="hover:text-accent-light">
+                <Link
+                  href={
+                    advertisement.category.slug
+                      ? `/kategoria/${advertisement.category.slug}`
+                      : '/'
+                  }
+                  className="hover:text-accent-light"
+                >
                   {advertisement.category.name}
                 </Link>
               </li>
@@ -428,7 +478,22 @@ export default function AdvertisementDetailPage({
           </ol>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div
+          className={
+            subcategoryNav.root && subcategoryNav.subs.length > 0 && advertisement.category?.slug
+              ? 'grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:items-start lg:gap-10 xl:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] xl:gap-12 2xl:grid-cols-[minmax(0,19rem)_minmax(0,1fr)]'
+              : 'grid grid-cols-1 gap-8'
+          }
+        >
+          {subcategoryNav.root && subcategoryNav.subs.length > 0 && advertisement.category?.slug ? (
+            <CategorySubcategorySidebar
+              rootCategory={subcategoryNav.root}
+              subcategories={subcategoryNav.subs}
+              activeSlug={advertisement.category.slug}
+            />
+          ) : null}
+
+          <div className="grid min-w-0 grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Title */}
@@ -791,6 +856,7 @@ export default function AdvertisementDetailPage({
               )}
             </div>
           </div>
+          </div>
         </div>
       </div>
 
@@ -982,11 +1048,11 @@ export default function AdvertisementDetailPage({
 
       {/* Continue Modal — admin štýl + priehľadný overlay */}
       {showContinueModal && advertisement && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 pt-[5vh]">
           <button
             type="button"
             aria-label="Zavrieť"
-            className="absolute inset-0 bg-black/45 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/45 backdrop-blur-sm"
             onClick={() => {
               setShowContinueModal(false)
               setContinueSuccess(false)
@@ -998,7 +1064,7 @@ export default function AdvertisementDetailPage({
             role="dialog"
             aria-modal="true"
             aria-labelledby="continue-modal-title"
-            className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/[0.08] bg-card shadow-2xl"
+            className="relative mb-10 w-full max-w-lg rounded-2xl border border-white/[0.08] bg-card shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="border-b border-white/[0.06] px-6 py-4">
@@ -1007,7 +1073,7 @@ export default function AdvertisementDetailPage({
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 ring-1 ring-accent/20">
                     <Calendar className="h-5 w-5 text-accent" />
                   </span>
-                  {advertisement.type === 'SERVICE' ? 'Dohodnúť konzultáciu' : 'Rezervovať inzerát'}
+                  {advertisement.type === 'SERVICE' ? 'Dohodnúť objednávku' : 'Rezervovať inzerát'}
                 </h2>
                 <button
                   type="button"
@@ -1033,7 +1099,7 @@ export default function AdvertisementDetailPage({
                   <h3 className="mb-2 text-lg font-semibold text-white">Žiadosť odoslaná</h3>
                   <p className="text-sm text-gray-400">
                     {advertisement.type === 'SERVICE'
-                      ? 'Predajca vám čoskoro odpíše s návrhom termínu konzultácie. Sledujte sekciu Správy.'
+                      ? 'Predajca vám čoskoro odpíše k vašej objednávke. Sledujte sekciu Správy.'
                       : 'Predajca vám čoskoro odpíše k rezervácii. Sledujte sekciu Správy.'}
                   </p>
                 </div>
@@ -1041,7 +1107,7 @@ export default function AdvertisementDetailPage({
                 <div className="space-y-4">
                   <p className="text-sm text-gray-400">
                     {advertisement.type === 'SERVICE'
-                      ? 'Vyberte dátum a popíšte, čo potrebujete. Predajca vám odpíše cez Správy.'
+                      ? 'Vyberte dátum začiatku a stručne popíšte objednávku (rozsah, podmienky). Predajca vám odpíše cez Správy a dohodnete detaily.'
                       : 'Vyberte termín rezervácie a doplňte správu. Predajca dostane všetky potrebné informácie.'}
                   </p>
 
@@ -1074,7 +1140,7 @@ export default function AdvertisementDetailPage({
                       className="w-full resize-none rounded-xl border border-white/[0.12] bg-white/[0.08] px-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/25"
                       placeholder={
                         advertisement.type === 'SERVICE'
-                          ? 'Čo potrebujete vyriešiť, preferovaný čas, kontakt...'
+                          ? 'Čo objednávate, rozsah, preferovaný čas, kontakt...'
                           : 'Doplňujúce informácie, spôsob prevzatia, otázky...'
                       }
                     />

@@ -260,3 +260,83 @@ option:hover {
     transform: translateY(0);
   }
 }
+
+/* react-day-picker v9 – dark / accent-gold overrides */
+.rdp-dark {
+  --rdp-accent-color: #c9a96e;
+  --rdp-accent-background-color: #c9a96e;
+  --rdp-day-height: 2.5rem;
+  --rdp-day-width: 2.5rem;
+  --rdp-range_middle-background-color: rgba(201, 169, 110, 0.15);
+  --rdp-range_middle-color: #fff;
+  --rdp-selected-border: none;
+  --rdp-selected-color: #1a1a1a;
+  --rdp-today-color: #c9a96e;
+  --rdp-outside-opacity: 0.3;
+  --rdp-disabled-opacity: 0.25;
+}
+.rdp-dark .rdp-chevron {
+  fill: #c9a96e;
+}
+.rdp-dark .rdp-caption_label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+}
+.rdp-dark .rdp-button_previous,
+.rdp-dark .rdp-button_next {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0.5rem;
+  color: #c9a96e;
+  transition: background 0.15s;
+}
+.rdp-dark .rdp-button_previous:hover,
+.rdp-dark .rdp-button_next:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.rdp-dark .rdp-weekday {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+.rdp-dark .rdp-day_button {
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 0.5rem;
+  transition: background 0.15s, color 0.15s;
+}
+.rdp-dark .rdp-day_button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.rdp-dark .rdp-today .rdp-day_button {
+  color: #c9a96e;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(201, 169, 110, 0.4);
+}
+.rdp-dark .rdp-selected .rdp-day_button {
+  background: #c9a96e;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+.rdp-dark .rdp-selected .rdp-day_button:hover {
+  background: #d4b97e;
+}
+.rdp-dark .rdp-outside .rdp-day_button {
+  color: rgba(255, 255, 255, 0.2);
+}
+.rdp-dark .rdp-disabled .rdp-day_button {
+  color: rgba(255, 255, 255, 0.15);
+  cursor: not-allowed;
+}
+.rdp-dark .rdp-range_start .rdp-day_button,
+.rdp-dark .rdp-range_end .rdp-day_button {
+  background: #c9a96e;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+.rdp-dark .rdp-range_middle .rdp-day_button {
+  background: rgba(201, 169, 110, 0.15);
+  color: #fff;
+  border-radius: 0;
+}
