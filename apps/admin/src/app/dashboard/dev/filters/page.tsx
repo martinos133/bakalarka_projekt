@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
 import DashboardLayout from '@/components/DashboardLayout'
@@ -49,7 +49,7 @@ type BatchRow = {
   optionsInput: string
 }
 
-export default function DevFiltersPage() {
+function DevFiltersPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -383,7 +383,7 @@ export default function DevFiltersPage() {
       />
           <div className="flex items-start justify-between mb-6 gap-4">
             <div>
-              <h1 className="text-2xl font-bold">Špecifikácie inzerátov</h1>
+              <h1 className="text-2xl font-bold">Špecifikácia inzerátov</h1>
               <p className="mt-1 text-sm text-gray-400 max-w-2xl">
                 Vyberte kategóriu a pridajte polia (text, číslo, výber, dátum, rozsah…). Tieto údaje potom vyplnia predajcovia pri
                 podaní inzerátu v tejto kategórii.
@@ -419,6 +419,10 @@ export default function DevFiltersPage() {
                 }}
                 options={[
                   { value: '', label: '-- Vyberte kategóriu --' },
+                  ...categoriesForFilterSelect.map((c) => ({
+                    value: c.id,
+                    label: c.label,
+                  })),
                 ]}
                 />
               {!!selectedCategoryId && (
@@ -598,6 +602,10 @@ export default function DevFiltersPage() {
                       }
                       options={[
                         { value: '', label: 'Vyberte kategóriu' },
+                        ...categoriesForFilterSelect.map((c) => ({
+                          value: c.id,
+                          label: c.label,
+                        })),
                       ]}
                       />
                     <p className="mt-1.5 text-xs text-gray-500">
@@ -913,6 +921,20 @@ export default function DevFiltersPage() {
             )}
           </div>
         </DashboardLayout>
+  )
+}
+
+export default function DevFiltersPage() {
+  return (
+    <Suspense
+      fallback={
+        <DashboardLayout>
+          <div className="p-8 text-center text-gray-500">Načítavam…</div>
+        </DashboardLayout>
+      }
+    >
+      <DevFiltersPageInner />
+    </Suspense>
   )
 }
 

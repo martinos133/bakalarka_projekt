@@ -68,6 +68,7 @@ interface Advertisement {
   }
   location?: string
   priorityBoosted?: boolean
+  userId?: string
   user?: {
     id: string
     firstName?: string
@@ -76,6 +77,7 @@ interface Advertisement {
     phone?: string
     sellerPlan?: string
     sellerPlanValidUntil?: string | null
+    avatarUrl?: string | null
   }
   createdAt: string
   type?: 'SERVICE' | 'RENTAL'
@@ -444,10 +446,10 @@ export default function AdvertisementDetailPage({
             {/* Seller Info */}
             {advertisement.user && (
               <div className="flex items-center gap-4 mb-6 pb-6 border-b border-white/[0.08]">
-                {(advertisement.user as { avatarUrl?: string | null }).avatarUrl ? (
+                {advertisement.user.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={(advertisement.user as { avatarUrl: string }).avatarUrl}
+                    src={advertisement.user.avatarUrl}
                     alt=""
                     className="h-16 w-16 rounded-full border border-white/10 object-cover"
                   />
@@ -519,7 +521,7 @@ export default function AdvertisementDetailPage({
                 if (rows.length === 0) return null
                 return (
                   <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-accent mb-4">Špecifikácie</h2>
+                    <h2 className="text-2xl font-bold text-accent mb-4">Špecifikácia</h2>
                     <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 rounded-xl border border-white/[0.08] bg-dark-50/50 p-4 sm:p-6">
                       {rows.map(({ f, text }) => (
                         <div key={f.id} className="border-b border-white/[0.06] pb-3 last:border-0 sm:border-0 sm:pb-0">
@@ -649,7 +651,10 @@ export default function AdvertisementDetailPage({
             )}
 
             {/* Reviews Section */}
-            <ReviewsSection advertisementId={advertisement.id} ownerId={advertisement.userId} />
+            <ReviewsSection
+              advertisementId={advertisement.id}
+              ownerId={advertisement.userId ?? advertisement.user?.id ?? ''}
+            />
           </div>
 
           {/* Sidebar */}
@@ -739,10 +744,10 @@ export default function AdvertisementDetailPage({
               {advertisement.user && (
                 <div className="card overflow-hidden p-6 shadow-2xl shadow-black/20">
                   <div className="mb-4 flex items-center gap-4">
-                    {advertisement.user && (advertisement.user as { avatarUrl?: string | null }).avatarUrl ? (
+                    {advertisement.user?.avatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={(advertisement.user as { avatarUrl: string }).avatarUrl}
+                        src={advertisement.user.avatarUrl}
                         alt=""
                         className="h-16 w-16 rounded-full border border-white/[0.1] object-cover ring-1 ring-accent/15"
                       />

@@ -155,12 +155,12 @@ function formToQuery(f: FilterForm): Record<string, string> {
   const q: Record<string, string> = {}
   const sec = ALL_SECTIONS.filter((s) => f.sections.has(s))
   if (sec.length) q.sections = sec.join(',')
-  q.adStatuses = [...f.adStatuses].join(',')
+  q.adStatuses = Array.from(f.adStatuses).join(',')
   q.blogScope = f.blogScope
   q.staticScope = f.staticScope
   if (f.adsCategoryId) q.adsCategoryId = f.adsCategoryId
   if (f.adsPriorityOnly) q.adsPriorityOnly = 'true'
-  if (f.categoryIds.size) q.categoryIds = [...f.categoryIds].join(',')
+  if (f.categoryIds.size) q.categoryIds = Array.from(f.categoryIds).join(',')
   if (f.dateFrom) q.dateFrom = f.dateFrom
   if (f.dateTo) q.dateTo = f.dateTo
   q.dateField = f.dateField
@@ -178,7 +178,7 @@ function countActiveFilters(f: FilterForm): number {
   const d = defaultFilterForm()
   let n = 0
   if (f.sections.size !== d.sections.size) n++
-  if (f.adStatuses.size !== d.adStatuses.size || ![...f.adStatuses].every((x) => d.adStatuses.has(x))) n++
+  if (f.adStatuses.size !== d.adStatuses.size || !Array.from(f.adStatuses).every((x) => d.adStatuses.has(x))) n++
   if (f.blogScope !== d.blogScope) n++
   if (f.staticScope !== d.staticScope) n++
   if (f.adsCategoryId) n++

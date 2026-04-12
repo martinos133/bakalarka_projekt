@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
@@ -17,7 +17,7 @@ function safeRedirect(path: string | null): string {
   return '/'
 }
 
-export default function SignInPage() {
+function SignInPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = safeRedirect(searchParams.get('redirect'))
@@ -139,5 +139,21 @@ export default function SignInPage() {
       <Footer />
     </div>
     </CmsGate>
+  )
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-dark">
+          <Header />
+          <div className="flex min-h-[50vh] items-center justify-center text-gray-500">Načítavam…</div>
+          <Footer />
+        </div>
+      }
+    >
+      <SignInPageInner />
+    </Suspense>
   )
 }

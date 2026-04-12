@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
-import { prisma } from '@inzertna-platforma/database';
+import { prisma, Prisma } from '@inzertna-platforma/database';
 import { CreateCategoryDto, UpdateCategoryDto } from '@inzertna-platforma/shared';
+
+type CategoryDelegate = (typeof prisma)['category'];
 
 @Injectable()
 export class CategoriesService {
@@ -13,36 +15,31 @@ export class CategoriesService {
       .replace(/(^-|-$)/g, '');
   }
 
-  async create(createDto: CreateCategoryDto) {
-    const slugFromName = CategoriesService.slugify(createDto.name);
-    const finalSlug =
-      createDto.slug && createDto.slug.trim() !== ''
-        ? CategoriesService.slugify(createDto.slug.trim())
-        : slugFromName;
-
-    const existing = await prisma.category.findFirst({
-      where: {
-        OR: [{ name: createDto.name }, { slug: finalSlug }],
-      },
-    });
-
-    if (existing) {
-      if (existing.name === createDto.name) {
-        throw new ConflictException(
-          'Kategória s týmto názvom už existuje. Názvy kategórií musia byť v systéme jedinečné.',
-        );
-      }
-      throw new ConflictException(
-        `URL identifikátor (slug) „${finalSlug}“ už používa iná kategória. Zmeňte slug alebo názov.`,
-      );
+  /** Slug je globálne jedinečný; pri kolízii pridá `-2`, `-3`, … */
+  private async ensureUniqueSlug(
+    db: { category: CategoryDelegate },
+    base: string,
+    excludeCategoryId?: string,
+  ): Promise<string> {
+    let slug = base;
+    let n = 0;
+    for (;;) {
+      const existing = await db.category.findFirst({
+        where: {
+          slug,
+          ...(excludeCategoryId ? { id: { not: excludeCategoryId } } : {}),
+        },
+      });
+      if (!existing) return slug;
+      n += 1;
+      slug = `${base}-${n}`;
     }
+  }
 
-    // Ak je parentId prázdny string, nastav ho na null
-    const parentId = createDto.parentId && createDto.parentId.trim() !== '' 
-      ? createDto.parentId 
-      : null;
+  async create(createDto: CreateCategoryDto) {
+    const parentId =
+      createDto.parentId && createDto.parentId.trim() !== '' ? createDto.parentId.trim() : null;
 
-    // Skontroluj, či parentId existuje (ak nie je null)
     if (parentId) {
       const parentExists = await prisma.category.findUnique({
         where: { id: parentId },
@@ -52,14 +49,75 @@ export class CategoriesService {
       }
     }
 
-    return prisma.category.create({
-      data: {
-        ...createDto,
-        slug: finalSlug,
-        parentId,
-        status: createDto.status || 'ACTIVE',
-      },
+    const nameDup = await prisma.category.findFirst({
+      where: parentId
+        ? { parentId, name: createDto.name }
+        : { parentId: null, name: createDto.name },
     });
+    if (nameDup) {
+      throw new ConflictException(
+        parentId
+          ? 'Podkategória s týmto názvom už v tejto kategórii existuje.'
+          : 'Hlavná kategória s týmto názvom už existuje.',
+      );
+    }
+
+    const baseSlug =
+      createDto.slug && createDto.slug.trim() !== ''
+        ? CategoriesService.slugify(createDto.slug.trim())
+        : CategoriesService.slugify(createDto.name);
+
+    let finalSlug: string;
+    if (parentId) {
+      const parent = await prisma.category.findUnique({ where: { id: parentId } });
+      if (!parent) throw new NotFoundException('Nadradená kategória nebola nájdená');
+      finalSlug = await this.ensureUniqueSlug(prisma, `${parent.slug}-${baseSlug}`);
+    } else {
+      finalSlug = await this.ensureUniqueSlug(prisma, baseSlug);
+    }
+
+    try {
+      return await prisma.$transaction(async (tx) => {
+        const created = await tx.category.create({
+          data: {
+            ...createDto,
+            slug: finalSlug,
+            parentId,
+            status: createDto.status || 'ACTIVE',
+          },
+        });
+
+        if (!parentId) {
+          const hasOstatne = await tx.category.findFirst({
+            where: { parentId: created.id, name: 'Ostatné' },
+          });
+          if (!hasOstatne) {
+            const oSlug = await this.ensureUniqueSlug(tx, `${created.slug}-ostatne`);
+            await tx.category.create({
+              data: {
+                name: 'Ostatné',
+                slug: oSlug,
+                parentId: created.id,
+                status: 'ACTIVE',
+                order: 9999,
+              },
+            });
+          }
+        }
+
+        return created;
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+        const targets = ((e.meta as { target?: string[] })?.target ?? []).map(String);
+        if (targets.some((t) => t.includes('name'))) {
+          throw new ConflictException(
+            'Databáza má ešte starú schému (globálne jedinečný názov kategórie). V priečinku packages/database spustite: npm run db:push — alebo prisma migrate deploy — potom reštartujte API.',
+          );
+        }
+      }
+      throw e;
+    }
   }
 
   async findAll() {
@@ -224,37 +282,52 @@ export class CategoriesService {
       throw new NotFoundException('Kategória nebola nájdená');
     }
 
-    // Ak sa mení názov, vytvor nový slug
-    let slug = category.slug;
-    if (updateDto.name && updateDto.name !== category.name) {
-      slug = updateDto.name
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
+    const nameChanged =
+      updateDto.name !== undefined && updateDto.name !== category.name;
 
-      // Skontroluj, či už existuje kategória s týmto slugom
-      const existing = await prisma.category.findFirst({
-        where: {
-          slug,
-          id: { not: id },
-        },
+    if (nameChanged && updateDto.name) {
+      const pid = category.parentId;
+      const dup = await prisma.category.findFirst({
+        where: pid
+          ? { parentId: pid, name: updateDto.name, id: { not: id } }
+          : { parentId: null, name: updateDto.name, id: { not: id } },
       });
-
-      if (existing) {
+      if (dup) {
         throw new ConflictException(
-          'Rovnaký URL identifikátor (slug) by už používala iná kategória. Zvoľte iný názov alebo upravte slug.',
+          pid
+            ? 'Podkategória s týmto názvom už v tejto kategórii existuje.'
+            : 'Hlavná kategória s týmto názvom už existuje.',
         );
       }
     }
 
-    // Ak je parentId prázdny string, nastav ho na null
+    let slug = category.slug;
+    const slugFromBody =
+      updateDto.slug !== undefined && String(updateDto.slug).trim() !== ''
+        ? CategoriesService.slugify(String(updateDto.slug).trim())
+        : null;
+
+    if (slugFromBody !== null) {
+      slug = await this.ensureUniqueSlug(prisma, slugFromBody, id);
+    } else if (nameChanged && updateDto.name) {
+      const base = CategoriesService.slugify(updateDto.name);
+      if (category.parentId) {
+        const parent = await prisma.category.findUnique({
+          where: { id: category.parentId },
+        });
+        if (!parent) {
+          throw new NotFoundException('Nadradená kategória nebola nájdená');
+        }
+        slug = await this.ensureUniqueSlug(prisma, `${parent.slug}-${base}`, id);
+      } else {
+        slug = await this.ensureUniqueSlug(prisma, base, id);
+      }
+    }
+
     let parentId = updateDto.parentId;
     if (parentId !== undefined) {
       parentId = parentId && parentId.trim() !== '' ? parentId : null;
-      
-      // Skontroluj, či parentId existuje (ak nie je null) a nie je to tá istá kategória
+
       if (parentId) {
         if (parentId === id) {
           throw new ConflictException('Kategória nemôže byť sama sebe nadradená');
@@ -268,14 +341,26 @@ export class CategoriesService {
       }
     }
 
-    return prisma.category.update({
-      where: { id },
-      data: {
-        ...updateDto,
-        ...(slug !== category.slug && { slug }),
-        ...(parentId !== undefined && { parentId }),
-      },
-    });
+    try {
+      return await prisma.category.update({
+        where: { id },
+        data: {
+          ...updateDto,
+          ...(slug !== category.slug && { slug }),
+          ...(parentId !== undefined && { parentId }),
+        },
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+        const targets = ((e.meta as { target?: string[] })?.target ?? []).map(String);
+        if (targets.some((t) => t.includes('name'))) {
+          throw new ConflictException(
+            'Databáza má ešte starú schému (globálne jedinečný názov). Spustite npm run db:push v packages/database a reštartujte API.',
+          );
+        }
+      }
+      throw e;
+    }
   }
 
   async remove(id: string) {

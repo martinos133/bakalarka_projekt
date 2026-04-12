@@ -18,7 +18,7 @@ export async function validateCategorySpecifications(
 ): Promise<Record<string, unknown> | null> {
   if (!categoryId) {
     if (raw && typeof raw === 'object' && !Array.isArray(raw) && Object.keys(raw as object).length > 0) {
-      throw new BadRequestException('Špecifikácie je možné vyplniť až po výbere kategórie');
+      throw new BadRequestException('Špecifikáciu je možné vyplniť až po výbere kategórie');
     }
     return null;
   }

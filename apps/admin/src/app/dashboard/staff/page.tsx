@@ -39,7 +39,7 @@ const PERMISSION_GROUPS: { title: string; permissions: { key: string; label: str
       { key: 'advertisements', label: 'Inzeráty' },
       { key: 'users', label: 'Používatelia' },
       { key: 'categories', label: 'Kategórie' },
-      { key: 'specifications', label: 'Špecifikácie' },
+      { key: 'specifications', label: 'Špecifikácia' },
       { key: 'monitoring', label: 'Monitoring' },
     ],
   },
@@ -234,7 +234,7 @@ export default function StaffPage() {
     if (allSelected) {
       return perms.filter((p) => !keys.includes(p))
     }
-    return [...new Set([...perms, ...keys])]
+    return Array.from(new Set([...perms, ...keys]))
   }
 
   const isMemberOwner = (member: StaffMember) => {

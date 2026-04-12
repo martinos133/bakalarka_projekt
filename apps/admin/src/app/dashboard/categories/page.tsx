@@ -217,10 +217,13 @@ export default function CategoriesPage() {
                       contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }}
                       labelStyle={{ color: '#9ca3af' }}
                       cursor={false}
-                      formatter={(value: number, name: string, props: { payload: { percent: string } }) => [
-                        `${value} (${props.payload.percent}%)`,
-                        name,
-                      ]}
+                      formatter={(value: number, name: string, item: { payload?: { percent?: number } }) => {
+                        const pct = item?.payload?.percent
+                        return [
+                          pct != null ? `${value} (${typeof pct === 'number' ? pct.toFixed(1) : pct}%)` : String(value),
+                          name,
+                        ]
+                      }}
                     />
                     <Legend
                       layout="vertical"
@@ -322,7 +325,7 @@ export default function CategoriesPage() {
                         cursor={false}
                         formatter={(value: number) => [value, '']}
                       />
-                      <Bar dataKey="count" nameKey="name" radius={[0, 4, 4, 0]} barSize={20} minPointSize={4}>
+                      <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20} minPointSize={4}>
                         {chartDataByType.map((entry, index) => (
                           <Cell key={index} fill={entry.fill} />
                         ))}
@@ -450,7 +453,7 @@ export default function CategoriesPage() {
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Podkategórie</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Inzeráty</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-300">Poradie</th>
-                      <th className="text-right px-6 py-3 text-sm font-semibold text-gray-300">Špecifikácie</th>
+                      <th className="text-right px-6 py-3 text-sm font-semibold text-gray-300">Špecifikácia</th>
                     </tr>
                   </thead>
                   <tbody>

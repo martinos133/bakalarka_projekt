@@ -399,7 +399,7 @@ export default function UsersPage() {
                       <XAxis type="number" domain={[0, Math.max(byRole.admin, byRole.user, 1)]} hide />
                       <YAxis type="category" dataKey="name" width={52} tick={{ fill: '#9ca3af', fontSize: 13 }} axisLine={false} tickLine={false} />
                       <Tooltip contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }} labelStyle={{ color: '#9ca3af' }} cursor={false} formatter={(value: number) => [value, '']} />
-                      <Bar dataKey="count" nameKey="name" radius={[0, 6, 6, 0]} barSize={28} minPointSize={4}>
+                      <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={28} minPointSize={4}>
                         {[
                           { name: 'Admin', count: byRole.admin, fill: '#a855f7' },
                           { name: 'Používateľ', count: byRole.user, fill: '#3b82f6' },
@@ -433,7 +433,18 @@ export default function UsersPage() {
                         <Cell key={index} fill={entry.fill} stroke="#1f2937" strokeWidth={2} />
                       ))}
                     </Pie>
-                    <Tooltip contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }} labelStyle={{ color: '#9ca3af' }} cursor={false} formatter={(value: number, name: string, props: { payload: { percent: string } }) => [`${value} (${props.payload.percent}%)`, name]} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }}
+                      labelStyle={{ color: '#9ca3af' }}
+                      cursor={false}
+                      formatter={(value: number, name: string, item: { payload?: { percent?: number } }) => {
+                        const pct = item?.payload?.percent
+                        return [
+                          pct != null ? `${value} (${typeof pct === 'number' ? pct.toFixed(1) : pct}%)` : String(value),
+                          name,
+                        ]
+                      }}
+                    />
                     <Legend layout="vertical" align="right" verticalAlign="middle" wrapperStyle={{ fontSize: '12px' }} formatter={(value) => <span className="text-gray-300">{value}</span>} />
                   </RechartsPieChart>
                 </ResponsiveContainer>
@@ -586,7 +597,7 @@ export default function UsersPage() {
                           <XAxis type="number" domain={[0, 'auto']} hide />
                           <YAxis type="category" dataKey="name" width={58} tick={{ fill: '#d1d5db', fontSize: 13 }} axisLine={false} tickLine={false} />
                           <Tooltip contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }} labelStyle={{ color: '#9ca3af' }} cursor={false} formatter={(value: number) => [`${value} rokov`, 'Priem. vek']} />
-                          <Bar dataKey="avgAge" nameKey="name" radius={[0, 4, 4, 0]} barSize={24} minPointSize={4}>
+                          <Bar dataKey="avgAge" radius={[0, 4, 4, 0]} barSize={24} minPointSize={4}>
                             {avgAgeByGender.map((entry, index) => (
                               <Cell key={index} fill={entry.fill} />
                             ))}

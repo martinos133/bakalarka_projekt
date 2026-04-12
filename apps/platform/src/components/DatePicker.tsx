@@ -92,42 +92,76 @@
          <Calendar className="w-4 h-4 text-gray-500" />
        </button>
  
-       {open && (
-         <div className="relative">
-           <div className="absolute z-50 mt-2 w-full sm:w-[360px] bg-dark border border-white/[0.08] rounded-xl shadow-xl shadow-black/30 p-3">
-             <DayPicker
-               mode={props.mode}
-               selected={props.value as any}
-               onSelect={handleSelect as any}
-               locale={sk}
-               weekStartsOn={1}
-               showOutsideDays
-               disabled={minDate ? { before: minDate } : undefined}
-               classNames={{
-                 months: 'flex flex-col',
-                 month: 'space-y-4',
-                 caption: 'flex items-center justify-between px-2',
-                 caption_label: 'text-sm font-semibold text-white',
-                 nav: 'flex items-center gap-1',
-                 nav_button:
-                   'h-8 w-8 inline-flex items-center justify-center rounded-md border border-white/[0.08] hover:bg-dark-200/[0.04] text-gray-300',
-                 table: 'w-full border-collapse',
-                 head_row: 'flex',
-                 head_cell: 'w-9 text-[11px] font-medium text-gray-500 text-center',
-                 row: 'flex w-full mt-1',
-                 cell: 'w-9 h-9 text-center text-sm relative',
-                 day: 'w-9 h-9 rounded-md hover:bg-dark-200/[0.04] text-white aria-selected:bg-[#c9a96e] aria-selected:text-white',
-                 day_today: 'ring-1 ring-[#c9a96e] ring-offset-2',
-                 day_outside: 'text-gray-300',
-                 day_disabled: 'text-gray-300 opacity-50',
-                 day_range_start: 'aria-selected:bg-[#c9a96e] aria-selected:text-white',
-                 day_range_end: 'aria-selected:bg-[#c9a96e] aria-selected:text-white',
-                 day_range_middle: 'aria-selected:bg-[#c9a96e]/15 aria-selected:text-white rounded-none',
-               }}
-             />
-           </div>
-         </div>
-       )}
+      {open && (
+        <div className="relative">
+          <div className="absolute z-50 mt-2 w-full sm:w-[360px] bg-dark border border-white/[0.08] rounded-xl shadow-xl shadow-black/30 p-3">
+            {props.mode === 'single' ? (
+              <DayPicker
+                mode="single"
+                selected={props.value}
+                onSelect={handleSelect}
+                locale={sk}
+                weekStartsOn={1}
+                showOutsideDays
+                disabled={minDate ? { before: minDate } : undefined}
+                classNames={{
+                  months: 'flex flex-col',
+                  month: 'space-y-4',
+                  caption: 'flex items-center justify-between px-2',
+                  caption_label: 'text-sm font-semibold text-white',
+                  nav: 'flex items-center gap-1',
+                  nav_button:
+                    'h-8 w-8 inline-flex items-center justify-center rounded-md border border-white/[0.08] hover:bg-dark-200/[0.04] text-gray-300',
+                  table: 'w-full border-collapse',
+                  head_row: 'flex',
+                  head_cell: 'w-9 text-[11px] font-medium text-gray-500 text-center',
+                  row: 'flex w-full mt-1',
+                  cell: 'w-9 h-9 text-center text-sm relative',
+                  day: 'w-9 h-9 rounded-md hover:bg-dark-200/[0.04] text-white aria-selected:bg-[#c9a96e] aria-selected:text-white',
+                  day_today: 'ring-1 ring-[#c9a96e] ring-offset-2',
+                  day_outside: 'text-gray-300',
+                  day_disabled: 'text-gray-300 opacity-50',
+                  day_range_start: 'aria-selected:bg-[#c9a96e] aria-selected:text-white',
+                  day_range_end: 'aria-selected:bg-[#c9a96e] aria-selected:text-white',
+                  day_range_middle: 'aria-selected:bg-[#c9a96e]/15 aria-selected:text-white rounded-none',
+                }}
+              />
+            ) : (
+              <DayPicker
+                mode="range"
+                required={false}
+                selected={props.value}
+                onSelect={handleSelect}
+                locale={sk}
+                weekStartsOn={1}
+                showOutsideDays
+                disabled={minDate ? { before: minDate } : undefined}
+                classNames={{
+                  months: 'flex flex-col',
+                  month: 'space-y-4',
+                  caption: 'flex items-center justify-between px-2',
+                  caption_label: 'text-sm font-semibold text-white',
+                  nav: 'flex items-center gap-1',
+                  nav_button:
+                    'h-8 w-8 inline-flex items-center justify-center rounded-md border border-white/[0.08] hover:bg-dark-200/[0.04] text-gray-300',
+                  table: 'w-full border-collapse',
+                  head_row: 'flex',
+                  head_cell: 'w-9 text-[11px] font-medium text-gray-500 text-center',
+                  row: 'flex w-full mt-1',
+                  cell: 'w-9 h-9 text-center text-sm relative',
+                  day: 'w-9 h-9 rounded-md hover:bg-dark-200/[0.04] text-white aria-selected:bg-[#c9a96e] aria-selected:text-white',
+                  day_today: 'ring-1 ring-[#c9a96e] ring-offset-2',
+                  day_outside: 'text-gray-300',
+                  day_disabled: 'text-gray-300 opacity-50',
+                  day_range_start: 'aria-selected:bg-[#c9a96e] aria-selected:text-white',
+                  day_range_end: 'aria-selected:bg-[#c9a96e] aria-selected:text-white',
+                  day_range_middle: 'aria-selected:bg-[#c9a96e]/15 aria-selected:text-white rounded-none',
+                }}
+              />
+            )}
+          </div>
+        </div>
+      )}
      </div>
    )
  }

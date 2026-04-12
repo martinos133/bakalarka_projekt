@@ -93,6 +93,8 @@ const emptyAdForm = (): AdFormDataState => ({
   categoryId: '',
   location: '',
   postalCode: '',
+  mapLat: null,
+  mapLon: null,
   type: 'SERVICE',
   images: [],
   pricingType: 'FIXED',
@@ -233,6 +235,8 @@ export default function CreateAdvertisementWizard({
           categoryId: catId,
           location: fullAd.location || '',
           postalCode: fullAd.postalCode || '',
+          mapLat: fullAd.latitude != null ? Number(fullAd.latitude) : null,
+          mapLon: fullAd.longitude != null ? Number(fullAd.longitude) : null,
           type: fullAd.type || 'SERVICE',
           images: fullAd.images || [],
           pricingType: fullAd.pricingType || 'FIXED',
@@ -333,7 +337,7 @@ export default function CreateAdvertisementWizard({
     try {
       setSaving(true)
       setError('')
-      const coords = getCoordsFromLocation(adFormData.location || null)
+      const fallbackCoords = getCoordsFromLocation(adFormData.location || null)
       const payload: any = {
         title: adFormData.title,
         description: adFormData.description,
@@ -345,9 +349,12 @@ export default function CreateAdvertisementWizard({
         images: adFormData.images || [],
         specifications: specificationValues,
       }
-      if (coords) {
-        payload.latitude = coords[0]
-        payload.longitude = coords[1]
+      if (adFormData.mapLat != null && adFormData.mapLon != null) {
+        payload.latitude = adFormData.mapLat
+        payload.longitude = adFormData.mapLon
+      } else if (fallbackCoords) {
+        payload.latitude = fallbackCoords[0]
+        payload.longitude = fallbackCoords[1]
       }
       if (adFormData.type === 'SERVICE') {
         payload.pricingType = adFormData.pricingType
@@ -463,7 +470,7 @@ export default function CreateAdvertisementWizard({
           </h2>
           <p className={`mt-1 text-sm leading-relaxed ${isAdmin ? 'text-gray-500' : 'text-muted'}`}>
             {isAdmin
-              ? 'Rovnaký postup ako na webe: kategória → špecifikácie → údaje. Špecifikácie vychádzajú z vášho nastavenia v sekcii Špecifikácie.'
+              ? 'Rovnaký postup ako na webe: kategória → údaje inzerátu (vrátane špecifikácie). Polia špecifikácie nastavíte v sekcii Špecifikácia.'
               : 'Vyberte kategóriu podľa toho, čo ponúkate – špecifikácie sa načítajú z nastavení administrátora.'}
           </p>
         </div>
@@ -719,33 +726,6 @@ export default function CreateAdvertisementWizard({
             </div>
           )}
 
-          <div
-            className={
-              isAdmin
-                ? 'rounded-xl border border-card bg-dark p-6'
-                : 'rounded-2xl border border-white/[0.06] bg-dark-100 p-6'
-            }
-          >
-            <h3 className={`text-lg font-semibold ${isAdmin ? 'text-white' : 'text-white'}`}>Špecifikácie</h3>
-            <p className={`mt-1 text-sm ${isAdmin ? 'text-gray-500' : 'text-gray-500'}`}>
-              Polia podľa zvolenej kategórie. Povinné polia sú označené hviezdičkou.
-            </p>
-            <div className="mt-5">
-              <CategorySpecificationsForm
-                variant={isAdmin ? 'admin' : 'platform'}
-                filters={categoryFilters}
-                values={specificationValues}
-                onChange={(slug, v) =>
-                  setSpecificationValues((prev) => {
-                    const next = { ...prev, [slug]: v }
-                    if (v === undefined || v === '') delete next[slug]
-                    return next
-                  })
-                }
-              />
-            </div>
-          </div>
-
           <AdvertisementAdForm
             variant={isAdmin ? 'admin' : 'platform'}
             adFormData={adFormData}
@@ -763,6 +743,34 @@ export default function CreateAdvertisementWizard({
             onSubmit={handleSubmit}
             saving={saving}
             editingId={editingId}
+            specificationsSlot={
+              <div
+                className={
+                  isAdmin
+                    ? 'rounded-xl border border-card bg-dark p-6'
+                    : 'rounded-2xl border border-white/[0.06] bg-dark-100 p-6'
+                }
+              >
+                <h3 className={`text-lg font-semibold ${isAdmin ? 'text-white' : 'text-white'}`}>Špecifikácia</h3>
+                <p className={`mt-1 text-sm ${isAdmin ? 'text-gray-500' : 'text-gray-500'}`}>
+                  Polia podľa zvolenej kategórie. Povinné polia sú označené hviezdičkou.
+                </p>
+                <div className="mt-5">
+                  <CategorySpecificationsForm
+                    variant={isAdmin ? 'admin' : 'platform'}
+                    filters={categoryFilters}
+                    values={specificationValues}
+                    onChange={(slug, v) =>
+                      setSpecificationValues((prev) => {
+                        const next = { ...prev, [slug]: v }
+                        if (v === undefined || v === '') delete next[slug]
+                        return next
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            }
           />
         </div>
       )}

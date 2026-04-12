@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { api } from '@/lib/api'
 import Link from 'next/link'
@@ -174,7 +174,17 @@ function SearchPageInner() {
 export default function SearchPage() {
   return (
     <CmsGate cmsSlug="vyhladavanie">
-      <SearchPageInner />
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-dark-50">
+            <Header />
+            <div className="flex min-h-[40vh] items-center justify-center text-gray-500">Načítavam…</div>
+            <Footer />
+          </div>
+        }
+      >
+        <SearchPageInner />
+      </Suspense>
     </CmsGate>
   )
 }

@@ -98,7 +98,9 @@ model User {
 
 model Category {
   id              String          @id @default(uuid())
-  name            String          @unique
+  /// Jedinečný v rámci rodiča (root: jedinečný medzi kategóriami bez parentId)
+  name            String
+  /// Vždy globálne jedinečný (URL); u podkategórií používaj prefix parent slug
   slug            String          @unique
   description     String?         @db.Text
   icon            String?

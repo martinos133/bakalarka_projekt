@@ -323,7 +323,7 @@ export default function AdvertisementsPage() {
                         cursor={false}
                         formatter={(value: number) => [value, '']}
                       />
-                      <Bar dataKey="count" nameKey="name" radius={[0, 6, 6, 0]} barSize={28} minPointSize={4}>
+                      <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={28} minPointSize={4}>
                         {[
                           { name: 'Služby', count: byType.services, fill: '#3b82f6' },
                           { name: 'Prenájom', count: byType.rentals, fill: '#a855f7' },
@@ -362,10 +362,13 @@ export default function AdvertisementsPage() {
                       contentStyle={{ backgroundColor: 'transparent', border: 'none', color: '#9ca3af' }}
                       labelStyle={{ color: '#9ca3af' }}
                       cursor={false}
-                      formatter={(value: number, name: string, props: { payload: { percent: string } }) => [
-                        `${value} (${props.payload.percent}%)`,
-                        name,
-                      ]}
+                      formatter={(value: number, name: string, item: { payload?: { percent?: number } }) => {
+                        const pct = item?.payload?.percent
+                        return [
+                          pct != null ? `${value} (${typeof pct === 'number' ? pct.toFixed(1) : pct}%)` : String(value),
+                          name,
+                        ]
+                      }}
                     />
                     <Legend
                       layout="vertical"

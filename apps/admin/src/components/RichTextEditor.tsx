@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useRef, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false })
 
@@ -84,7 +84,6 @@ export default function RichTextEditor({
   minHeight = 320,
   className = '',
 }: RichTextEditorProps) {
-  const quillRef = useRef<any>(null)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -105,7 +104,6 @@ export default function RichTextEditor({
   return (
     <div className={`blog-editor ${className}`}>
       <ReactQuill
-        ref={quillRef}
         theme="snow"
         value={value}
         onChange={onChange}

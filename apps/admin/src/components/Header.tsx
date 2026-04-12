@@ -623,7 +623,7 @@ function getPageTitle(pathname: string): string {
     '/dashboard/advertisements': 'Inzeráty',
     '/dashboard/users': 'Používatelia',
     '/dashboard/categories': 'Kategórie',
-    '/dashboard/specifications': 'Špecifikácie',
+    '/dashboard/specifications': 'Špecifikácia',
     '/dashboard/monitoring': 'Monitoring kliknutí',
     '/dashboard/contact-forms': 'Kontaktné formuláre',
     '/dashboard/pending': 'Čakajúce inzeráty',

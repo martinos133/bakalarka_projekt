@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -15,7 +15,7 @@ import { fileToResizedAvatarDataUrl } from '@/lib/avatarResize'
 import { useCmsOverride } from '@/lib/useCmsOverride'
 import CustomSelect from '@/components/CustomSelect'
 
-export default function DashboardPage() {
+function DashboardPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { loading: cmsLoading, page: cmsPage } = useCmsOverride('dashboard')
@@ -230,7 +230,6 @@ export default function DashboardPage() {
       setUser(updated)
       setProfileData(updated)
       setAuthUser(updated)
-      setEditing(false)
       setSuccess('Profil bol úspešne aktualizovaný')
       setTimeout(() => setSuccess(''), 3000)
     } catch (err: any) {
@@ -255,7 +254,6 @@ export default function DashboardPage() {
       setError('')
       await api.changePassword(passwordData.oldPassword, passwordData.newPassword)
       setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' })
-      setChangingPassword(false)
       setSuccess('Heslo bolo úspešne zmenené')
       setTimeout(() => setSuccess(''), 3000)
     } catch (err: any) {
@@ -1233,5 +1231,23 @@ export default function DashboardPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-dark">
+          <Header />
+          <div className="flex min-h-[60vh] items-center justify-center">
+            <div className="text-gray-500">Načítavam...</div>
+          </div>
+          <Footer />
+        </div>
+      }
+    >
+      <DashboardPageInner />
+    </Suspense>
   )
 }

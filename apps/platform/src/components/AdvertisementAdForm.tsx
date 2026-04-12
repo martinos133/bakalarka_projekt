@@ -1,8 +1,9 @@
 'use client'
 
-import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { ChangeEvent, Dispatch, ReactNode, SetStateAction } from 'react'
 import { Plus, Save, X, Trash2, Image as ImageIcon } from 'lucide-react'
 import CustomSelect from '@/components/CustomSelect'
+import PhotonLocationInputs from '@/components/PhotonLocationInputs'
 
 export type AdFormDataState = {
   title: string
@@ -11,6 +12,9 @@ export type AdFormDataState = {
   categoryId: string
   location: string
   postalCode: string
+  /** Súradnice z Photon (WGS84); pri ručnej úprave textu sa vymažú. */
+  mapLat: number | null
+  mapLon: number | null
   type: string
   images: string[]
   pricingType: string
@@ -41,6 +45,8 @@ export type AdvertisementAdFormProps = {
   editingId: string | null
   /** `admin` = tmavé polia zladené s admin panelom */
   variant?: 'platform' | 'admin'
+  /** Voliteľný blok (napr. špecifikácie kategórie) — zobrazí sa po základných poliach, pred detailmi služby. */
+  specificationsSlot?: ReactNode
 }
 
 export default function AdvertisementAdForm({
@@ -60,6 +66,7 @@ export default function AdvertisementAdForm({
   saving,
   editingId,
   variant = 'platform',
+  specificationsSlot,
 }: AdvertisementAdFormProps) {
   const a = variant === 'admin'
   const c = {
@@ -173,36 +180,15 @@ export default function AdvertisementAdForm({
     />
   </div>
 
-  <div className="grid grid-cols-2 gap-4">
-    <div>
-      <label className={c.label}>
-        Lokalita
-      </label>
-      <input
-        type="text"
-        value={adFormData.location}
-        onChange={(e) => setAdFormData({ ...adFormData, location: e.target.value })}
-        className={c.input}
-        placeholder="Napríklad: Bratislava, Košice, Nitra"
-      />
-      <p className={c.hint}>
-        Zadajte kraj alebo mesto – inzerát sa podľa lokality zobrazí na mape.
-      </p>
-    </div>
+  <PhotonLocationInputs
+    adFormData={adFormData}
+    setAdFormData={setAdFormData}
+    labelClass={c.label}
+    inputClass={c.input}
+    hintClass={c.hint}
+  />
 
-    <div>
-      <label className={c.label}>
-        PSČ
-      </label>
-      <input
-        type="text"
-        value={adFormData.postalCode}
-        onChange={(e) => setAdFormData({ ...adFormData, postalCode: e.target.value })}
-        className={c.input}
-        placeholder="Napríklad: 811 01"
-      />
-    </div>
-  </div>
+  {specificationsSlot ? <div className="mt-2">{specificationsSlot}</div> : null}
 
   {/* Service-specific fields */}
   {adFormData.type === 'SERVICE' && (

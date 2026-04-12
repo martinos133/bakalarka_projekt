@@ -1208,7 +1208,7 @@ export default function OrganizerPage() {
                       `}
                       style={{
                         backgroundColor: c.value,
-                        ringColor: c.value,
+                        ...(form.color === c.value ? { boxShadow: `0 0 0 2px ${c.value}, 0 0 0 4px rgba(0,0,0,0.35)` } : {}),
                       }}
                     />
                   ))}

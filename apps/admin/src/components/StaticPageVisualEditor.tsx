@@ -32,7 +32,7 @@ export function normalizeStoredPageHtml(raw: string): string {
   try {
     const doc = new DOMParser().parseFromString(t, 'text/html')
     const bodyHtml = doc.body?.innerHTML?.trim() ?? ''
-    const headStyles = [...doc.querySelectorAll('head style')]
+    const headStyles = Array.from(doc.querySelectorAll('head style'))
       .map((s) => (s.textContent || '').trim())
       .filter(Boolean)
       .join('\n')
@@ -53,9 +53,16 @@ const StaticPageVisualEditor = forwardRef<StaticPageVisualEditorHandle, Props>(
     const hostRef = useRef<HTMLDivElement>(null)
     const initialHtmlRef = useRef(initialHtml)
     initialHtmlRef.current = initialHtml
-    const editorInstanceRef = useRef<{ destroy: () => void; getHtml: () => string; getCss: () => string } | null>(
-      null
-    )
+    /** GrapesJS Editor – typ getCss sa líši podľa verzie */
+    const editorInstanceRef = useRef<{
+      destroy: () => void
+      getHtml: () => string
+      getCss: () => string | undefined
+      setStyle?: (s: string) => void
+      setComponents: (c: string) => void
+      refresh: () => void
+      once: (ev: string, fn: () => void) => void
+    } | null>(null)
 
     useImperativeHandle(ref, () => ({
       getContent: () => {
@@ -73,7 +80,7 @@ const StaticPageVisualEditor = forwardRef<StaticPageVisualEditorHandle, Props>(
       if (!host) return
 
       let cancelled = false
-      const timers: ReturnType<typeof setTimeout>[] = []
+      const timers: number[] = []
       const normalized = normalizeStoredPageHtml(initialHtml)
       const { css, html } = splitStoredPageContent(normalized)
 
@@ -108,7 +115,7 @@ const StaticPageVisualEditor = forwardRef<StaticPageVisualEditorHandle, Props>(
           if (cancelled || !editorInstanceRef.current) return
           const ed = editorInstanceRef.current
           try {
-            if (css) ed.setStyle(css)
+            if (css) ed.setStyle?.(css)
             ed.setComponents(html)
             ed.refresh()
           } catch {

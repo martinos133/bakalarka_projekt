@@ -52,7 +52,7 @@ const navigation: NavSection[] = [
       { label: 'Inzeráty', path: '/dashboard/advertisements', icon: FileText, permission: 'advertisements' },
       { label: 'Používatelia', path: '/dashboard/users', icon: Users, permission: 'users' },
       { label: 'Kategórie', path: '/dashboard/categories', icon: FolderTree, permission: 'categories' },
-      { label: 'Špecifikácie', path: '/dashboard/specifications', icon: ListChecks, permission: 'specifications' },
+      { label: 'Špecifikácia', path: '/dashboard/specifications', icon: ListChecks, permission: 'specifications' },
       { label: 'Monitoring', path: '/dashboard/monitoring', icon: MousePointerClick, permission: 'monitoring' },
     ],
   },
@@ -222,7 +222,7 @@ export default function Sidebar() {
                     `}
                   >
                     <span className="relative inline-flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center">
-                      <Icon className={`h-[18px] w-[18px] ${isActive ? 'text-accent' : ''}`} strokeWidth={2} />
+                      <Icon className={`h-[18px] w-[18px] ${isActive ? 'text-accent' : ''}`} />
                       {showChatBadge && (
                         <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-0.5 text-[8px] font-bold leading-none text-white shadow-md shadow-red-500/35 ring-2 ring-card">
                           {chatUnread > 9 ? '9+' : chatUnread}

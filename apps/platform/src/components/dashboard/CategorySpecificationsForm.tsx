@@ -67,12 +67,12 @@ export default function CategorySpecificationsForm({
         <p className={u.emptyHint}>
           {a ? (
             <>
-              Doplňte ich v sekcii <strong className="text-gray-300">Špecifikácie</strong> alebo pri kategórii cez stĺpec
+              Doplňte ich v sekcii <strong className="text-gray-300">Špecifikácia</strong> alebo pri kategórii cez stĺpec
               špecifikácií.
             </>
           ) : (
             <>
-              V <strong>admin paneli</strong> otvorte vľavo <strong>Špecifikácie</strong> (alebo pri kategórii v zozname
+              V <strong>admin paneli</strong> otvorte vľavo <strong>Špecifikácia</strong> (alebo pri kategórii v zozname
               kliknite „Upraviť“ v stĺpci špecifikácií).
             </>
           )}
