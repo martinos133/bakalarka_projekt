@@ -269,11 +269,20 @@ export default function AdvertisementDetailPage({
 
   const recommendedAds = useMemo(() => {
     const currentId = id
-    const sameCategory = categoryAdsForFilters.filter((ad: any) => ad.id !== currentId)
+    const sortByPriority = (a: any, b: any) => {
+      if (a.priorityBoosted && !b.priorityBoosted) return -1
+      if (!a.priorityBoosted && b.priorityBoosted) return 1
+      return 0
+    }
+    const sameCategory = categoryAdsForFilters
+      .filter((ad: any) => ad.id !== currentId)
+      .sort(sortByPriority)
     if (sameCategory.length >= 6) return sameCategory.slice(0, 6)
     const seen = new Set(sameCategory.map((a: any) => a.id))
     seen.add(currentId)
-    const fromRoot = rootCategoryAds.filter((ad: any) => !seen.has(ad.id))
+    const fromRoot = rootCategoryAds
+      .filter((ad: any) => !seen.has(ad.id))
+      .sort(sortByPriority)
     return [...sameCategory, ...fromRoot].slice(0, 6)
   }, [id, categoryAdsForFilters, rootCategoryAds])
 
