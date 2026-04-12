@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useState } from 'react'
+import { use, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import CategoryNav from '@/components/CategoryNav'
@@ -11,6 +11,10 @@ import DatePicker from '@/components/DatePicker'
 import CategorySubcategorySidebar, {
   type SubcategoryItem,
 } from '@/components/CategorySubcategorySidebar'
+import SpecificationFilters, {
+  matchesFilters,
+  type FilterValues,
+} from '@/components/SpecificationFilters'
 import { api } from '@/lib/api'
 import { useCmsOverride } from '@/lib/useCmsOverride'
 import { isAuthenticated, getAuthUser } from '@/lib/auth'
@@ -127,27 +131,55 @@ export default function AdvertisementDetailPage({
   const [continueSubmitting, setContinueSubmitting] = useState(false)
   const [continueSuccess, setContinueSuccess] = useState(false)
   const [categorySpecFilters, setCategorySpecFilters] = useState<Filter[]>([])
+  const [filterValues, setFilterValues] = useState<FilterValues>({})
+  const [categoryAdsForFilters, setCategoryAdsForFilters] = useState<Advertisement[]>([])
   const [sellerRating, setSellerRating] = useState<{ count: number; average: number }>({ count: 0, average: 0 })
   const [subcategoryNav, setSubcategoryNav] = useState<{
     root: { id: string; name: string; slug: string } | null
     subs: SubcategoryItem[]
   }>({ root: null, subs: [] })
 
+  const filteredAdsCount = useMemo(
+    () =>
+      categoryAdsForFilters.filter((ad) =>
+        matchesFilters(ad, categorySpecFilters, filterValues),
+      ).length,
+    [categoryAdsForFilters, categorySpecFilters, filterValues],
+  )
+
   useEffect(() => {
     loadAdvertisement()
   }, [id])
 
   useEffect(() => {
-    const cid = advertisement?.categoryId || advertisement?.category?.id
-    if (!cid) {
+    const catId = advertisement?.categoryId || advertisement?.category?.id
+    if (!catId) {
       setCategorySpecFilters([])
       return
     }
     let cancelled = false
-    api
-      .getActiveFilters(cid)
-      .then((rows) => {
-        if (!cancelled) setCategorySpecFilters(Array.isArray(rows) ? rows : [])
+    const categoryIds = new Set<string>([catId])
+    if (subcategoryNav.root) {
+      categoryIds.add(subcategoryNav.root.id)
+      subcategoryNav.subs.forEach((s) => categoryIds.add(s.id))
+    }
+    Promise.all(
+      [...categoryIds].map((id) => api.getActiveFilters(id).catch(() => [])),
+    )
+      .then((results) => {
+        if (cancelled) return
+        const seen = new Set<string>()
+        const merged: Filter[] = []
+        for (const rows of results) {
+          for (const f of Array.isArray(rows) ? rows : []) {
+            if (!seen.has(f.slug)) {
+              seen.add(f.slug)
+              merged.push(f)
+            }
+          }
+        }
+        merged.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+        setCategorySpecFilters(merged)
       })
       .catch(() => {
         if (!cancelled) setCategorySpecFilters([])
@@ -155,7 +187,27 @@ export default function AdvertisementDetailPage({
     return () => {
       cancelled = true
     }
-  }, [advertisement?.categoryId, advertisement?.category?.id])
+  }, [advertisement?.categoryId, advertisement?.category?.id, subcategoryNav])
+
+  useEffect(() => {
+    const slug = advertisement?.category?.slug
+    if (!slug) {
+      setCategoryAdsForFilters([])
+      return
+    }
+    let cancelled = false
+    api
+      .getAdvertisementsByCategory(slug)
+      .then((data) => {
+        if (!cancelled) setCategoryAdsForFilters(Array.isArray(data) ? data : [])
+      })
+      .catch(() => {
+        if (!cancelled) setCategoryAdsForFilters([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [advertisement?.category?.slug])
 
   useEffect(() => {
     const slug = advertisement?.category?.slug
@@ -480,17 +532,55 @@ export default function AdvertisementDetailPage({
 
         <div
           className={
-            subcategoryNav.root && subcategoryNav.subs.length > 0 && advertisement.category?.slug
+            advertisement.category?.slug
               ? 'grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:items-start lg:gap-10 xl:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] xl:gap-12 2xl:grid-cols-[minmax(0,19rem)_minmax(0,1fr)]'
               : 'grid grid-cols-1 gap-8'
           }
         >
-          {subcategoryNav.root && subcategoryNav.subs.length > 0 && advertisement.category?.slug ? (
-            <CategorySubcategorySidebar
-              rootCategory={subcategoryNav.root}
-              subcategories={subcategoryNav.subs}
-              activeSlug={advertisement.category.slug}
-            />
+          {advertisement.category?.slug ? (
+            <aside className="shrink-0 lg:w-60 xl:w-64">
+              <div className="card sticky top-6 shadow-md shadow-black/10">
+                {subcategoryNav.root && subcategoryNav.subs.length > 0 ? (
+                  <CategorySubcategorySidebar
+                    embedded
+                    rootCategory={subcategoryNav.root}
+                    subcategories={subcategoryNav.subs}
+                    activeSlug={advertisement.category.slug}
+                  />
+                ) : null}
+                <SpecificationFilters
+                  filters={categorySpecFilters}
+                  values={filterValues}
+                  onChange={setFilterValues}
+                  advertisements={categoryAdsForFilters}
+                  embedded
+                />
+                <div className="border-t border-white/[0.08] p-4 pt-3">
+                  <Link
+                    href={`/kategoria/${advertisement.category.slug}`}
+                    className="inline-flex w-full items-center justify-center rounded-xl border border-white/[0.1] bg-white/[0.04] px-3 py-2.5 text-center text-sm font-medium text-white/90 transition hover:border-accent/35 hover:bg-accent/10 hover:text-accent"
+                    onClick={() => {
+                      try {
+                        sessionStorage.setItem(
+                          'inzertna-category-filters',
+                          JSON.stringify({
+                            slug: advertisement.category!.slug,
+                            filterValues,
+                          }),
+                        )
+                      } catch {
+                        /* ignore */
+                      }
+                    }}
+                  >
+                    Zobraziť inzeráty v kategórii
+                    {filteredAdsCount > 0 ? (
+                      <span className="ml-1.5 tabular-nums text-muted">({filteredAdsCount})</span>
+                    ) : null}
+                  </Link>
+                </div>
+              </div>
+            </aside>
           ) : null}
 
           <div className="grid min-w-0 grid-cols-1 gap-8 lg:grid-cols-3">

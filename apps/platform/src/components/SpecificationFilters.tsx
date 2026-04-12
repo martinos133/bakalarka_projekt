@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { ChevronDown } from 'lucide-react'
 import type { Filter, FilterType } from '@inzertna-platforma/shared'
+import CustomSelect from '@/components/CustomSelect'
 
 export type FilterValues = Record<string, unknown>
 
@@ -131,7 +131,6 @@ export default function SpecificationFilters({ filters, values, onChange, advert
           <PriceFilter
             value={values.__price as { min?: string; max?: string } | undefined}
             onChange={(v) => set('__price', v)}
-            range={priceRange!}
           />
         )}
         {activeFilters.map((f) => (
@@ -159,46 +158,52 @@ export default function SpecificationFilters({ filters, values, onChange, advert
 function PriceFilter({
   value,
   onChange,
-  range,
 }: {
   value: { min?: string; max?: string } | undefined
   onChange: (v: unknown) => void
-  range: { min: number; max: number }
 }) {
   const v = value ?? {}
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-medium text-white/50">
-        Cena (€)
-      </label>
-      <div className="flex items-center gap-2">
-        <input
-          type="number"
-          placeholder={range.min.toString()}
-          value={v.min ?? ''}
-          onChange={(e) => {
-            const next = { ...v, min: e.target.value || undefined }
-            if (!next.min && !next.max) onChange(undefined)
-            else onChange(next)
-          }}
-          className="w-full rounded-lg border border-white/[0.1] bg-white/[0.06] px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/25"
-        />
-        <span className="text-xs text-white/30">–</span>
-        <input
-          type="number"
-          placeholder={range.max.toString()}
-          value={v.max ?? ''}
-          onChange={(e) => {
-            const next = { ...v, max: e.target.value || undefined }
-            if (!next.min && !next.max) onChange(undefined)
-            else onChange(next)
-          }}
-          className="w-full rounded-lg border border-white/[0.1] bg-white/[0.06] px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/25"
-        />
+      <label className="mb-1.5 block text-xs font-medium text-white/50">Cena (€)</label>
+      <div className="flex items-end gap-2">
+        <div className="min-w-0 flex-1">
+          <span className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-white/35">
+            Od
+          </span>
+          <input
+            type="number"
+            inputMode="decimal"
+            placeholder="Od"
+            aria-label="Cena od"
+            value={v.min ?? ''}
+            onChange={(e) => {
+              const next = { ...v, min: e.target.value || undefined }
+              if (!next.min && !next.max) onChange(undefined)
+              else onChange(next)
+            }}
+            className="w-full rounded-lg border border-white/[0.1] bg-white/[0.06] px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/25"
+          />
+        </div>
+        <div className="min-w-0 flex-1">
+          <span className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-white/35">
+            Do
+          </span>
+          <input
+            type="number"
+            inputMode="decimal"
+            placeholder="Do"
+            aria-label="Cena do"
+            value={v.max ?? ''}
+            onChange={(e) => {
+              const next = { ...v, max: e.target.value || undefined }
+              if (!next.min && !next.max) onChange(undefined)
+              else onChange(next)
+            }}
+            className="w-full rounded-lg border border-white/[0.1] bg-white/[0.06] px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/25"
+          />
+        </div>
       </div>
-      <p className="mt-1 text-[10px] text-white/25">
-        {range.min} € – {range.max} €
-      </p>
     </div>
   )
 }
@@ -244,24 +249,25 @@ function FilterField({
 
   if (type === 'SELECT') {
     const selected = typeof value === 'string' ? value : ''
+    const selectOptions = [
+      { value: '', label: 'Všetky' },
+      ...filter.options.map((opt) => ({ value: opt, label: opt })),
+    ]
     return (
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-white/50">{filter.name}</label>
-        <div className="relative">
-          <select
-            value={selected}
-            onChange={(e) => onChange(e.target.value || undefined)}
-            className="w-full appearance-none rounded-lg border border-white/[0.1] bg-white/[0.06] px-3 py-2 pr-8 text-sm text-white transition-colors hover:border-white/[0.18] focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/25"
-          >
-            <option value="">Všetky</option>
-            {filter.options.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/40" />
-        </div>
+        <label
+          htmlFor={`filter-select-${filter.slug}`}
+          className="mb-1.5 block text-xs font-medium text-white/50"
+        >
+          {filter.name}
+        </label>
+        <CustomSelect
+          id={`filter-select-${filter.slug}`}
+          value={selected}
+          onChange={(v) => onChange(v === '' ? undefined : v)}
+          options={selectOptions}
+          placeholder="Všetky"
+        />
       </div>
     )
   }

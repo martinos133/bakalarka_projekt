@@ -34,6 +34,22 @@ export default function CategoryPage() {
   const [specFilters, setSpecFilters] = useState<Filter[]>([])
   const [filterValues, setFilterValues] = useState<FilterValues>({})
 
+  /** Presun filtre zo stránky detailu inzerátu */
+  useEffect(() => {
+    if (!slug || typeof window === 'undefined') return
+    try {
+      const raw = sessionStorage.getItem('inzertna-category-filters')
+      if (!raw) return
+      const parsed = JSON.parse(raw) as { slug?: string; filterValues?: FilterValues }
+      if (parsed.slug === slug && parsed.filterValues && typeof parsed.filterValues === 'object') {
+        setFilterValues(parsed.filterValues)
+      }
+      sessionStorage.removeItem('inzertna-category-filters')
+    } catch {
+      sessionStorage.removeItem('inzertna-category-filters')
+    }
+  }, [slug])
+
   useEffect(() => {
     if (slug) {
       setActiveSlug(slug)
