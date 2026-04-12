@@ -20,6 +20,12 @@ import CategoryNav from '@/components/CategoryNav'
 import Footer from '@/components/Footer'
 import { CmsGate } from '@/components/CmsGate'
 import { getCoordsFromLocation } from '@/lib/mapRegions'
+import {
+  latLonFromPhotonPoint,
+  photonSearchClient,
+  postalCodeSearchClient,
+  type PhotonFeature,
+} from '@/lib/photon'
 
 const AdMap = dynamic(() => import('@/components/AdMap'), { ssr: false })
 
@@ -139,6 +145,12 @@ function MapPageInner() {
   const [categoryId, setCategoryId] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [regionFilter, setRegionFilter] = useState('')
+  const [postalCode, setPostalCode] = useState('')
+  const [city, setCity] = useState('')
+  const [radiusKm, setRadiusKm] = useState('')
+  const [geoCenter, setGeoCenter] = useState<{ lat: number; lng: number } | null>(null)
+  const geoCenterRef = useRef<{ lat: number; lng: number } | null>(null)
+  const geocodedKeyRef = useRef<string>('')
   const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([])
   const [list, setList] = useState<MapAd[]>([])
   const [loading, setLoading] = useState(true)
@@ -168,27 +180,100 @@ function MapPageInner() {
   }, [])
 
   useEffect(() => {
-    let cancelled = false
+    geoCenterRef.current = geoCenter
+  }, [geoCenter])
+
+  useEffect(() => {
+    const ac = new AbortController()
     setLoading(true)
+    const r = radiusKm ? parseFloat(radiusKm) : NaN
+    const wantsRadius = Number.isFinite(r) && r > 0
     api
-      .getAdvertisementsForMap({
-        categoryId: categoryId || undefined,
-        type: typeFilter || undefined,
-        region: regionFilter.trim() || undefined,
-      })
+      .getAdvertisementsForMap(
+        {
+          categoryId: categoryId || undefined,
+          type: typeFilter || undefined,
+          region: regionFilter.trim() || undefined,
+          postalCode: postalCode.trim() || undefined,
+          city: city.trim() || undefined,
+          ...(wantsRadius && geoCenter ? { centerLat: geoCenter.lat, centerLng: geoCenter.lng, radiusKm: r } : {}),
+        },
+        { signal: ac.signal },
+      )
       .then((data) => {
-        if (!cancelled) setList(Array.isArray(data) ? data : [])
+        setList(Array.isArray(data) ? data : [])
       })
-      .catch(() => {
-        if (!cancelled) setList([])
+      .catch((err: Error & { name?: string }) => {
+        if (ac.signal.aborted || err?.name === 'AbortError') return
+        setList([])
       })
       .finally(() => {
-        if (!cancelled) setLoading(false)
+        if (!ac.signal.aborted) setLoading(false)
       })
+    return () => ac.abort()
+  }, [categoryId, typeFilter, regionFilter, postalCode, city, radiusKm, geoCenter])
+
+  useEffect(() => {
+    const r = radiusKm ? parseFloat(radiusKm) : NaN
+    if (!Number.isFinite(r) || r <= 0) {
+      geoCenterRef.current = null
+      setGeoCenter(null)
+      geocodedKeyRef.current = ''
+      return
+    }
+    const pc = postalCode.trim()
+    const ct = city.trim()
+    const q = ct || pc
+    if (q.length < 2) {
+      geoCenterRef.current = null
+      setGeoCenter(null)
+      geocodedKeyRef.current = ''
+      return
+    }
+    const key = `${pc}|${ct}`
+    if (geocodedKeyRef.current === key && geoCenterRef.current != null) {
+      return
+    }
+
+    let cancelled = false
+    const timer = setTimeout(async () => {
+      try {
+        let features: PhotonFeature[] = []
+        if (pc.length >= 3) {
+          features = await postalCodeSearchClient(pc)
+        }
+        if (!features.length && ct.length >= 2) {
+          features = await photonSearchClient(`${ct} Slovakia`, 6)
+        }
+        if (!features.length && pc.length >= 3) {
+          features = await photonSearchClient(`${pc} Slovakia`, 6)
+        }
+        if (cancelled) return
+        const first = features[0]
+        if (first) {
+          const { lat, lon } = latLonFromPhotonPoint(first)
+          const coord = { lat, lng: lon }
+          geoCenterRef.current = coord
+          setGeoCenter(coord)
+          geocodedKeyRef.current = key
+        } else {
+          geoCenterRef.current = null
+          setGeoCenter(null)
+          geocodedKeyRef.current = ''
+        }
+      } catch {
+        if (!cancelled) {
+          geoCenterRef.current = null
+          setGeoCenter(null)
+          geocodedKeyRef.current = ''
+        }
+      }
+    }, 150)
     return () => {
       cancelled = true
+      clearTimeout(timer)
     }
-  }, [categoryId, typeFilter, regionFilter])
+  }, [postalCode, city, radiusKm])
 
   const points = useMemo(() => {
     return list
@@ -212,7 +297,18 @@ function MapPageInner() {
   }, [list])
 
   const notOnMapCount = Math.max(0, list.length - points.length)
-  const hasActiveFilters = Boolean(categoryId || typeFilter || regionFilter)
+  const hasActiveFilters = Boolean(
+    categoryId || typeFilter || regionFilter || postalCode.trim() || city.trim() || radiusKm,
+  )
+  const radiusOptions: SelectOption[] = [
+    { value: '', label: 'Bez obmedzenia okolia' },
+    { value: '5', label: 'Okolo 5 km' },
+    { value: '10', label: 'Okolo 10 km' },
+    { value: '20', label: 'Okolo 20 km' },
+    { value: '30', label: 'Okolo 30 km' },
+    { value: '50', label: 'Okolo 50 km' },
+    { value: '100', label: 'Okolo 100 km' },
+  ]
   const categoryOptions = useMemo<SelectOption[]>(
     () => [{ value: '', label: 'Všetky kategórie' }, ...categories.map((c) => ({ value: c.id, label: c.name }))],
     [categories],
@@ -328,6 +424,12 @@ function MapPageInner() {
                 setCategoryId('')
                 setTypeFilter('')
                 setRegionFilter('')
+                setPostalCode('')
+                setCity('')
+                setRadiusKm('')
+                geoCenterRef.current = null
+                geocodedKeyRef.current = ''
+                setGeoCenter(null)
               }}
               className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:border-white/[0.14] hover:bg-white/[0.07] hover:text-white"
             >
@@ -335,7 +437,7 @@ function MapPageInner() {
               Resetovať filtre
             </button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <ProSelect
               id="map-filter-category"
               label="Kategória"
@@ -358,6 +460,51 @@ function MapPageInner() {
               onChange={setRegionFilter}
             />
           </div>
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div>
+              <label htmlFor="map-filter-psc" className="mb-1.5 block text-xs font-medium text-muted">
+                PSČ
+              </label>
+              <input
+                id="map-filter-psc"
+                type="text"
+                inputMode="numeric"
+                autoComplete="postal-code"
+                placeholder="napr. 811 01"
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
+                className="w-full rounded-xl border border-white/[0.1] bg-card px-3.5 py-2.5 text-sm text-white shadow-sm outline-none transition-all placeholder:text-white/35 focus:border-accent/45 focus:ring-2 focus:ring-accent/20"
+              />
+            </div>
+            <div>
+              <label htmlFor="map-filter-city" className="mb-1.5 block text-xs font-medium text-muted">
+                Mesto alebo obec
+              </label>
+              <input
+                id="map-filter-city"
+                type="text"
+                autoComplete="address-level2"
+                placeholder="napr. Bratislava"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full rounded-xl border border-white/[0.1] bg-card px-3.5 py-2.5 text-sm text-white shadow-sm outline-none transition-all placeholder:text-white/35 focus:border-accent/45 focus:ring-2 focus:ring-accent/20"
+              />
+            </div>
+            <ProSelect
+              id="map-filter-radius"
+              label="Polomer okolia"
+              value={radiusKm}
+              options={radiusOptions}
+              onChange={setRadiusKm}
+            />
+          </div>
+          {radiusKm && parseFloat(radiusKm) > 0 && (
+            <p className="mt-3 text-xs leading-relaxed text-muted">
+              Okolie sa počíta od stredu podľa PSČ (ak je zadané), inak podľa mesta – nie ako text v inzeráte,
+              takže v kruhu uvidíte aj ponuky z iných miest (napr. Košice pri stredu v okolí Úporu). Ak nezadáte
+              mesto ani PSČ, polomer sa nepoužije. Prioritné inzeráty sú navrchu.
+            </p>
+          )}
         </section>
 
         {!mounted ? (

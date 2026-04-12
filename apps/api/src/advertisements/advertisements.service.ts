@@ -4,6 +4,7 @@ import { CreateAdvertisementDto, UpdateAdvertisementDto, MessageType } from '@in
 import { MessagesService } from '../messages/messages.service';
 import { UsersService } from '../users/users.service';
 import { validateCategorySpecifications } from './specifications.validation';
+import { getCoordsFromLocationString, haversineKm } from '../lib/sk-location-coords';
 
 @Injectable()
 export class AdvertisementsService {
@@ -57,21 +58,57 @@ export class AdvertisementsService {
     return created;
   }
 
-  async findForMap(filters: { categoryId?: string; type?: 'SERVICE' | 'RENTAL'; region?: string }) {
-    const where: any = { status: 'ACTIVE' };
-    if (filters.categoryId) where.categoryId = filters.categoryId;
-    if (filters.type) where.type = filters.type;
-    if (filters.region && filters.region.trim()) {
-      where.location = { contains: filters.region.trim(), mode: 'insensitive' };
+  async findForMap(filters: {
+    categoryId?: string;
+    type?: 'SERVICE' | 'RENTAL';
+    region?: string;
+    postalCode?: string;
+    city?: string;
+    centerLat?: number;
+    centerLng?: number;
+    radiusKm?: number;
+  }) {
+    const rKm = filters.radiusKm;
+    const cLat = filters.centerLat;
+    const cLng = filters.centerLng;
+    /** Pri zadanom polomieri a strede sú mesto/PSČ len na geokódovanie – nefiltrujeme nimi text inzerátu (inak by sa vylúčili napr. Košice pri „stred Úpor“). */
+    const radiusGeoMode =
+      rKm != null &&
+      rKm > 0 &&
+      Number.isFinite(cLat) &&
+      Number.isFinite(cLng) &&
+      cLat != null &&
+      cLng != null;
+
+    const and: any[] = [{ status: 'ACTIVE' }];
+    if (filters.categoryId) and.push({ categoryId: filters.categoryId });
+    if (filters.type) and.push({ type: filters.type });
+    if (filters.region?.trim()) {
+      and.push({ location: { contains: filters.region.trim(), mode: 'insensitive' } });
     }
+    if (!radiusGeoMode && filters.postalCode?.trim()) {
+      const p = filters.postalCode.trim();
+      and.push({
+        OR: [
+          { postalCode: { contains: p, mode: 'insensitive' } },
+          { location: { contains: p.replace(/\s/g, ''), mode: 'insensitive' } },
+          { location: { contains: p, mode: 'insensitive' } },
+        ],
+      });
+    }
+    if (!radiusGeoMode && filters.city?.trim()) {
+      and.push({ location: { contains: filters.city.trim(), mode: 'insensitive' } });
+    }
+
     const list = await prisma.advertisement.findMany({
-      where,
+      where: { AND: and },
       select: {
         id: true,
         title: true,
         location: true,
         latitude: true,
         longitude: true,
+        postalCode: true,
         type: true,
         price: true,
         images: true,
@@ -83,7 +120,24 @@ export class AdvertisementsService {
       },
       orderBy: [{ priorityBoosted: 'desc' }, { createdAt: 'desc' }],
     });
-    return list.map((ad) => ({
+
+    let filtered = list;
+    if (radiusGeoMode) {
+      const maxKm = Math.min(Math.max(rKm!, 1), 200);
+      filtered = list.filter((ad) => {
+        let lat = ad.latitude ?? undefined;
+        let lng = ad.longitude ?? undefined;
+        if (lat == null || lng == null) {
+          const fallback = getCoordsFromLocationString(ad.location);
+          if (!fallback) return false;
+          lat = fallback[0];
+          lng = fallback[1];
+        }
+        return haversineKm(lat, lng, cLat, cLng) <= maxKm;
+      });
+    }
+
+    return filtered.map((ad) => ({
       id: ad.id,
       title: ad.title,
       location: ad.location,

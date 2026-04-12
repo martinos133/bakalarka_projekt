@@ -31,18 +31,20 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-dark-50 text-white border-t border-white/[0.06]">
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+    <footer className="border-t border-white/[0.06] bg-dark text-white/90">
+      <div className="mx-auto max-w-[1920px] px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
           {sections.map((section) => (
             <div key={section.id}>
-              <h3 className="font-semibold mb-4">{section.title}</h3>
-              <ul className="space-y-2">
+              <h3 className="mb-4 font-serif text-base font-semibold text-accent md:text-lg">
+                {section.title}
+              </h3>
+              <ul className="space-y-2.5">
                 {section.links.map((link) => (
                   <li key={link.id}>
                     <Link
                       href={link.href}
-                      className="text-gray-500 hover:text-white transition-colors text-sm"
+                      className="text-sm text-muted transition-colors hover:text-accent-light"
                     >
                       {link.label}
                     </Link>
@@ -52,11 +54,13 @@ export default function Footer() {
             </div>
           ))}
           <div>
-            <h3 className="font-semibold mb-4">Sledujte nás</h3>
-            <div className="flex gap-4 mb-4">
+            <h3 className="mb-4 font-serif text-base font-semibold text-accent md:text-lg">
+              Sledujte nás
+            </h3>
+            <div className="mb-4 flex gap-3">
               <a
                 href="#"
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-dark-200/15 transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.06] text-white/85 transition-colors hover:border-accent/35 hover:bg-accent/10 hover:text-accent"
                 aria-label="Facebook"
               >
                 <svg
@@ -69,7 +73,7 @@ export default function Footer() {
               </a>
               <a
                 href="#"
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-dark-200/15 transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.06] text-white/85 transition-colors hover:border-accent/35 hover:bg-accent/10 hover:text-accent"
                 aria-label="Twitter"
               >
                 <svg
@@ -82,7 +86,7 @@ export default function Footer() {
               </a>
               <a
                 href="#"
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-dark-200/15 transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.06] text-white/85 transition-colors hover:border-accent/35 hover:bg-accent/10 hover:text-accent"
                 aria-label="Instagram"
               >
                 <svg
@@ -97,20 +101,26 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-white/[0.06] pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-serif italic">RentMe</span>
-              <span className="w-2 h-2 bg-accent rounded-full"></span>
-              <span className="text-gray-500 text-sm ml-2">
-                © RentMe International Ltd. 2024
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-serif text-2xl italic text-white">RentMe</span>
+              <span className="h-2 w-2 shrink-0 rounded-full bg-accent" />
+              <span className="ml-1 text-sm text-muted">
+                © RentMe International Ltd. 2026
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <button className="text-gray-500 hover:text-white transition-colors text-sm">
+              <button
+                type="button"
+                className="text-sm text-muted transition-colors hover:text-accent-light"
+              >
                 Slovenčina
               </button>
-              <span className="text-gray-500">|</span>
-              <button className="text-gray-500 hover:text-white transition-colors text-sm">
+              <span className="text-white/20">|</span>
+              <button
+                type="button"
+                className="text-sm text-muted transition-colors hover:text-accent-light"
+              >
                 € EUR
               </button>
             </div>

@@ -45,11 +45,24 @@ export class AdvertisementsController {
     @Query('categoryId') categoryId?: string,
     @Query('type') type?: string,
     @Query('region') region?: string,
+    @Query('postalCode') postalCode?: string,
+    @Query('city') city?: string,
+    @Query('centerLat') centerLat?: string,
+    @Query('centerLng') centerLng?: string,
+    @Query('radiusKm') radiusKm?: string,
   ) {
+    const lat = centerLat != null && centerLat !== '' ? parseFloat(centerLat) : undefined;
+    const lng = centerLng != null && centerLng !== '' ? parseFloat(centerLng) : undefined;
+    const r = radiusKm != null && radiusKm !== '' ? parseFloat(radiusKm) : undefined;
     return this.advertisementsService.findForMap({
       categoryId: categoryId || undefined,
       type: type as 'SERVICE' | 'RENTAL' | undefined,
       region: region || undefined,
+      postalCode: postalCode || undefined,
+      city: city || undefined,
+      centerLat: lat != null && !Number.isNaN(lat) ? lat : undefined,
+      centerLng: lng != null && !Number.isNaN(lng) ? lng : undefined,
+      radiusKm: r != null && !Number.isNaN(r) ? r : undefined,
     });
   }
 

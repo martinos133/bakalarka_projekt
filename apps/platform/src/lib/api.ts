@@ -101,13 +101,33 @@ export const api = {
     fetchAPI(`/filters/active?categoryId=${encodeURIComponent(categoryId)}`, { cache: 'no-store' }),
   getCategoryBySlug: (slug: string) => fetchAPI(`/categories/slug/${slug}`),
   getAdvertisementsByCategory: (slug: string) => fetchAPI(`/advertisements/category/${slug}`),
-  getAdvertisementsForMap: (params?: { categoryId?: string; type?: string; region?: string }) => {
+  getAdvertisementsForMap: (
+    params?: {
+      categoryId?: string
+      type?: string
+      region?: string
+      postalCode?: string
+      city?: string
+      centerLat?: number
+      centerLng?: number
+      radiusKm?: number
+    },
+    opts?: { signal?: AbortSignal },
+  ) => {
     const search = new URLSearchParams()
     if (params?.categoryId) search.set('categoryId', params.categoryId)
     if (params?.type) search.set('type', params.type)
     if (params?.region) search.set('region', params.region)
+    if (params?.postalCode) search.set('postalCode', params.postalCode)
+    if (params?.city) search.set('city', params.city)
+    if (params?.centerLat != null) search.set('centerLat', String(params.centerLat))
+    if (params?.centerLng != null) search.set('centerLng', String(params.centerLng))
+    if (params?.radiusKm != null) search.set('radiusKm', String(params.radiusKm))
     const q = search.toString()
-    return fetchAPI(q ? `/advertisements/map?${q}` : '/advertisements/map', { cache: 'no-store' })
+    return fetchAPI(q ? `/advertisements/map?${q}` : '/advertisements/map', {
+      cache: 'no-store',
+      signal: opts?.signal,
+    })
   },
   searchAdvertisements: (q: string) => fetchAPI(`/advertisements?q=${encodeURIComponent(q)}`),
   getSearchSuggestions: (q: string) => fetchAPI(`/search/suggestions?q=${encodeURIComponent(q)}`),
