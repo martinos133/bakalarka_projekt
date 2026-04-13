@@ -16,6 +16,7 @@ import { SearchModule } from './search/search.module';
 import { StaticPagesModule } from './static-pages/static-pages.module';
 import { BlogModule } from './blog/blog.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { PlatformTestimonialsModule } from './platform-testimonials/platform-testimonials.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { StaffModule } from './staff/staff.module';
 import { TeamChatModule } from './team-chat/team-chat.module';
@@ -45,6 +46,7 @@ import { SeoModule } from './seo/seo.module';
     StaticPagesModule,
     BlogModule,
     ReviewsModule,
+    PlatformTestimonialsModule,
     CalendarModule,
     StaffModule,
     TeamChatModule,

@@ -145,7 +145,7 @@ export default function Header() {
         api.getPendingAdvertisements().catch(() => []),
         api.getPendingReports().catch(() => []),
         api.getChatUnread().catch(() => ({ total: 0 })),
-        api.getAdminMessages('unread').catch(() => []),
+        api.getAdminMessages('UNREAD').catch(() => []),
         api.getAuditStats().catch(() => null),
       ])
 

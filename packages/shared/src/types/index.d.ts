@@ -382,3 +382,27 @@ export interface UpdateReviewDto {
     rating?: number;
     comment?: string;
 }
+export interface PlatformTestimonialPublic {
+    id: string;
+    rating: number;
+    comment: string;
+    roleLabel: string | null;
+    createdAt: string;
+    author: {
+        firstName?: string | null;
+        lastName?: string | null;
+        avatarUrl?: string | null;
+        companyName?: string | null;
+        isCompany: boolean;
+    };
+}
+export interface CreatePlatformTestimonialDto {
+    rating: number;
+    comment: string;
+    roleLabel?: string;
+}
+export interface UpdatePlatformTestimonialDto {
+    rating?: number;
+    comment?: string;
+    roleLabel?: string;
+}

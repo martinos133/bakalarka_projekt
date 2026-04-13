@@ -90,6 +90,8 @@ model User {
   conversationsA       TeamConversation[] @relation("ConvParticipantA")
   conversationsB       TeamConversation[] @relation("ConvParticipantB")
   teamMessages         TeamMessage[]      @relation("TeamMessageSender")
+  /// Jedna verejná referencia na homepage (voliteľné)
+  platformTestimonial  PlatformTestimonial?
 
   @@index([banned])
   @@index([bannedUntil])
@@ -227,6 +229,22 @@ model Review {
   @@unique([advertisementId, authorId])
   @@index([advertisementId])
   @@index([authorId])
+}
+
+/// Referencia na platformu (homepage – sekcia Referencie)
+model PlatformTestimonial {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String   @db.Text
+  /// Zobrazený podtitul (napr. „CEO, Tech Startup“); ak prázdne, použije sa firma / „Člen platformy“
+  roleLabel String?
+  approved  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([approved])
 }
 
 model Payment {

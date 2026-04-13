@@ -2,6 +2,14 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { prisma } from '@inzertna-platforma/database';
 import { CreateMessageDto, CreateInquiryDto, MessageType, MessageStatus } from '@inzertna-platforma/shared';
 
+/** Query string často posiela `unread` – Prisma očakáva enum `UNREAD`. */
+function coerceMessageStatus(raw?: string): MessageStatus | undefined {
+  if (raw == null || raw === '') return undefined;
+  const u = String(raw).trim().toUpperCase();
+  if (u === 'UNREAD' || u === 'READ' || u === 'ARCHIVED') return u as MessageStatus;
+  return undefined;
+}
+
 @Injectable()
 export class MessagesService {
   async create(userId: string, createDto: CreateMessageDto) {
@@ -82,7 +90,8 @@ export class MessagesService {
 
   async findAllForAdmin(status?: MessageStatus, type?: MessageType) {
     const where: any = {};
-    if (status) where.status = status;
+    const st = coerceMessageStatus(status as unknown as string);
+    if (st) where.status = st;
     if (type) where.type = type;
     return prisma.message.findMany({
       where,
@@ -120,8 +129,9 @@ export class MessagesService {
       OR: [{ recipientId: userId }, { senderId: userId, type: 'INQUIRY' as any }],
     };
 
-    if (status) {
-      where.status = status;
+    const st = coerceMessageStatus(status as unknown as string);
+    if (st) {
+      where.status = st;
     }
 
     if (type) {

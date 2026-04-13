@@ -1,3 +1,5 @@
+import type { CreatePlatformTestimonialDto, UpdatePlatformTestimonialDto } from '@inzertna-platforma/shared'
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
 function messageFromApiErrorBody(data: unknown): string | undefined {
@@ -135,6 +137,21 @@ export const api = {
   getBlogPosts: (limit?: number) =>
     fetchAPI(limit ? `/blog/posts?limit=${limit}` : '/blog/posts'),
   getBlogPost: (slug: string) => fetchAPI(`/blog/posts/slug/${slug}`),
+
+  /** Verejné referencie na homepage */
+  getPlatformTestimonials: () =>
+    fetchAPI('/platform-testimonials', { cache: 'no-store' }),
+  getMyPlatformTestimonial: () => fetchWithAuth('/platform-testimonials/me'),
+  createPlatformTestimonial: (data: CreatePlatformTestimonialDto) =>
+    fetchWithAuth('/platform-testimonials', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updatePlatformTestimonial: (data: UpdatePlatformTestimonialDto) =>
+    fetchWithAuth('/platform-testimonials/me', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
 
   // Auth endpoints
   register: (data: any) => fetchAPI('/auth/register', {
