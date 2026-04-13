@@ -276,7 +276,7 @@ export default function DevBlogPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Obsah (formátovanie, obrázky, zoznamy)
+                    Obsah — farba písma / podfarbenie; pri obrázku sa zadá šírka v %; JPG/PNG; zoznamy
                   </label>
                   <RichTextEditor
                     value={formData.content}

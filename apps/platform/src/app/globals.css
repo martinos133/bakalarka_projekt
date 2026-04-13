@@ -148,8 +148,8 @@ option:hover {
 }
 
 .blog-content strong {
-  color: #f4f4f5;
   font-weight: 600;
+  color: inherit;
 }
 .blog-content ul,
 .blog-content ol {
@@ -198,12 +198,14 @@ option:hover {
 
 .blog-content img {
   display: block;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
+  height: auto;
   max-height: 560px;
   object-fit: contain;
   border-radius: 18px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  margin: 1.5em 0;
+  margin: 1.5em auto;
 }
 
 /* Quill size classes – nech nevystrelí typografia mimo */
