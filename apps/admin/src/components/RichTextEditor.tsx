@@ -6,7 +6,12 @@ import { Image as ImageIcon, X } from 'lucide-react'
 
 import 'react-quill-new/dist/quill.snow.css'
 
-import { registerSizedImageFormat } from '@/lib/quill-sized-image'
+import {
+  registerSizedImageFormat,
+  buildSizedImageStyle,
+  readSizedImageAlign,
+  type ImgBlockAlign,
+} from '@/lib/quill-sized-image'
 
 /** Palety namiesto „prázdneho“ pickera – na tmavom UI sú štvorce vždy čitateľné */
 /** Len farba písma (Quill format „color“) – vrátane modrej bez zmeny pozadia */
@@ -64,13 +69,59 @@ function readImageWidthPct(img: HTMLImageElement): number {
   return 100
 }
 
-function applyImageWidthPct(img: HTMLImageElement, w: number) {
+/** Zarovnanie bloku v Quill (false = vľavo) */
+type QuillBlockAlignUi = 'left' | 'center' | 'right' | 'justify'
+
+function readAlignFromQuillFormat(align: string | undefined | false): QuillBlockAlignUi {
+  if (align === 'center' || align === 'right' || align === 'justify') return align
+  return 'left'
+}
+
+function quillAlignValue(ui: QuillBlockAlignUi): string | false {
+  if (ui === 'left') return false
+  return ui
+}
+
+const TEXT_ALIGN_POPOVER_W = 300
+
+/** getEditor() – len API potrebné na layout (žiadny statický import quill kvôli SSR). */
+type QuillEditorForLayout = {
+  container: HTMLElement
+  getBounds(
+    index: number,
+    length: number,
+  ): {
+    top: number
+    left: number
+    bottom: number
+    width: number
+    height: number
+  } | null
+}
+
+/** Umiestnenie panela zarovnania pod oblasťou výberu alebo bloku (viewport). */
+function computeTextAlignPopoverPosition(
+  quill: QuillEditorForLayout,
+  range: { index: number; length: number },
+): { top: number; left: number } {
+  const container = quill.container.getBoundingClientRect()
+  const b = quill.getBounds(range.index, range.length)
+  if (b == null || (b.height <= 0 && b.width <= 0)) {
+    return { top: container.top + 8, left: 16 }
+  }
+  let top = container.top + b.bottom + 8
+  let left = container.left + b.left + b.width / 2 - TEXT_ALIGN_POPOVER_W / 2
+  if (top + 120 > window.innerHeight) top = Math.max(8, container.top + b.top - 8 - 52)
+  left = Math.max(8, Math.min(left, window.innerWidth - TEXT_ALIGN_POPOVER_W - 8))
+  return { top, left }
+}
+
+function applyImageStyle(img: HTMLImageElement, w: number, align: ImgBlockAlign) {
   const v = Math.min(100, Math.max(25, w))
+  const a: ImgBlockAlign = align === 'left' || align === 'right' ? align : 'center'
   img.setAttribute('data-img-width', String(v))
-  img.setAttribute(
-    'style',
-    `max-width:${v}%; height:auto; display:block; margin:1rem auto; border-radius:12px;`,
-  )
+  img.setAttribute('data-img-align', a)
+  img.setAttribute('style', buildSizedImageStyle(v, a))
 }
 
 function createImageHandler(
@@ -112,6 +163,7 @@ function makeToolbarModules() {
       [{ header: [1, 2, 3, false] }],
       ['bold', 'italic', 'underline', 'strike'],
       [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ align: [] }],
       ['blockquote', 'link', 'image'],
       /** Samostatné skupiny – v toolbare sú dva jasné nástroje: písmo vs. podklad */
       [{ color: TEXT_COLORS }],
@@ -127,7 +179,7 @@ function makeToolbarModules() {
 const formats = [
   'header',
   'bold', 'italic', 'underline', 'strike',
-  'list', 'blockquote', 'link', 'image',
+  'list', 'align', 'blockquote', 'link', 'image',
   'color', 'background',
 ]
 
@@ -166,6 +218,21 @@ type ImgPopoverState = {
   img: HTMLImageElement
   width: number
   initialWidth: number
+  align: ImgBlockAlign
+  initialAlign: ImgBlockAlign
+  top: number
+  left: number
+} | null
+
+type TextAlignPopoverState = {
+  /** Jedna položka po kliknutí na blok; viac odsekov po označení myšou/klávesnicou */
+  mode: 'block' | 'selection'
+  anchorEl: HTMLElement | null
+  lineStart: number
+  /** Rozsah pre formatLine – celý blok alebo celý označený text */
+  lineLength: number
+  align: QuillBlockAlignUi
+  initialAlign: QuillBlockAlignUi
   top: number
   left: number
 } | null
@@ -181,13 +248,22 @@ export default function RichTextEditor({
   const [ReactQuill, setReactQuill] = useState<typeof ReactQuillClass | null>(null)
   const [imageModal, setImageModal] = useState<ImageModalState>(null)
   const [imageWidthPct, setImageWidthPct] = useState(100)
+  const [imageAlign, setImageAlign] = useState<ImgBlockAlign>('center')
   const [imgPopover, setImgPopover] = useState<ImgPopoverState>(null)
+  const [textAlignPopover, setTextAlignPopover] = useState<TextAlignPopoverState>(null)
   const quillRef = useRef<InstanceType<typeof ReactQuillClass> | null>(null)
+  /** Quill len na klientovi (Quill.find) – bez top-level importu kvôli SSR. */
+  const quillConstructorRef = useRef<(typeof import('quill'))['default'] | null>(null)
   const imgPopoverRef = useRef<ImgPopoverState>(null)
+  const textAlignPopoverRef = useRef<TextAlignPopoverState>(null)
+  const imageModalOpenRef = useRef(false)
   imgPopoverRef.current = imgPopover
+  textAlignPopoverRef.current = textAlignPopover
+  imageModalOpenRef.current = !!imageModal
 
   const openImageDialog = useCallback((dataUrl: string, insertIndex: number) => {
     setImageWidthPct(100)
+    setImageAlign('center')
     setImageModal({ dataUrl, insertIndex })
   }, [])
 
@@ -205,16 +281,33 @@ export default function RichTextEditor({
       return
     }
     const w = Math.min(100, Math.max(25, imageWidthPct))
-    quill.insertEmbed(imageModal.insertIndex, 'image', { src: imageModal.dataUrl, width: w })
+    quill.insertEmbed(imageModal.insertIndex, 'image', {
+      src: imageModal.dataUrl,
+      width: w,
+      align: imageAlign,
+    })
     quill.setSelection(imageModal.insertIndex + 1)
     setImageModal(null)
-  }, [imageModal, imageWidthPct])
+  }, [imageModal, imageWidthPct, imageAlign])
 
+  /** Odloženie mimo render – inak Quill/sync môže zavolať setState v rodičovi počas renderu dieťaťa. */
   const syncQuillHtml = useCallback(() => {
     const quill = quillRef.current?.getEditor()
     if (!quill) return
-    onChange(quill.getSemanticHTML())
+    const html = quill.getSemanticHTML()
+    queueMicrotask(() => {
+      onChange(html)
+    })
   }, [onChange])
+
+  const handleQuillChange = useCallback(
+    (content: string) => {
+      queueMicrotask(() => {
+        onChange(content)
+      })
+    },
+    [onChange],
+  )
 
   /** revert=true vráti pôvodnú šírku, false uloží aktuálnu (Hotovo / klik mimo) */
   const finalizeImgPopover = useCallback(
@@ -223,12 +316,27 @@ export default function RichTextEditor({
       if (!cur) return
       cur.img.style.outline = ''
       if (revert) {
-        applyImageWidthPct(cur.img, cur.initialWidth)
+        applyImageStyle(cur.img, cur.initialWidth, cur.initialAlign)
       } else {
-        applyImageWidthPct(cur.img, cur.width)
+        applyImageStyle(cur.img, cur.width, cur.align)
       }
       syncQuillHtml()
       setImgPopover(null)
+    },
+    [syncQuillHtml],
+  )
+
+  const finalizeTextAlignPopover = useCallback(
+    (revert: boolean) => {
+      const cur = textAlignPopoverRef.current
+      if (!cur) return
+      if (cur.anchorEl) cur.anchorEl.style.outline = ''
+      const quill = quillRef.current?.getEditor()
+      if (quill && revert) {
+        quill.formatLine(cur.lineStart, cur.lineLength, 'align', quillAlignValue(cur.initialAlign))
+      }
+      syncQuillHtml()
+      setTextAlignPopover(null)
     },
     [syncQuillHtml],
   )
@@ -247,6 +355,7 @@ export default function RichTextEditor({
     Promise.all([import('react-quill-new'), import('quill')])
       .then(([rqMod, { default: Quill }]) => {
         if (cancelled) return
+        quillConstructorRef.current = Quill
         registerSizedImageFormat(Quill)
         setReactQuill(() => rqMod.default)
         setMounted(true)
@@ -272,67 +381,221 @@ export default function RichTextEditor({
     return () => window.clearTimeout(t)
   }, [mounted])
 
-  /** Klik na obrázok v editore → panel na úpravu šírky */
+  /** Klik na obrázok alebo textový blok → plávajúci panel (ako pri obrázku) */
   useEffect(() => {
     if (!mounted || imageModal) return
     const editor = document.querySelector('.blog-editor .ql-editor')
     if (!editor) return
 
-    const placePopover = (img: HTMLImageElement) => {
-      const rect = img.getBoundingClientRect()
-      return {
-        top: rect.bottom + 8,
-        left: Math.max(8, Math.min(rect.left, window.innerWidth - 308)),
-      }
-    }
+    const placePopover = (rect: DOMRect) => ({
+      top: rect.bottom + 8,
+      left: Math.max(8, Math.min(rect.left, window.innerWidth - 308)),
+    })
 
     const onEditorClick = (e: Event) => {
       const t = e.target as HTMLElement
-      if (t.tagName !== 'IMG' || !editor.contains(t)) return
-      e.stopPropagation()
-      const img = t as HTMLImageElement
-      const w = readImageWidthPct(img)
-      const curOpen = imgPopoverRef.current
-      if (curOpen?.img === img) {
-        curOpen.img.style.outline = ''
-        applyImageWidthPct(curOpen.img, curOpen.width)
-        syncQuillHtml()
-        setImgPopover(null)
+      if (!editor.contains(t)) return
+      if (t.closest('#rte-img-edit-popover') || t.closest('#rte-text-align-popover')) return
+
+      const quill = quillRef.current?.getEditor()
+      if (!quill) return
+
+      if (t.tagName === 'IMG') {
+        e.stopPropagation()
+        finalizeTextAlignPopover(false)
+        const img = t as HTMLImageElement
+        const w = readImageWidthPct(img)
+        const curOpen = imgPopoverRef.current
+        if (curOpen?.img === img) {
+          curOpen.img.style.outline = ''
+          applyImageStyle(curOpen.img, curOpen.width, curOpen.align)
+          syncQuillHtml()
+          setImgPopover(null)
+          return
+        }
+        const prev = imgPopoverRef.current
+        if (prev && prev.img !== img) {
+          prev.img.style.outline = ''
+          applyImageStyle(prev.img, prev.width, prev.align)
+          syncQuillHtml()
+        }
+        img.style.outline = '2px solid #c9a96e'
+        const { top, left } = placePopover(img.getBoundingClientRect())
+        const al = readSizedImageAlign(img)
+        setImgPopover({
+          img,
+          width: w,
+          initialWidth: w,
+          align: al,
+          initialAlign: al,
+          top,
+          left,
+        })
         return
       }
-      const prev = imgPopoverRef.current
-      if (prev && prev.img !== img) {
-        prev.img.style.outline = ''
-        applyImageWidthPct(prev.img, prev.width)
-        syncQuillHtml()
+
+      const blockEl = t.closest(
+        'p,h1,h2,h3,h4,blockquote,li',
+      ) as HTMLElement | null
+      if (!blockEl || !editor.contains(blockEl)) return
+
+      const selRange = quill.getSelection()
+      if (selRange && selRange.length > 0) return
+
+      const Q = quillConstructorRef.current
+      if (!Q) return
+      const blot = Q.find(blockEl, true) as { statics?: { blotName?: string }; length?: () => number } | null
+      const blotName = blot?.statics?.blotName
+      if (!blot || blotName === 'image' || blotName === 'video') return
+
+      e.stopPropagation()
+
+      const lineStart = quill.getIndex(blot as never)
+      const lineTuple = quill.getLine(lineStart) as unknown as [{ length?: () => number } | null, number]
+      const lineBlot = lineTuple[0]
+      const lineLength =
+        lineBlot && typeof lineBlot.length === 'function' ? Math.max(1, lineBlot.length()) : 1
+      const fmt = quill.getFormat(lineStart, 1)
+      const initialAlign = readAlignFromQuillFormat(fmt.align as string | false | undefined)
+
+      const openTxt = textAlignPopoverRef.current
+      if (openTxt?.mode === 'block' && openTxt.anchorEl === blockEl) {
+        finalizeTextAlignPopover(false)
+        return
       }
-      img.style.outline = '2px solid #c9a96e'
-      const { top, left } = placePopover(img)
-      setImgPopover({ img, width: w, initialWidth: w, top, left })
+
+      finalizeImgPopover(false)
+
+      const prevTxt = textAlignPopoverRef.current
+      if (prevTxt && !(prevTxt.mode === 'block' && prevTxt.anchorEl === blockEl)) {
+        finalizeTextAlignPopover(false)
+      }
+
+      blockEl.style.outline = '2px solid #c9a96e'
+      const { top, left } = placePopover(blockEl.getBoundingClientRect())
+      setTextAlignPopover({
+        mode: 'block',
+        anchorEl: blockEl,
+        lineStart,
+        lineLength,
+        align: initialAlign,
+        initialAlign,
+        top,
+        left,
+      })
+    }
+
+    let selCollapseTimer: number | undefined
+    let keyOpenTimer: number | undefined
+
+    const tryOpenSelectionAlignPopover = () => {
+      window.clearTimeout(selCollapseTimer)
+      if (imageModalOpenRef.current) return
+      if (imgPopoverRef.current) return
+      const q = quillRef.current?.getEditor()
+      if (!q) return
+      const range = q.getSelection(true)
+      if (!range || range.length < 1) return
+
+      const prev = textAlignPopoverRef.current
+      if (
+        prev?.mode === 'selection' &&
+        prev.lineStart === range.index &&
+        prev.lineLength === range.length
+      ) {
+        finalizeTextAlignPopover(false)
+        return
+      }
+
+      finalizeImgPopover(false)
+      if (prev) finalizeTextAlignPopover(false)
+
+      const fmt = q.getFormat(range.index, 1)
+      const initialAlign = readAlignFromQuillFormat(fmt.align as string | false | undefined)
+      const pos = computeTextAlignPopoverPosition(q, range)
+      setTextAlignPopover({
+        mode: 'selection',
+        anchorEl: null,
+        lineStart: range.index,
+        lineLength: range.length,
+        align: initialAlign,
+        initialAlign,
+        top: pos.top,
+        left: pos.left,
+      })
+    }
+
+    const onSelectionChangeForClose = (range: { index: number; length: number } | null) => {
+      window.clearTimeout(selCollapseTimer)
+      if (range && range.length > 0) return
+      selCollapseTimer = window.setTimeout(() => {
+        const cur = textAlignPopoverRef.current
+        if (cur?.mode === 'selection') finalizeTextAlignPopover(false)
+      }, 150)
+    }
+
+    const quillInst = quillRef.current?.getEditor()
+    quillInst?.on('selection-change', onSelectionChangeForClose)
+
+    const onKeyUpDebounced = () => {
+      window.clearTimeout(keyOpenTimer)
+      keyOpenTimer = window.setTimeout(tryOpenSelectionAlignPopover, 280)
     }
 
     editor.addEventListener('click', onEditorClick, true)
-    return () => editor.removeEventListener('click', onEditorClick, true)
-  }, [mounted, imageModal, value, syncQuillHtml])
+    editor.addEventListener('mouseup', tryOpenSelectionAlignPopover)
+    editor.addEventListener('keyup', onKeyUpDebounced)
+    return () => {
+      editor.removeEventListener('click', onEditorClick, true)
+      editor.removeEventListener('mouseup', tryOpenSelectionAlignPopover)
+      editor.removeEventListener('keyup', onKeyUpDebounced)
+      window.clearTimeout(selCollapseTimer)
+      window.clearTimeout(keyOpenTimer)
+      quillInst?.off('selection-change', onSelectionChangeForClose)
+    }
+  }, [mounted, imageModal, value, syncQuillHtml, finalizeTextAlignPopover, finalizeImgPopover])
 
   useEffect(() => {
-    if (!imgPopover) return
+    if (!imgPopover && !textAlignPopover) return
     const onDocDown = (e: Event) => {
       const el = e.target as HTMLElement
-      if (imgPopover.img.contains(el)) return
-      if (el.closest('#rte-img-edit-popover')) return
-      finalizeImgPopover(false)
+      if (imgPopover?.img.contains(el)) return
+      if (textAlignPopover?.anchorEl?.contains(el)) return
+      if (el.closest('#rte-img-edit-popover') || el.closest('#rte-text-align-popover')) return
+      if (imgPopover) finalizeImgPopover(false)
+      if (textAlignPopover) finalizeTextAlignPopover(false)
     }
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') finalizeImgPopover(true)
+      if (e.key !== 'Escape') return
+      if (textAlignPopoverRef.current) finalizeTextAlignPopover(true)
+      else if (imgPopoverRef.current) finalizeImgPopover(true)
     }
     const onScrollOrResize = () => {
-      const cur = imgPopoverRef.current
-      if (!cur) return
-      const rect = cur.img.getBoundingClientRect()
-      const top = rect.bottom + 8
-      const left = Math.max(8, Math.min(rect.left, window.innerWidth - 308))
-      setImgPopover((p) => (p ? { ...p, top, left } : null))
+      const imgCur = imgPopoverRef.current
+      if (imgCur) {
+        const rect = imgCur.img.getBoundingClientRect()
+        const top = rect.bottom + 8
+        const left = Math.max(8, Math.min(rect.left, window.innerWidth - 308))
+        setImgPopover((p) => (p ? { ...p, top, left } : null))
+      }
+      const txtCur = textAlignPopoverRef.current
+      if (txtCur) {
+        if (txtCur.mode === 'selection') {
+          const q = quillRef.current?.getEditor()
+          if (q) {
+            const pos = computeTextAlignPopoverPosition(q, {
+              index: txtCur.lineStart,
+              length: txtCur.lineLength,
+            })
+            setTextAlignPopover((p) => (p?.mode === 'selection' ? { ...p, ...pos } : p))
+          }
+        } else if (txtCur.anchorEl) {
+          const rect = txtCur.anchorEl.getBoundingClientRect()
+          const top = rect.bottom + 8
+          const left = Math.max(8, Math.min(rect.left, window.innerWidth - 308))
+          setTextAlignPopover((p) => (p ? { ...p, top, left } : null))
+        }
+      }
     }
     document.addEventListener('mousedown', onDocDown, true)
     window.addEventListener('keydown', onKey)
@@ -344,7 +607,7 @@ export default function RichTextEditor({
       window.removeEventListener('scroll', onScrollOrResize, true)
       window.removeEventListener('resize', onScrollOrResize)
     }
-  }, [imgPopover, finalizeImgPopover])
+  }, [imgPopover, textAlignPopover, finalizeImgPopover, finalizeTextAlignPopover])
 
   useLayoutEffect(() => {
     if (!imgPopover) return
@@ -352,7 +615,38 @@ export default function RichTextEditor({
     const top = rect.bottom + 8
     const left = Math.max(8, Math.min(rect.left, window.innerWidth - 308))
     setImgPopover((p) => (p && p.img === imgPopover.img ? { ...p, top, left } : p))
-  }, [imgPopover?.width, imgPopover?.img])
+  }, [imgPopover?.width, imgPopover?.align, imgPopover?.img])
+
+  useLayoutEffect(() => {
+    if (!textAlignPopover) return
+    if (textAlignPopover.mode === 'selection') {
+      const q = quillRef.current?.getEditor()
+      if (!q) return
+      const pos = computeTextAlignPopoverPosition(q, {
+        index: textAlignPopover.lineStart,
+        length: textAlignPopover.lineLength,
+      })
+      setTextAlignPopover((p) =>
+        p && p.mode === 'selection' && p.lineStart === textAlignPopover.lineStart && p.lineLength === textAlignPopover.lineLength
+          ? { ...p, top: pos.top, left: pos.left }
+          : p,
+      )
+      return
+    }
+    if (!textAlignPopover.anchorEl) return
+    const rect = textAlignPopover.anchorEl.getBoundingClientRect()
+    const top = rect.bottom + 8
+    const left = Math.max(8, Math.min(rect.left, window.innerWidth - 308))
+    setTextAlignPopover((p) =>
+      p && p.anchorEl === textAlignPopover.anchorEl ? { ...p, top, left } : p,
+    )
+  }, [
+    textAlignPopover?.align,
+    textAlignPopover?.anchorEl,
+    textAlignPopover?.mode,
+    textAlignPopover?.lineStart,
+    textAlignPopover?.lineLength,
+  ])
 
   if (!mounted || !ReactQuill) {
     return (
@@ -400,6 +694,34 @@ export default function RichTextEditor({
               />
             </div>
             <div className="space-y-4 px-5 py-5">
+              <div>
+                <p className="mb-2 text-sm font-medium text-gray-300">Zarovnanie obrázka</p>
+                <div className="flex flex-wrap gap-2">
+                  {(
+                    [
+                      { k: 'left' as const, label: 'Vľavo' },
+                      { k: 'center' as const, label: 'Stred' },
+                      { k: 'right' as const, label: 'Vpravo' },
+                    ] as const
+                  ).map(({ k, label }) => (
+                    <button
+                      key={k}
+                      type="button"
+                      onClick={() => setImageAlign(k)}
+                      className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                        imageAlign === k
+                          ? 'border-accent bg-accent/15 text-accent'
+                          : 'border-white/[0.12] text-gray-300 hover:bg-white/[0.06]'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-gray-500">
+                  Text zarovnáš kliknutím na odsek, alebo označ viac odsekov myšou / klávesnicou – po uvoľnení sa otvorí rovnaký panel.
+                </p>
+              </div>
               <div>
                 <div className="mb-2 flex items-center justify-between gap-3">
                   <label htmlFor="rte-img-width" className="text-sm font-medium text-gray-300">
@@ -458,18 +780,112 @@ export default function RichTextEditor({
         </div>
       ) : null}
 
+      {textAlignPopover ? (
+        <div
+          id="rte-text-align-popover"
+          role="dialog"
+          aria-label="Zarovnanie textu"
+          className="fixed z-[20001] w-[min(calc(100vw-16px),300px)] rounded-xl border border-white/[0.12] bg-[#1a1a1c] p-4 shadow-2xl"
+          style={{ top: textAlignPopover.top, left: textAlignPopover.left }}
+          onMouseDown={(e) => e.preventDefault()}
+        >
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-accent">Zarovnanie textu</p>
+          <p className="mb-2 text-xs text-gray-400">
+            {textAlignPopover.mode === 'selection'
+              ? 'Platí pre všetky odseky v označení. Hotovo uloží; Zruší vráti pôvodné.'
+              : 'Platí pre celý tento odsek / položku zoznamu. Hotovo uloží; Zruší vráti pôvodné.'}
+          </p>
+          <div className="mb-3 flex flex-wrap gap-1">
+            {(
+              [
+                { k: 'left' as const, label: 'Vľavo' },
+                { k: 'center' as const, label: 'Stred' },
+                { k: 'right' as const, label: 'Vpravo' },
+                { k: 'justify' as const, label: 'Do bloku' },
+              ] as const
+            ).map(({ k, label }) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => {
+                  const q = quillRef.current?.getEditor()
+                  setTextAlignPopover((p) => {
+                    if (!p) return null
+                    q?.formatLine(p.lineStart, p.lineLength, 'align', quillAlignValue(k))
+                    return { ...p, align: k }
+                  })
+                  syncQuillHtml()
+                }}
+                className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                  textAlignPopover.align === k
+                    ? 'border-accent bg-accent/15 text-accent'
+                    : 'border-white/[0.12] text-gray-300 hover:bg-white/[0.06]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => finalizeTextAlignPopover(true)}
+              className="rounded-lg border border-white/[0.12] px-3 py-2 text-xs font-medium text-gray-300 hover:bg-white/[0.06]"
+            >
+              Zrušiť
+            </button>
+            <button
+              type="button"
+              onClick={() => finalizeTextAlignPopover(false)}
+              className="rounded-lg bg-accent px-3 py-2 text-xs font-semibold text-[#1a1a1a] hover:opacity-90"
+            >
+              Hotovo
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       {imgPopover ? (
         <div
           id="rte-img-edit-popover"
           role="dialog"
-          aria-label="Úprava šírky obrázka"
+          aria-label="Úprava obrázka (šírka a zarovnanie)"
           className="fixed z-[20001] w-[min(calc(100vw-16px),300px)] rounded-xl border border-white/[0.12] bg-[#1a1a1c] p-4 shadow-2xl"
           style={{ top: imgPopover.top, left: imgPopover.left }}
         >
           <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-accent">Úprava obrázka</p>
           <p className="mb-2 text-xs text-gray-400">
-            Uprav šírku v článku. Hotovo uloží zmeny; Zruší vráti pôvodné.
+            Šírka a zarovnanie v stĺpci. Hotovo uloží; Zruší vráti pôvodné.
           </p>
+          <p className="mb-1.5 text-xs text-gray-300">Zarovnanie</p>
+          <div className="mb-3 flex flex-wrap gap-1">
+            {(
+              [
+                { k: 'left' as const, label: 'Vľavo' },
+                { k: 'center' as const, label: 'Stred' },
+                { k: 'right' as const, label: 'Vpravo' },
+              ] as const
+            ).map(({ k, label }) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => {
+                  setImgPopover((p) => {
+                    if (!p) return null
+                    applyImageStyle(p.img, p.width, k)
+                    return { ...p, align: k }
+                  })
+                }}
+                className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                  imgPopover.align === k
+                    ? 'border-accent bg-accent/15 text-accent'
+                    : 'border-white/[0.12] text-gray-300 hover:bg-white/[0.06]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <div className="mb-2 flex items-center justify-between gap-2">
             <span className="text-xs text-gray-300">Šírka</span>
             <span className="tabular-nums text-sm font-semibold text-white">{imgPopover.width}%</span>
@@ -484,7 +900,7 @@ export default function RichTextEditor({
               const v = Number(e.target.value)
               setImgPopover((p) => {
                 if (!p) return null
-                applyImageWidthPct(p.img, v)
+                applyImageStyle(p.img, v, p.align)
                 return { ...p, width: v }
               })
             }}
@@ -502,7 +918,7 @@ export default function RichTextEditor({
                 const v = Math.min(100, Math.max(25, n))
                 setImgPopover((p) => {
                   if (!p) return null
-                  applyImageWidthPct(p.img, v)
+                  applyImageStyle(p.img, v, p.align)
                   return { ...p, width: v }
                 })
               }}
@@ -533,7 +949,7 @@ export default function RichTextEditor({
         ref={quillRef}
         theme="snow"
         value={value}
-        onChange={onChange}
+        onChange={handleQuillChange}
         modules={quillModules}
         formats={formats}
         placeholder={placeholder}

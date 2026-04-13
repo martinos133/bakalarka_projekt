@@ -102,17 +102,44 @@ option:hover {
   margin-right: auto;
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   font-size: 1.0625rem;
-  line-height: 1.82;
-  color: #c4cad3;
+  line-height: 1.78;
+  color: #cfd4dc;
   font-kerning: normal;
   text-rendering: optimizeLegibility;
-  hyphens: auto;
-  -webkit-hyphens: auto;
+  /* Bez auto-hyphenation – inak prehliadač seká zvýraznené slová na slabiky (napr. RE-MO-NEY) */
+  hyphens: none;
+  -webkit-hyphens: none;
+  word-break: normal;
   overflow-wrap: break-word;
   word-wrap: break-word;
 }
+
+/* Quill – zarovnanie odstavcov a nadpisov (toolbar v admin editore) */
+.blog-content .ql-align-left,
+.static-page-content .ql-align-left {
+  text-align: left;
+}
+.blog-content .ql-align-center,
+.static-page-content .ql-align-center {
+  text-align: center;
+}
+.blog-content .ql-align-right,
+.static-page-content .ql-align-right {
+  text-align: right;
+}
+.blog-content .ql-align-justify,
+.static-page-content .ql-align-justify {
+  text-align: justify;
+}
+
 .blog-lead {
-  max-width: 55ch;
+  max-width: 65ch;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 1.125rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  letter-spacing: -0.02em;
+  font-feature-settings: 'kern' 1, 'liga' 1;
 }
 .blog-content p,
 .blog-content ul,
@@ -130,8 +157,9 @@ option:hover {
   letter-spacing: -0.02em;
   line-height: 1.22;
   margin: 1.35em 0 0.65em 0;
-  hyphens: auto;
-  overflow-wrap: anywhere;
+  hyphens: none;
+  -webkit-hyphens: none;
+  overflow-wrap: break-word;
 }
 .blog-content h1 { font-size: clamp(26px, 3.2vw, 38px); }
 .blog-content h2 { font-size: clamp(1.2rem, 2.4vw, 1.5rem); }
@@ -149,7 +177,9 @@ option:hover {
 
 .blog-content strong {
   font-weight: 600;
-  color: inherit;
+  color: #e4e7ec;
+  hyphens: none;
+  -webkit-hyphens: none;
 }
 .blog-content ul,
 .blog-content ol {

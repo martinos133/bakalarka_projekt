@@ -116,7 +116,7 @@ export default function BlogPostPage({
           </div>
         ) : null}
 
-        <header className="mb-10 max-w-prose">
+        <header className="mb-6 max-w-prose sm:mb-7">
           <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
             Blog
           </p>
@@ -130,7 +130,7 @@ export default function BlogPostPage({
             {formatDate(post.publishedAt || post.createdAt)}
           </time>
           {post.excerpt ? (
-            <p className="blog-lead mt-6 text-pretty text-lg leading-relaxed text-zinc-400 sm:text-xl">
+            <p className="blog-lead mt-5 text-pretty text-lg font-medium leading-[1.55] text-zinc-300 sm:mt-6 sm:text-[1.125rem] sm:leading-[1.6]">
               {post.excerpt}
             </p>
           ) : null}
@@ -141,12 +141,12 @@ export default function BlogPostPage({
             prose-headings:font-bold prose-headings:text-zinc-100 prose-headings:tracking-tight prose-headings:text-balance prose-headings:break-words
             prose-h2:text-[1.35rem] prose-h2:mt-12 prose-h2:mb-3 sm:prose-h2:text-[1.5rem]
             prose-h3:text-xl prose-h3:mt-9 prose-h3:mb-3
-            prose-p:text-zinc-400 prose-p:leading-[1.85] prose-p:mb-5
+            prose-p:text-zinc-300/95 prose-p:leading-[1.78] prose-p:mb-5
             prose-strong:text-zinc-100
             prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-a:font-semibold
-            prose-ul:my-5 prose-ol:my-5 prose-li:my-2 prose-li:text-zinc-400 prose-li:marker:text-zinc-600
+            prose-ul:my-5 prose-ol:my-5 prose-li:my-2 prose-li:text-zinc-300/95 prose-li:marker:text-zinc-600
             prose-hr:border-white/[0.08]
-            prose-blockquote:border-l-accent prose-blockquote:bg-zinc-900/35 prose-blockquote:py-3 prose-blockquote:px-4 prose-blockquote:rounded-r-xl prose-blockquote:not-italic prose-blockquote:text-zinc-400
+            prose-blockquote:border-l-accent prose-blockquote:bg-zinc-900/35 prose-blockquote:py-3 prose-blockquote:px-4 prose-blockquote:rounded-r-xl prose-blockquote:not-italic prose-blockquote:text-zinc-300/90
             prose-code:text-zinc-200 prose-code:bg-white/[0.07] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:font-normal
             prose-pre:bg-black/35 prose-pre:border prose-pre:border-white/[0.08]
             prose-img:rounded-2xl prose-img:shadow-lg prose-img:my-8 prose-img:w-full prose-img:max-h-[520px] prose-img:object-contain"
