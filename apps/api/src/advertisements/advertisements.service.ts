@@ -48,6 +48,12 @@ export class AdvertisementsService {
       createRest.description || '',
     );
 
+    const statusMap = {
+      approve: 'ACTIVE',
+      reject: 'INACTIVE',
+      manual: 'PENDING',
+    } as const;
+
     const created = await prisma.advertisement.create({
       data: {
         ...createRest,
@@ -58,17 +64,25 @@ export class AdvertisementsService {
         packages: createRest.packages ? JSON.parse(JSON.stringify(createRest.packages)) : null,
         faq: createRest.faq ? JSON.parse(JSON.stringify(createRest.faq)) : null,
         specifications,
-        ...(moderation.autoApprove ? { status: 'ACTIVE' as any } : {}),
+        status: statusMap[moderation.action] as any,
       } as any,
     });
 
-    if (moderation.autoApprove) {
+    if (moderation.action === 'approve') {
       await this.messagesService.createSystemMessage(
         userId,
         'AD_APPROVED' as any,
         'Váš inzerát bol automaticky schválený',
         `Váš inzerát "${created.title}" bol automaticky schválený a je teraz aktívny na platforme.`,
         { advertisementId: created.id },
+      ).catch(() => undefined);
+    } else if (moderation.action === 'reject') {
+      await this.messagesService.createSystemMessage(
+        userId,
+        'AD_REJECTED' as any,
+        'Váš inzerát bol automaticky zamietnutý',
+        `Váš inzerát "${created.title}" bol automaticky zamietnutý.\n\nDôvod: ${moderation.reason}`,
+        { advertisementId: created.id, reason: moderation.reason },
       ).catch(() => undefined);
     }
 

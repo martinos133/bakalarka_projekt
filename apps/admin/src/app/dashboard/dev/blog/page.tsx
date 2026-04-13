@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth'
 import { api } from '@/lib/api'
 import RichTextEditor from '@/components/RichTextEditor'
-import { Plus, Edit, Trash2, X, Save, BookOpen, ExternalLink } from 'lucide-react'
+import { Plus, Edit, Trash2, X, Save, BookOpen, ExternalLink, Upload, ImageOff } from 'lucide-react'
 import DashboardLayout from '@/components/DashboardLayout'
 import Select from '@/components/Select'
 
@@ -205,15 +205,73 @@ export default function DevBlogPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Hlavný obrázok (URL)
+                    Hlavný obrázok
                   </label>
-                  <input
-                    type="text"
-                    value={formData.featuredImage}
-                    onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })}
-                    placeholder="https://..."
-                    className="input px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-accent/40 hover:bg-cardHover"
-                  />
+                  {formData.featuredImage ? (
+                    <div className="relative group rounded-xl overflow-hidden border border-white/[0.08] bg-white/[0.03]">
+                      <img
+                        src={formData.featuredImage}
+                        alt="Náhľad"
+                        className="w-full h-52 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                        <label className="cursor-pointer px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm text-white transition-colors">
+                          Zmeniť
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,image/gif"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0]
+                              if (!file) return
+                              if (file.size > 5 * 1024 * 1024) {
+                                alert('Obrázok môže mať max. 5 MB')
+                                return
+                              }
+                              const reader = new FileReader()
+                              reader.onloadend = () => {
+                                setFormData({ ...formData, featuredImage: reader.result as string })
+                              }
+                              reader.readAsDataURL(file)
+                              e.target.value = ''
+                            }}
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, featuredImage: '' })}
+                          className="px-3 py-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg text-sm text-red-400 transition-colors"
+                        >
+                          Odstrániť
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center gap-3 w-full h-44 rounded-xl border-2 border-dashed border-white/[0.1] bg-white/[0.02] hover:border-accent/40 hover:bg-accent/5 cursor-pointer transition-all">
+                      <Upload className="w-8 h-8 text-gray-500" />
+                      <span className="text-sm text-gray-400">Klikni alebo pretiahni obrázok</span>
+                      <span className="text-xs text-gray-600">JPG, PNG, WebP, GIF (max. 5 MB)</span>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          if (file.size > 5 * 1024 * 1024) {
+                            alert('Obrázok môže mať max. 5 MB')
+                            return
+                          }
+                          const reader = new FileReader()
+                          reader.onloadend = () => {
+                            setFormData({ ...formData, featuredImage: reader.result as string })
+                          }
+                          reader.readAsDataURL(file)
+                          e.target.value = ''
+                        }}
+                      />
+                    </label>
+                  )}
                 </div>
 
                 <div>

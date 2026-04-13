@@ -20,15 +20,17 @@ let _config: ForbiddenWordsConfig | null = null
 function loadConfig(): ForbiddenWordsConfig {
   if (_config) return _config
   const raw = readFileSync(
-    join(__dirname, '..', '..', '..', 'forbidden_words_sk.json'),
+    join(process.cwd(), '..', 'forbidden_words_sk.json'),
     'utf-8',
   )
   _config = JSON.parse(raw) as ForbiddenWordsConfig
   return _config
 }
 
+export type ModerationAction = 'approve' | 'reject' | 'manual'
+
 export interface ModerationResult {
-  autoApprove: boolean
+  action: ModerationAction
   reason: string | null
   matchedWords: string[]
   category: string | null
@@ -78,7 +80,7 @@ export function moderateContent(title: string, description: string): ModerationR
 
   if (!looksLikeSlovak(fullText)) {
     return {
-      autoApprove: false,
+      action: 'manual',
       reason: 'Inzerát nie je v slovenčine – vyžaduje manuálnu kontrolu.',
       matchedWords: [],
       category: 'non_slovak',
@@ -100,8 +102,9 @@ export function moderateContent(title: string, description: string): ModerationR
     }
 
     if (matched.length > 0) {
+      const action: ModerationAction = cat.action === 'reject' ? 'reject' : 'manual'
       return {
-        autoApprove: false,
+        action,
         reason: `Obsahuje zakázané výrazy (${cat.label}): ${matched.join(', ')}`,
         matchedWords: matched,
         category: catKey,
@@ -109,5 +112,5 @@ export function moderateContent(title: string, description: string): ModerationR
     }
   }
 
-  return { autoApprove: true, reason: null, matchedWords: [], category: null }
+  return { action: 'approve', reason: null, matchedWords: [], category: null }
 }
