@@ -3,6 +3,7 @@ import { prisma } from '@inzertna-platforma/database';
 import { CreateAdvertisementDto, UpdateAdvertisementDto, MessageType } from '@inzertna-platforma/shared';
 import { MessagesService } from '../messages/messages.service';
 import { UsersService } from '../users/users.service';
+import { CalendarService } from '../calendar/calendar.service';
 import { validateCategorySpecifications } from './specifications.validation';
 import { getCoordsFromLocationString, haversineKm } from '../lib/sk-location-coords';
 import { moderateContent } from '../lib/content-moderation';
@@ -12,6 +13,7 @@ export class AdvertisementsService {
   constructor(
     private readonly messagesService: MessagesService,
     private readonly usersService: UsersService,
+    private readonly calendarService: CalendarService,
   ) {}
   async create(userId: string, createDto: CreateAdvertisementDto) {
     // Skontroluj, či používateľ nie je zabanovaný
@@ -337,6 +339,23 @@ export class AdvertisementsService {
     }
 
     return advertisement;
+  }
+
+  /**
+   * Verejné obsadené dni predajcu (kalendár: blok + potvrdená rezervácia) pre výber termínu na inzeráte.
+   */
+  async getOccupiedDaysForAdvertisementPublic(advertisementId: string) {
+    const ad = await prisma.advertisement.findUnique({
+      where: { id: advertisementId },
+      select: { userId: true },
+    });
+    if (!ad) {
+      throw new NotFoundException('Inzerát nebol nájdený');
+    }
+    const occupiedDays = await this.calendarService.getOccupiedYmdsForSellerPublic(
+      ad.userId,
+    );
+    return { occupiedDays };
   }
 
   async update(id: string, userId: string, updateDto: UpdateAdvertisementDto) {

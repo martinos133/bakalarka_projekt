@@ -5,6 +5,7 @@ import { Calendar } from 'lucide-react'
 import { DayPicker, getDefaultClassNames, type DateRange } from 'react-day-picker'
 import { sk } from 'date-fns/locale'
 import { format } from 'date-fns'
+import type { Matcher } from 'react-day-picker'
 
 import 'react-day-picker/style.css'
 
@@ -13,6 +14,8 @@ type CommonProps = {
   className?: string
   disabled?: boolean
   minDate?: Date
+  /** YYYY-MM-DD – dni nedostupné (obsadené / blok), zobrazia sa ako obsadené a nie je ich možné vybrať */
+  occupiedDays?: string[]
 }
 
 type SingleProps = CommonProps & {
@@ -65,7 +68,7 @@ const classNames = {
 }
 
 export default function DatePicker(props: Props) {
-  const { label, className = '', disabled, minDate } = props
+  const { label, className = '', disabled, minDate, occupiedDays } = props
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -92,7 +95,27 @@ export default function DatePicker(props: Props) {
     return ''
   }, [props])
 
-  const disabledMatcher = minDate ? { before: minDate } : undefined
+  const occKey = occupiedDays?.length ? occupiedDays.join('|') : ''
+
+  const disabledMatchers: Matcher | Matcher[] | undefined = useMemo(() => {
+    const occ = new Set(occupiedDays ?? [])
+    const parts: Matcher[] = []
+    if (minDate) parts.push({ before: minDate })
+    if (occ.size) parts.push((d: Date) => occ.has(format(d, 'yyyy-MM-dd')))
+    if (parts.length === 0) return undefined
+    if (parts.length === 1) return parts[0]
+    return parts
+  }, [minDate, occKey])
+
+  const modifiers = useMemo(() => {
+    const occ = new Set(occupiedDays ?? [])
+    if (!occ.size) return undefined
+    return {
+      occupied: (d: Date) => occ.has(format(d, 'yyyy-MM-dd')),
+    }
+  }, [occKey])
+
+  const modifiersClassNames = { occupied: 'rdp-day_occupied' }
 
   return (
     <div ref={rootRef} className={`w-full ${className}`}>
@@ -127,12 +150,13 @@ export default function DatePicker(props: Props) {
                 selected={props.value}
                 onSelect={(d) => {
                   props.onChange(d)
-                  if (d) setOpen(false)
                 }}
                 locale={sk}
                 weekStartsOn={1}
                 showOutsideDays
-                disabled={disabledMatcher}
+                disabled={disabledMatchers}
+                modifiers={modifiers}
+                modifiersClassNames={modifiers ? modifiersClassNames : undefined}
                 classNames={classNames}
               />
             ) : (
@@ -142,15 +166,44 @@ export default function DatePicker(props: Props) {
                 selected={props.value}
                 onSelect={(r) => {
                   props.onChange(r)
-                  if (r?.from && r?.to) setOpen(false)
                 }}
                 locale={sk}
                 weekStartsOn={1}
                 showOutsideDays
-                disabled={disabledMatcher}
+                disabled={disabledMatchers}
+                modifiers={modifiers}
+                modifiersClassNames={modifiers ? modifiersClassNames : undefined}
                 classNames={classNames}
               />
             )}
+
+            {occupiedDays && occupiedDays.length > 0 && (
+              <p className="mt-2 text-xs text-gray-500">
+                Sivé / červené dni sú obsadené – nie je možné ich vybrať.
+              </p>
+            )}
+
+            <div className="mt-3 flex items-center justify-end gap-2 border-t border-white/[0.06] pt-3">
+              <button
+                type="button"
+                className="rounded-lg border border-white/[0.12] bg-transparent px-3 py-2 text-xs font-medium text-white/75 transition hover:bg-white/[0.06] hover:text-white"
+                onClick={() => setOpen(false)}
+              >
+                Zavrieť
+              </button>
+              <button
+                type="button"
+                disabled={
+                  props.mode === 'single'
+                    ? !props.value
+                    : !props.value?.from || !props.value?.to
+                }
+                className="rounded-lg bg-accent px-3 py-2 text-xs font-semibold text-dark transition hover:bg-accent-light disabled:cursor-not-allowed disabled:opacity-45"
+                onClick={() => setOpen(false)}
+              >
+                Použiť
+              </button>
+            </div>
           </div>
         </div>
       )}

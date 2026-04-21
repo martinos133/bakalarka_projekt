@@ -97,6 +97,9 @@ export const api = {
     ),
   getPopularServices: () => fetchAPI('/advertisements/popular/services'),
   getAdvertisement: (id: string) => fetchAPI(`/advertisements/${id}`),
+  /** Verejné YYYY-MM-DD obsadené predajcom (blok + potvrdená rezervácia) pre výber termínu */
+  getAdvertisementOccupiedDays: (advertisementId: string) =>
+    fetchAPI(`/advertisements/${advertisementId}/occupied-days`, { cache: 'no-store' }),
   getCategories: () => fetchAPI('/categories/active'),
   /** Aktívne špecifikácie / filtre pre kategóriu (verejný endpoint) */
   getActiveFilters: (categoryId: string) =>
@@ -225,6 +228,30 @@ export const api = {
     method: 'POST',
     body: JSON.stringify(data),
   }),
+
+  /** Kalendár prihláseného používateľa (from/to = ISO alebo YYYY-MM-DD) */
+  getCalendarEvents: (from?: string, to?: string) => {
+    const q = new URLSearchParams()
+    if (from) q.set('from', from)
+    if (to) q.set('to', to)
+    const s = q.toString()
+    return fetchWithAuth(s ? `/calendar?${s}` : '/calendar')
+  },
+  createCalendarEvent: (data: {
+    title: string
+    description?: string
+    type?: 'EVENT' | 'REMINDER' | 'TASK'
+    date: string
+    endDate?: string
+    allDay?: boolean
+    color?: string
+  }) =>
+    fetchWithAuth('/calendar', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  deleteCalendarEvent: (id: string) =>
+    fetchWithAuth(`/calendar/${id}`, { method: 'DELETE' }),
 
   // Favorites endpoints
   getFavorites: () => fetchWithAuth('/favorites'),

@@ -1,0 +1,3 @@
+# Omylom vygenerovaný JS v src/ má prednosť pred .ts pri require() – nepatrí do repozitára
+src/**/*.js
+src/**/*.js.map

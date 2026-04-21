@@ -453,6 +453,20 @@ option:hover {
   border-radius: 0.5rem;
   transition: background 0.15s, color 0.15s;
 }
+/* Zruš default modrý focus ring (browser/rdp) */
+.rdp-dark .rdp-day_button:focus,
+.rdp-dark .rdp-day_button:focus-visible,
+.rdp-dark .rdp-button_previous:focus,
+.rdp-dark .rdp-button_previous:focus-visible,
+.rdp-dark .rdp-button_next:focus,
+.rdp-dark .rdp-button_next:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+/* Vlastný decentný gold focus len pre klávesnicu */
+.rdp-dark .rdp-day_button:focus-visible {
+  box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.45) !important;
+}
 .rdp-dark .rdp-day_button:hover {
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
@@ -477,6 +491,18 @@ option:hover {
   color: rgba(255, 255, 255, 0.15);
   cursor: not-allowed;
 }
+
+/* Obsadené dni predajcu (rezervácia / blok) – DatePicker occupiedDays */
+.rdp-dark .rdp-day_occupied .rdp-day_button {
+  opacity: 1;
+  background: rgba(127, 29, 29, 0.4);
+  color: #fecaca;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+.rdp-dark .rdp-range_middle {
+  background: rgba(201, 169, 110, 0.15);
+}
 .rdp-dark .rdp-range_start .rdp-day_button,
 .rdp-dark .rdp-range_end .rdp-day_button {
   background: #c9a96e;
@@ -484,7 +510,27 @@ option:hover {
   font-weight: 600;
 }
 .rdp-dark .rdp-range_middle .rdp-day_button {
-  background: rgba(201, 169, 110, 0.15);
+  background: transparent;
   color: #fff;
   border-radius: 0;
+}
+
+/* Plynulý „pill“ vzhľad pre range (od–do) */
+.rdp-dark .rdp-range_start {
+  background: linear-gradient(to right, transparent 0 50%, rgba(201, 169, 110, 0.15) 50% 100%);
+  border-top-left-radius: 0.85rem;
+  border-bottom-left-radius: 0.85rem;
+}
+.rdp-dark .rdp-range_end {
+  background: linear-gradient(to left, transparent 0 50%, rgba(201, 169, 110, 0.15) 50% 100%);
+  border-top-right-radius: 0.85rem;
+  border-bottom-right-radius: 0.85rem;
+}
+.rdp-dark .rdp-range_start .rdp-day_button {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.rdp-dark .rdp-range_end .rdp-day_button {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }

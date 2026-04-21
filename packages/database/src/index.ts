@@ -88,13 +88,19 @@ if (!databaseUrl) {
   throw new Error('DATABASE_URL environment variable is required');
 }
 
-/** Po `prisma generate` môže zostať starý PrismaClient v `global` bez nových modelov (napr. PlatformTestimonial). */
-if (
-  process.env.NODE_ENV !== 'production' &&
-  globalForPrisma.prisma &&
-  typeof (globalForPrisma.prisma as { platformTestimonial?: unknown }).platformTestimonial === 'undefined'
-) {
-  globalForPrisma.prisma.$disconnect().catch(() => {});
+/** Po `prisma generate` môže zostať starý PrismaClient v `global` bez nových modelov. */
+const prismaGlobal = globalForPrisma.prisma as
+  | (typeof globalForPrisma.prisma & {
+      platformTestimonial?: unknown;
+      calendarEvent?: unknown;
+    })
+  | undefined;
+const prismaMissingDelegates =
+  prismaGlobal &&
+  (typeof prismaGlobal.platformTestimonial === 'undefined' ||
+    typeof prismaGlobal.calendarEvent === 'undefined');
+if (process.env.NODE_ENV !== 'production' && prismaMissingDelegates) {
+  prismaGlobal.$disconnect().catch(() => {});
   globalForPrisma.prisma = undefined;
 }
 

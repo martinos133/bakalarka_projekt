@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -14,13 +14,22 @@ import { sellerPlanLabel } from '@/lib/sellerPlan'
 import { fileToResizedAvatarDataUrl } from '@/lib/avatarResize'
 import { useCmsOverride } from '@/lib/useCmsOverride'
 import CustomSelect from '@/components/CustomSelect'
+import ProfileCalendar from '@/components/ProfileCalendar'
+import { parseInquiryDateRangeYmd, CALENDAR_COLOR_BOOKING } from '@inzertna-platforma/shared'
 
 function DashboardPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { loading: cmsLoading, page: cmsPage } = useCmsOverride('dashboard')
   const [mounted, setMounted] = useState(false)
-  const [activeTab, setActiveTab] = useState<'profile' | 'advertisements' | 'favorites' | 'create' | 'messages'>('profile')
+  const [activeTab, setActiveTab] = useState<
+    'profile' | 'advertisements' | 'favorites' | 'create' | 'messages' | 'calendar'
+  >('profile')
+  const [calendarRefreshKey, setCalendarRefreshKey] = useState(0)
+  /** accept = kalendár + odpoveď, decline = len odmietnutie kupujúcemu */
+  const [inquiryOrderBusy, setInquiryOrderBusy] = useState<'accept' | 'decline' | null>(null)
+  /** Po akcii skryť panel hneď (reset pri výbere inej správy). */
+  const [inquiryOrderPanelHiddenForRootId, setInquiryOrderPanelHiddenForRootId] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
   const [advertisements, setAdvertisements] = useState<any[]>([])
   const [favorites, setFavorites] = useState<any[]>([])
@@ -61,7 +70,14 @@ function DashboardPageInner() {
 
   useEffect(() => {
     const tab = searchParams.get('tab')
-    if (tab === 'messages' || tab === 'profile' || tab === 'advertisements' || tab === 'favorites' || tab === 'create') {
+    if (
+      tab === 'messages' ||
+      tab === 'profile' ||
+      tab === 'advertisements' ||
+      tab === 'favorites' ||
+      tab === 'create' ||
+      tab === 'calendar'
+    ) {
       setActiveTab(tab)
     }
   }, [searchParams])
@@ -124,6 +140,43 @@ function DashboardPageInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, messageFilter])
 
+  useEffect(() => {
+    setInquiryOrderPanelHiddenForRootId(null)
+  }, [selectedMessage?.id])
+
+  const inquiryParsedRange = useMemo(() => {
+    if (!conversationMessages.length) return null
+    const txt = conversationMessages.map((m: any) => m.content || '').join('\n')
+    return parseInquiryDateRangeYmd(txt)
+  }, [conversationMessages])
+
+  const inquiryThreadRoot = useMemo(() => {
+    if (!conversationMessages.length) return null
+    return conversationMessages.find((m: any) => !m.parentId) ?? conversationMessages[0]
+  }, [conversationMessages])
+
+  const canConfirmInquiryCalendar = Boolean(
+    user?.id && inquiryParsedRange && inquiryThreadRoot && inquiryThreadRoot.recipientId === user.id,
+  )
+
+  /**
+   * Po odpovedi predajcu (potvrdenie / odmietnutie) už neukazovať panel Prijať/Odmietnuť.
+   * Nepoužívame \\b okolo slov s diakritikou – v JS nie je „á“ word char, takže \\bpotvrdená\\b často neplatí.
+   */
+  const inquirySellerRespondedToOrder = useMemo(() => {
+    if (!conversationMessages.length || !user?.id || !inquiryThreadRoot) return false
+    const rootId = inquiryThreadRoot.id
+    return conversationMessages.some((m: any) => {
+      if (m.senderId !== user.id || m.id === rootId) return false
+      const c = (m.content || '').trim()
+      if (!c) return false
+      return (
+        /potvrdená|potvrdený|potvrdené/i.test(c) ||
+        /nemôžem akceptovať/i.test(c)
+      )
+    })
+  }, [conversationMessages, user?.id, inquiryThreadRoot])
+
   const handleMessageClick = async (message: any) => {
     try {
       setSelectedMessage(message)
@@ -183,6 +236,76 @@ function DashboardPageInner() {
       setError(err.message || 'Chyba pri odoslaní odpovede')
     } finally {
       setReplySubmitting(false)
+    }
+  }
+
+  const handleAcceptInquiryOrder = async () => {
+    if (!inquiryParsedRange || !canConfirmInquiryCalendar) return
+    const adTitle =
+      conversationMessages.find((m: any) => m.advertisement?.title)?.advertisement?.title ||
+      selectedMessage?.advertisement?.title ||
+      selectedMessage?.subject ||
+      'Rezervácia'
+    const rootMsg = conversationMessages.find((m: any) => !m.parentId) || conversationMessages[0]
+    const rootId = rootMsg.id
+    const fromSk = new Date(inquiryParsedRange.startYmd + 'T12:00:00.000Z').toLocaleDateString('sk-SK')
+    const toSk = new Date(inquiryParsedRange.endYmd + 'T12:00:00.000Z').toLocaleDateString('sk-SK')
+    try {
+      setInquiryOrderBusy('accept')
+      setError('')
+      await api.createCalendarEvent({
+        title: `Rezervácia: ${adTitle}`,
+        description: 'Potvrdené z konverzácie v správach.',
+        date: `${inquiryParsedRange.startYmd}T12:00:00.000Z`,
+        endDate: `${inquiryParsedRange.endYmd}T12:00:00.000Z`,
+        allDay: true,
+        color: CALENDAR_COLOR_BOOKING,
+      })
+      setInquiryOrderPanelHiddenForRootId(rootId)
+      try {
+        const replyText = `Vaša rezervácia / objednávka je na termín ${fromSk} – ${toSk} potvrdená. Ďakujem za dôveru.`
+        const newMsg = await api.createReply(rootId, replyText, [])
+        setConversationMessages((prev) => [...prev, newMsg])
+      } catch (replyErr: any) {
+        setError(
+          replyErr?.message ||
+            'Kalendár bol aktualizovaný, ale odpoveď sa nepodarila odoslať – napíšte kupujúcemu ručne.',
+        )
+      }
+      setSuccess(
+        'Termín je v kalendári obsadený. Kupujúci uvidí potvrdenie v Správach v tej istej konverzácii.',
+      )
+      setTimeout(() => setSuccess(''), 5000)
+      setCalendarRefreshKey((k) => k + 1)
+      loadMessages()
+    } catch (err: any) {
+      setError(err.message || 'Nepodarilo sa uložiť do kalendára')
+    } finally {
+      setInquiryOrderBusy(null)
+    }
+  }
+
+  const handleDeclineInquiryOrder = async () => {
+    if (!canConfirmInquiryCalendar || !inquiryParsedRange) return
+    if (!confirm('Naozaj chcete odmietnuť túto žiadosť? Kupujúci dostane krátku odpoveď v konverzácii.')) return
+    const rootMsg = conversationMessages.find((m: any) => !m.parentId) || conversationMessages[0]
+    const rootId = rootMsg.id
+    const fromSk = new Date(inquiryParsedRange.startYmd + 'T12:00:00.000Z').toLocaleDateString('sk-SK')
+    const toSk = new Date(inquiryParsedRange.endYmd + 'T12:00:00.000Z').toLocaleDateString('sk-SK')
+    const body = `Ďakujem za záujem. Žiadosť na termín ${fromSk} – ${toSk} nemôžem akceptovať.`
+    try {
+      setInquiryOrderBusy('decline')
+      setError('')
+      const newMsg = await api.createReply(rootId, body, [])
+      setConversationMessages((prev) => [...prev, newMsg])
+      setInquiryOrderPanelHiddenForRootId(rootId)
+      setSuccess('Žiadosť bola odmietnutá a odpoveď odoslaná.')
+      setTimeout(() => setSuccess(''), 4500)
+      loadMessages()
+    } catch (err: any) {
+      setError(err.message || 'Nepodarilo sa odoslať odmietnutie')
+    } finally {
+      setInquiryOrderBusy(null)
     }
   }
 
@@ -376,6 +499,18 @@ function DashboardPageInner() {
               }`}
             >
               Pridať inzerát
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('calendar')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm inline-flex items-center gap-2 ${
+                activeTab === 'calendar'
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-gray-500 hover:text-white hover:border-white/15'
+              }`}
+            >
+              <Calendar className="w-4 h-4 shrink-0" aria-hidden />
+              Kalendár
             </button>
             <button
               onClick={() => setActiveTab('messages')}
@@ -1032,6 +1167,41 @@ function DashboardPageInner() {
                         )
                       })}
                     </div>
+                    {canConfirmInquiryCalendar &&
+                      inquiryParsedRange &&
+                      !inquirySellerRespondedToOrder &&
+                      inquiryOrderPanelHiddenForRootId !== inquiryThreadRoot?.id && (
+                      <div className="mb-3 rounded-lg border border-accent/25 bg-accent/5 px-3 py-3 space-y-2">
+                        <p className="text-xs text-gray-400">
+                          Žiadosť o termín:{' '}
+                          <span className="text-white font-medium">
+                            {new Date(inquiryParsedRange.startYmd + 'T12:00:00.000Z').toLocaleDateString('sk-SK')} –{' '}
+                            {new Date(inquiryParsedRange.endYmd + 'T12:00:00.000Z').toLocaleDateString('sk-SK')}
+                          </span>
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Ste predávajúci: môžete žiadosť prijať (obsadí sa váš kalendár) alebo odmietnuť (bez zmeny v kalendári).
+                        </p>
+                        <div className="flex flex-col gap-2 sm:flex-row">
+                          <button
+                            type="button"
+                            disabled={inquiryOrderBusy !== null}
+                            onClick={() => void handleAcceptInquiryOrder()}
+                            className="flex-1 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent-light disabled:opacity-50"
+                          >
+                            {inquiryOrderBusy === 'accept' ? 'Spracovávam…' : 'Prijať a obsadiť v kalendári'}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={inquiryOrderBusy !== null}
+                            onClick={() => void handleDeclineInquiryOrder()}
+                            className="flex-1 rounded-lg border border-white/15 bg-transparent px-3 py-2 text-sm font-medium text-gray-200 hover:bg-white/[0.06] disabled:opacity-50"
+                          >
+                            {inquiryOrderBusy === 'decline' ? 'Odosielam…' : 'Odmietnuť'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                     <div className="border-t border-white/[0.08] pt-3">
                       {replyAttachments.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-2">
@@ -1203,6 +1373,10 @@ function DashboardPageInner() {
               )}
             </div>
           </div>
+        )}
+
+        {activeTab === 'calendar' && (
+          <ProfileCalendar refreshKey={calendarRefreshKey} />
         )}
       </div>
 

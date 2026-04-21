@@ -17,9 +17,20 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AuditErrorInterceptor } from './audit/audit-error.interceptor';
 import { AuditService } from './audit/audit.service';
+import { prisma } from '@inzertna-platforma/database';
 import * as express from 'express';
 
 async function bootstrap() {
+  try {
+    await prisma.$connect();
+  } catch (e) {
+    console.error(
+      '❌ Prisma / PostgreSQL: nepodarilo sa pripojiť. Skontrolujte, či databázový server beží a či DATABASE_URL v .env smeruje na správny host a port.',
+    );
+    console.error(e);
+    process.exit(1);
+  }
+
   const app = await NestFactory.create(AppModule);
 
   const auditService = app.get(AuditService);
@@ -63,6 +74,23 @@ async function bootstrap() {
   await app.listen(port);
   console.log(`API server running on http://localhost:${port}`);
   console.log(`Swagger docs available at http://localhost:${port}/api/docs`);
+
+  const shutdown = async (signal: string) => {
+    console.log(`\n${signal}: ukončujem API a odpájam Prisma…`);
+    try {
+      await app.close();
+    } catch {
+      /* ignore */
+    }
+    try {
+      await prisma.$disconnect();
+    } catch {
+      /* ignore */
+    }
+    process.exit(0);
+  };
+  process.once('SIGINT', () => void shutdown('SIGINT'));
+  process.once('SIGTERM', () => void shutdown('SIGTERM'));
 }
 
 bootstrap();

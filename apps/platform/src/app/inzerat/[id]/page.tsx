@@ -131,6 +131,8 @@ export default function AdvertisementDetailPage({
   const [continueRentalRange, setContinueRentalRange] = useState<DateRange | undefined>(undefined)
   const [continueSubmitting, setContinueSubmitting] = useState(false)
   const [continueSuccess, setContinueSuccess] = useState(false)
+  /** YYYY-MM-DD – obsadené predajcom (verejný endpoint), pre DatePicker v modáli žiadosti */
+  const [sellerOccupiedYmds, setSellerOccupiedYmds] = useState<string[]>([])
   const [categorySpecFilters, setCategorySpecFilters] = useState<Filter[]>([])
   const [filterValues, setFilterValues] = useState<FilterValues>({})
   const [categoryAdsForFilters, setCategoryAdsForFilters] = useState<any[]>([])
@@ -286,11 +288,21 @@ export default function AdvertisementDetailPage({
     return [...sameCategory, ...fromRoot].slice(0, 6)
   }, [id, categoryAdsForFilters, rootCategoryAds])
 
+  const refreshSellerOccupiedDays = async () => {
+    try {
+      const res = await api.getAdvertisementOccupiedDays(id)
+      setSellerOccupiedYmds(Array.isArray((res as any)?.occupiedDays) ? (res as any).occupiedDays : [])
+    } catch {
+      setSellerOccupiedYmds([])
+    }
+  }
+
   const loadAdvertisement = async () => {
     try {
       setLoading(true)
       const data = await api.getAdvertisement(id)
       setAdvertisement(data)
+      void refreshSellerOccupiedDays()
       if (data?.userId) {
         api.getUserReviewStats(data.userId).then(setSellerRating).catch(() => {})
       }
@@ -439,6 +451,7 @@ export default function AdvertisementDetailPage({
     setContinueServiceRange(undefined)
     setContinueRentalRange(undefined)
     setContinueSuccess(false)
+    void refreshSellerOccupiedDays()
     setShowContinueModal(true)
   }
 
@@ -1256,6 +1269,7 @@ export default function AdvertisementDetailPage({
                       value={continueServiceRange}
                       onChange={setContinueServiceRange}
                       minDate={new Date()}
+                      occupiedDays={sellerOccupiedYmds}
                     />
                   ) : (
                     <DatePicker
@@ -1264,6 +1278,7 @@ export default function AdvertisementDetailPage({
                       value={continueRentalRange}
                       onChange={setContinueRentalRange}
                       minDate={new Date()}
+                      occupiedDays={sellerOccupiedYmds}
                     />
                   )}
 

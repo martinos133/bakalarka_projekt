@@ -99,6 +99,14 @@ export class AdvertisementsController {
     return this.advertisementsService.findByUser(req.user.userId);
   }
 
+  @Get(':id/occupied-days')
+  @ApiOperation({
+    summary: 'Obsadené dni predajcu (verejné, pre kalendár žiadosti)',
+  })
+  getOccupiedDays(@Param('id') id: string) {
+    return this.advertisementsService.getOccupiedDaysForAdvertisementPublic(id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Získanie inzerátu podľa ID' })
   findOne(@Param('id') id: string) {

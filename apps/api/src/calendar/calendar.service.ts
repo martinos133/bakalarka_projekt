@@ -4,22 +4,86 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { prisma } from '@inzertna-platforma/database';
+import {
+  CALENDAR_COLOR_BLOCKED,
+  CALENDAR_COLOR_BOOKING,
+  rangesOverlapYmd,
+  ymdRangeFromStoredEvent,
+  iterateYmdRangeLocal,
+} from '@inzertna-platforma/shared';
 
 @Injectable()
 export class CalendarService {
+  /**
+   * Udalosti používateľa; ak sú from/to, vráti len tie, čo sa s daným mesiacom/obdobím prekrývajú.
+   */
   async findByUser(userId: string, from?: string, to?: string) {
-    const where: any = { userId };
-
-    if (from || to) {
-      where.date = {};
-      if (from) where.date.gte = new Date(from);
-      if (to) where.date.lte = new Date(to);
-    }
-
-    return prisma.calendarEvent.findMany({
-      where,
+    const events = await prisma.calendarEvent.findMany({
+      where: { userId },
       orderBy: { date: 'asc' },
     });
+    if (!from?.trim() && !to?.trim()) return events;
+    const f = (from || '1970-01-01').slice(0, 10);
+    const t = (to || '2999-12-31').slice(0, 10);
+    const window = { startYmd: f, endYmd: t };
+    return events.filter((e) => {
+      const ev = ymdRangeFromStoredEvent(e.date, e.endDate);
+      return rangesOverlapYmd(window, ev);
+    });
+  }
+
+  /** Blokované sloty predajcu, ktoré sa prekrývajú s intervalom dotazu. */
+  async findBlockedOverlapsForSeller(
+    sellerId: string,
+    startYmd: string,
+    endYmd: string,
+  ) {
+    const blocks = await prisma.calendarEvent.findMany({
+      where: { userId: sellerId, color: CALENDAR_COLOR_BLOCKED },
+      orderBy: { date: 'asc' },
+    });
+    const q = { startYmd, endYmd };
+    return blocks.filter((e) =>
+      rangesOverlapYmd(q, ymdRangeFromStoredEvent(e.date, e.endDate)),
+    );
+  }
+
+  /** Blok + potvrdená rezervácia – pre validáciu žiadosti a verejný kalendár. */
+  async findBusyOverlapsForSeller(
+    sellerId: string,
+    startYmd: string,
+    endYmd: string,
+  ) {
+    const rows = await prisma.calendarEvent.findMany({
+      where: {
+        userId: sellerId,
+        color: { in: [CALENDAR_COLOR_BLOCKED, CALENDAR_COLOR_BOOKING] },
+      },
+      orderBy: { date: 'asc' },
+    });
+    const q = { startYmd, endYmd };
+    return rows.filter((e) =>
+      rangesOverlapYmd(q, ymdRangeFromStoredEvent(e.date, e.endDate)),
+    );
+  }
+
+  /** Zoznam YYYY-MM-DD pre všetky obsadené dni predajcu (bez citlivých údajov). */
+  async getOccupiedYmdsForSellerPublic(sellerUserId: string): Promise<string[]> {
+    const rows = await prisma.calendarEvent.findMany({
+      where: {
+        userId: sellerUserId,
+        color: { in: [CALENDAR_COLOR_BLOCKED, CALENDAR_COLOR_BOOKING] },
+      },
+      select: { date: true, endDate: true },
+    });
+    const set = new Set<string>();
+    for (const e of rows) {
+      const { startYmd, endYmd } = ymdRangeFromStoredEvent(e.date, e.endDate);
+      for (const ymd of iterateYmdRangeLocal(startYmd, endYmd)) {
+        set.add(ymd);
+      }
+    }
+    return Array.from(set).sort();
   }
 
   async findOne(id: string, userId: string) {

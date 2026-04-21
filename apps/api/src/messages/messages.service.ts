@@ -1,6 +1,18 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { prisma } from '@inzertna-platforma/database';
-import { CreateMessageDto, CreateInquiryDto, MessageType, MessageStatus } from '@inzertna-platforma/shared';
+import {
+  CreateMessageDto,
+  CreateInquiryDto,
+  MessageType,
+  MessageStatus,
+  parseInquiryDateRangeYmd,
+} from '@inzertna-platforma/shared';
+import { CalendarService } from '../calendar/calendar.service';
 
 /** Query string často posiela `unread` – Prisma očakáva enum `UNREAD`. */
 function coerceMessageStatus(raw?: string): MessageStatus | undefined {
@@ -12,6 +24,7 @@ function coerceMessageStatus(raw?: string): MessageStatus | undefined {
 
 @Injectable()
 export class MessagesService {
+  constructor(private readonly calendarService: CalendarService) {}
   async create(userId: string, createDto: CreateMessageDto) {
     return prisma.message.create({
       data: {
@@ -56,6 +69,20 @@ export class MessagesService {
 
     if (!advertisement) {
       throw new NotFoundException('Inzerát nebol nájdený');
+    }
+
+    const range = parseInquiryDateRangeYmd(createDto.content);
+    if (range) {
+      const overlaps = await this.calendarService.findBusyOverlapsForSeller(
+        advertisement.userId,
+        range.startYmd,
+        range.endYmd,
+      );
+      if (overlaps.length > 0) {
+        throw new BadRequestException(
+          'V zvolenom termíne už nie je voľno (obsadená rezervácia alebo blok predajcu). Vyberte iné dátumy.',
+        );
+      }
     }
 
     // Vytvor správu pre majiteľa inzerátu
