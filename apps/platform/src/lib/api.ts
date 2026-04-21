@@ -250,6 +250,23 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+  updateCalendarEvent: (
+    id: string,
+    data: {
+      title?: string
+      description?: string
+      type?: 'EVENT' | 'REMINDER' | 'TASK'
+      date?: string
+      endDate?: string
+      allDay?: boolean
+      color?: string
+      completed?: boolean
+    },
+  ) =>
+    fetchWithAuth(`/calendar/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
   deleteCalendarEvent: (id: string) =>
     fetchWithAuth(`/calendar/${id}`, { method: 'DELETE' }),
 

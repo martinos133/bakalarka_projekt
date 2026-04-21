@@ -250,12 +250,24 @@ function DashboardPageInner() {
     const rootId = rootMsg.id
     const fromSk = new Date(inquiryParsedRange.startYmd + 'T12:00:00.000Z').toLocaleDateString('sk-SK')
     const toSk = new Date(inquiryParsedRange.endYmd + 'T12:00:00.000Z').toLocaleDateString('sk-SK')
+    const buyerMsg = conversationMessages.find(
+      (m: any) => m.senderId && m.senderId !== user?.id && m.sender,
+    ) as { sender?: { firstName?: string; lastName?: string; email?: string } } | undefined
+    const buyer =
+      buyerMsg?.sender &&
+      [buyerMsg.sender.firstName, buyerMsg.sender.lastName].filter(Boolean).join(' ').trim()
+        ? `${[buyerMsg.sender.firstName, buyerMsg.sender.lastName].filter(Boolean).join(' ')}${buyerMsg.sender.email ? ` · ${buyerMsg.sender.email}` : ''}`
+        : ''
+    const descriptionParts = [
+      buyer ? `Kupujúci: ${buyer}.` : null,
+      'Potvrdené z konverzácie v správach.',
+    ].filter(Boolean) as string[]
     try {
       setInquiryOrderBusy('accept')
       setError('')
       await api.createCalendarEvent({
         title: `Rezervácia: ${adTitle}`,
-        description: 'Potvrdené z konverzácie v správach.',
+        description: descriptionParts.join(' '),
         date: `${inquiryParsedRange.startYmd}T12:00:00.000Z`,
         endDate: `${inquiryParsedRange.endYmd}T12:00:00.000Z`,
         allDay: true,
