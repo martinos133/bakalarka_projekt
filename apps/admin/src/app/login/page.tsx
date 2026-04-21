@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Lock } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -60,13 +59,13 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-dark">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
-            <Lock className="w-6 h-6 text-accent" />
+          <div className="mb-5 flex justify-center">
+            <div className="flex items-center gap-1.5" aria-label="RentMe">
+              <span className="text-3xl font-serif italic text-white tracking-tight">RentMe</span>
+              <span className="w-2.5 h-2.5 bg-accent rounded-full" aria-hidden></span>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">
-            Admin Panel
-          </h1>
-          <p className="text-sm text-muted mt-1">
+          <p className="text-sm text-muted">
             Prihláste sa do administračného panelu
           </p>
         </div>
@@ -88,6 +87,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                suppressHydrationWarning
                 required
                 className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/[0.06] rounded-xl text-white placeholder-white/70 focus:outline-none focus:border-accent/40 focus:bg-white/[0.08] transition-all text-sm"
                 placeholder="admin@example.com"
@@ -103,6 +103,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                suppressHydrationWarning
                 required
                 className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/[0.06] rounded-xl text-white placeholder-white/70 focus:outline-none focus:border-accent/40 focus:bg-white/[0.08] transition-all text-sm"
                 placeholder="••••••••"

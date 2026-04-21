@@ -163,6 +163,7 @@ export default function Header() {
             <div className="w-full overflow-hidden rounded-lg border border-white/[0.1] bg-card shadow-lg shadow-black/25 transition-[border-color,box-shadow] focus-within:border-accent/45 focus-within:ring-1 focus-within:ring-accent/20">
               <form onSubmit={handleSearch} className="flex w-full min-w-0">
                 <input
+                  suppressHydrationWarning
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}

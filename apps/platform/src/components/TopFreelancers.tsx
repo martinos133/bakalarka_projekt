@@ -116,7 +116,7 @@ export default function TopFreelancers() {
           <h2 className="font-serif text-3xl font-bold text-accent md:text-4xl">{title}</h2>
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {freelancers.map((freelancer) => (
+            {freelancers.map((freelancer) => (
             <TrackedLink
               key={freelancer.id}
               href={freelancer.adId ? `/inzerat/${freelancer.adId}` : `/dashboard`}

@@ -14,6 +14,10 @@ Monorepo pre **webovú inzertnú platformu** (verejný front-end, používateľs
 
 Ak má tvoja **knižná práca v obsahu inú doménu** (napr. sklad), štruktúra kapitol z predlohy stále platí — v texte však popisuj **tento repozitár** (inzertná platforma), aby bol dokument v súlade so zdrojovým kódom a obhajobou.
 
+### Referencie (zdroje)
+
+Zoznam použitých zdrojov/dokumentácie je v `REFERENCIE.md`.
+
 ---
 
 ## Štruktúra repozitára

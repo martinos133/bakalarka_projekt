@@ -127,7 +127,7 @@ export default function AdvertisementDetailPage({
   const [showContinueModal, setShowContinueModal] = useState(false)
   const [continueSubject, setContinueSubject] = useState('')
   const [continueContent, setContinueContent] = useState('')
-  const [continueServiceDate, setContinueServiceDate] = useState<Date | undefined>(undefined)
+  const [continueServiceRange, setContinueServiceRange] = useState<DateRange | undefined>(undefined)
   const [continueRentalRange, setContinueRentalRange] = useState<DateRange | undefined>(undefined)
   const [continueSubmitting, setContinueSubmitting] = useState(false)
   const [continueSuccess, setContinueSuccess] = useState(false)
@@ -436,7 +436,7 @@ export default function AdvertisementDetailPage({
         : `Žiadosť o rezerváciu: ${advertisement?.title || ''}`
     )
     setContinueContent('')
-    setContinueServiceDate(undefined)
+    setContinueServiceRange(undefined)
     setContinueRentalRange(undefined)
     setContinueSuccess(false)
     setShowContinueModal(true)
@@ -451,8 +451,14 @@ export default function AdvertisementDetailPage({
     const isService = advertisement?.type === 'SERVICE'
     if (!continueSubject.trim()) return
     if (isService) {
-      if (!continueServiceDate) {
-        alert('Vyberte dátum, od kedy chcete využívať službu.')
+      const from = continueServiceRange?.from
+      const to = continueServiceRange?.to
+      if (!from || !to) {
+        alert('Vyberte dátumy objednávky (od – do).')
+        return
+      }
+      if (from > to) {
+        alert('Dátum „do“ musí byť neskôr ako dátum „od“.')
         return
       }
     } else {
@@ -473,7 +479,7 @@ export default function AdvertisementDetailPage({
     }
 
     const dateBlock = isService
-      ? `--- DÁTUM ---\nOd kedy chcete využívať službu: ${formatDateForDisplay(continueServiceDate)}\n---------------\n\n`
+      ? `--- OBJEDNÁVKA ---\nOd: ${formatDateForDisplay(continueServiceRange?.from)}\nDo: ${formatDateForDisplay(continueServiceRange?.to)}\n---------------\n\n`
       : `--- REZERVÁCIA ---\nOd: ${formatDateForDisplay(continueRentalRange?.from)}\nDo: ${formatDateForDisplay(continueRentalRange?.to)}\n---------------\n\n`
     const fullContent = dateBlock + continueContent.trim()
 
@@ -1188,7 +1194,7 @@ export default function AdvertisementDetailPage({
             onClick={() => {
               setShowContinueModal(false)
               setContinueSuccess(false)
-              setContinueServiceDate(undefined)
+              setContinueServiceRange(undefined)
               setContinueRentalRange(undefined)
             }}
           />
@@ -1212,7 +1218,7 @@ export default function AdvertisementDetailPage({
                   onClick={() => {
                     setShowContinueModal(false)
                     setContinueSuccess(false)
-                    setContinueServiceDate(undefined)
+                    setContinueServiceRange(undefined)
                     setContinueRentalRange(undefined)
                   }}
                   className="rounded-lg p-1.5 text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white"
@@ -1239,16 +1245,16 @@ export default function AdvertisementDetailPage({
                 <div className="space-y-4">
                   <p className="text-sm text-gray-400">
                     {advertisement.type === 'SERVICE'
-                      ? 'Vyberte dátum začiatku a stručne popíšte objednávku (rozsah, podmienky). Predajca vám odpíše cez Správy a dohodnete detaily.'
+                      ? 'Vyberte termín (od – do) a stručne popíšte objednávku (rozsah, podmienky). Predajca vám odpíše cez Správy a dohodnete detaily.'
                       : 'Vyberte termín rezervácie a doplňte správu. Predajca dostane všetky potrebné informácie.'}
                   </p>
 
                   {advertisement.type === 'SERVICE' ? (
                     <DatePicker
-                      mode="single"
-                      label="Od kedy chcete využívať službu *"
-                      value={continueServiceDate}
-                      onChange={setContinueServiceDate}
+                      mode="range"
+                      label="Termín objednávky (od – do) *"
+                      value={continueServiceRange}
+                      onChange={setContinueServiceRange}
                       minDate={new Date()}
                     />
                   ) : (
@@ -1292,7 +1298,7 @@ export default function AdvertisementDetailPage({
                       disabled={
                         !continueContent.trim() ||
                         (advertisement.type === 'SERVICE'
-                          ? !continueServiceDate
+                          ? !continueServiceRange?.from || !continueServiceRange?.to
                           : !continueRentalRange?.from || !continueRentalRange?.to) ||
                         continueSubmitting
                       }

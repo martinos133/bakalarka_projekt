@@ -42,6 +42,7 @@ async function bootstrap() {
       'http://localhost:3002', // Admin app
       'http://localhost:3003', // User app
       'http://localhost:3000', // Platform app
+      'http://localhost:3004', // Platform app (alternate dev port)
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

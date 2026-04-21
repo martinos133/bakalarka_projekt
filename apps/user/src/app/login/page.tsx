@@ -48,25 +48,29 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">
-            Prihlásenie
-          </h1>
-          <p className="text-gray-600 text-center mb-8">
-            Prihláste sa do svojho účtu
-          </p>
+    <div className="min-h-screen flex items-center justify-center bg-dark px-4">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+          <div className="mb-5 flex justify-center">
+            <div className="flex items-center gap-1.5" aria-label="RentMe">
+              <span className="text-3xl font-serif italic text-white tracking-tight">RentMe</span>
+              <span className="w-2.5 h-2.5 bg-accent rounded-full" aria-hidden></span>
+            </div>
+          </div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Prihlásenie</h1>
+          <p className="text-sm text-muted mt-1">Prihláste sa do svojho účtu</p>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="card p-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+              <div className="bg-red-500/10 border border-red-500/20 text-red-300 px-4 py-3 rounded-xl text-sm">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">
                 Email
               </label>
               <input
@@ -74,14 +78,15 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                suppressHydrationWarning
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/[0.06] rounded-xl text-white placeholder-white/35 focus:outline-none focus:border-accent/40 focus:bg-white/[0.08] transition-all text-sm"
                 placeholder="vas@email.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1.5">
                 Heslo
               </label>
               <input
@@ -89,8 +94,9 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                suppressHydrationWarning
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/[0.06] rounded-xl text-white placeholder-white/35 focus:outline-none focus:border-accent/40 focus:bg-white/[0.08] transition-all text-sm"
                 placeholder="••••••••"
               />
             </div>
@@ -98,16 +104,16 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
+              className="w-full bg-accent hover:bg-accent-light disabled:bg-gray-700 disabled:cursor-not-allowed text-dark font-semibold py-2.5 px-4 rounded-xl transition-all duration-200 text-sm"
             >
               {loading ? 'Prihlasovanie...' : 'Prihlásiť sa'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600">
+            <p className="text-sm text-white/55">
               Nemáte účet?{' '}
-              <Link href="/register" className="text-green-600 hover:text-green-700 font-medium">
+              <Link href="/register" className="text-accent hover:text-accent-light font-medium">
                 Zaregistrujte sa
               </Link>
             </p>

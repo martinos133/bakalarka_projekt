@@ -101,6 +101,7 @@ export default function Testimonials() {
   const [mounted, setMounted] = useState(false)
   const [rows, setRows] = useState<DisplayRow[]>(STATIC_FALLBACK)
   const [listLoading, setListLoading] = useState(true)
+  const [listError, setListError] = useState<string | null>(null)
   const [loggedIn, setLoggedIn] = useState(false)
   const [mine, setMine] = useState<PlatformTestimonialPublic | null>(null)
   const [mineLoading, setMineLoading] = useState(false)
@@ -122,8 +123,11 @@ export default function Testimonials() {
       } else {
         setRows(STATIC_FALLBACK)
       }
-    } catch {
+      setListError(null)
+    } catch (err: unknown) {
       setRows(STATIC_FALLBACK)
+      const msg = err instanceof Error ? err.message : 'Nepodarilo sa načítať referencie.'
+      setListError(msg)
     } finally {
       setListLoading(false)
     }
@@ -273,6 +277,11 @@ export default function Testimonials() {
                       ? 'Upraviť referenciu'
                       : 'Napísať recenziu'}
                 </button>
+              </p>
+            )}
+            {listError && (
+              <p className="mt-2 font-sans text-xs text-white/35">
+                Referencie z API sa nepodarilo načítať: <span className="text-white/45">{listError}</span>
               </p>
             )}
           </div>
