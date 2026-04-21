@@ -43,7 +43,8 @@ export interface MapPoint {
   lng: number
 }
 
-function popupContent(ad: MapPoint): string {
+function popupContent(ad: MapPoint, opts?: { compact?: boolean }): string {
+  const compact = opts?.compact === true
   const img = ad.image
     ? `<img src="${escapeHtml(ad.image)}" alt="" class="ad-map-popup-img" />`
     : `<div class="ad-map-popup-placeholder" role="img" aria-label="Bez fotografie">
@@ -57,10 +58,15 @@ function popupContent(ad: MapPoint): string {
     ad.price != null
       ? `<p class="ad-map-popup-price">${escapeHtml(formatPriceSk(ad.price))}</p>`
       : '<p class="ad-map-popup-price ad-map-popup-price--muted">Cena na vyžiadanie</p>'
-  const link = `<a href="/inzerat/${ad.id}" class="ad-map-popup-link">Otvoriť detail inzerátu<span class="ad-map-popup-link-arrow" aria-hidden="true"> →</span></a>`
+  const link = compact
+    ? `<a href="/inzerat/${ad.id}" class="ad-map-popup-link" aria-label="Otvoriť detail inzerátu">Detail<span class="ad-map-popup-link-arrow" aria-hidden="true"> →</span></a>`
+    : `<a href="/inzerat/${ad.id}" class="ad-map-popup-link">Otvoriť detail inzerátu<span class="ad-map-popup-link-arrow" aria-hidden="true"> →</span></a>`
+  const kicker = compact
+    ? ''
+    : `<p class="ad-map-popup-kicker">Rýchly náhľad</p>`
   return `
     <div class="ad-map-popup-card">
-      <p class="ad-map-popup-kicker">Rýchly náhľad</p>
+      ${kicker}
       <div class="ad-map-popup-img-wrap">${img}</div>
       <div class="ad-map-popup-body">
         ${cat}
@@ -83,9 +89,22 @@ export interface AdMapProps {
   points: MapPoint[]
   selectedPointId?: string | null
   onMarkerClick?: (id: string) => void
+  /** Jednoduchá mapa v bočnom paneli — menšia výška a priblíženie na jediný špendlík. */
+  compact?: boolean
+  /**
+   * Pri false sa náhľad neotvorí sám (vhodné v bočnom paneli) — zobrazí sa po kliknutí na značku.
+   * Na /mapa nechajte predvolené true.
+   */
+  autoOpenPopup?: boolean
 }
 
-export default function AdMap({ points, selectedPointId, onMarkerClick }: AdMapProps) {
+export default function AdMap({
+  points,
+  selectedPointId,
+  onMarkerClick,
+  compact,
+  autoOpenPopup = true,
+}: AdMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const markersRef = useRef<L.Marker[]>([])
@@ -125,18 +144,24 @@ export default function AdMap({ points, selectedPointId, onMarkerClick }: AdMapP
     points.forEach((ad) => {
       const icon = createPinIcon(ad.id === selectedPointId)
       const marker = L.marker([ad.lat, ad.lng], { icon })
-      marker.bindPopup(popupContent(ad), {
-        className: 'ad-map-popup',
-        maxWidth: 340,
-        autoPanPadding: [16, 16],
+      marker.bindPopup(popupContent(ad, { compact: !!compact }), {
+        className: compact ? 'ad-map-popup ad-map-popup--compact' : 'ad-map-popup',
+        maxWidth: compact ? 200 : 340,
+        autoPan: true,
+        autoPanPadding: compact ? [16, 20] : [16, 16],
+        keepInView: true,
       })
       marker.on('click', () => onMarkerClick?.(ad.id))
       marker.addTo(map)
       markersRef.current.push(marker)
     })
-  }, [points, onMarkerClick, selectedPointId])
+    if (compact && points.length === 1) {
+      const p = points[0]
+      map.setView(L.latLng(p.lat, p.lng), 11, { animate: true })
+    }
+  }, [points, onMarkerClick, selectedPointId, compact])
 
-  // Pri zmene selectedPointId posun mapu na marker a otvor popup
+  // Pri zmene selectedPointId posun mapu na marker a (voliteľne) otvor popup — v compact + autoOpenPopup false len zvýrazníme špendlík
   useEffect(() => {
     const map = mapRef.current
     if (!selectedPointId) {
@@ -151,14 +176,16 @@ export default function AdMap({ points, selectedPointId, onMarkerClick }: AdMapP
     const marker = markersRef.current[idx]
     if (marker) {
       map.panTo(marker.getLatLng(), { animate: true, duration: 0.3 })
-      marker.openPopup()
+      if (autoOpenPopup) {
+        marker.openPopup()
+      }
     }
-  }, [selectedPointId, points])
+  }, [selectedPointId, points, autoOpenPopup])
 
   return (
     <div
       ref={containerRef}
-      className="w-full h-full min-h-[500px] bg-dark"
+      className={`leaflet-ad-map-root h-full w-full bg-dark ${compact ? 'min-h-[220px] sm:min-h-[260px]' : 'min-h-[500px]'}`}
     />
   )
 }

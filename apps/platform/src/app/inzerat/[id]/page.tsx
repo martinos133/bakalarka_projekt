@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { use, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import Header from '@/components/Header'
@@ -20,8 +21,29 @@ import { api } from '@/lib/api'
 import { useCmsOverride } from '@/lib/useCmsOverride'
 import { isAuthenticated, getAuthUser } from '@/lib/auth'
 import { isProSellerBadge } from '@/lib/sellerPlan'
+import { getCoordsFromLocation } from '@/lib/mapRegions'
+import type { MapPoint } from '@/components/AdMap'
 import type { Filter } from '@inzertna-platforma/shared'
-import { ChevronDown, ChevronUp, Flag, AlertCircle, X, Check, MessageSquare, Phone, Heart, Star, Trash2, Edit3, Reply, RefreshCw, Calendar, Clock } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronUp,
+  Flag,
+  AlertCircle,
+  X,
+  Check,
+  MessageSquare,
+  Phone,
+  Heart,
+  Star,
+  Trash2,
+  Edit3,
+  Reply,
+  RefreshCw,
+  Calendar,
+  Clock,
+  MapPin,
+  Layers,
+} from 'lucide-react'
 import CustomSelect from '@/components/CustomSelect'
 import type { DateRange } from 'react-day-picker'
 
@@ -76,6 +98,8 @@ interface Advertisement {
     slug?: string
   }
   location?: string
+  latitude?: number | null
+  longitude?: number | null
   priorityBoosted?: boolean
   userId?: string
   user?: {
@@ -99,6 +123,8 @@ interface Advertisement {
   features?: string[]
   faq?: FAQ[]
 }
+
+const AdMap = dynamic(() => import('@/components/AdMap'), { ssr: false })
 
 export default function AdvertisementDetailPage({
   params,
@@ -150,6 +176,43 @@ export default function AdvertisementDetailPage({
       ).length,
     [categoryAdsForFilters, categorySpecFilters, filterValues],
   )
+
+  /** Jedna značka pre bočnú mapu — rovnaký model ako na /mapa (lat/lng alebo textová lokalita → približné súradnice). */
+  const adSidebarMapPoints: MapPoint[] = useMemo(() => {
+    if (!advertisement) return []
+    let lat = advertisement.latitude ?? undefined
+    let lng = advertisement.longitude ?? undefined
+    if (
+      lat == null ||
+      lng == null ||
+      !Number.isFinite(Number(lat)) ||
+      !Number.isFinite(Number(lng))
+    ) {
+      const g = getCoordsFromLocation(advertisement.location)
+      if (!g) return []
+      lat = g[0]
+      lng = g[1]
+    }
+    const cat = advertisement.category
+    return [
+      {
+        id: advertisement.id,
+        title: advertisement.title,
+        location: advertisement.location ?? null,
+        price: advertisement.price ?? null,
+        image: advertisement.images?.[0] ?? null,
+        category: cat?.name
+          ? {
+              id: cat.id || advertisement.categoryId || '',
+              name: cat.name,
+              slug: cat.slug || '',
+            }
+          : null,
+        lat: Number(lat),
+        lng: Number(lng),
+      },
+    ]
+  }, [advertisement])
 
   useEffect(() => {
     loadAdvertisement()
@@ -1003,6 +1066,49 @@ export default function AdvertisementDetailPage({
                   >
                     Kontaktovať predajcu
                   </button>
+                </div>
+              )}
+
+              {adSidebarMapPoints.length > 0 && (
+                <div className="card mt-6 overflow-visible p-0 shadow-2xl shadow-black/20 ring-1 ring-white/[0.04]">
+                  <div className="border-b border-white/[0.08] px-5 py-4">
+                    <h3 className="flex items-center gap-2 font-semibold text-white">
+                      <Layers className="h-5 w-5 shrink-0 text-accent" aria-hidden />
+                      Lokalita na mape
+                    </h3>
+                    <p className="mt-1 flex items-start gap-2 text-sm text-gray-500">
+                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent/80" aria-hidden />
+                      <span>
+                        Inzerát je zobrazený na mape rovnako ako v sekcii Mapa — špendlík zodpovedá
+                        {advertisement.location ? (
+                          <>
+                            {' '}
+                            oblasti{' '}
+                            <span className="font-medium text-gray-300">{advertisement.location}</span>.
+                          </>
+                        ) : (
+                          ' zadanej polohe.'
+                        )}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="relative z-10 h-64 w-full overflow-visible sm:h-72">
+                    <AdMap
+                      points={adSidebarMapPoints}
+                      selectedPointId={adSidebarMapPoints[0]?.id ?? null}
+                      compact
+                      autoOpenPopup={false}
+                    />
+                  </div>
+                  <div className="border-t border-white/[0.08] px-5 py-3">
+                    <Link
+                      href="/mapa"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-accent transition hover:text-accent-light"
+                    >
+                      Všetky inzeráty na mape
+                      <span aria-hidden>→</span>
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>

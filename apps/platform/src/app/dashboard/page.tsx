@@ -7,10 +7,38 @@ import Footer from '@/components/Footer'
 import { CmsArticleView, CmsLoadingView } from '@/components/CmsGate'
 import { api } from '@/lib/api'
 import { isAuthenticated, getAuthUser, setAuthUser } from '@/lib/auth'
-import { User, Building2, Trash2, X, Lock, Mail, Phone, MapPin, Calendar, Crown, Save, Eye, Edit, MessageSquare, Archive, CheckCircle, Paperclip, FileText, Download, Heart, Image as ImageIcon } from 'lucide-react'
+import {
+  User,
+  Building2,
+  Trash2,
+  X,
+  Lock,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Crown,
+  Save,
+  Eye,
+  Edit,
+  MessageSquare,
+  Archive,
+  CheckCircle,
+  Paperclip,
+  FileText,
+  Download,
+  Heart,
+  Image as ImageIcon,
+  CreditCard,
+  ArrowRight,
+} from 'lucide-react'
 import CreateAdvertisementWizard from '@/components/CreateAdvertisementWizard'
 import Link from 'next/link'
-import { sellerPlanLabel } from '@/lib/sellerPlan'
+import {
+  sellerPlanLabel,
+  sellerPlanSubscriptionActive,
+  sellerPlanSubscriptionExpired,
+} from '@/lib/sellerPlan'
 import { fileToResizedAvatarDataUrl } from '@/lib/avatarResize'
 import { useCmsOverride } from '@/lib/useCmsOverride'
 import CustomSelect from '@/components/CustomSelect'
@@ -23,7 +51,7 @@ function DashboardPageInner() {
   const { loading: cmsLoading, page: cmsPage } = useCmsOverride('dashboard')
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState<
-    'profile' | 'advertisements' | 'favorites' | 'create' | 'messages' | 'calendar'
+    'profile' | 'advertisements' | 'favorites' | 'create' | 'messages' | 'calendar' | 'subscription'
   >('profile')
   const [calendarRefreshKey, setCalendarRefreshKey] = useState(0)
   /** accept = kalendár + odpoveď, decline = len odmietnutie kupujúcemu */
@@ -76,9 +104,11 @@ function DashboardPageInner() {
       tab === 'advertisements' ||
       tab === 'favorites' ||
       tab === 'create' ||
-      tab === 'calendar'
+      tab === 'calendar' ||
+      tab === 'subscription' ||
+      tab === 'predplatne'
     ) {
-      setActiveTab(tab)
+      setActiveTab(tab === 'predplatne' ? 'subscription' : tab)
     }
   }, [searchParams])
 
@@ -465,8 +495,8 @@ function DashboardPageInner() {
         )}
 
         {/* Tabs */}
-        <div className="border-b border-white/[0.08] mb-6">
-          <nav className="flex space-x-8">
+        <div className="mb-6 border-b border-white/[0.08]">
+          <nav className="-mb-px flex gap-x-6 overflow-x-auto pb-px sm:gap-x-8 [&>button]:shrink-0">
             <button
               onClick={() => setActiveTab('profile')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
@@ -538,6 +568,18 @@ function DashboardPageInner() {
                   {unreadCount}
                 </span>
               )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('subscription')}
+              className={`inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                activeTab === 'subscription'
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-gray-500 hover:text-white hover:border-white/15'
+              }`}
+            >
+              <CreditCard className="h-4 w-4 shrink-0" aria-hidden />
+              Predplatné
             </button>
           </nav>
         </div>
@@ -1389,6 +1431,136 @@ function DashboardPageInner() {
 
         {activeTab === 'calendar' && (
           <ProfileCalendar refreshKey={calendarRefreshKey} />
+        )}
+
+        {activeTab === 'subscription' && (
+          <div className="space-y-6">
+            <div className="card overflow-hidden p-6 sm:p-8">
+              <div className="flex flex-col gap-2 border-b border-white/[0.08] pb-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <h2 className="flex items-center gap-2 font-serif text-2xl font-medium text-white">
+                    <Crown className="h-6 w-6 text-accent" aria-hidden />
+                    Predplatné
+                  </h2>
+                  <p className="mt-1 max-w-xl text-sm text-gray-500">
+                    Prehľad vášho balíka a odkaz na nákup alebo zmenu plánu — rovnaké balíky ako na stránke Prémium.
+                  </p>
+                </div>
+                <Link
+                  href="/premium"
+                  className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-dark transition hover:bg-accent-light"
+                >
+                  Prehliadnuť balíky
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </Link>
+              </div>
+
+              <div className="mt-6 grid gap-6 lg:grid-cols-2">
+                <section
+                  className={`rounded-xl border p-5 sm:p-6 ${
+                    sellerPlanSubscriptionActive(profileData?.sellerPlan, profileData?.sellerPlanValidUntil)
+                      ? 'border-accent/25 bg-accent/[0.07]'
+                      : sellerPlanSubscriptionExpired(profileData?.sellerPlan, profileData?.sellerPlanValidUntil)
+                        ? 'border-amber-800/35 bg-amber-950/25'
+                        : 'border-white/[0.08] bg-white/[0.02]'
+                  }`}
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">
+                    Váš stav
+                  </p>
+                  {sellerPlanSubscriptionActive(profileData?.sellerPlan, profileData?.sellerPlanValidUntil) ? (
+                    <>
+                      <p className="mt-2 text-sm text-gray-400">Aktívny balík</p>
+                      <p className="mt-1 font-serif text-2xl font-medium text-accent">
+                        {sellerPlanLabel(profileData?.sellerPlan)}
+                      </p>
+                      <p className="mt-3 text-sm leading-relaxed text-gray-300">
+                        Predplatné máte aktivované na plán{' '}
+                        <span className="font-medium text-white">{sellerPlanLabel(profileData?.sellerPlan)}</span>.
+                        {profileData?.sellerPlanValidUntil ? (
+                          <>
+                            {' '}
+                            Je platné do{' '}
+                            <span className="font-medium text-white">
+                              {new Date(profileData.sellerPlanValidUntil).toLocaleDateString('sk-SK', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric',
+                              })}
+                            </span>
+                            .
+                          </>
+                        ) : null}
+                      </p>
+                    </>
+                  ) : sellerPlanSubscriptionExpired(profileData?.sellerPlan, profileData?.sellerPlanValidUntil) ? (
+                    <>
+                      <p className="mt-2 text-sm text-amber-200/90">Predplatné vypršalo</p>
+                      <p className="mt-1 font-serif text-xl font-medium text-white">
+                        {sellerPlanLabel(profileData?.sellerPlan)}
+                      </p>
+                      <p className="mt-3 text-sm leading-relaxed text-gray-300">
+                        Platnosť balíka skončila{' '}
+                        {profileData?.sellerPlanValidUntil ? (
+                          <span className="text-white">
+                            {new Date(profileData.sellerPlanValidUntil).toLocaleDateString('sk-SK')}
+                          </span>
+                        ) : (
+                          ''
+                        )}
+                        . Obnovte si predplatné v sekcii Prémium — znova získate výhody balíka.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="mt-2 text-sm text-gray-400">Bez prémiového predplatného</p>
+                      <p className="mt-1 font-serif text-xl font-medium text-white">
+                        {sellerPlanLabel(profileData?.sellerPlan)}
+                      </p>
+                      <p className="mt-3 text-sm leading-relaxed text-gray-400">
+                        Momentálne používate bezplatný režim Štandard. Balíky Plus, RentMe Pro a Firma nájdete na
+                        stránke Prémium — tam si vyberiete plán a dokončíte objednávku podľa pokynov.
+                      </p>
+                    </>
+                  )}
+                </section>
+
+                <section className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">
+                    Kde kúpiť
+                  </p>
+                  <h3 className="mt-2 font-medium text-white">Prémium — balíky a ceny</h3>
+                  <ul className="mt-4 space-y-2.5 text-sm text-gray-400">
+                    <li className="flex gap-2">
+                      <span className="text-accent">·</span>
+                      <span>
+                        <strong className="text-gray-200">Plus</strong> — jeden prioritný inzerát, lepšia viditeľnosť.
+                      </span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-accent">·</span>
+                      <span>
+                        <strong className="text-gray-200">RentMe Pro</strong> — až 3 prioritné inzeráty, odznak Pro.
+                      </span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-accent">·</span>
+                      <span>
+                        <strong className="text-gray-200">Firma</strong> — viac inzerátov a funkcie pre tímy.
+                      </span>
+                    </li>
+                  </ul>
+                  <Link
+                    href="/premium"
+                    className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-accent/40 bg-accent/10 py-3 text-sm font-semibold text-accent transition hover:bg-accent/15"
+                  >
+                    Otvoriť stránku Prémium
+                    <ArrowRight className="h-4 w-4" aria-hidden />
+                  </Link>
+                </section>
+              </div>
+            </div>
+          </div>
         )}
       </div>
 
