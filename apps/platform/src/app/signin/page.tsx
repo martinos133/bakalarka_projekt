@@ -128,7 +128,14 @@ function SignInPageInner() {
             <div className="mt-6 text-center">
               <p className="text-gray-500">
                 Nemáte účet?{' '}
-                <Link href="/join" className="text-accent hover:text-accent font-medium">
+                <Link
+                  href={
+                    redirectTo && redirectTo !== '/'
+                      ? `/join?redirect=${encodeURIComponent(redirectTo)}`
+                      : '/join'
+                  }
+                  className="text-accent hover:text-accent font-medium"
+                >
                   Zaregistrujte sa
                 </Link>
               </p>

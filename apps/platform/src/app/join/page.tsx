@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -11,8 +11,19 @@ import { User, Building2, Eye, EyeOff } from 'lucide-react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
-export default function JoinPage() {
+/** Povolené presmerovanie po registrácii – len interné cesty */
+function safeRedirectPath(path: string | null): string | null {
+  if (!path || typeof path !== 'string') return null
+  const p = path.trim()
+  if (p.startsWith('/') && !p.startsWith('//')) return p
+  return null
+}
+
+function JoinPageInner() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectParam = safeRedirectPath(searchParams.get('redirect'))
+  const signInResumeHref = redirectParam ? `/signin?redirect=${encodeURIComponent(redirectParam)}` : '/signin'
   const [isCompany, setIsCompany] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
@@ -119,8 +130,8 @@ export default function JoinPage() {
         localStorage.setItem('user_user', JSON.stringify(data.user))
       }
 
-      // Presmerovanie na hlavnú stránku
-      router.push('/')
+      const nextPath = redirectParam ?? '/'
+      router.push(nextPath)
     } catch (err: any) {
       if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
         setError('Nepodarilo sa pripojiť k API serveru. Skontrolujte, či API server beží.')
@@ -626,7 +637,7 @@ export default function JoinPage() {
             <div className="mt-6 text-center">
               <p className="text-gray-500">
                 Už máte účet?{' '}
-                <Link href="/signin" className="text-accent hover:text-accent font-medium">
+                <Link href={signInResumeHref} className="text-accent hover:text-accent font-medium">
                   Prihláste sa
                 </Link>
               </p>
@@ -637,5 +648,21 @@ export default function JoinPage() {
       <Footer />
     </div>
     </CmsGate>
+  )
+}
+
+export default function JoinPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-dark">
+          <Header />
+          <div className="flex min-h-[50vh] items-center justify-center text-gray-500">Načítavam…</div>
+          <Footer />
+        </div>
+      }
+    >
+      <JoinPageInner />
+    </Suspense>
   )
 }

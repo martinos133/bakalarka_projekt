@@ -16,7 +16,8 @@ interface NavbarItem {
 }
 
 const PODAT_INZERAT = '/podat-inzerat'
-
+/** Nezalogovaný — prihlásenie a potom formulár inzerátu */
+const SIGNIN_FOR_NEW_AD = `/signin?redirect=${encodeURIComponent(PODAT_INZERAT)}`
 /** Položky menu z CMS niekedy ukazujú starý odkaz na záložku v dashboarde – zjednotíme na verejný formulár. */
 function normalizeNavbarHref(href: string): string {
   if (!href || typeof href !== 'string') return href
@@ -223,15 +224,13 @@ export default function Header() {
                 {item.label}
               </Link>
             ))}
-            {mounted && !user && (
-              <Link
-                href={PODAT_INZERAT}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-white transition-colors hover:text-accent-light"
-              >
-                <PlusCircle className="h-4 w-4 text-accent" aria-hidden />
-                Pridať inzerát
-              </Link>
-            )}
+            <Link
+              href={mounted && user ? PODAT_INZERAT : SIGNIN_FOR_NEW_AD}
+              className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-dark shadow-md shadow-accent/25 transition hover:bg-accent-light hover:shadow-lg hover:shadow-accent/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-dark"
+            >
+              <PlusCircle className="h-4 w-4 shrink-0" aria-hidden />
+              Vytvoriť inzerát
+            </Link>
             {mounted && user ? (
               <div className="relative">
                 <button
@@ -271,7 +270,7 @@ export default function Header() {
                       onClick={() => setShowUserMenu(false)}
                     >
                       <PlusCircle className="w-4 h-4 text-accent" />
-                      Pridať inzerát
+                      Vytvoriť inzerát
                     </Link>
                     <Link
                       href="/dashboard"
@@ -346,7 +345,7 @@ export default function Header() {
                       onClick={() => setShowUserMenu(false)}
                     >
                       <PlusCircle className="w-4 h-4 text-accent" />
-                      Pridať inzerát
+                      Vytvoriť inzerát
                     </Link>
                     <Link
                       href="/dashboard"
@@ -397,14 +396,6 @@ export default function Header() {
             >
               Mapa
             </Link>
-            <Link
-              href={PODAT_INZERAT}
-              className="flex items-center gap-2 text-white"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <PlusCircle className="h-4 w-4 shrink-0 text-accent" aria-hidden />
-              Pridať inzerát
-            </Link>
             {navbarItemsWithoutMap.map((item) => (
               <Link
                 key={item.id}
@@ -415,6 +406,14 @@ export default function Header() {
                 {item.label}
               </Link>
             ))}
+            <Link
+              href={mounted && user ? PODAT_INZERAT : SIGNIN_FOR_NEW_AD}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-accent py-3 text-sm font-semibold text-dark shadow-md shadow-accent/25 transition hover:bg-accent-light"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <PlusCircle className="h-4 w-4 shrink-0" aria-hidden />
+              Vytvoriť inzerát
+            </Link>
           </div>
         </div>
       )}
