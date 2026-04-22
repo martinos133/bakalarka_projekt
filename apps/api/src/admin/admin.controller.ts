@@ -38,10 +38,17 @@ export class AdminController {
   }
 
   @Get('chart')
-  @ApiOperation({ summary: 'Získanie dát pre graf' })
+  @ApiOperation({ summary: 'Získanie dát pre graf inzerátov' })
   @ApiQuery({ name: 'period', enum: ['7d', '30d', '3m'], required: false, description: 'Časové obdobie' })
   getChartData(@Query('period') period: '7d' | '30d' | '3m' = '30d') {
     return this.adminService.getChartData(period);
+  }
+
+  @Get('chart/users')
+  @ApiOperation({ summary: 'Získanie dát pre graf používateľov (registrácie / firmy)' })
+  @ApiQuery({ name: 'period', enum: ['7d', '30d', '3m'], required: false, description: 'Časové obdobie' })
+  getUserChartData(@Query('period') period: '7d' | '30d' | '3m' = '30d') {
+    return this.adminService.getUserChartData(period);
   }
 
   @Get('messages')

@@ -92,8 +92,10 @@ export const api = {
     if (type) params.set('type', type)
     return fetchWithAuth(`/admin/messages?${params.toString()}`)
   },
-  getChartData: (period: '7d' | '30d' | '3m' = '30d') => 
+  getChartData: (period: '7d' | '30d' | '3m' = '30d') =>
     fetchWithAuth(`/admin/chart?period=${period}`),
+  getUserChartData: (period: '7d' | '30d' | '3m' = '30d') =>
+    fetchWithAuth(`/admin/chart/users?period=${period}`),
   getUsers: () => fetchWithAuth('/users'),
   getAdvertisements: () => fetchWithAuth('/admin/advertisements'),
   createAdvertisement: (data: any) => 

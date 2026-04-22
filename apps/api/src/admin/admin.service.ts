@@ -125,4 +125,62 @@ export class AdminService {
 
     return result;
   }
+
+  async getUserChartData(period: '7d' | '30d' | '3m') {
+    const now = new Date();
+    let startDate: Date;
+
+    switch (period) {
+      case '7d':
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case '30d':
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+      case '3m':
+        startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+        break;
+      default:
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    }
+
+    const users = await prisma.user.findMany({
+      where: {
+        createdAt: {
+          gte: startDate,
+        },
+      },
+      select: {
+        createdAt: true,
+        isCompany: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+
+    const dataMap = new Map<string, { date: string; registrations: number; companies: number }>();
+
+    users.forEach((u) => {
+      const date = new Date(u.createdAt).toISOString().split('T')[0];
+      const existing = dataMap.get(date) || { date, registrations: 0, companies: 0 };
+      existing.registrations++;
+      if (u.isCompany) {
+        existing.companies++;
+      }
+      dataMap.set(date, existing);
+    });
+
+    const result: Array<{ date: string; registrations: number; companies: number }> = [];
+    const currentDate = new Date(startDate);
+
+    while (currentDate <= now) {
+      const dateStr = currentDate.toISOString().split('T')[0];
+      const row = dataMap.get(dateStr) || { date: dateStr, registrations: 0, companies: 0 };
+      result.push(row);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return result;
+  }
 }

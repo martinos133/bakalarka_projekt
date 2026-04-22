@@ -8,6 +8,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import MetricCard from '@/components/MetricCard'
 import QuickActions from '@/components/QuickActions'
 import Chart from '@/components/Chart'
+import UsersChart from '@/components/UsersChart'
 import { Users, UserCheck, FileText, Zap, Calendar, Bell, CheckSquare, ArrowRight, MessageCircle, Send } from 'lucide-react'
 
 interface Stats {
@@ -142,9 +143,10 @@ export default function DashboardPage() {
       {/* Organizer overview */}
       <OrganizerOverview events={calendarEvents} onNavigate={() => router.push('/dashboard/organizer')} />
 
-      {/* Chart */}
-      <div className="mb-8">
+      {/* Charts */}
+      <div className="mb-8 space-y-8">
         <Chart />
+        <UsersChart />
       </div>
     </DashboardLayout>
   )
